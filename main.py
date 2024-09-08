@@ -26,6 +26,8 @@ the invite to that server is at the bottom of https://herodirk.github.io/
 
 This program and related files (Hkinter.py and HSB_minion_data.py) are protected under a GNU GENERAL PUBLIC LICENSE (Version 3)
 Herodirk: I dont want any legal trouble, just ask me for permission if you want to copy parts of the code for your own public projects. Copying for private projects is fine.
+
+Herodirk is not affiliated with Hypixel Inc.
 """
 
 
