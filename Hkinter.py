@@ -7,6 +7,7 @@ A module containing functions to assit in the creation and handling of Tkinter w
 """
 
 import tkinter as tk
+from tkinter import ttk
 import numpy as np
 
 
@@ -21,7 +22,7 @@ color_palettes = {
         "text": "white",
         "selected_text": "black",
         "selection": "light gray"
-        },
+    },
     "dark_red": {
         "background": "black",
         "frame_background": "#100808",
@@ -32,7 +33,18 @@ color_palettes = {
         "text": "white",
         "selected_text": "black",
         "selection": "light gray"
-        },
+    },
+    "light": {
+        "background": "black",
+        "frame_background": "#FFFFFF",
+        "controls_frame": "#FFCF4B",
+        "widget_background": "#FFCA8E",
+        "widget_border": "#FF9E4F",
+        "active_background": "#FF9E4F",
+        "text": "black",
+        "selected_text": "black",
+        "selection": "light gray"
+    },
     "gray_text": {
         "background": "black",
         "frame_background": "#200808",
@@ -43,8 +55,8 @@ color_palettes = {
         "text": "gray",
         "selected_text": "black",
         "selection": "light gray"
-        }
     }
+}
 
 
 #%% Hkinter
@@ -92,6 +104,36 @@ class Hk():
         self.main.frames = {}
         self.main.var_dict = {}
         self.edit_vars_active = False
+
+        self.style = ttk.Style()
+        self.style.theme_create(
+            "minion_calculator", parent="clam",
+            settings={
+                "TCombobox": {
+                    "configure": {
+                        "background": self.main.colors["frame_background"],
+                        "fieldbackground": self.main.colors["widget_background"],
+                        "foreground": self.main.colors["text"],
+                        "selectbackground": self.main.colors["widget_background"],
+                        "selectforeground": self.main.colors["text"],
+                        "arrowcolor": self.main.colors["text"],
+                        "lightcolor": self.main.colors["widget_border"],
+                        "darkcolor": self.main.colors["frame_background"],
+                        "bordercolor": self.main.colors["widget_border"],
+                        "padding": 5
+                    }
+                },
+                "Vertical.TScrollbar" : {
+                    "configure": {
+                        "arrowcolor": self.main.colors["text"],
+                        "background": self.main.colors["widget_border"],
+                        "bordercolor": self.main.colors["widget_background"],
+                        "troughcolor": self.main.colors["frame_background"],
+                    }
+                }
+            }
+        )
+        self.style.theme_use('minion_calculator')
         return
 
     def createControls(self, relControlsHeight=0.07):
@@ -253,7 +295,9 @@ class Hk():
         var = self.defVar(dtype, initial=initial)
         if dtype != bool:
             if len(options) != 0:
-                entry = tk.OptionMenu(frame, var, *options, command=cmd)
+                entry = ttk.Combobox(frame, textvariable=var, values=options, state="readonly", width=1 + len(str(max(options, key=lambda x: len(str(x))))), height=20)
+                if cmd is not None:
+                    entry.bind('<<ComboboxSelected>>', lambda void_event: cmd(var.get()))
             else:
                 entry = tk.Entry(frame, textvariable=var)
         else:
@@ -730,7 +774,7 @@ class Hk():
         self.edit_vars_mainframe = tk.Frame(self.main, background=self.main.colors["background"])
         self.edit_vars_mainframe.place(anchor="c", relx=0.5, rely=0.5, relwidth=0.2, relheight=0.5)
         
-        self.createFrames(self.edit_vars_mainframe, frame_keys=[["edit_vars"]], grid_frames=True, grid_size=0.96, border=0.007, relControlsHeight=0.1)
+        self.createFrames(self.edit_vars_mainframe, frame_keys=[["edit_vars"]], grid_frames=True, grid_size=0.96, border=0.04, relControlsHeight=0.1)
         self.edit_vars_options = tk.Frame(self.edit_vars_mainframe, background=self.main.colors["controls_frame"])
         self.edit_vars_options.place(rely=0.9, relheight=0.1, relwidth=1)
 
