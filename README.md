@@ -3,7 +3,7 @@ Minion Calculator for Hypixel Skyblock Minions
 Made by Herodirk
 
 Notable features:<br>
-| Accuracy supported by research <br>
+| Accuracy supported by research<br>
 | Near infinite customizable setup<br>
 | Corrupt soil calculations<br>
 | Inferno minions calculations<br>
@@ -12,8 +12,8 @@ Notable features:<br>
 Visit https://herodirk.github.io/ for an online manual.<br>
 To start the calculator: run the file `main.py` with a local python interpreter
 
-Bazaar data from https://api.hypixel.net
-AH data from https://sky.coflnet.com/api (currently only Postcard)
+Bazaar data from https://api.hypixel.net<br>
+AH data from https://sky.coflnet.com/data (currently only Postcard)
 
 Current major limitations:<br>
 | Inferno drop chances might be unaccurate<br>
