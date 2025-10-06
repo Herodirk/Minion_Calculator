@@ -1,5 +1,5 @@
-# Minion_Calculator
-Minion Calculator for Hypixel Skyblock Minions
+# Minion Calculator
+Minion Calculator for Hypixel Skyblock Minions<br>
 Made by Herodirk
 
 Notable features:<br>
