@@ -44,7 +44,12 @@ def setup_repay_time(calculator):
     """Outputs the time (in days) it take for a setup to repay itself"""
     totaltime = calculator.variables["time_seconds"]["var"].get()
     setupcost = calculator.variables["setupcost"]["var"].get()
+    if calculator.variables["free_will"]["var"].get():
+        setupcost += calculator.variables["freewillcost"]["var"].get()
     profit = calculator.variables["totalProfit"]["var"].get()
+    if profit < 0:
+        calculator.collect_addon_output("Setup Repay Time", "Negative profit, cannot repay")
+        return
     try:
         profitpersecond = profit / totaltime
         repay_time_s = setupcost / profitpersecond
@@ -56,13 +61,15 @@ def setup_repay_time(calculator):
     return
 
 
-def rising_celsius_override(calculator):
+def rising_celsius_override(calculator, inGUI=True):
     """Forces the rising celsius boost to max"""
     calculator.rising_celsius_override = True
     calculator.calculate()
-    calculator.update_GUI()
+    if inGUI:
+        calculator.update_GUI()
+        calculator.collect_addon_output("Rising Celsius Override", "Forced Rising Celsius boost to max")
+        pass
     calculator.rising_celsius_override = False
-    calculator.collect_addon_output("Rising Celsius Override", "Forced Rising Celsius boost to max")
     return
 
 
@@ -97,12 +104,15 @@ def basic_minion_loop(calculator):
         calculator.calculate()
         calculated_setup_profits[loop_minion] = calculator.variables["totalProfit"]["var"].get()
         calculated_setup_costs[loop_minion] = calculator.variables["setupcost"]["var"].get()
+        if calculator.variables["free_will"]["var"].get():
+            calculated_setup_costs[loop_minion] += calculator.variables["freewillcost"]["var"].get()
     print("Minion : profit , setup cost")
     for _ in range(10):
         top_minion = max(calculated_setup_profits, key=calculated_setup_profits.get)
         print(top_minion, ":", calculator.reduced_number(calculated_setup_profits[top_minion]), ",", calculator.reduced_number(calculated_setup_costs[top_minion]))
         del calculated_setup_profits[top_minion]
     print("\n")
+    calculator.collect_addon_output("Basic Minion Loop", "See terminal")
     return
 
 
@@ -111,7 +121,7 @@ def inferno_minion_loop(calculator):
     calculated_setup_bad_luck_profits = {}
     calculated_setup_costs = {}
 
-    cost_filter = 10000000000
+    cost_filter = 6000000000
     # input the full number as filter, so no abbreviations like "6B"
     # saving this file and restarting the calculator is needed to apply changes.
     # will make this into a good working input in the GUI later.
@@ -126,7 +136,7 @@ def inferno_minion_loop(calculator):
         calculator.variables["miniontier"]["var"].set(loop_tier)
         for loop_amount in loop_amounts:
             calculator.variables["amount"]["var"].set(loop_amount)
-            rising_celsius_override(calculator)
+            rising_celsius_override(calculator, False)
             bad_luck_profit = bad_luck_inferno(calculator, return_value=True)
             cost = calculator.variables["setupcost"]["var"].get()
             if calculator.variables["free_will"]["var"].get():
@@ -142,7 +152,22 @@ def inferno_minion_loop(calculator):
         del calculated_setup_bad_luck_profits[top_minion]
     print(f"Bad Luck Profit: + {calculator.reduced_number(calculator.getPrice('INFERNO_VERTEX', 'sell', 'bazaar'), 2)} per Inferno Vertex")
     print("\n")
+    calculator.collect_addon_output("Inferno Minion Loop", "See terminal")
+    return
 
 
-add_ons_package = {"Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop, "Bad Luck Inferno": bad_luck_inferno, "Rising Celsius Override": rising_celsius_override, "Inferno Minion Loop": inferno_minion_loop}
+def craft_material_amount(calculator):
+    minion = calculator.variables["minion"]["var"].get()
+    tier = calculator.variables["miniontier"]["var"].get()
+    minion_amount = calculator.variables["amount"]["var"].get()
+    materials = md.minionCostSum(minion, tier)
+    extra_costs_string = calculator.variables["extracost"]["var"].get()
+    materials_string = ", ".join([f"{amount * minion_amount} {md.itemList[material]["display"]}" for material, amount in materials.items()])
+    if len(extra_costs_string) != 0:
+        materials_string += ", " + extra_costs_string
+    calculator.collect_addon_output("Minion Crafting Materials", materials_string)
+    return
+
+
+add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop, "Bad Luck Inferno": bad_luck_inferno, "Rising Celsius Override": rising_celsius_override, "Inferno Minion Loop": inferno_minion_loop}
 # "Old Corrupted Frags": old_corrupted_frags
