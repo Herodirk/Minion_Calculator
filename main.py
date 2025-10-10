@@ -17,7 +17,7 @@ Bazaar data from https://api.hypixel.net
 AH data from https://sky.coflnet.com/data (currently only Postcard)
 
 Current major limitations:
-    Inferno drop chances might be unaccurate
+    Inferno drop chances might be inaccurate
     Item prices from AH (like pets) have to be updated manually
     Unconfirmed average wool amount from Enchanted Shears
     For offline calculations of mob minions: Hypixel takes 5 actions to spawn in mobs, this calculator does not account for that
@@ -376,6 +376,7 @@ class Calculator(tk.Tk):
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.hk.toggleSwitch("addons"))
         self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_bazaar)
+        # self.status, self.statusO = self.hk.defVarO(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
         controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.bazaarB, self.addonsB]
         self.hk.fill_arr(controlsGrid, self.frames["controls"])
@@ -1461,6 +1462,11 @@ class Calculator(tk.Tk):
                     upgrade_drops[item] += harvestsPerTime * amount
             elif upgrade_type == "timer":
                 # timer upgrades are like Soulflow Engines
+                # formula for effective_cooldown still in research
+                # if afk_toggle:
+                #     effective_cooldown = 2 * secondsPaction * (1 + np.floor(np.ceil(md.itemList[upgrade]["upgrade"]["special"]["cooldown"] / secondsPaction) / 2))
+                # else:
+                #     effective_cooldown = ???
                 if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrades:
                     continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
                 effective_cooldown = md.itemList[upgrade]["upgrade"]["special"]["cooldown"]
@@ -1669,6 +1675,7 @@ class Calculator(tk.Tk):
                 prices.clear()
                 prices["NPC"] = self.getPrice(itemtype, "sell", "npc")
                 prices["bazaar"] = self.getPrice(itemtype, "sell", "bazaar")
+                # prices["custom"] = self.getPrice(itemtype, "sell", "custom", force=True)  # might use later
                 if sellto in prices:
                     self.variables["itemSellLoc"]["list"][itemtype] = sellto
                     final_price = prices[sellto]
