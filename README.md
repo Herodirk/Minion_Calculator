@@ -16,10 +16,10 @@ Bazaar data from https://api.hypixel.net<br>
 AH data from https://sky.coflnet.com/data (currently only Postcard)
 
 Current major limitations:<br>
-| Inferno drop chances might be unaccurate<br>
+| Inferno drop chances might be inaccurate<br>
 | Item prices from AH (like pets) have to be updated manually<br>
 | Unconfirmed average wool amount from Enchanted Shears<br>
-| For offline calculations of mob minions: Hypixel takes 5 actions to spawn in mobs, this calculator does not account for that<br>
+| +/- spawn actions: Hypixel takes harvests from offline calculation to fill empty spawning spaces when loading the island, this calculator does not account for that<br>
 | Not entirely bazaar manipulation proof<br>
 | Coop Shenanigans is not an actual option (but can still be applied by using the effective wisdom)<br>
 | Player Harvests interacting with minion upgrades is going wrong in every way<br>
@@ -28,7 +28,10 @@ Current major limitations:<br>
 Lesser limitations are listed on the support discord server,<br>
 the invite to that server is at the bottom of https://herodirk.github.io/
 
-This program and related files (Hkinter.py, HSB_minion_data.py and official_calculator_add_ons.py) are protected under a GNU GENERAL PUBLIC LICENSE (Version 3)<br>
+This program, consisting of `main.py`, `Hkinter.py`, `HSB_minion_data.py` and `official_calculator_add_ons.py`, are protected under a GNU GENERAL PUBLIC LICENSE (Version 3).<br>
 Herodirk: I dont want any legal trouble, just ask me for permission if you want to copy parts of the code for your own public projects. Copying for private projects is fine.
 
-Herodirk is not affiliated with Hypixel Inc.
+Herodirk is not affiliated with any of the following:
+- Hypixel Inc.
+- Mojang AB
+- Microsoft Corporation

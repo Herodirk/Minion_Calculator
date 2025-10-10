@@ -4,6 +4,15 @@
 
 Official Minion Calculator Add-ons.
 A collection of add-ons made by Herodirk.
+
+The Official Add-ons include:
+- Minion Crafting
+- Days to Repay Setup
+- Basic Minion Loop
+- Bad Luck Inferno
+- Rising Celsius Override
+- Inferno Minion Loop
+- Old Corrupted Frags (inactive)
 """
 
 import numpy as np

@@ -3,7 +3,7 @@
 @author: Herodirk
 
 Hkinter
-A module containing functions to assit in the creation and handling of Tkinter windows and Tkinter variables
+A module containing functions to assit in the creation and management of Tkinter windows and Tkinter variables
 """
 
 import tkinter as tk

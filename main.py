@@ -3,36 +3,10 @@
 @author: Herodirk
 
 Main file for the minion calculator.
-Notable features:
-    Accuracy supported by research
-    Near infinite customizable setup
-    Corrupt soil calculations
-    Inferno minions calculations
-    Pet leveling with exp share calculations
-    Setup cost calculations
-Visit https://herodirk.github.io/ for an online manual.
 To start the calculator: run this file with a local python interpreter
 
 Bazaar data from https://api.hypixel.net
 AH data from https://sky.coflnet.com/data (currently only Postcard)
-
-Current major limitations:
-    Inferno drop chances might be inaccurate
-    Item prices from AH (like pets) have to be updated manually
-    Unconfirmed average wool amount from Enchanted Shears
-    For offline calculations of mob minions: Hypixel takes 5 actions to spawn in mobs, this calculator does not account for that
-    Not entirely bazaar manipulation proof
-    Coop Shenanigans is not an actual option (but can still be applied by using the effective wisdom)
-    Player Harvests interacting with minion upgrades is going wrong in every way
-    Good Storage logic is just not there
-    Cooldown upgrade logic is using the wrong cooldowns
-Lesser limitations are listed on the support discord server,
-the invite to that server is at the bottom of https://herodirk.github.io/
-
-This program and related files (Hkinter.py, HSB_minion_data.py and official_calculator_add_ons.py) are protected under a GNU GENERAL PUBLIC LICENSE (Version 3)
-Herodirk: I dont want any legal trouble, just ask me for permission if you want to copy parts of the code for your own public projects. Copying for private projects is fine.
-
-Herodirk is not affiliated with Hypixel Inc.
 """
 
 

@@ -4,25 +4,23 @@
 
 File containing data of hypixel skyblock minions.
 Data includes:
-    List of minion related items with skyblock ID, prices and possible gained skill xp
-    Skyblock IDs of minion upgrades
-    Lists of compactor, super compactor and auto smelter transformations, inferno minion chances
-    List of minions with their drop amounts, speed and notes
-    Functions for calculating minion crafting cost
-    List of minion costs
+- List of minion related items with skyblock ID, prices and possible gained skill xp
+- Skyblock IDs of minion upgrades
+- Lists of compactor, super compactor and auto smelter transformations, inferno minion chances
+- List of minions with their drop amounts, speed and notes
+- Functions for calculating minion crafting cost
+- List of minion costs
 
-The prices for minion related items are tagged with "npc" or "custom".
-Bazaar prices are updated in it automatically by the calculator, these are not saved.
-You can fill in anything you want for "custom" prices,
-as long as you share them when sharing calculation results that use them.
+Bazaar data from https://api.hypixel.net
+AH data from https://sky.coflnet.com/data (currently only Postcard)
 
 Items that are not on bazaar will have "# not in bazaar" behind the display name,
 some of these are on the auction house and have "(AH)" behind "# not in bazaar",
 these AH only items must have their custom prices updated manually,
-custom prices for auction house only item last updated on: 2025-10-6
+each of these items has a date behind them showing when they were last updated.
 
-There are a lot of unknown things here, any unknowns are written next to it in #-comments.
-If information has been confirmed, there is "# correct" behind it
+There are a few illogical things here. If information has been confirmed, there is "# correct" behind it with the date of the test.
+If that date is missing, it was confirmed by an old test and might need to be checked again.
 """
 
 from copy import deepcopy
