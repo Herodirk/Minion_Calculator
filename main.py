@@ -21,11 +21,11 @@ try:
     from copy import deepcopy
     import webbrowser
     import HSB_minion_data as md
-    import Hkinter
+    import Hero_UI_Manager
     import official_calculator_add_ons as Hero_addons
 except ModuleNotFoundError as import_error:
     missing_package = import_error.name
-    if missing_package in ["HSB_minion_data", "Hkinter", "official_calculator_add_ons"]:
+    if missing_package in ["HSB_minion_data", "Hero_UI_Manager", "official_calculator_add_ons"]:
         print(f"Could not find calculator file {missing_package}.py,\nplease make sure all the calculator files are in the same folder.")
     else:
         print(f"Could not find {missing_package} module,\nplease install this module using PIP")
@@ -187,15 +187,15 @@ reduced_amounts = {0: "", 1: "k", 2: "M", 3: "B", 4: "T", 5: "Qd"}
 class Calculator(tk.Tk):
     def __init__(self):
         super().__init__()
-        # Use Hkinter to initialize the window and the frames with grids
-        self.hk = Hkinter.Hk(main=self, version="MINION", windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
-        print("BOOTING: Hkinter loaded")
-        self.hk.createControls()
-        self.hk.createFrames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
+        # Use Hero UI Manager to initialize the window and the frames with grids
+        self.huim = Hero_UI_Manager.H_UI_M(main=self, version="MINION", windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
+        print("BOOTING: Hero UI Manager loaded")
+        self.huim.createControls()
+        self.huim.createFrames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
-        self.hk.createFrames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
+        self.huim.createFrames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
         print("BOOTING: Framework set up")
-        self.version = self.hk.defVar(dtype=float, initial=1.1)
+        self.version = self.huim.defVar(dtype=float, initial=1.1)
         print(f"BOOTING: Calculator version {self.version.get()}")
 
         # The calculator stores all important variables into this dict
@@ -221,13 +221,13 @@ class Calculator(tk.Tk):
             "upgrade1": {"vtype": "input", "dtype": str, "display": "Upgrade 1", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.upgrade_options.keys()), "command": None},
             "upgrade2": {"vtype": "input", "dtype": str, "display": "Upgrade 2", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.upgrade_options.keys()), "command": None},
             "chest": {"vtype": "input", "dtype": str, "display": "Chest", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.minion_chests.keys()), "command": None},
-            "beacon": {"vtype": "input", "dtype": int, "display": "Beacon", "frame": "inputs_minion_grid", "initial": 0, "options": [0, 1, 2, 3, 4, 5], "command": self.hk.createSwitchCall("beacon", controlvar="self")},
+            "beacon": {"vtype": "input", "dtype": int, "display": "Beacon", "frame": "inputs_minion_grid", "initial": 0, "options": [0, 1, 2, 3, 4, 5], "command": self.huim.createSwitchCall("beacon", controlvar="self")},
             "scorched": {"vtype": "input", "dtype": bool, "display": "Scorched", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
             "B_constant": {"vtype": "input", "dtype": bool, "display": "Free Fuel Beacon", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
             "B_acquired": {"vtype": "input", "dtype": bool, "display": "Acquired Beacon", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
             "infusion": {"vtype": "input", "dtype": bool, "display": "Infusion", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
             "crystal": {"vtype": "input", "dtype": str, "display": "Crystal", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.floating_crystals.keys()), "command": None},
-            "free_will": {"vtype": "input", "dtype": bool, "display": "Free Will", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": self.hk.createSwitchCall("free_will", controlvar="free_will")},
+            "free_will": {"vtype": "input", "dtype": bool, "display": "Free Will", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": self.huim.createSwitchCall("free_will", controlvar="free_will")},
             "postcard": {"vtype": "input", "dtype": bool, "display": "Postcard", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
             "afk": {"vtype": "input", "dtype": bool, "display": "AFK", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": lambda: self.multiswitch("afk", None)},
             "afkpet": {"vtype": "input", "dtype": str, "display": "AFK Pet", "frame": "inputs_player_grid", "initial": "None", "options": list(md.boost_pets.keys()), "command": None},
@@ -256,11 +256,11 @@ class Calculator(tk.Tk):
             "expsharepetslot2": {"vtype": "input", "dtype": str, "display": "Exp Share pet 2", "frame": "inputs_player_grid", "initial": "None", "options": list(md.all_pets.keys()), "command": None},
             "expsharepetslot3": {"vtype": "input", "dtype": str, "display": "Exp Share pet 3", "frame": "inputs_player_grid", "initial": "None", "options": list(md.all_pets.keys()), "command": None},
             "expshareitem": {"vtype": "input", "dtype": bool, "display": "Exp Share pet item", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": None},
-            "often_empty": {"vtype": "input", "dtype": bool, "display": "Empty Often", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": self.hk.createSwitchCall("emptytime", controlvar="often_empty")},
-            "sellLoc": {"vtype": "input", "dtype": str, "display": "Sell Location", "frame": "inputs_player_grid", "initial": "Best (NPC/Bazaar)", "options": ["Best (NPC/Bazaar)", "Bazaar", "Hopper", "NPC"], "command": self.hk.createSwitchCall("NPC_Bazaar", controlvar="self")},
+            "often_empty": {"vtype": "input", "dtype": bool, "display": "Empty Often", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": self.huim.createSwitchCall("emptytime", controlvar="often_empty")},
+            "sellLoc": {"vtype": "input", "dtype": str, "display": "Sell Location", "frame": "inputs_player_grid", "initial": "Best (NPC/Bazaar)", "options": ["Best (NPC/Bazaar)", "Bazaar", "Hopper", "NPC"], "command": self.huim.createSwitchCall("NPC_Bazaar", controlvar="self")},
             "bazaar_sell_type": {"vtype": "input", "dtype": str, "display": "Bazaar sell type", "frame": "inputs_player_grid", "initial": "Sell Offer", "options": list(md.bazaar_sell_types.keys()), "command": None},
             "bazaar_buy_type": {"vtype": "input", "dtype": str, "display": "Bazaar buy type", "frame": "inputs_player_grid", "initial": "Buy Order", "options": list(md.bazaar_buy_types.keys()), "command": None},
-            "bazaar_taxes": {"vtype": "input", "dtype": bool, "display": "Bazaar taxes", "frame": "inputs_player_grid", "initial": True, "options": [False, True], "command": self.hk.createSwitchCall("bazaar_tax", controlvar="bazaar_taxes")},
+            "bazaar_taxes": {"vtype": "input", "dtype": bool, "display": "Bazaar taxes", "frame": "inputs_player_grid", "initial": True, "options": [False, True], "command": self.huim.createSwitchCall("bazaar_tax", controlvar="bazaar_taxes")},
             "bazaar_flipper": {"vtype": "input", "dtype": int, "display": "Bazaar Flipper", "frame": "inputs_player_grid", "initial": 1, "options": [0, 1, 2], "command": None},
             "ID": {"vtype": "output", "dtype": str, "display": "Setup ID", "frame": "outputs_setup_grid", "initial": "", "switch_initial": True},
             "ID_container": {"vtype": "list", "display": "ID", "frame": "outputs_setup_grid", "w": 35, "h": 1, "list": [], "switch_initial": False, "IDtoDisplay": False},
@@ -292,55 +292,55 @@ class Calculator(tk.Tk):
         }
 
         # determining input/output types according to "vtype", "noWidget" and "switch_initial"
-        # the other values are send to Hkinter. Hkinter creates the Tkinter variable and widgets (stored in "var" and "widget" respectively)
+        # the other values are send to Hero UI Manager. Hero UI Manager creates the Tkinter variable and widgets (stored in "var" and "widget" respectively)
         for var_key, var_data in self.variables.items():
             if var_data["vtype"] == "input" and "noWidget" not in var_data:
-                var_data["var"], var_data["widget"] = self.hk.defVarI(dtype=var_data["dtype"], frame=self.frames[var_data["frame"]],
+                var_data["var"], var_data["widget"] = self.huim.defVarI(dtype=var_data["dtype"], frame=self.frames[var_data["frame"]],
                                                                       L_text=f"{var_data['display']}:", initial=var_data["initial"],
                                                                       options=var_data["options"], cmd=var_data["command"])
             elif var_data["vtype"] == "output":
-                var_data["var"], var_data["widget"] = self.hk.defVarO(dtype=var_data["dtype"], frame=self.frames[var_data["frame"]],
+                var_data["var"], var_data["widget"] = self.huim.defVarO(dtype=var_data["dtype"], frame=self.frames[var_data["frame"]],
                                                                       L_text=f"{var_data['display']}:", initial=var_data["initial"])
             elif var_data["vtype"] == "input" and "noWidget" in var_data:
-                var_data["var"] = self.hk.defVar(dtype=var_data["dtype"], initial=var_data["initial"])
+                var_data["var"] = self.huim.defVar(dtype=var_data["dtype"], initial=var_data["initial"])
             elif var_data["vtype"] == "list":
-                var_data["var"], var_data["widget"] = self.hk.defListO(frame=self.frames[var_data["frame"]], L_text=f"{var_data['display']}:", h=var_data["h"], w=var_data["w"])
+                var_data["var"], var_data["widget"] = self.huim.defListO(frame=self.frames[var_data["frame"]], L_text=f"{var_data['display']}:", h=var_data["h"], w=var_data["w"])
             elif var_data["vtype"] == "storage":
-                var_data["var"] = self.hk.defVar(dtype=var_data["dtype"], initial=var_data["initial"])
+                var_data["var"] = self.huim.defVar(dtype=var_data["dtype"], initial=var_data["initial"])
             if "switch_initial" in var_data:
-                self.variables[var_key]["output_switch"], widget = self.hk.defVarI(dtype=bool, frame=self.frames[self.variables[var_key]["frame"]], L_text="", initial=self.variables[var_key]["switch_initial"])
+                self.variables[var_key]["output_switch"], widget = self.huim.defVarI(dtype=bool, frame=self.frames[self.variables[var_key]["frame"]], L_text="", initial=self.variables[var_key]["switch_initial"])
                 var_data["widget"].append(widget[-1])
 
         # define left over Tkinter variables and widgets that didnt fit in self.variables
-        self.template, self.templateI = self.hk.defVarI(dtype=str, frame=self.frames["inputs_minion_grid"], L_text="Templates:", initial="Choose Template", options=list(templateList.keys()), cmd=self.load_template)
-        self.loadID, self.loadIDI = self.hk.defVarI(dtype=str, frame=self.frames["inputs_minion_grid"], L_text="Load ID:")
+        self.template, self.templateI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_minion_grid"], L_text="Templates:", initial="Choose Template", options=list(templateList.keys()), cmd=self.load_template)
+        self.loadID, self.loadIDI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_minion_grid"], L_text="Load ID:")
 
         for skill in ['combat', 'mining', 'farming', 'fishing', 'foraging', 'alchemy']:
             self.variables["wisdom"]["list"][skill] = self.variables[f"{skill}Wisdom"]["var"]
-        self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.hk.edit_vars(self.update_GUI_wisdom, ["combatWisdom", "miningWisdom", "farmingWisdom", "fishingWisdom", "foragingWisdom", "alchemyWisdom"]))
+        self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(self.update_GUI_wisdom, ["combatWisdom", "miningWisdom", "farmingWisdom", "fishingWisdom", "foragingWisdom", "alchemyWisdom"]))
         self.wisdomB.place(in_=self.variables["wisdom"]["widget"][-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.rising_celsius_override = False
 
-        self.emptytimeamount, self.emptytimeamountI = self.hk.defVarI(dtype=float, frame=self.frames["inputs_player_grid"], L_text="Empty Time span:", initial=1.0)
-        self.emptytimelength, self.emptytimelengthI = self.hk.defVarI(dtype=str, frame=self.frames["inputs_player_grid"], L_text="Empty Time Length:", initial="Days", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.emptytimeamount, self.emptytimeamountI = self.huim.defVarI(dtype=float, frame=self.frames["inputs_player_grid"], L_text="Empty Time span:", initial=1.0)
+        self.emptytimelength, self.emptytimelengthI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_player_grid"], L_text="Empty Time Length:", initial="Days", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.emptytimelengthI[-1].place(in_=self.emptytimeamountI[-1], relx=1, x=3, rely=0.5, anchor='w')
 
-        self.totaltimeamount, self.totaltimeamountI = self.hk.defVarI(dtype=float, frame=self.frames["inputs_player_grid"], L_text="Total Time span:", initial=1.0)
-        self.totaltimelength, self.totaltimelengthI = self.hk.defVarI(dtype=str, frame=self.frames["inputs_player_grid"], L_text="Total Time Length:", initial="Days", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.totaltimeamount, self.totaltimeamountI = self.huim.defVarI(dtype=float, frame=self.frames["inputs_player_grid"], L_text="Total Time span:", initial=1.0)
+        self.totaltimelength, self.totaltimelengthI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_player_grid"], L_text="Total Time Length:", initial="Days", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.totaltimelengthI[-1].place(in_=self.totaltimeamountI[-1], relx=1, x=3, rely=0.5, anchor='w')
 
-        self.notesAnchor = self.hk.genLabel(frm=self.frames["outputs_setup_grid"], txt="")
+        self.notesAnchor = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="")
 
         print("BOOTING: self.variables initialized")
 
         # Create widgets for controls menu and placing them
-        self.creditLB = self.hk.genLabel(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
+        self.creditLB = self.huim.genLabel(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
         self.creditLB.place(in_=self.stopB, x=-10, rely=0.5, y=-1, anchor="e")
-        self.manualLB = self.hk.genLabel(frm=self.frames["controls"], txt="Online Manual:\nCalculator Manual")
+        self.manualLB = self.huim.genLabel(frm=self.frames["controls"], txt="Online Manual:\nCalculator Manual")
         self.manualLB.place(in_=self.creditLB, x=-10, rely=0.5, anchor="e")
         self.manualLB.bind("<Button-1>", lambda void_event: webbrowser.open(r"https://herodirk.github.io/"))
-        self.API_creditLB = self.hk.genLabel(frm=self.frames["controls"], txt="Bazaar data from Hypixel API,\nAH data from SkyCofl API")
+        self.API_creditLB = self.huim.genLabel(frm=self.frames["controls"], txt="Bazaar data from Hypixel API,\nAH data from SkyCofl API")
         self.API_creditLB.place(in_=self.manualLB, x=-10, rely=0.5, anchor="e")
         self.API_creditLB.bind("<Button-1>", lambda click_event: webbrowser.open(r"https://api.hypixel.net/") if click_event.y < 18 else webbrowser.open(r"https://sky.coflnet.com/data"))
 
@@ -348,27 +348,27 @@ class Calculator(tk.Tk):
         self.fancyoutputB = tk.Button(self.frames["controls"], text='Share Output', command=self.fancyOutput)
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
-        self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.hk.toggleSwitch("addons"))
+        self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggleSwitch("addons"))
         self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_bazaar)
-        # self.status, self.statusO = self.hk.defVarO(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
+        # self.status, self.statusO = self.huim.defVarO(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
         controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.bazaarB, self.addonsB]
-        self.hk.fill_arr(controlsGrid, self.frames["controls"])
+        self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
-        miniontitleLB = self.hk.genLabel(frm=self.frames["inputs_minion_grid"], txt="\nMinion options")
-        islandtitleLB = self.hk.genLabel(frm=self.frames["inputs_minion_grid"], txt="\nIsland options")
-        playertitleLB = self.hk.genLabel(frm=self.frames["inputs_player_grid"], txt="Player options")
-        timingtitleLB = self.hk.genLabel(frm=self.frames["inputs_player_grid"], txt="\nTime options")
-        markettitleLB = self.hk.genLabel(frm=self.frames["inputs_player_grid"], txt="\nMarket options")
-        setupoutputsLB = self.hk.genLabel(frm=self.frames["outputs_setup_grid"], txt="Setup Information")
-        setupprintLB = self.hk.genLabel(frm=self.frames["outputs_setup_grid"], txt="Share")
-        minionoutputsLB = self.hk.genLabel(frm=self.frames["outputs_setup_grid"], txt="Minion Outputs")
-        minionprintLB = self.hk.genLabel(frm=self.frames["outputs_setup_grid"], txt="Share")
-        profitoutputsLB = self.hk.genLabel(frm=self.frames["outputs_profit_grid"], txt="Profit Outputs")
-        profitprintLB = self.hk.genLabel(frm=self.frames["outputs_profit_grid"], txt="Share")
-        addonsprintLB = self.hk.genLabel(frm=self.frames["addons_output_grid"], txt="Share")
-        addonsoutputsLB = self.hk.genLabel(frm=self.frames["addons_output_grid"], txt="Add-on Outputs")
+        miniontitleLB = self.huim.genLabel(frm=self.frames["inputs_minion_grid"], txt="\nMinion options")
+        islandtitleLB = self.huim.genLabel(frm=self.frames["inputs_minion_grid"], txt="\nIsland options")
+        playertitleLB = self.huim.genLabel(frm=self.frames["inputs_player_grid"], txt="Player options")
+        timingtitleLB = self.huim.genLabel(frm=self.frames["inputs_player_grid"], txt="\nTime options")
+        markettitleLB = self.huim.genLabel(frm=self.frames["inputs_player_grid"], txt="\nMarket options")
+        setupoutputsLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Setup Information")
+        setupprintLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Share")
+        minionoutputsLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Minion Outputs")
+        minionprintLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Share")
+        profitoutputsLB = self.huim.genLabel(frm=self.frames["outputs_profit_grid"], txt="Profit Outputs")
+        profitprintLB = self.huim.genLabel(frm=self.frames["outputs_profit_grid"], txt="Share")
+        addonsprintLB = self.huim.genLabel(frm=self.frames["addons_output_grid"], txt="Share")
+        addonsoutputsLB = self.huim.genLabel(frm=self.frames["addons_output_grid"], txt="Add-on Outputs")
 
         # Defining the order of widgets and placing them for all the grids
         self.grids = {
@@ -411,7 +411,7 @@ class Calculator(tk.Tk):
                 "wisdom": self.variables["wisdom"]["widget"],
                 "mayor": self.variables["mayor"]["widget"],
                 "levelingpet": self.variables["levelingpet"]["widget"],
-                "toggle_levelingpet_options": [None, self.hk.createShowHideToggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
+                "toggle_levelingpet_options": [None, self.huim.createShowHideToggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
                 "taming": self.variables["taming"]["widget"],
                 "falcon_attribute": self.variables["falcon_attribute"]["widget"],
                 "petxpboost": self.variables["petxpboost"]["widget"],
@@ -469,7 +469,7 @@ class Calculator(tk.Tk):
             },
         }
         for grid_key in self.grids.keys():
-            self.hk.fill_grid(self.grids[grid_key].values(), self.frames[grid_key])
+            self.huim.fill_grid(self.grids[grid_key].values(), self.frames[grid_key])
 
         self.variables["notes"]["widget"][1].place(in_=self.notesAnchor, relx=1, x=5, rely=0, anchor='nw')
         self.variables["notes"]["widget"][1].tkraise()
@@ -482,46 +482,46 @@ class Calculator(tk.Tk):
             addon_name, addon_function = addon_info
             button_function = lambda func=addon_function: func(self)
             self.addons_buttons[addon_name] = tk.Button(self.frames["addons_buttons_grid"], text=addon_name, command=button_function)
-            self.addons_auto_run[addon_name], widget = self.hk.defVarI(dtype=bool, frame=self.frames["addons_buttons_grid"], L_text="", initial=False)
+            self.addons_auto_run[addon_name], widget = self.huim.defVarI(dtype=bool, frame=self.frames["addons_buttons_grid"], L_text="", initial=False)
             widget[-1].place(in_=self.addons_buttons[addon_name], anchor="w", relx=1, rely=0.5, x=10)
             self.addons_buttons[addon_name].grid(row=number % 8, column=(int(number / 8)) * 2)
 
         print("BOOTING: Widgets placed")
 
-        # Create switches with Hkinter for the extended minion options
-        self.hk.defSwitch("pet_leveling", [*self.variables["taming"]["widget"], *self.variables["petxpboost"]["widget"], *self.variables["beastmaster"]["widget"],
+        # Create switches with Hero UI Manager for the extended minion options
+        self.huim.defSwitch("pet_leveling", [*self.variables["taming"]["widget"], *self.variables["petxpboost"]["widget"], *self.variables["beastmaster"]["widget"],
                                            *self.variables["expsharepet"]["widget"], *self.variables["expshareitem"]["widget"],
                                            *self.variables["pets_levelled"]["widget"], *self.variables["petProfit"]["widget"],
                                            *self.variables["falcon_attribute"]["widget"], *self.variables["toucan_attribute"]["widget"]],
                           loc="grid", control="None", negate=True, initial=False)
-        self.hk.defSwitch("exp_share_diana", [*self.variables["expsharepetslot2"]["widget"], *self.variables["expsharepetslot3"]["widget"]],
+        self.huim.defSwitch("exp_share_diana", [*self.variables["expsharepetslot2"]["widget"], *self.variables["expsharepetslot3"]["widget"]],
                           loc="grid", control="DianaTrue", negate=False, initial=False)
-        self.hk.defSwitch("NPC_Bazaar", [*self.variables["itemSellLoc"]["widget"]],
+        self.huim.defSwitch("NPC_Bazaar", [*self.variables["itemSellLoc"]["widget"]],
                           loc="grid", control="Best (NPC/Bazaar)", negate=False, initial=True)
-        self.hk.defSwitch("infernofuel", [*self.variables["infernoGrade"]["widget"], *self.variables["infernoDistillate"]["widget"], *self.variables["infernoEyedrops"]["widget"]],
+        self.huim.defSwitch("infernofuel", [*self.variables["infernoGrade"]["widget"], *self.variables["infernoDistillate"]["widget"], *self.variables["infernoEyedrops"]["widget"]],
                           loc="grid", control="Inferno Minion Fuel", negate=False, initial=False)
-        self.hk.defSwitch("beacon", [*self.variables["scorched"]["widget"], *self.variables["B_constant"]["widget"], *self.variables["B_acquired"]["widget"]],
+        self.huim.defSwitch("beacon", [*self.variables["scorched"]["widget"], *self.variables["B_constant"]["widget"], *self.variables["B_acquired"]["widget"]],
                           loc="grid", control=0, negate=True, initial=False)
-        self.hk.defSwitch("potato", [*self.variables["potatoTalisman"]["widget"]],
+        self.huim.defSwitch("potato", [*self.variables["potatoTalisman"]["widget"]],
                           loc="grid", control="PotatoTrue", negate=False, initial=False)
-        self.hk.defSwitch("bazaar_tax", [*self.variables["bazaar_flipper"]["widget"]],
+        self.huim.defSwitch("bazaar_tax", [*self.variables["bazaar_flipper"]["widget"]],
                           loc="grid", control=1, negate=False, initial=True)
-        self.hk.defSwitch("afking", [*self.variables["afkpet"]["widget"], *self.variables["afkpetrarity"]["widget"], *self.variables["afkpetlvl"]["widget"],
+        self.huim.defSwitch("afking", [*self.variables["afkpet"]["widget"], *self.variables["afkpetrarity"]["widget"], *self.variables["afkpetlvl"]["widget"],
                                      *self.variables["enchanted_clock"]["widget"], *self.variables["specialLayout"]["widget"],
                                      *self.variables["playerHarvests"]["widget"], *self.variables["playerLooting"]["widget"]],
                           loc="grid", control=True, negate=False, initial=False)
-        self.hk.defSwitch("fuel_amount", [*self.variables["fuelamount"]["widget"]],
+        self.huim.defSwitch("fuel_amount", [*self.variables["fuelamount"]["widget"]],
                           loc="grid", control=0, negate=True, initial=False)
-        self.hk.defSwitch("emptytime", [*self.emptytimeamountI, *self.variables["emptytime"]["widget"]],
+        self.huim.defSwitch("emptytime", [*self.emptytimeamountI, *self.variables["emptytime"]["widget"]],
                           loc="grid", control=True, negate=False, initial=False)
-        self.hk.defSwitch("free_will", [*self.variables["freewillcost"]["widget"]],
+        self.huim.defSwitch("free_will", [*self.variables["freewillcost"]["widget"]],
                           loc="grid", control=True, negate=False, initial=False)
-        self.hk.defSwitch(ID="addons", obj=self.frames["addons_main"],
+        self.huim.defSwitch(ID="addons", obj=self.frames["addons_main"],
                           loc={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
         
         # Show/Hide toggle buttons for large amount of extended options
-        self.hk.createShowHideToggle("afk", "afking")
-        self.hk.createShowHideToggle("beacon", "beacon")
+        self.huim.createShowHideToggle("afk", "afking")
+        self.huim.createShowHideToggle("beacon", "beacon")
         
         print("BOOTING: Switches activated")
 
@@ -679,7 +679,7 @@ class Calculator(tk.Tk):
 
     def multiswitch(self, multi_ID, control):
         """
-        Function for switches that were too complicated for Hkinter to handle.
+        Function for switches that were too complicated for Hero UI Manager to handle.
 
         Parameters
         ----------
@@ -697,22 +697,22 @@ class Calculator(tk.Tk):
             if type(control) == str or self.variables["miniontier"]["var"].get() not in md.minionList[self.variables["minion"]["var"].get()]["speed"].keys():
                 self.variables["miniontier"]["var"].set(list(md.minionList[self.variables["minion"]["var"].get()]["speed"].keys())[-1])
             if type(control) == str:
-                self.hk.toggleSwitch("potato", control + str(self.variables["afk"]["var"].get()))
+                self.huim.toggleSwitch("potato", control + str(self.variables["afk"]["var"].get()))
         elif multi_ID == "fuel":
-            self.hk.toggleSwitch("infernofuel", control)
-            self.hk.toggleSwitch("fuel_amount", md.itemList[md.fuel_options[control]]["upgrade"]["duration"])
+            self.huim.toggleSwitch("infernofuel", control)
+            self.huim.toggleSwitch("fuel_amount", md.itemList[md.fuel_options[control]]["upgrade"]["duration"])
         elif multi_ID == "afk":
             afkState = self.variables["afk"]["var"].get()
-            self.hk.toggleSwitch("afking", afkState)
-            self.hk.toggleSwitch("potato", self.variables["minion"]["var"].get() + str(afkState))
+            self.huim.toggleSwitch("afking", afkState)
+            self.huim.toggleSwitch("potato", self.variables["minion"]["var"].get() + str(afkState))
         elif multi_ID == "pet_leveling":
-            self.hk.toggleSwitch("pet_leveling", control)
+            self.huim.toggleSwitch("pet_leveling", control)
             mayor = self.variables["mayor"]["var"].get()
             pet_leveling_state = self.switches["pet_leveling"]["state"]
-            self.hk.toggleSwitch("exp_share_diana", mayor + str(pet_leveling_state))
+            self.huim.toggleSwitch("exp_share_diana", mayor + str(pet_leveling_state))
         elif multi_ID == "mayors":
             pet_leveling_state = self.switches["pet_leveling"]["state"]
-            self.hk.toggleSwitch("exp_share_diana", control + str(pet_leveling_state))
+            self.huim.toggleSwitch("exp_share_diana", control + str(pet_leveling_state))
         return
 
     def load_template(self, templateName):
