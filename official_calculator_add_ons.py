@@ -31,6 +31,17 @@ def old_corrupted_frags(calculator):
     return
 
 
+def old_enchanted_hopper(calculator):
+    # This Add-on is inactive, to turn it back on add this function to `add_ons_package` at the bottom of this file.
+    """Outputs the total profit for the old sell rate of Enchanted Hoppers"""
+    if calculator.variables["hopper"]["var"].get() != "Enchanted Hopper" or calculator.variables["sellLoc"]["var"].get() != "Hopper":
+        calculator.collect_addon_output("Old Enchanted Hopper profit", "Setup does not use Enchanted Hoppers")
+        return
+    profit = calculator.variables["totalProfit"]["var"].get()
+    calculator.collect_addon_output("Old Enchanted Hopper profit", f"{calculator.reduced_number(profit * (9 / 7), 2)}")
+    return
+
+
 def bad_luck_inferno(calculator, return_value=False):
     """Outputs the profit of the common Hypergolic drops and the price per Inferno Vertex"""
     if calculator.variables["fuel"]["var"].get() != "Inferno Minion Fuel":
@@ -180,3 +191,4 @@ def craft_material_amount(calculator):
 
 add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop, "Bad Luck Inferno": bad_luck_inferno, "Rising Celsius Override": rising_celsius_override, "Inferno Minion Loop": inferno_minion_loop}
 # "Old Corrupted Frags": old_corrupted_frags
+# "Old Enchanted Hopper": old_enchanted_hopper
