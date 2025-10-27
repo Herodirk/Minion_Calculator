@@ -2198,7 +2198,7 @@ minionList = {
         "speed": { 1: 25, 2: 25, 3: 23, 4: 23, 5: 21, 6: 21, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13, 12: 11 }
     },
     "Gravel": {
-        "drops": { "GRAVEL": 1 },
+        "drops": { "GRAVEL": 0.9, "FLINT": 0.1 },
         "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 },
         "storage": { 1: 2, 2: 4, 3: 4 },
         "notes": { "Special Layout": "only spawn (gravity blocks)" }
@@ -2319,17 +2319,17 @@ minionList = {
         "speed": { 1: 22, 2: 22, 3: 20, 4: 20, 5: 18, 6: 18, 7: 16, 8: 16, 9: 14.5, 10: 14.5, 11: 12, 12: 9 }
     },
     "Nether Wart": {
-        "drops": { "NETHER_STALK": 3 },
+        "drops": { "NETHER_STALK": 2.5 },  # correct (2025-10-18)
         "speed": { 1: 50, 2: 50, 3: 47, 4: 47, 5: 44, 6: 44, 7: 41, 8: 41, 9: 38, 10: 38, 11: 32, 12: 27 }
     },
     "Flower": {
-        "drops": { "YELLOW_FLOWER": 1 / 14, "RED_ROSE": 1 / 14, "SMALL_FLOWER": 8 / 14, "LARGE_FLOWER": 4 / 14 },
+        "drops": { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 },  # correct (2025-10-20)
         "speed": { 1: 30, 2: 29, 3: 28, 4: 27, 5: 26, 6: 25, 7: 24, 8: 23, 9: 22, 10: 20, 11: 18, 12: 15 },
         "storage": { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15, 9: 15, 10: 15, 11: 15, 12: 15 },
         "notes": { "Special Layout": "only spawn, no large flowers (water flushing, low roof)" }
     },
     "Fishing": {
-        "drops": { "RAW_FISH": 0.5, "RAW_FISH:1": 0.25, "RAW_FISH:3": 0.12, "RAW_FISH:2": 0.04, "PRISMARINE_CRYSTALS": 0.03, "PRISMARINE_SHARD": 0.03, "SPONGE": 0.03 },
+        "drops": { "RAW_FISH": 0.54, "RAW_FISH:1": 0.225, "RAW_FISH:3": 0.117, "RAW_FISH:2": 0.036, "PRISMARINE_CRYSTALS": (2 + (11 / 15)) / 100, "PRISMARINE_SHARD": (2 + (11 / 15)) / 100, "SPONGE": (2 + (11 / 15)) / 100 },  # good average (2025-10-24)
         "speed": { 1: 75, 2: 75, 3: 67, 4: 67, 5: 59, 6: 59, 7: 51, 8: 51, 9: 43, 10: 43, 11: 35, 12: 30 },
         "storage": { 1: 10, 2: 10, 3: 10, 4: 11, 5: 11, 6: 12, 7: 12, 8: 13, 9: 13, 10: 14, 11: 15 },
         "notes": { "Always": "only harvests" }

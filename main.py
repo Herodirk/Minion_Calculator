@@ -1363,12 +1363,26 @@ class Calculator(tk.Tk):
                 md.minionList[minion_type]["drops"][md.getID[f"{minion_type} Log"]] = 4
             else:
                 md.minionList[minion_type]["drops"][md.getID[f"{minion_type} Log"]] = 3
+        if minion_type == "Gravel":
+            if afk_toggle:
+                # vanilla minecraft chance for gravel to become flint
+                md.minionList[minion_type]["drops"]["GRAVEL"] = 0.9
+                md.minionList[minion_type]["drops"]["FLINT"] = 0.1
+            else:
+                md.minionList[minion_type]["drops"]["GRAVEL"] = 1
+                md.minionList[minion_type]["drops"]["FLINT"] = 0
+        if minion_type == "Pumpkin":
+            if afk_toggle:
+                # it just does this, idk, ask Hypixel
+                md.minionList[minion_type]["drops"]["PUMPKIN"] = 1
+            else:
+                md.minionList[minion_type]["drops"]["PUMPKIN"] = 3
         if minion_type == "Flower":
             if afk_toggle and self.variables["specialLayout"]["var"].get():
-                # tall flows blocked by string
-                md.minionList[minion_type]["drops"] = {"YELLOW_FLOWER": 1 / 10, "RED_ROSE": 1 / 10, "SMALL_FLOWER": 8 / 10}
+                # tall flowers blocked by low ceiling
+                md.minionList[minion_type]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 0.5 }
             else:
-                md.minionList[minion_type]["drops"] = {"YELLOW_FLOWER": 1 / 14, "RED_ROSE": 1 / 14, "SMALL_FLOWER": 8 / 14, "LARGE_FLOWER": 4 / 14}
+                md.minionList[minion_type]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 }
 
         # calculate final minion speed
         base_speed = md.minionList[minion_type]["speed"][minion_tier]
@@ -1415,7 +1429,10 @@ class Calculator(tk.Tk):
                 items = list(self.variables["items"]["list"].keys())
                 for item in items:
                     if item in md.itemList[upgrade]["upgrade"]["special"]["list"]:
-                        self.variables["items"]["list"][md.itemList[upgrade]["upgrade"]["special"]["list"][item]] = self.variables["items"]["list"].pop(item)
+                        replacement_item = md.itemList[upgrade]["upgrade"]["special"]["list"][item]
+                        if replacement_item not in self.variables["items"]["list"]:
+                            self.variables["items"]["list"][replacement_item] = 0
+                        self.variables["items"]["list"][replacement_item] += self.variables["items"]["list"].pop(item)
             if upgrade_type == "generate":
                 # generating upgrades are like Diamond Spreadings
                 finalAmount = 0
