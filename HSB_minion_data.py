@@ -2014,7 +2014,7 @@ standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10:
 hopper_data = {
     "None": 1,
     "Budget Hopper": 0.5,
-    "Enchanted Hopper": 0.9,
+    "Enchanted Hopper": 0.7,
 }
 
 #%% Mayors
