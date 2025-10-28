@@ -794,6 +794,9 @@ class Calculator(tk.Tk):
             if var_key == "bazaar_update_txt":
                 string_parts["bazaar_update_txt"] = f'Bazaar info: {self.variables["bazaar_sell_type"]["var"].get()}, {self.variables["bazaar_buy_type"]["var"].get()}, Last updated at {self.variables["bazaar_update_txt"]["var"].get()}'
                 continue
+            if var_key == "extracost":
+                if self.variables["setupcost"]["output_switch"].get() is False:
+                    continue
 
             vtype = self.variables[var_key]["vtype"]
             display = self.variables[var_key]["display"]
@@ -827,7 +830,7 @@ class Calculator(tk.Tk):
                     string_parts[var_key] = f'Inferno Minion Fuel ({self.variables["infernoGrade"]["var"].get()}, {self.variables["infernoDistillate"]["var"].get()}, Capcaisin: {self.variables["infernoEyedrops"]["var"].get()})'
                 else:
                     string_parts[var_key] = f"{val}"
-            elif vtype == "output":
+            else:
                 if dtype in [int, float]:
                     string_parts[var_key] = f"{display}: {self.reduced_number(val)}"
                 else:
@@ -901,6 +904,11 @@ class Calculator(tk.Tk):
                 val = f"`{self.variables[var_key]['display']}`"
             else:
                 return None
+        elif var_key == "extracost":  # special case: setup cost is turned off
+            if self.variables["setupcost"]["output_switch"].get() is False:
+                return None
+            else:
+                val = f"`{self.variables[var_key]['var'].get()}`"
         elif var_key == "ID":  # special case: spoiler lines around setup ID
             val = f"||{self.variables[var_key]['var'].get()}||".replace("\\", r"\\")
         elif self.variables[var_key]["vtype"] == "list":
