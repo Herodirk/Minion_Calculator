@@ -64,7 +64,7 @@ color_palettes = {
 class H_UI_M():
     def __init__(self, main, version, windowTitle, windowWidth, windowHeight, palette="dark"):
         """
-        Hk: Hero UI Manager, main class for Hero UI Manager functions
+        H_UI_M: Hero UI Manager, main class for Hero UI Manager functions
         Initializes Hero UI Manager. Sets the chosen color palette. Configures the main window. Creates dict variables for storage of switches and frames.
 
         Parameters

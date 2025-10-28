@@ -28,7 +28,7 @@ Current major limitations:<br>
 Lesser limitations are listed on the support discord server,<br>
 the invite to that server is at the bottom of https://herodirk.github.io/
 
-This program, consisting of `main.py`, `Hkinter.py`, `HSB_minion_data.py` and `official_calculator_add_ons.py`, are protected under a GNU GENERAL PUBLIC LICENSE (Version 3).<br>
+This program, consisting of `main.py`, `Hero_UI_Manager.py`, `HSB_minion_data.py` and `official_calculator_add_ons.py`, are protected under a GNU GENERAL PUBLIC LICENSE (Version 3).<br>
 Herodirk: I dont want any legal trouble, just ask me for permission if you want to copy parts of the code for your own public projects. Copying for private projects is fine.
 
 Herodirk is not affiliated with any of the following:
