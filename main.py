@@ -584,6 +584,21 @@ class Calculator(tk.Tk):
             "totalProfit": None,
             "addons_output_container": None
         }
+
+        self.ID_order = [
+            "minion", "miniontier", "amount", "fuel", "infernoGrade", "infernoDistillate", "infernoEyedrops",
+            "hopper", "upgrade1", "upgrade2", "chest", "beacon", "scorched", "B_constant", "B_acquired",
+            "infusion", "crystal", "free_will", "postcard",
+            "afk", "afkpet", "afkpetrarity", "afkpetlvl", "enchanted_clock", "specialLayout",
+            "playerHarvests", "playerLooting", "potatoTalisman",
+            "combatWisdom", "miningWisdom", "farmingWisdom", "fishingWisdom", "foragingWisdom", "alchemyWisdom",
+            "mayor",
+            "levelingpet", "taming", "falcon_attribute", "toucan_attribute", "petxpboost", "beastmaster",
+            "expsharepet", "expsharepetslot2", "expsharepetslot3", "expshareitem",
+            "often_empty",
+            "sellLoc",
+            "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper",
+        ]
         print("BOOTING: Output orders defined")
 
         # Load bazaar prices
@@ -1003,7 +1018,17 @@ class Calculator(tk.Tk):
         else:
             return crafted_string
 
-    def constructID(self):
+    def get_inputs(self):
+        template = {}
+        for key in self.ID_order:
+            var_data = self.variables[key]
+            if var_data["vtype"] != "input":
+                self.catch_warning("self.ID_order contains non-input variable")
+                continue
+            template[key] = var_data["var"].get()
+        return template
+
+    def constructID(self, template):
         """
         Generates the setup ID of the current inputted setup.
         A setup ID consists of:
@@ -1017,19 +1042,18 @@ class Calculator(tk.Tk):
             Setup ID.
 
         """
-        ID = str(self.version.get()) + "!"
-        for key, var_data in self.variables.items():
-            if var_data["vtype"] != "input":
-                continue
-            val = var_data["var"].get()
-            if len(var_data["options"]) == 0:
+        setup_id = str(self.version.get()) + "!"
+        for key, val in template.items():
+            var_options = self.variables[key]["options"]
+            # val = var_data["var"].get()
+            if len(var_options) == 0:
                 if int(val) == val:
                     val = int(val)
-                ID += "!" + str(val) + "!"
+                setup_id += "!" + str(val) + "!"
             else:
-                index = var_data["options"].index(val)
-                ID += chr(48 + index)
-        return ID
+                index = var_options.index(val)
+                setup_id += chr(48 + index)
+        return setup_id
 
     def decodeID(self, ID):
         """
@@ -1928,7 +1952,8 @@ class Calculator(tk.Tk):
                 self.variables[loop_key]["list"][item] *= timeratio
 
         # Construct ID
-        setup_ID = self.constructID()
+        setup_template = self.get_inputs()
+        setup_ID = self.constructID(setup_template)
         self.variables["ID"]["var"].set(setup_ID)
         self.variables["ID_container"]["list"].clear()
         self.variables["ID_container"]["list"].append(setup_ID)
