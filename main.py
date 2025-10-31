@@ -1157,6 +1157,48 @@ class Calculator(tk.Tk):
             print("WARNING:", ID, "not in itemList")
             return 0
 
+    def getSpeedBoosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_template):
+        """Adds up speed boosts, uses the fact that booleans can be seen as 0 or 1 or false and true resp."""
+        speedBonus = 0
+        speedBonus += md.itemList[minion_fuel_id]["upgrade"]["speed"]
+        speedBonus += md.itemList[upgrade_ids[0]]["upgrade"]["speed"] + md.itemList[upgrade_ids[1]]["upgrade"]["speed"]
+        speedBonus += 2 * setup_template["beacon"] + 10 * setup_template["infusion"]
+        speedBonus += 10 * setup_template["free_will"] + 5 * setup_template["postcard"]
+        speedBonus += 5 * setup_template["potatoTalisman"] * (afk_toggle or clock_override) * (minion == "Potato")
+        if setup_template["crystal"] != "None":
+            if minion in list(md.floating_crystals[setup_template["crystal"]].values())[0]:
+                speedBonus += list(md.floating_crystals[setup_template["crystal"]].keys())[0]
+        if setup_template["beacon"] != 0:
+            speedBonus += 1 * setup_template["scorched"]
+        if minion == "Inferno":
+            if self.rising_celsius_override:
+                speedBonus += 180
+            else:
+                speedBonus += 18 * min(10, setup_template["amount"])
+        if setup_template["mayor"] == "Cole" and (afk_toggle or clock_override) and minion in md.affected_by_cole:
+            speedBonus += 25
+        afkpet = setup_template["afkpet"]
+        afkpet_rarity = setup_template["afkpetrarity"]
+        afkpet_lvl = setup_template["afkpetlvl"]
+        if (afk_toggle or clock_override) and minion in md.boost_pets[afkpet]["affects"] and afkpet_rarity in md.boost_pets[afkpet]:
+            speedBonus += md.boost_pets[afkpet][afkpet_rarity][0] + afkpet_lvl * md.boost_pets[afkpet][afkpet_rarity][1]
+        return speedBonus
+
+    def getDropMultiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_template):
+        dropMultiplier = 1
+        dropMultiplier *= md.itemList[minion_fuel_id]["upgrade"]["drop"]
+        dropMultiplier *= md.itemList[upgrade_ids[0]]["upgrade"]["drop"]
+        if afk_toggle and dropMultiplier > 1:
+            # drop multiplier greater than 1 is rounded down while online
+            dropMultiplier = int(dropMultiplier)
+        dropMultiplier *= md.itemList[upgrade_ids[1]]["upgrade"]["drop"]
+        if afk_toggle and dropMultiplier > 1:
+            dropMultiplier = int(dropMultiplier)
+        if setup_template["mayor"] == "Derpy":
+            dropMultiplier *= 2
+        # TODO: add player harvesting to here too
+        return dropMultiplier
+
     def getPetXPBoosts(self, pet, xp_type, exp_share=False):
         """
         Return pet xp boosts for a given skill xp type.
@@ -1263,7 +1305,7 @@ class Calculator(tk.Tk):
         print("WARNING: " + warning_message)
         return
 
-    def calculate(self, inGUI=False):
+    def calculate(self, inGUI=False, setup_template=None):
         """
         Main calculation function
 
@@ -1293,71 +1335,40 @@ class Calculator(tk.Tk):
                     continue
                 var_data["list"].clear()
 
-        # Get inputs
-        setup_template = self.get_inputs()
+        # Get inputs if none are given
+        if setup_template is None:
+            setup_template = self.get_inputs()
+
 
         # extracting often used minion constants
-        minion_type = self.variables["minion"]["var"].get()
-        minion_tier = self.variables["miniontier"]["var"].get()
-        minion_amount = self.variables["amount"]["var"].get()
-        minion_fuel = md.fuel_options[self.variables["fuel"]["var"].get()]
-        minion_beacon = self.variables["beacon"]["var"].get()
-        mayor = self.variables["mayor"]["var"].get()
+        minion_type = setup_template["minion"]
+        minion_tier = setup_template["miniontier"]
+        minion_amount = setup_template["amount"]
+        minion_fuel = md.fuel_options[setup_template["fuel"]]
+        minion_beacon = setup_template["beacon"]
+        mayor = setup_template["mayor"]
 
         # Enchanted Clock uses offline calculations, but you can be on the island when using it to apply boosts that require a loaded island.
         # This clock_override replaces afk_toggle for these boosts
-        afk_toggle = self.variables["afk"]["var"].get()
-        clock_toggle = self.variables["enchanted_clock"]["var"].get()
+        afk_toggle = setup_template["afk"]
+        clock_toggle = setup_template["enchanted_clock"]
         clock_override = False
         if clock_toggle and afk_toggle:
             afk_toggle = False
             clock_override = True
 
         # list upgrades types
-        upgrades = [md.upgrade_options[self.variables["upgrade1"]["var"].get()], md.upgrade_options[self.variables["upgrade2"]["var"].get()]]
+        upgrades = [md.upgrade_options[setup_template["upgrade1"]], md.upgrade_options[setup_template["upgrade2"]]]
         upgrades_types = []
         for upgrade in upgrades:
             for temp_type in md.itemList[upgrade]["upgrade"]["special"]["type"].split(", "):
                 upgrades_types.append(temp_type)
 
         # adding up minion speed bonus
-        # uses the fact that booleans can be seen as 0 or 1 or false and true resp.
-        speedBonus = 0
-        speedBonus += md.itemList[minion_fuel]["upgrade"]["speed"]
-        speedBonus += md.itemList[upgrades[0]]["upgrade"]["speed"] + md.itemList[upgrades[1]]["upgrade"]["speed"]
-        speedBonus += 2 * minion_beacon + 10 * self.variables["infusion"]["var"].get()
-        speedBonus += 10 * self.variables["free_will"]["var"].get() + 5 * self.variables["postcard"]["var"].get()
-        speedBonus += 5 * self.variables["potatoTalisman"]["var"].get() * (afk_toggle or clock_override) * (minion_type == "Potato")
-        if self.variables["crystal"]["var"].get() != "None":
-            if minion_type in list(md.floating_crystals[self.variables["crystal"]["var"].get()].values())[0]:
-                speedBonus += list(md.floating_crystals[self.variables["crystal"]["var"].get()].keys())[0]
-        if minion_beacon != 0:
-            speedBonus += 1 * self.variables["scorched"]["var"].get()
-        if minion_type == "Inferno":
-            if self.rising_celsius_override:
-                speedBonus += 180
-            else:
-                speedBonus += 18 * min(10, minion_amount)
-        if mayor == "Cole" and (afk_toggle or clock_override) and minion_type in md.affected_by_cole:
-            speedBonus += 25
-        afkpet = self.variables["afkpet"]["var"].get()
-        afkpet_rarity = self.variables["afkpetrarity"]["var"].get()
-        afkpet_lvl = self.variables["afkpetlvl"]["var"].get()
-        if (afk_toggle or clock_override) and minion_type in md.boost_pets[afkpet]["affects"] and afkpet_rarity in md.boost_pets[afkpet]:
-            speedBonus += md.boost_pets[afkpet][afkpet_rarity][0] + afkpet_lvl * md.boost_pets[afkpet][afkpet_rarity][1]
+        speed_boost = self.getSpeedBoosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_template)
 
         # multiply up minion drop bonus
-        dropMultiplier = 1
-        dropMultiplier *= md.itemList[minion_fuel]["upgrade"]["drop"]
-        dropMultiplier *= md.itemList[upgrades[0]]["upgrade"]["drop"]
-        if afk_toggle and dropMultiplier > 1:
-            # drop multiplier greater than 1 is rounded down while online
-            dropMultiplier = int(dropMultiplier)
-        dropMultiplier *= md.itemList[upgrades[1]]["upgrade"]["drop"]
-        if afk_toggle and dropMultiplier > 1:
-            dropMultiplier = int(dropMultiplier)
-        if mayor == "Derpy":
-            dropMultiplier *= 2
+        dropMultiplier = self.getDropMultiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_template)
 
         # AFKing, Special Layouts and Player Harvests influences
         actionsPerHarvest = 2
@@ -1420,7 +1431,7 @@ class Calculator(tk.Tk):
 
         # calculate final minion speed
         base_speed = md.minionList[minion_type]["speed"][minion_tier]
-        secondsPaction = base_speed / (1 + speedBonus / 100)
+        secondsPaction = base_speed / (1 + speed_boost / 100)
         if minion_fuel == "INFERNO_FUEL":
             secondsPaction /= 1 + md.infernofuel_data["grades"][md.getID[self.variables["infernoGrade"]["var"].get()]]
 
