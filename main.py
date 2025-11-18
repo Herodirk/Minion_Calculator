@@ -345,7 +345,7 @@ class Calculator(tk.Tk):
         self.API_creditLB.bind("<Button-1>", lambda click_event: webbrowser.open(r"https://api.hypixel.net/") if click_event.y < 18 else webbrowser.open(r"https://sky.coflnet.com/data"))
 
         self.outputB = tk.Button(self.frames["controls"], text='Short Output', command=self.output_data)
-        self.fancyoutputB = tk.Button(self.frames["controls"], text='Share Output', command=self.fancyOutput)
+        self.fancyoutputB = tk.Button(self.frames["controls"], text='Share Output', command=self.fancy_output)
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggleSwitch("addons"))
@@ -962,7 +962,7 @@ class Calculator(tk.Tk):
             return_str += "\n"
         return return_str
 
-    def fancyOutput(self, toTerminal=True):
+    def fancy_output(self, toTerminal=True):
         """
         Generates the Share Output. The Share Output is meant for sharing through discord as it uses discords markdown features.
         This function combines the outputs of prep_fancy_data() in the order given by self.fancyOrder as defined in __init__().
