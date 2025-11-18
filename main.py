@@ -317,7 +317,7 @@ class Calculator(tk.Tk):
 
         for skill in ['combat', 'mining', 'farming', 'fishing', 'foraging', 'alchemy']:
             self.variables["wisdom"]["list"][skill] = self.variables[f"{skill}Wisdom"]["var"]
-        self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(self.update_GUI_wisdom, ["combatWisdom", "miningWisdom", "farmingWisdom", "fishingWisdom", "foragingWisdom", "alchemyWisdom"]))
+        self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(self.update_gui_wisdom, ["combatWisdom", "miningWisdom", "farmingWisdom", "fishingWisdom", "foragingWisdom", "alchemyWisdom"]))
         self.wisdomB.place(in_=self.variables["wisdom"]["widget"][-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.rising_celsius_override = False
@@ -673,7 +673,7 @@ class Calculator(tk.Tk):
         output_string = f'{reduced}{reduced_amounts[highest_reduction]}'
         return output_string
 
-    def update_GUI_wisdom(self):
+    def update_gui_wisdom(self):
         """
         Updates the wisdom listbox
         Does not display wisdom values equal to 0
@@ -752,7 +752,7 @@ class Calculator(tk.Tk):
             return
         self.template.set("Choose Template")
         if templateName == "ID":
-            template = self.decodeID(self.loadID.get())
+            template = self.decode_id(self.loadID.get())
         elif templateName == "Clean":
             template = {var_key: self.variables[var_key]["initial"] for var_key in self.variables if self.variables[var_key]["vtype"] == "input" and var_key not in ["minion", "miniontier"]}
         else:
@@ -765,7 +765,7 @@ class Calculator(tk.Tk):
                 else:
                     self.variables[setting]["command"](variable)
             if "Wisdom" in setting:
-                self.update_GUI_wisdom()
+                self.update_gui_wisdom()
         return
 
     def output_data(self, toTerminal=True):
@@ -1028,7 +1028,7 @@ class Calculator(tk.Tk):
             template[key] = var_data["var"].get()
         return template
 
-    def constructID(self, template):
+    def construct_id(self, template):
         """
         Generates the setup ID of the current inputted setup.
         A setup ID consists of:
@@ -1054,7 +1054,7 @@ class Calculator(tk.Tk):
                 setup_id += chr(48 + index)
         return setup_id
 
-    def decodeID(self, ID):
+    def decode_id(self, ID):
         """
         Generates a template structure for load_template() from a given setup ID.
 
@@ -1106,7 +1106,7 @@ class Calculator(tk.Tk):
                 return {}
         return template
 
-    def getPrice(self, ID, action="buy", location="bazaar", force=False):
+    def get_price(self, ID, action="buy", location="bazaar", force=False):
         """
         Returns the price of an item from ID, transaction type and location of transaction.
         Uses self.variables "bazaar_buy_type" and "bazaar_sell_type" for bazaar specifics.
@@ -1157,7 +1157,14 @@ class Calculator(tk.Tk):
             print("WARNING:", ID, "not in itemList")
             return 0
 
-    def getSpeedBoosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_template):
+    def get_upgrades_types(self, upgrades):
+        upgrades_types = []
+        for upgrade in upgrades:
+            for temp_type in md.itemList[upgrade]["upgrade"]["special"]["type"].split(", "):
+                upgrades_types.append(temp_type)
+        return upgrades_types
+
+    def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_template):
         """Adds up speed boosts, uses the fact that booleans can be seen as 0 or 1 or false and true resp."""
         speedBonus = 0
         speedBonus += md.itemList[minion_fuel_id]["upgrade"]["speed"]
@@ -1184,8 +1191,12 @@ class Calculator(tk.Tk):
             speedBonus += md.boost_pets[afkpet][afkpet_rarity][0] + afkpet_lvl * md.boost_pets[afkpet][afkpet_rarity][1]
         return speedBonus
 
-    def getDropMultiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_template):
+    def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_template):
         dropMultiplier = 1
+        if afk_toggle and setup_template["playerHarvests"] and (minion not in ["Fishing", "Pumpkin", "Melon"]):
+            if minion in ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]:
+                dropMultiplier *= 1 + 15 * setup_template["playerLooting"] / 100
+            return dropMultiplier
         dropMultiplier *= md.itemList[minion_fuel_id]["upgrade"]["drop"]
         dropMultiplier *= md.itemList[upgrade_ids[0]]["upgrade"]["drop"]
         if afk_toggle and dropMultiplier > 1:
@@ -1196,10 +1207,38 @@ class Calculator(tk.Tk):
             dropMultiplier = int(dropMultiplier)
         if setup_template["mayor"] == "Derpy":
             dropMultiplier *= 2
-        # TODO: add player harvesting to here too
         return dropMultiplier
+    
+    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_template):
+        actionsPerHarvest = 2
+        if minion == "Fishing":
+            # only has harvests actions
+            actionsPerHarvest = 1
+        if afk_toggle:
+            if minion in ["Pumpkin", "Melon"]:
+                # pumpkins and melons are forced to regrow for minion to harvest
+                actionsPerHarvest = 1
+            if setup_template["playerHarvests"]:
+                if minion in ["Fishing", "Pumpkin", "Melon"]:
+                    self.set_note("Player Harvests", "Player Harvesting does not work with this minion")
+                else:
+                    actionsPerHarvest = 1
+                    if minion in ["Gravel"]:
+                        upgrade_ids.append("FLINT_SHOVEL")
+                        self.set_note("Player Tools", "Assuming Player is using Flint Shovel")
+                    if minion in ["Ice"]:
+                        self.set_note("Player Tools", "Assuming Player is using Silk Touch")
+            elif setup_template["specialLayout"]:
+                if minion in ["Cobblestone", "Mycelium", "Ice"]:
+                    # cobblestone generator, regrowing mycelium, freezing water
+                    actionsPerHarvest = 1
+                if minion in ["Flower", "Sand", "Red Sand", "Gravel"]:
+                    # harvests through natural means: water flushing, gravity
+                    actionsPerHarvest = 1
+                    # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
+        return actionsPerHarvest
 
-    def getPetXPBoosts(self, pet, xp_type, exp_share=False):
+    def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
         Return pet xp boosts for a given skill xp type.
         All boosts except pet item are multiplied together before returning.
@@ -1304,6 +1343,10 @@ class Calculator(tk.Tk):
             self.variables["notes"]["list"]["WARNING"] = "Check terminal for warning"
         print("WARNING: " + warning_message)
         return
+    
+    def set_note(self, note_name, note_text):
+        self.variables["notes"]["list"][note_name] = note_text
+        return
 
     def calculate(self, inGUI=False, setup_template=None):
         """
@@ -1359,47 +1402,16 @@ class Calculator(tk.Tk):
 
         # list upgrades types
         upgrades = [md.upgrade_options[setup_template["upgrade1"]], md.upgrade_options[setup_template["upgrade2"]]]
-        upgrades_types = []
-        for upgrade in upgrades:
-            for temp_type in md.itemList[upgrade]["upgrade"]["special"]["type"].split(", "):
-                upgrades_types.append(temp_type)
+        upgrades_types = self.get_upgrades_types(upgrades)
 
         # adding up minion speed bonus
-        speed_boost = self.getSpeedBoosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_template)
+        speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_template)
 
         # multiply up minion drop bonus
-        dropMultiplier = self.getDropMultiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_template)
+        dropMultiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_template)
 
         # AFKing, Special Layouts and Player Harvests influences
-        actionsPerHarvest = 2
-        if minion_type == "Fishing":
-            # only has harvests actions
-            actionsPerHarvest = 1
-        if afk_toggle:
-            if minion_type in ["Pumpkin", "Melon"]:
-                # pumpkins and melons are forced to regrow for minion to harvest
-                actionsPerHarvest = 1
-            if self.variables["playerHarvests"]["var"].get():
-                if minion_type in ["Fishing", "Pumpkin", "Melon"]:
-                    self.variables["notes"]["list"]["Player Harvests"] = "Player Harvesting does not work with this minion"
-                else:
-                    actionsPerHarvest = 1
-                    dropMultiplier = 1
-                    if minion_type in ["Gravel"]:
-                        upgrades.append("FLINT_SHOVEL")
-                        self.variables["notes"]["list"]["Player Tools"] = "Assuming Player is using Flint Shovel"
-                    if minion_type in ["Ice"]:
-                        self.variables["notes"]["list"]["Player Tools"] = "Assuming Player is using Silk Touch"
-                    if minion_type in ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]:
-                        dropMultiplier *= 1 + 15 * self.variables["playerLooting"]["var"].get() / 100
-            elif self.variables["specialLayout"]["var"].get():
-                if minion_type in ["Cobblestone", "Mycelium", "Ice"]:
-                    # cobblestone generator, regrowing mycelium, freezing water
-                    actionsPerHarvest = 1
-                if minion_type in ["Flower", "Sand", "Red Sand", "Gravel"]:
-                    # harvests through natural means: water flushing, gravity
-                    actionsPerHarvest = 1
-                    # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
+        actionsPerHarvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_template)
 
         # AFK loot table changes
         if minion_type in ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle']:
@@ -1590,7 +1602,7 @@ class Calculator(tk.Tk):
                                       }
             costPerInfernofuel = 0
             for component_ID, amount in infernofuel_components.items():
-                costPerInfernofuel += amount * self.getPrice(component_ID, action="buy", location="bazaar")
+                costPerInfernofuel += amount * self.get_price(component_ID, action="buy", location="bazaar")
             md.itemList["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
             # the fuel cost is put into the item data to be used later in the general fuel cost calculator
             pass
@@ -1709,8 +1721,8 @@ class Calculator(tk.Tk):
         if minion_sellLoc != "None":
             for itemtype, amount in self.variables["items"]["list"].items():
                 prices.clear()
-                prices["NPC"] = self.getPrice(itemtype, "sell", "npc")
-                prices["bazaar"] = self.getPrice(itemtype, "sell", "bazaar")
+                prices["NPC"] = self.get_price(itemtype, "sell", "npc")
+                prices["bazaar"] = self.get_price(itemtype, "sell", "bazaar")
                 # prices["custom"] = self.getPrice(itemtype, "sell", "custom", force=True)  # might use later
                 if sellto in prices:
                     self.variables["itemSellLoc"]["list"][itemtype] = sellto
@@ -1746,8 +1758,8 @@ class Calculator(tk.Tk):
                 compact_amount = 1
                 if "amount" in data:
                     compact_amount = data["amount"]
-                cost = self.getPrice(item, "sell", "bazaar") * per_compact
-                compact_cost = self.getPrice(compact_item, "sell", "bazaar") * compact_amount
+                cost = self.get_price(item, "sell", "bazaar") * per_compact
+                compact_cost = self.get_price(compact_item, "sell", "bazaar") * compact_amount
                 if cost - compact_cost > compact_tolerance:
                     overcompacting.append(md.itemList[item]['display'])
             if len(overcompacting) != 0:
@@ -1770,11 +1782,11 @@ class Calculator(tk.Tk):
             if main_pet in ["Golden Dragon", "Jade Dragon"]:
                 left_over_pet_xp = 0.0
                 for skill, amount in self.variables["xp"]["list"].items():
-                    pet_xp_boost, xp_boost_pet_item = self.getPetXPBoosts(main_pet, skill)
+                    pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
                     main_pet_xp[skill], left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
             else:
                 for skill, amount in self.variables["xp"]["list"].items():
-                    pet_xp_boost, xp_boost_pet_item = self.getPetXPBoosts(main_pet, skill)
+                    pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
                     main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
             exp_share_boost = 0.2 * self.variables["taming"]["var"].get() + 10 * (self.variables["mayor"]["var"].get() == "Diana") + self.variables["toucan_attribute"]["var"].get()
             exp_share_item = 15 * self.variables["expshareitem"]["var"].get()
@@ -1788,20 +1800,20 @@ class Calculator(tk.Tk):
                             continue
                         left_over_pet_xp = 0.0
                         for skill, amount in main_pet_xp.items():
-                            non_matching = self.getPetXPBoosts(exp_share_pet, skill, True)
+                            non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
                             equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
                             equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
                             gained_pet_xp, left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
                             pet_info["pet_xp"]["exp_share"] += gained_pet_xp
                     else:
                         for skill, amount in main_pet_xp.items():
-                            non_matching = self.getPetXPBoosts(exp_share_pet, skill, True)
+                            non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
                             pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (exp_share_pet != "Golden Dragon (lvl 1-100)")) / 100) * non_matching
                 if mayor != "Diana":
                     break
-            exp_share_price = self.getPrice("PET_ITEM_EXP_SHARE", "buy", "custom", True)
+            exp_share_price = self.get_price("PET_ITEM_EXP_SHARE", "buy", "custom", True)
             if exp_share_price == 0:
-                exp_share_price = self.getPrice("PET_ITEM_EXP_SHARE_DROP", "buy", "bazaar") + 72 * self.getPrice("ENCHANTED_GOLD", "buy", "bazaar")
+                exp_share_price = self.get_price("PET_ITEM_EXP_SHARE_DROP", "buy", "bazaar") + 72 * self.get_price("ENCHANTED_GOLD", "buy", "bazaar")
             for pet_slot, pet_info in all_pets.items():
                 self.variables["pets_levelled"]["list"][pet_slot] = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.all_pets[pet_info["pet"]]["rarity"]]
                 if pet_info["pet"] not in pet_costs:
@@ -1809,7 +1821,7 @@ class Calculator(tk.Tk):
                 else:
                     petProfitPerTime += self.variables["pets_levelled"]["list"][pet_slot] * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
                 if pet_slot == "levelingpet" and (main_pet_item := self.variables["petxpboost"]["var"].get()) != "None":
-                    petProfitPerTime -= self.variables["pets_levelled"]["list"][pet_slot] * self.getPrice(md.getID[main_pet_item], "buy", "custom", True)
+                    petProfitPerTime -= self.variables["pets_levelled"]["list"][pet_slot] * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
                 elif self.variables["expshareitem"]["var"].get():
                     petProfitPerTime -= self.variables["pets_levelled"]["list"][pet_slot] * exp_share_price
                 self.variables["pets_levelled"]["list"][pet_slot] *= timeratio
@@ -1824,10 +1836,10 @@ class Calculator(tk.Tk):
                 beacon_fuel_ID = "SCORCHED_POWER_CRYSTAL"
             else:
                 beacon_fuel_ID = "POWER_CRYSTAL"
-            costPerCrystal = self.getPrice(beacon_fuel_ID, "buy", "bazaar")
+            costPerCrystal = self.get_price(beacon_fuel_ID, "buy", "bazaar")
             fuelCostPerTime += emptytimeNumber * costPerCrystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (self.variables["B_constant"]["var"].get()))
         if md.itemList[minion_fuel]["upgrade"]["duration"] != 0:
-            costPerFuel = self.getPrice(minion_fuel, "buy", "bazaar")
+            costPerFuel = self.get_price(minion_fuel, "buy", "bazaar")
             neededFuelPerTime = minion_amount * emptytimeNumber / md.itemList[minion_fuel]["upgrade"]["duration"]
             fuelCostPerTime += neededFuelPerTime * costPerFuel
         self.variables["fuelcost"]["var"].set(fuelCostPerTime * timeratio)
@@ -1850,7 +1862,7 @@ class Calculator(tk.Tk):
                         tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in md.extraMinionCosts[minion_type][tier].items() if cost_type != "COINS"}
             for item, amount in md.minionCosts[minion_type][tier].items():
                 if item not in cost_cache:
-                    cost_cache[item] = self.getPrice(item, "buy", "bazaar")
+                    cost_cache[item] = self.get_price(item, "buy", "bazaar")
                 tiered_coin_cost[tier] += amount * cost_cache[item]
             if tier != 1:
                 tiered_coin_cost[tier] += tiered_coin_cost[tier - 1]
@@ -1870,25 +1882,25 @@ class Calculator(tk.Tk):
 
         # Infinite fuel cost
         if minion_fuel != "NONE" and md.itemList[minion_fuel]["upgrade"]["duration"] == 0:
-            if minion_fuel == "EVERBURNING_FLAME" and self.getPrice("EVERBURNING_FLAME", "buy", "custom", True) == 0:
+            if minion_fuel == "EVERBURNING_FLAME" and self.get_price("EVERBURNING_FLAME", "buy", "custom", True) == 0:
                 for item_ID, amount in md.upgrades_material_cost["EVERBURNING_FLAME"].items():
-                    total_cost += amount * self.getPrice(item_ID, "buy", "bazaar")
+                    total_cost += amount * self.get_price(item_ID, "buy", "bazaar")
             else:
-                total_cost += self.getPrice(minion_fuel, "buy", "bazaar")
+                total_cost += self.get_price(minion_fuel, "buy", "bazaar")
 
         # Hopper cost
         if minion_hopper in ["Budget Hopper", "Enchanted Hopper"]:
             hopper_ID = md.getID[minion_hopper]
-            total_cost += self.getPrice(hopper_ID, "buy", "bazaar")
+            total_cost += self.get_price(hopper_ID, "buy", "bazaar")
 
         # Internal minion upgrades cost
         for upgrade in upgrades:
             if upgrade != "NONE":
-                total_cost += self.getPrice(upgrade, "buy", "bazaar")
+                total_cost += self.get_price(upgrade, "buy", "bazaar")
 
         # Infusion cost
         if self.variables["infusion"]["var"].get() is True:
-            total_cost += self.getPrice("MITHRIL_INFUSION", "buy", "bazaar")
+            total_cost += self.get_price("MITHRIL_INFUSION", "buy", "bazaar")
 
         # Free Will costs
         """
@@ -1901,8 +1913,8 @@ class Calculator(tk.Tk):
         E(X) = E(X)- pE(X) + 1
         E(X)= 1/p
         """
-        free_will_price = self.getPrice("FREE_WILL", "buy", "bazaar")
-        postcard_price = self.getPrice("POSTCARD", "buy", "custom", True)
+        free_will_price = self.get_price("FREE_WILL", "buy", "bazaar")
+        postcard_price = self.get_price("POSTCARD", "buy", "custom", True)
         if postcard_price == 0:
             # If no price found, use the free will price
             final_postcard_cost = free_will_price
@@ -1924,7 +1936,7 @@ class Calculator(tk.Tk):
         # Storage Chest cost
         if self.variables["chest"]["var"].get() != "None":
             chest_ID = md.getID[self.variables["chest"]["var"].get()]
-            total_cost += self.getPrice(chest_ID, "buy", "bazaar")
+            total_cost += self.get_price(chest_ID, "buy", "bazaar")
         
         # multiply by minion amount
         total_cost *= minion_amount
@@ -1933,12 +1945,12 @@ class Calculator(tk.Tk):
         if minion_beacon != 0 and not self.variables["B_acquired"]["var"].get():
             for i in np.arange(minion_beacon) + 1:
                 for item_ID, amount in md.upgrades_material_cost["beacon"][i].items():
-                    total_cost += amount * self.getPrice(item_ID, "buy", "bazaar")
+                    total_cost += amount * self.get_price(item_ID, "buy", "bazaar")
 
         # Floating Crystal cost
         if self.variables["crystal"]["var"].get() != "None":
             for item_ID, amount in md.upgrades_material_cost["crystal"][self.variables["crystal"]["var"].get()].items():
-                total_cost += amount * self.getPrice(item_ID, "buy", "bazaar")
+                total_cost += amount * self.get_price(item_ID, "buy", "bazaar")
 
         # Postcard cost
         if self.variables["postcard"]["var"].get():
@@ -1946,13 +1958,13 @@ class Calculator(tk.Tk):
 
         # Potato Talisman cost
         if self.variables["potatoTalisman"]["var"].get():
-            total_cost += self.getPrice("POTATO_TALISMAN", "buy", "custom", True)
+            total_cost += self.get_price("POTATO_TALISMAN", "buy", "custom", True)
 
         # Attribute costs
         if self.variables["toucan_attribute"]["var"].get() != 0:
-            total_cost += md.attribute_shards["Epic"][self.variables["toucan_attribute"]["var"].get()] * self.getPrice("SHARD_TOUCAN", "buy", "bazaar")
+            total_cost += md.attribute_shards["Epic"][self.variables["toucan_attribute"]["var"].get()] * self.get_price("SHARD_TOUCAN", "buy", "bazaar")
         if self.variables["falcon_attribute"]["var"].get() != 0:
-            total_cost += md.attribute_shards["Rare"][self.variables["falcon_attribute"]["var"].get()] * self.getPrice("SHARD_FALCON", "buy", "bazaar")
+            total_cost += md.attribute_shards["Rare"][self.variables["falcon_attribute"]["var"].get()] * self.get_price("SHARD_FALCON", "buy", "bazaar")
 
 
         # Sending results to self.variables
@@ -1965,7 +1977,7 @@ class Calculator(tk.Tk):
                 self.variables[loop_key]["list"][item] *= timeratio
 
         # Construct ID
-        setup_ID = self.constructID(setup_template)
+        setup_ID = self.construct_id(setup_template)
         self.variables["ID"]["var"].set(setup_ID)
         self.variables["ID_container"]["list"].clear()
         self.variables["ID_container"]["list"].append(setup_ID)
@@ -1985,7 +1997,7 @@ class Calculator(tk.Tk):
                     continue
                 if auto_run_bool.get():
                     self.addons_list[addon_name](self)
-            self.update_GUI()
+            self.update_gui()
             self.statusC.configure(bg="green")
             self.statusC.update()
         return        
@@ -2058,10 +2070,10 @@ class Calculator(tk.Tk):
                     item_data["prices"][f"{action}Price"] = top_percent_avg_price
         print("BAZAAR: Processing complete")
         print("AH: Updating Postcard price")
-        self.update_AH()
+        self.update_ah()
         return
 
-    def update_AH(self):
+    def update_ah(self):
         """
         Currently: Updates price of Postcard.
         In the future: Updates Auction House prices.
@@ -2086,7 +2098,7 @@ class Calculator(tk.Tk):
         md.itemList["POSTCARD"]["prices"]["custom"] = (raw_data["lowest"] + raw_data["secondLowest"]) / 2
         return
 
-    def update_GUI(self):
+    def update_gui(self):
         """
         Creates an array for the listbox out of the list storage of self.variables with "vtype" equal to "list"
 
