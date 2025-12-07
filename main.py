@@ -1164,38 +1164,38 @@ class Calculator(tk.Tk):
                 upgrades_types.append(temp_type)
         return upgrades_types
 
-    def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_template):
+    def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
         """Adds up speed boosts, uses the fact that booleans can be seen as 0 or 1 or false and true resp."""
-        speedBonus = 0
-        speedBonus += md.itemList[minion_fuel_id]["upgrade"]["speed"]
-        speedBonus += md.itemList[upgrade_ids[0]]["upgrade"]["speed"] + md.itemList[upgrade_ids[1]]["upgrade"]["speed"]
-        speedBonus += 2 * setup_template["beacon"] + 10 * setup_template["infusion"]
-        speedBonus += 10 * setup_template["free_will"] + 5 * setup_template["postcard"]
-        speedBonus += 5 * setup_template["potatoTalisman"] * (afk_toggle or clock_override) * (minion == "Potato")
-        if setup_template["crystal"] != "None":
-            if minion in list(md.floating_crystals[setup_template["crystal"]].values())[0]:
-                speedBonus += list(md.floating_crystals[setup_template["crystal"]].keys())[0]
-        if setup_template["beacon"] != 0:
-            speedBonus += 1 * setup_template["scorched"]
+        speed_boost = 0
+        speed_boost += md.itemList[minion_fuel_id]["upgrade"]["speed"]
+        speed_boost += md.itemList[upgrade_ids[0]]["upgrade"]["speed"] + md.itemList[upgrade_ids[1]]["upgrade"]["speed"]
+        speed_boost += 2 * setup_data["beacon"] + 10 * setup_data["infusion"]
+        speed_boost += 10 * setup_data["free_will"] + 5 * setup_data["postcard"]
+        speed_boost += 5 * setup_data["potatoTalisman"] * (afk_toggle or clock_override) * (minion == "Potato")
+        if setup_data["crystal"] != "None":
+            if minion in list(md.floating_crystals[setup_data["crystal"]].values())[0]:
+                speed_boost += list(md.floating_crystals[setup_data["crystal"]].keys())[0]
+        if setup_data["beacon"] != 0:
+            speed_boost += 1 * setup_data["scorched"]
         if minion == "Inferno":
             if self.rising_celsius_override:
-                speedBonus += 180
+                speed_boost += 180
             else:
-                speedBonus += 18 * min(10, setup_template["amount"])
-        if setup_template["mayor"] == "Cole" and (afk_toggle or clock_override) and minion in md.affected_by_cole:
-            speedBonus += 25
-        afkpet = setup_template["afkpet"]
-        afkpet_rarity = setup_template["afkpetrarity"]
-        afkpet_lvl = setup_template["afkpetlvl"]
+                speed_boost += 18 * min(10, setup_data["amount"])
+        if setup_data["mayor"] == "Cole" and (afk_toggle or clock_override) and minion in md.affected_by_cole:
+            speed_boost += 25
+        afkpet = setup_data["afkpet"]
+        afkpet_rarity = setup_data["afkpetrarity"]
+        afkpet_lvl = setup_data["afkpetlvl"]
         if (afk_toggle or clock_override) and minion in md.boost_pets[afkpet]["affects"] and afkpet_rarity in md.boost_pets[afkpet]:
-            speedBonus += md.boost_pets[afkpet][afkpet_rarity][0] + afkpet_lvl * md.boost_pets[afkpet][afkpet_rarity][1]
-        return speedBonus
+            speed_boost += md.boost_pets[afkpet][afkpet_rarity][0] + afkpet_lvl * md.boost_pets[afkpet][afkpet_rarity][1]
+        return speed_boost
 
-    def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_template):
+    def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_data):
         dropMultiplier = 1
-        if afk_toggle and setup_template["playerHarvests"] and (minion not in ["Fishing", "Pumpkin", "Melon"]):
+        if afk_toggle and setup_data["playerHarvests"] and (minion not in ["Fishing", "Pumpkin", "Melon"]):
             if minion in ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]:
-                dropMultiplier *= 1 + 15 * setup_template["playerLooting"] / 100
+                dropMultiplier *= 1 + 15 * setup_data["playerLooting"] / 100
             return dropMultiplier
         dropMultiplier *= md.itemList[minion_fuel_id]["upgrade"]["drop"]
         dropMultiplier *= md.itemList[upgrade_ids[0]]["upgrade"]["drop"]
@@ -1205,38 +1205,90 @@ class Calculator(tk.Tk):
         dropMultiplier *= md.itemList[upgrade_ids[1]]["upgrade"]["drop"]
         if afk_toggle and dropMultiplier > 1:
             dropMultiplier = int(dropMultiplier)
-        if setup_template["mayor"] == "Derpy":
+        if setup_data["mayor"] == "Derpy":
             dropMultiplier *= 2
         return dropMultiplier
     
-    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_template):
-        actionsPerHarvest = 2
+    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data):
+        actions_per_harvest = 2
         if minion == "Fishing":
             # only has harvests actions
-            actionsPerHarvest = 1
+            actions_per_harvest = 1
         if afk_toggle:
             if minion in ["Pumpkin", "Melon"]:
                 # pumpkins and melons are forced to regrow for minion to harvest
-                actionsPerHarvest = 1
-            if setup_template["playerHarvests"]:
+                actions_per_harvest = 1
+            if setup_data["playerHarvests"]:
                 if minion in ["Fishing", "Pumpkin", "Melon"]:
                     self.set_note("Player Harvests", "Player Harvesting does not work with this minion")
                 else:
-                    actionsPerHarvest = 1
+                    actions_per_harvest = 1
                     if minion in ["Gravel"]:
                         upgrade_ids.append("FLINT_SHOVEL")
                         self.set_note("Player Tools", "Assuming Player is using Flint Shovel")
                     if minion in ["Ice"]:
                         self.set_note("Player Tools", "Assuming Player is using Silk Touch")
-            elif setup_template["specialLayout"]:
+            elif setup_data["specialLayout"]:
                 if minion in ["Cobblestone", "Mycelium", "Ice"]:
                     # cobblestone generator, regrowing mycelium, freezing water
-                    actionsPerHarvest = 1
+                    actions_per_harvest = 1
                 if minion in ["Flower", "Sand", "Red Sand", "Gravel"]:
                     # harvests through natural means: water flushing, gravity
-                    actionsPerHarvest = 1
+                    actions_per_harvest = 1
                     # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
-        return actionsPerHarvest
+        return actions_per_harvest
+
+    def update_loot_table(self, minion, afk_toggle, setup_data):
+        if minion in ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle']:
+            if afk_toggle:
+                # chopped trees have 4 blocks of wood, unknown why offline gives 3
+                md.minionList[minion]["drops"][md.getID[f"{minion} Log"]] = 4
+            else:
+                md.minionList[minion]["drops"][md.getID[f"{minion} Log"]] = 3
+        if minion == "Gravel":
+            if afk_toggle:
+                # vanilla minecraft chance for gravel to become flint
+                md.minionList[minion]["drops"]["GRAVEL"] = 0.9
+                md.minionList[minion]["drops"]["FLINT"] = 0.1
+            else:
+                md.minionList[minion]["drops"]["GRAVEL"] = 1
+                md.minionList[minion]["drops"]["FLINT"] = 0
+        if minion == "Pumpkin":
+            if afk_toggle:
+                # it just does this, idk, ask Hypixel
+                md.minionList[minion]["drops"]["PUMPKIN"] = 1
+            else:
+                md.minionList[minion]["drops"]["PUMPKIN"] = 3
+        if minion == "Flower":
+            if afk_toggle and setup_data["specialLayout"]:
+                # tall flowers blocked by low ceiling
+                md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 0.5 }
+            else:
+                md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 }
+
+    def get_seconds_per_action(self, minion, minion_tier, minion_fuel_id, speed_boost, setup_data):
+        base_speed = md.minionList[minion]["speed"][minion_tier]
+        secondsPaction = base_speed / (1 + speed_boost / 100)
+        if minion_fuel_id == "INFERNO_FUEL":
+            secondsPaction /= 1 + md.infernofuel_data["grades"][md.getID[setup_data["infernoGrade"]]]
+        return secondsPaction
+
+    def get_emptytime_and_ratio(self, seconds_per_action, actions_per_harvest, setup_data):
+        if setup_data["often_empty"]:
+            emptytime_seconds = self.time_number(self.emptytimelength.get(), self.emptytimeamount.get(), seconds_per_action, actions_per_harvest)
+            scaled_time_seconds = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), seconds_per_action, actions_per_harvest)
+            timeratio = scaled_time_seconds / emptytime_seconds
+        else:
+            emptytime_seconds = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), seconds_per_action, actions_per_harvest)
+            timeratio = 1
+        return emptytime_seconds, timeratio
+    
+    def get_harvests_per_time(self, emptytime_seconds, actions_per_harvest, seconds_per_action):
+        if self.emptytimelength.get() == "Harvests":
+            harvests_per_time = self.emptytimeamount.get()
+        else:
+            harvests_per_time = emptytime_seconds / (actions_per_harvest * seconds_per_action)
+        return harvests_per_time
 
     def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
@@ -1348,7 +1400,7 @@ class Calculator(tk.Tk):
         self.variables["notes"]["list"][note_name] = note_text
         return
 
-    def calculate(self, inGUI=False, setup_template=None):
+    def calculate(self, inGUI=False, setup_data=None):
         """
         Main calculation function
 
@@ -1379,99 +1431,64 @@ class Calculator(tk.Tk):
                 var_data["list"].clear()
 
         # Get inputs if none are given
-        if setup_template is None:
-            setup_template = self.get_inputs()
+        if setup_data is None:
+            setup_data = self.get_inputs()
 
 
         # extracting often used minion constants
-        minion_type = setup_template["minion"]
-        minion_tier = setup_template["miniontier"]
-        minion_amount = setup_template["amount"]
-        minion_fuel = md.fuel_options[setup_template["fuel"]]
-        minion_beacon = setup_template["beacon"]
-        mayor = setup_template["mayor"]
+        minion_type = setup_data["minion"]
+        minion_tier = setup_data["miniontier"]
+        minion_amount = setup_data["amount"]
+        minion_fuel = md.fuel_options[setup_data["fuel"]]
+        minion_beacon = setup_data["beacon"]
+        mayor = setup_data["mayor"]
 
         # Enchanted Clock uses offline calculations, but you can be on the island when using it to apply boosts that require a loaded island.
         # This clock_override replaces afk_toggle for these boosts
-        afk_toggle = setup_template["afk"]
-        clock_toggle = setup_template["enchanted_clock"]
+        afk_toggle = setup_data["afk"]
+        clock_toggle = setup_data["enchanted_clock"]
         clock_override = False
         if clock_toggle and afk_toggle:
             afk_toggle = False
             clock_override = True
 
         # list upgrades types
-        upgrades = [md.upgrade_options[setup_template["upgrade1"]], md.upgrade_options[setup_template["upgrade2"]]]
+        upgrades = [md.upgrade_options[setup_data["upgrade1"]], md.upgrade_options[setup_data["upgrade2"]]]
         upgrades_types = self.get_upgrades_types(upgrades)
 
         # adding up minion speed bonus
-        speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_template)
+        speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_data)
 
         # multiply up minion drop bonus
-        dropMultiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_template)
+        dropMultiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
 
         # AFKing, Special Layouts and Player Harvests influences
-        actionsPerHarvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_template)
+        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data)
 
         # AFK loot table changes
-        if minion_type in ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle']:
-            if afk_toggle:
-                # chopped trees have 4 blocks of wood, unknown why offline gives 3
-                md.minionList[minion_type]["drops"][md.getID[f"{minion_type} Log"]] = 4
-            else:
-                md.minionList[minion_type]["drops"][md.getID[f"{minion_type} Log"]] = 3
-        if minion_type == "Gravel":
-            if afk_toggle:
-                # vanilla minecraft chance for gravel to become flint
-                md.minionList[minion_type]["drops"]["GRAVEL"] = 0.9
-                md.minionList[minion_type]["drops"]["FLINT"] = 0.1
-            else:
-                md.minionList[minion_type]["drops"]["GRAVEL"] = 1
-                md.minionList[minion_type]["drops"]["FLINT"] = 0
-        if minion_type == "Pumpkin":
-            if afk_toggle:
-                # it just does this, idk, ask Hypixel
-                md.minionList[minion_type]["drops"]["PUMPKIN"] = 1
-            else:
-                md.minionList[minion_type]["drops"]["PUMPKIN"] = 3
-        if minion_type == "Flower":
-            if afk_toggle and self.variables["specialLayout"]["var"].get():
-                # tall flowers blocked by low ceiling
-                md.minionList[minion_type]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 0.5 }
-            else:
-                md.minionList[minion_type]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 }
+        self.update_loot_table(minion_type, afk_toggle, setup_data)
 
         # calculate final minion speed
-        base_speed = md.minionList[minion_type]["speed"][minion_tier]
-        secondsPaction = base_speed / (1 + speed_boost / 100)
-        if minion_fuel == "INFERNO_FUEL":
-            secondsPaction /= 1 + md.infernofuel_data["grades"][md.getID[self.variables["infernoGrade"]["var"].get()]]
+        seconds_per_action = self.get_seconds_per_action(minion_type, minion_tier, minion_fuel, speed_boost, setup_data)
 
         # time calculations
-        if self.variables["often_empty"]["var"].get():
-            emptytimeNumber = self.time_number(self.emptytimelength.get(), self.emptytimeamount.get(), secondsPaction, actionsPerHarvest)
-            timeNumber = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), secondsPaction, actionsPerHarvest)
-            timeratio = timeNumber / emptytimeNumber
-            self.variables["emptytime"]["var"].set(f"{self.emptytimeamount.get()} {self.emptytimelength.get()}")
-        else:
-            emptytimeNumber = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), secondsPaction, actionsPerHarvest)
-            timeratio = 1
+        emptytimeNumber, timeratio = self.get_emptytime_and_ratio(seconds_per_action, actions_per_harvest, setup_data)
+        self.variables["emptytime"]["var"].set(f"{self.emptytimeamount.get()} {self.emptytimelength.get()}")
         self.variables["time"]["var"].set(f"{self.totaltimeamount.get()} {self.totaltimelength.get()}")
-        if self.emptytimelength.get() == "Harvests":
-            harvestsPerTime = self.emptytimeamount.get()
-        else:
-            harvestsPerTime = emptytimeNumber / (actionsPerHarvest * secondsPaction)
-        self.variables["actiontime"]["var"].set(secondsPaction)
-        self.variables["harvests"]["var"].set(minion_amount * harvestsPerTime * timeratio)
+        
+        # harvests per time
+        harvests_per_time = self.get_harvests_per_time(emptytimeNumber, actions_per_harvest, seconds_per_action)
+        self.variables["actiontime"]["var"].set(seconds_per_action)
+        self.variables["harvests"]["var"].set(minion_amount * harvests_per_time * timeratio)
 
         # drop multiplier online/offline mode
         if not afk_toggle:
-            harvestsPerTime *= dropMultiplier
+            harvests_per_time *= dropMultiplier
             dropMultiplier = 1
 
         # base drops
         for item, amount in md.minionList[minion_type]["drops"].items():
-            self.variables["items"]["list"][item] = harvestsPerTime * amount * dropMultiplier
+            self.variables["items"]["list"][item] = harvests_per_time * amount * dropMultiplier
 
         # upgrade drops
         # create seperate dict to keep it separate from the main drops
@@ -1507,7 +1524,7 @@ class Calculator(tk.Tk):
                 for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
                     if item not in upgrade_drops:
                         upgrade_drops[item] = 0
-                    upgrade_drops[item] += harvestsPerTime * amount
+                    upgrade_drops[item] += harvests_per_time * amount
             elif upgrade_type == "timer":
                 # timer upgrades are like Soulflow Engines
                 # formula for effective_cooldown still in research
@@ -1559,7 +1576,7 @@ class Calculator(tk.Tk):
                         for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
                             if item not in spreading_drops:
                                 spreading_drops[item] = 0
-                            spreading_drops[item] += harvestsPerTime * dropMultiplier * spreading_chance * amount
+                            spreading_drops[item] += harvests_per_time * dropMultiplier * spreading_chance * amount
                 else:
                     finalAmount = 0
                     for amount in upgrade_drops.values():
@@ -1576,7 +1593,7 @@ class Calculator(tk.Tk):
             distilate = md.getID[self.variables["infernoDistillate"]["var"].get()]
             distilate_item = md.infernofuel_data["distilates"][distilate][0]
             amount_per = md.infernofuel_data["distilates"][distilate][1]
-            distillate_harvests = (harvestsPerTime * 4) / 5
+            distillate_harvests = (harvests_per_time * 4) / 5
             upgrade_drops[distilate_item] = distillate_harvests * amount_per
             static_items = list(self.variables["items"]["list"].keys())  # create copy to edit list while looping it
             for item in static_items:  # replacing main drops with distilate drops
@@ -1591,7 +1608,7 @@ class Calculator(tk.Tk):
                     upgrade_drops[item] = 0
                     if item == "INFERNO_APEX" and minion_tier >= 10:  # Apex Minion perk
                         chance *= 2
-                    upgrade_drops[item] += multiplier * chance * harvestsPerTime
+                    upgrade_drops[item] += multiplier * chance * harvests_per_time
                 upgrade_drops["HYPERGOLIC_IONIZED_CERAMICS"] = emptytimeNumber / md.itemList[minion_fuel]["upgrade"]["duration"]
 
             # calculate fuel cost
@@ -1977,7 +1994,7 @@ class Calculator(tk.Tk):
                 self.variables[loop_key]["list"][item] *= timeratio
 
         # Construct ID
-        setup_ID = self.construct_id(setup_template)
+        setup_ID = self.construct_id(setup_data)
         self.variables["ID"]["var"].set(setup_ID)
         self.variables["ID_container"]["list"].clear()
         self.variables["ID_container"]["list"].append(setup_ID)
