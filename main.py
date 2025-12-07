@@ -610,7 +610,7 @@ class Calculator(tk.Tk):
 
 #%% functions
 
-    def time_number(self, time_length, time_amount, secondsPaction=0.0, actionsPerHarvest=1.0):
+    def time_number(self, time_length, time_amount, seconds_per_action=0.0, actions_per_harvest=1.0):
         """
         Translates time amount and length into seconds.
 
@@ -644,7 +644,7 @@ class Calculator(tk.Tk):
         if time_length == "Seconds":
             return 1 * time_amount
         if time_length == "Harvests":
-            return secondsPaction * actionsPerHarvest * time_amount
+            return seconds_per_action * actions_per_harvest * time_amount
         return 1 * time_amount
 
     def reduced_number(self, number, decimal=2):
@@ -730,7 +730,7 @@ class Calculator(tk.Tk):
             self.huim.toggleSwitch("exp_share_diana", control + str(pet_leveling_state))
         return
 
-    def load_template(self, templateName):
+    def load_template(self, template_name):
         """
         Handles the input from the template input.
         If "ID" is selected it sends the inputted ID to the decoder.
@@ -748,15 +748,15 @@ class Calculator(tk.Tk):
         None.
 
         """
-        if templateName == "Choose Template":
+        if template_name == "Choose Template":
             return
         self.template.set("Choose Template")
-        if templateName == "ID":
+        if template_name == "ID":
             template = self.decode_id(self.loadID.get())
-        elif templateName == "Clean":
+        elif template_name == "Clean":
             template = {var_key: self.variables[var_key]["initial"] for var_key in self.variables if self.variables[var_key]["vtype"] == "input" and var_key not in ["minion", "miniontier"]}
         else:
-            template = templateList[templateName]
+            template = templateList[template_name]
         for setting, variable in template.items():
             self.variables[setting]["var"].set(variable)
             if "command" in self.variables[setting] and self.variables[setting]["command"] is not None:
@@ -1368,6 +1368,44 @@ class Calculator(tk.Tk):
                     self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * emptytime_seconds / effective_cooldown, drops_list)
         return
 
+    def get_inferno_drops(self, drops_list, spreading_info, replace_info, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data):
+        if minion_fuel != "INFERNO_FUEL":
+            return
+        # distilate drops
+        distilate = md.getID[setup_data["infernoDistillate"]]
+        distilate_item = md.infernofuel_data["distilates"][distilate][0]
+        amount_per = md.infernofuel_data["distilates"][distilate][1]
+        distillate_harvests = (harvests_per_time * 4) / 5
+        if afk_toggle:
+            self.get_base_drops(drops_list, spreading_info, replace_info, minion, - distillate_harvests, drop_multiplier)
+        else:
+            self.get_base_drops(drops_list, None, replace_info, minion, - distillate_harvests, drop_multiplier)
+        self.add_drops(distilate_item, distillate_harvests * amount_per, drops_list)
+
+        # Hypergolic drops
+        if setup_data["infernoGrade"] == "Hypergolic Gabagool":  # hypergolic fuel stuff
+            multiplier = 1
+            if setup_data["infernoEyedrops"] is True:  # Capsaicin Eyedrops
+                multiplier = 1.3
+            for item, chance in md.infernofuel_data["drops"].items():
+                if item == "INFERNO_APEX" and minion_tier >= 10:  # Apex Minion perk
+                    chance *= 2
+                self.add_drops(item, multiplier * chance * harvests_per_time, drops_list)
+            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", emptytime_seconds / md.itemList[minion_fuel]["upgrade"]["duration"], drops_list)
+
+        # calculate fuel cost
+        infernofuel_components = {
+            "INFERNO_FUEL_BLOCK": 2,  # 2 inferno fuel blocks
+            distilate: 6,  # 6 times distilate item
+            md.getID[setup_data["infernoGrade"]]: 1,  # 1 gabagool core
+            "CAPSAICIN_EYEDROPS_NO_CHARGES": int(setup_data["infernoEyedrops"])  # capsaicin eyedrops
+        }
+        costPerInfernofuel = 0
+        for component_ID, amount in infernofuel_components.items():
+            costPerInfernofuel += amount * self.get_price(component_ID, action="buy", location="bazaar")
+        md.itemList["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
+        # the fuel cost is put into the item data to be used later in the general fuel cost calculator
+        return
         
     def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
@@ -1551,81 +1589,28 @@ class Calculator(tk.Tk):
         seconds_per_action = self.get_seconds_per_action(minion_type, minion_tier, minion_fuel, speed_boost, setup_data)
 
         # time calculations
-        emptytimeNumber, timeratio = self.get_emptytime_and_ratio(seconds_per_action, actions_per_harvest, setup_data)
+        emptytime_seconds, timeratio = self.get_emptytime_and_ratio(seconds_per_action, actions_per_harvest, setup_data)
         self.variables["emptytime"]["var"].set(f"{self.emptytimeamount.get()} {self.emptytimelength.get()}")
         self.variables["time"]["var"].set(f"{self.totaltimeamount.get()} {self.totaltimelength.get()}")
         
         # harvests per time
-        harvests_per_time, drop_multiplier = self.get_harvests_per_time(emptytimeNumber, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier)
+        harvests_per_time, drop_multiplier = self.get_harvests_per_time(emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier)
         self.variables["actiontime"]["var"].set(seconds_per_action)
         self.variables["harvests"]["var"].set(minion_amount * harvests_per_time * timeratio)
 
         drops_list = {}
-        # print(drops_list)
         spreading_info, replace_info = self.get_upgrade_info(upgrades, drops_list)
-        # print(drops_list, spreading_info, replace_info)
+        
         # base drops
         self.get_base_drops(drops_list, spreading_info, replace_info, minion_type, harvests_per_time, drop_multiplier)
-        # print(drops_list)
 
         # upgrade drops
-        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, emptytimeNumber)
-        # print(drops_list)
+        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, emptytime_seconds)
         
-        
-
-        # to stop all the warnings:
-        upgrade_drops = {}
-        spreading_drops = {}
-        cooldown_drops = {}
-
         # Inferno minion fuel drops
         # https://wiki.hypixel.net/Inferno_Minion_Fuel
-        if minion_fuel == "INFERNO_FUEL":
-            # distilate drops
-            distilate = md.getID[self.variables["infernoDistillate"]["var"].get()]
-            distilate_item = md.infernofuel_data["distilates"][distilate][0]
-            amount_per = md.infernofuel_data["distilates"][distilate][1]
-            distillate_harvests = (harvests_per_time * 4) / 5
-            upgrade_drops[distilate_item] = distillate_harvests * amount_per
-            # for distillates: use self.add_drops but use a negative amount to remove the 4/5 of the gabagool (and possible spreading drops if online)
-            static_items = list(self.variables["items"]["list"].keys())  # create copy to edit list while looping it
-            for item in static_items:  # replacing main drops with distilate drops
-                self.variables["items"]["list"][item] /= 5
-
-            # Hypergolic drops
-            if self.variables["infernoGrade"]["var"].get() == "Hypergolic Gabagool":  # hypergolic fuel stuff
-                multiplier = 1
-                if self.variables["infernoEyedrops"]["var"].get() is True:  # Capsaicin Eyedrops
-                    multiplier = 1.3
-                for item, chance in md.infernofuel_data["drops"].items():
-                    upgrade_drops[item] = 0
-                    if item == "INFERNO_APEX" and minion_tier >= 10:  # Apex Minion perk
-                        chance *= 2
-                    upgrade_drops[item] += multiplier * chance * harvests_per_time
-                upgrade_drops["HYPERGOLIC_IONIZED_CERAMICS"] = emptytimeNumber / md.itemList[minion_fuel]["upgrade"]["duration"]
-
-            # calculate fuel cost
-            infernofuel_components = {"INFERNO_FUEL_BLOCK": 2,  # 2 inferno fuel blocks
-                                      distilate: 6,  # 6 times distilate item
-                                      md.getID[self.variables["infernoGrade"]["var"].get()]: 1,  # 1 gabagool core
-                                      "CAPSAICIN_EYEDROPS_NO_CHARGES": int(self.variables["infernoEyedrops"]["var"].get())  # capsaicin eyedrops
-                                      }
-            costPerInfernofuel = 0
-            for component_ID, amount in infernofuel_components.items():
-                costPerInfernofuel += amount * self.get_price(component_ID, action="buy", location="bazaar")
-            md.itemList["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
-            # the fuel cost is put into the item data to be used later in the general fuel cost calculator
-            pass
-
-
-        # add upgrade drops to main item list
-        upgrade_drops.update(spreading_drops)
-        upgrade_drops.update(cooldown_drops)
-        for item, amount in upgrade_drops.items():
-            if item not in self.variables["items"]["list"]:
-                self.variables["items"]["list"][item] = 0
-            self.variables["items"]["list"][item] += amount
+        self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data)
+        # print(drops_list)
 
         # (Super) Compactor logic at the end because it applies to all drops
         # for both compactor types it floors the ratio between items and needed items for one compacted
@@ -1703,7 +1688,7 @@ class Calculator(tk.Tk):
         for itemtype, amount in self.variables["items"]["list"].items():
             used_storage += amount / 64  # hypixel does not care about smaller max stack sizes
             used_storage_slots += np.ceil(amount / 64)
-        fill_time = (emptytimeNumber * available_storage) / used_storage
+        fill_time = (emptytime_seconds * available_storage) / used_storage
         self.variables["filltime"]["var"].set(fill_time)
         self.variables["used_storage"]["var"].set(used_storage_slots)
         self.variables["available_storage"]["var"].set(available_storage)
@@ -1848,10 +1833,10 @@ class Calculator(tk.Tk):
             else:
                 beacon_fuel_ID = "POWER_CRYSTAL"
             costPerCrystal = self.get_price(beacon_fuel_ID, "buy", "bazaar")
-            fuelCostPerTime += emptytimeNumber * costPerCrystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (self.variables["B_constant"]["var"].get()))
+            fuelCostPerTime += emptytime_seconds * costPerCrystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (self.variables["B_constant"]["var"].get()))
         if md.itemList[minion_fuel]["upgrade"]["duration"] != 0:
             costPerFuel = self.get_price(minion_fuel, "buy", "bazaar")
-            neededFuelPerTime = minion_amount * emptytimeNumber / md.itemList[minion_fuel]["upgrade"]["duration"]
+            neededFuelPerTime = minion_amount * emptytime_seconds / md.itemList[minion_fuel]["upgrade"]["duration"]
             fuelCostPerTime += neededFuelPerTime * costPerFuel
         self.variables["fuelcost"]["var"].set(fuelCostPerTime * timeratio)
         self.variables["fuelamount"]["var"].set(np.max([neededFuelPerTime * timeratio, minion_amount]))
