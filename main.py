@@ -1192,22 +1192,22 @@ class Calculator(tk.Tk):
         return speed_boost
 
     def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_data):
-        dropMultiplier = 1
+        drop_multiplier = 1
         if afk_toggle and setup_data["playerHarvests"] and (minion not in ["Fishing", "Pumpkin", "Melon"]):
             if minion in ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]:
-                dropMultiplier *= 1 + 15 * setup_data["playerLooting"] / 100
-            return dropMultiplier
-        dropMultiplier *= md.itemList[minion_fuel_id]["upgrade"]["drop"]
-        dropMultiplier *= md.itemList[upgrade_ids[0]]["upgrade"]["drop"]
-        if afk_toggle and dropMultiplier > 1:
+                drop_multiplier *= 1 + 15 * setup_data["playerLooting"] / 100
+            return drop_multiplier
+        drop_multiplier *= md.itemList[minion_fuel_id]["upgrade"]["drop"]
+        drop_multiplier *= md.itemList[upgrade_ids[0]]["upgrade"]["drop"]
+        if afk_toggle and drop_multiplier > 1:
             # drop multiplier greater than 1 is rounded down while online
-            dropMultiplier = int(dropMultiplier)
-        dropMultiplier *= md.itemList[upgrade_ids[1]]["upgrade"]["drop"]
-        if afk_toggle and dropMultiplier > 1:
-            dropMultiplier = int(dropMultiplier)
+            drop_multiplier = int(drop_multiplier)
+        drop_multiplier *= md.itemList[upgrade_ids[1]]["upgrade"]["drop"]
+        if afk_toggle and drop_multiplier > 1:
+            drop_multiplier = int(drop_multiplier)
         if setup_data["mayor"] == "Derpy":
-            dropMultiplier *= 2
-        return dropMultiplier
+            drop_multiplier *= 2
+        return drop_multiplier
     
     def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data):
         actions_per_harvest = 2
@@ -1283,13 +1283,92 @@ class Calculator(tk.Tk):
             timeratio = 1
         return emptytime_seconds, timeratio
     
-    def get_harvests_per_time(self, emptytime_seconds, actions_per_harvest, seconds_per_action):
+    def get_harvests_per_time(self, emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier):
         if self.emptytimelength.get() == "Harvests":
             harvests_per_time = self.emptytimeamount.get()
         else:
             harvests_per_time = emptytime_seconds / (actions_per_harvest * seconds_per_action)
-        return harvests_per_time
+        
+        # drop multiplier online/offline mode
+        if not afk_toggle:
+            harvests_per_time *= drop_multiplier
+            drop_multiplier = 1
+        return harvests_per_time, drop_multiplier
 
+    def get_upgrade_info(self, upgrade_ids, drops_list):
+        spreading_info = {}
+        replace_info = {}
+        for upgrade in upgrade_ids:
+            upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
+            if "generate" in upgrade_type:
+                spreading_chance = md.itemList[upgrade]["upgrade"]["special"]["chance"]
+                for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                    spreading_info[item] = spreading_chance * amount
+                    drops_list[item] = 0
+            if "replace" in upgrade_type:
+                replace_info.update(md.itemList[upgrade]["upgrade"]["special"]["list"])
+        return spreading_info, replace_info
+    
+    def add_drops(self, item, amount, drops_list, spreading_info=None, replace_info=None):
+        if replace_info is not None and item in replace_info:
+            item = replace_info[item]
+        if item not in drops_list:
+            drops_list[item] = 0
+        drops_list[item] += amount
+        if spreading_info is not None:
+            for spreading_item, spreading_average in spreading_info.items():
+                drops_list[spreading_item] += amount * spreading_average
+        return
+
+    def get_base_drops(self, drops_list, spreading_info, replace_info, minion, harvests_per_time, drop_multiplier):
+        for item, amount in md.minionList[minion]["drops"].items():
+            self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, spreading_info, replace_info)
+        return
+
+    def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, emptytime_seconds):
+        for upgrade in upgrade_ids:
+            upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
+            specific_multiplier = 1
+            if upgrade_type == "add":
+                # adding upgrades are like Corrupt Soils
+                if afk_toggle:
+                    if "CORRUPT_SOIL" == upgrade:
+                        if "afkcorrupt" in md.minionList[minion]:
+                            # Certain mob minions get more corrupt drops when afking
+                            # It is not a constant multiplier, it is equivalent in chance to the main drops of the minion
+                            specific_multiplier = md.minionList[minion]["afkcorrupt"]
+                        if minion == "Chicken" and "ENCHANTED_EGG" not in upgrade_ids:
+                            # Online Chicken minion without Enchanted Egg does not make corrupt drops
+                            specific_multiplier = 0
+                    if "ENCHANTED_EGG" == upgrade:
+                        # Enchanted Eggs make one laid egg and one egg on kill while AFKing
+                        # the egg on spawn is affected by drop multipliers and spreadings
+                        self.add_drops("EGG", harvests_per_time * drop_multiplier, drops_list, spreading_info)
+                    for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                        self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list)
+                else:
+                    if "ENCHANTED_SHEARS" == upgrade:
+                        # No wool gets added from Enchanted Shears when offline
+                        specific_multiplier = 0
+                    for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                        self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list, spreading_info)
+            elif upgrade_type == "timer":
+                # timer upgrades are like Soulflow Engines
+                # formula for effective_cooldown still in research
+                # if afk_toggle:
+                #     effective_cooldown = 2 * secondsPaction * (1 + np.floor(np.ceil(md.itemList[upgrade]["upgrade"]["special"]["cooldown"] / secondsPaction) / 2))
+                # else:
+                #     effective_cooldown = ???
+                if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrade_ids:
+                    continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
+                if "SOULFLOW_ENGINE" == upgrade and minion == "Voidling":
+                    specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
+                effective_cooldown = md.itemList[upgrade]["upgrade"]["special"]["cooldown"]
+                for cooldown_item, cooldown_amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                    self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * emptytime_seconds / effective_cooldown, drops_list)
+        return
+
+        
     def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
         Return pet xp boosts for a given skill xp type.
@@ -1460,7 +1539,7 @@ class Calculator(tk.Tk):
         speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_data)
 
         # multiply up minion drop bonus
-        dropMultiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
+        drop_multiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
 
         # AFKing, Special Layouts and Player Harvests influences
         actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data)
@@ -1477,114 +1556,28 @@ class Calculator(tk.Tk):
         self.variables["time"]["var"].set(f"{self.totaltimeamount.get()} {self.totaltimelength.get()}")
         
         # harvests per time
-        harvests_per_time = self.get_harvests_per_time(emptytimeNumber, actions_per_harvest, seconds_per_action)
+        harvests_per_time, drop_multiplier = self.get_harvests_per_time(emptytimeNumber, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier)
         self.variables["actiontime"]["var"].set(seconds_per_action)
         self.variables["harvests"]["var"].set(minion_amount * harvests_per_time * timeratio)
 
-        # drop multiplier online/offline mode
-        if not afk_toggle:
-            harvests_per_time *= dropMultiplier
-            dropMultiplier = 1
-
+        drops_list = {}
+        # print(drops_list)
+        spreading_info, replace_info = self.get_upgrade_info(upgrades, drops_list)
+        # print(drops_list, spreading_info, replace_info)
         # base drops
-        for item, amount in md.minionList[minion_type]["drops"].items():
-            self.variables["items"]["list"][item] = harvests_per_time * amount * dropMultiplier
+        self.get_base_drops(drops_list, spreading_info, replace_info, minion_type, harvests_per_time, drop_multiplier)
+        # print(drops_list)
 
         # upgrade drops
-        # create seperate dict to keep it separate from the main drops
-        # because some upgrades use main drops to generate something
+        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, emptytimeNumber)
+        # print(drops_list)
+        
+        
+
+        # to stop all the warnings:
         upgrade_drops = {}
         spreading_drops = {}
         cooldown_drops = {}
-        for upgrade in upgrades:
-            upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
-            if "replace" in upgrade_type:
-                # replacing upgrades are like Auto Smelters
-                items = list(self.variables["items"]["list"].keys())
-                for item in items:
-                    if item in md.itemList[upgrade]["upgrade"]["special"]["list"]:
-                        replacement_item = md.itemList[upgrade]["upgrade"]["special"]["list"][item]
-                        if replacement_item not in self.variables["items"]["list"]:
-                            self.variables["items"]["list"][replacement_item] = 0
-                        self.variables["items"]["list"][replacement_item] += self.variables["items"]["list"].pop(item)
-            if upgrade_type == "generate":
-                # generating upgrades are like Diamond Spreadings
-                finalAmount = 0
-                spreading_chance = md.itemList[upgrade]["upgrade"]["special"]["chance"]
-                for amount in self.variables["items"]["list"].values():
-                    finalAmount += spreading_chance * amount
-                if minion_fuel == "INFERNO_FUEL" and afk_toggle:
-                    finalAmount /= 5
-                for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                    if item not in spreading_drops:
-                        spreading_drops[item] = 0
-                    spreading_drops[item] += finalAmount * amount
-            elif upgrade_type == "add":
-                # adding upgrades are like Corrupt Soils
-                for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                    if item not in upgrade_drops:
-                        upgrade_drops[item] = 0
-                    upgrade_drops[item] += harvests_per_time * amount
-            elif upgrade_type == "timer":
-                # timer upgrades are like Soulflow Engines
-                # formula for effective_cooldown still in research
-                # if afk_toggle:
-                #     effective_cooldown = 2 * secondsPaction * (1 + np.floor(np.ceil(md.itemList[upgrade]["upgrade"]["special"]["cooldown"] / secondsPaction) / 2))
-                # else:
-                #     effective_cooldown = ???
-                if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrades:
-                    continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
-                effective_cooldown = md.itemList[upgrade]["upgrade"]["special"]["cooldown"]
-                for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                    if item not in cooldown_drops:
-                        cooldown_drops[item] = 0
-                    cooldown_drops[item] += amount * emptytimeNumber / effective_cooldown
-
-        # other upgrades behaviours
-        if afk_toggle:
-            if "CORRUPT_SOIL" in upgrades:
-                if "afkcorrupt" in md.minionList[minion_type]:
-                    # Certain mob minions get more corrupt drops when afking
-                    # It is not a constant multiplier, it is equivalent in chance to the main drops of the minion
-                    upgrade_drops["SULPHUR_ORE"] *= md.minionList[minion_type]["afkcorrupt"]
-                    upgrade_drops["CORRUPTED_FRAGMENT"] *= md.minionList[minion_type]["afkcorrupt"]
-                if minion_type == "Chicken" and "ENCHANTED_EGG" not in upgrades:
-                    # Online Chicken minion without Enchanted Egg does not make corrupt drops
-                    upgrade_drops["SULPHUR_ORE"] = 0
-                    upgrade_drops["CORRUPTED_FRAGMENT"] = 0
-            if "ENCHANTED_EGG" in upgrades:
-                # Enchanted Eggs make one laid egg and one egg on kill while AFKing
-                # the egg on spawn is affected by drop multipliers
-                upgrade_drops["EGG"] *= 1 + dropMultiplier
-        else:
-            if "ENCHANTED_SHEARS" in upgrades:
-                # No wool gets added from Enchanted Shears when offline
-                upgrade_drops["WOOL"] = 0
-        if "SOULFLOW_ENGINE" in upgrades and minion_type == "Voidling":
-            cooldown_drops["RAW_SOULFLOW"] *= 1 + 0.03 * minion_tier  # correct most likely, needs testing
-
-        # spreading upgrades triggering from some upgrade drops
-        for upgrade in upgrades:
-            upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
-            if upgrade_type != "generate":
-                continue
-            else:
-                spreading_chance = md.itemList[upgrade]["upgrade"]["special"]["chance"]
-                if afk_toggle:
-                    if "ENCHANTED_EGG" in upgrades:
-                        # the egg on spawn triggers spreadings
-                        for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                            if item not in spreading_drops:
-                                spreading_drops[item] = 0
-                            spreading_drops[item] += harvests_per_time * dropMultiplier * spreading_chance * amount
-                else:
-                    finalAmount = 0
-                    for amount in upgrade_drops.values():
-                        finalAmount += spreading_chance * amount
-                    for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                        if item not in spreading_drops:
-                            spreading_drops[item] = 0
-                        spreading_drops[item] += finalAmount * amount
 
         # Inferno minion fuel drops
         # https://wiki.hypixel.net/Inferno_Minion_Fuel
@@ -1595,6 +1588,7 @@ class Calculator(tk.Tk):
             amount_per = md.infernofuel_data["distilates"][distilate][1]
             distillate_harvests = (harvests_per_time * 4) / 5
             upgrade_drops[distilate_item] = distillate_harvests * amount_per
+            # for distillates: use self.add_drops but use a negative amount to remove the 4/5 of the gabagool (and possible spreading drops if online)
             static_items = list(self.variables["items"]["list"].keys())  # create copy to edit list while looping it
             for item in static_items:  # replacing main drops with distilate drops
                 self.variables["items"]["list"][item] /= 5
