@@ -1157,12 +1157,12 @@ class Calculator(tk.Tk):
             print("WARNING:", ID, "not in itemList")
             return 0
 
-    def get_upgrades_types(self, upgrades):
-        upgrades_types = []
+    def get_upgrade_types(self, upgrades):
+        upgrade_types = []
         for upgrade in upgrades:
             for temp_type in md.itemList[upgrade]["upgrade"]["special"]["type"].split(", "):
-                upgrades_types.append(temp_type)
-        return upgrades_types
+                upgrade_types.append(temp_type)
+        return upgrade_types
 
     def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
         """Adds up speed boosts, uses the fact that booleans can be seen as 0 or 1 or false and true resp."""
@@ -1406,7 +1406,79 @@ class Calculator(tk.Tk):
         md.itemList["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
         # the fuel cost is put into the item data to be used later in the general fuel cost calculator
         return
-        
+
+    def apply_compactor(self, drops_list, compactor_list):
+        """compactor_list: {item: {"makes": compacted item, "amount": amount of compacted, "per": amount of item needed}, ...}"""
+        compacted_items = []
+        compactables = list(drops_list.keys())
+        while compactables:
+            item = compactables.pop(0)
+            if item not in compactor_list:
+                continue
+            amount = drops_list[item]
+            per_compacted = compactor_list[item]["per"]
+            if amount < per_compacted:
+                continue
+            compacted_name = compactor_list[item]["makes"]
+            compacted_amount = int(amount / per_compacted)
+            if "amount" in compactor_list[item]:
+                compacted_amount *= compactor_list[item]["amount"]
+            left_over = amount % per_compacted
+            if left_over == 0.0:
+                del drops_list[item]
+            else:
+                drops_list[item] = left_over
+            drops_list[compacted_name] = compacted_amount
+            compacted_items.append({"from": item, **compactor_list[item]})
+            if compacted_name in compactor_list:
+                compactables.append(compacted_name)
+        return compacted_items
+
+    def get_compacted_drops(self, drops_list, upgrade_types):
+        compacted_items = []
+        # Compactors
+        if "compact" in upgrade_types:
+            compacted_items.extend(self.apply_compactor(drops_list, md.compactorList))
+
+        # Super compactor
+        if "enchant" in upgrade_types:
+            compacted_items.extend(self.apply_compactor(drops_list, md.enchanterList))
+        return compacted_items
+
+    def get_available_storage(self, minion, minion_tier, setup_data):
+        """amount of available storage measured in slots"""
+        available_storage = md.minion_chests[setup_data["chest"]]
+        if "storage" in md.minionList[minion] and minion_tier in md.minionList[minion]["storage"]:
+            available_storage += md.minionList[minion]["storage"][minion_tier]
+        else:
+            available_storage += md.standard_storage[minion_tier]
+        return available_storage
+    
+    def get_used_storage(self, drops_list):
+        """amount of used storage measured in slots"""
+        used_storage_slots = 0
+        for amount in drops_list.values():
+            used_storage_slots += np.ceil(amount / 64)  # hypixel does not care about smaller max stack sizes
+        return used_storage_slots
+    
+    def get_fill_time(self, minion, available_storage):
+        # WARNING: calculation for fill_time does not work with compactors and is not accurate for setup with multiple drops
+        # used_storage_slots calculations work fine.
+        # fill_time = (emptytime_seconds * available_storage) / used_storage
+
+        """ 
+        Rework idea:
+        It's always the highest enchanted form available of the item that fills most of the storage, but it's the lack of compacting space that actually fills the storage.
+        The amount of slots taken by a lack of compacting space is fixed, if there are 2 slots left for a base material the compacting will stop
+        So take away those slots and you are left with slots that need to be filled with the highest enchanted form
+        And the making of the highest enchanted forms is linear in time
+        And in case of multiple item types
+        The lack of compacting space just stacks
+        And the left over space for the highest enchanted forms can be filled with a ratio of the different items
+        Also add a few checks to see if final enchanted form can even be reached, in case of very low storage space
+        """
+        return 0
+
     def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
         Return pet xp boosts for a given skill xp type.
@@ -1571,7 +1643,7 @@ class Calculator(tk.Tk):
 
         # list upgrades types
         upgrades = [md.upgrade_options[setup_data["upgrade1"]], md.upgrade_options[setup_data["upgrade2"]]]
-        upgrades_types = self.get_upgrades_types(upgrades)
+        upgrade_types = self.get_upgrade_types(upgrades)
 
         # adding up minion speed bonus
         speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_data)
@@ -1598,6 +1670,7 @@ class Calculator(tk.Tk):
         self.variables["actiontime"]["var"].set(seconds_per_action)
         self.variables["harvests"]["var"].set(minion_amount * harvests_per_time * timeratio)
 
+        # initialise drops list and get upgrade info
         drops_list = {}
         spreading_info, replace_info = self.get_upgrade_info(upgrades, drops_list)
         
@@ -1610,93 +1683,24 @@ class Calculator(tk.Tk):
         # Inferno minion fuel drops
         # https://wiki.hypixel.net/Inferno_Minion_Fuel
         self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data)
-        # print(drops_list)
 
-        # (Super) Compactor logic at the end because it applies to all drops
-        # for both compactor types it floors the ratio between items and needed items for one compacted
-        # multiplies the floored ratio if the action creates multiple compacted item
-        # uses modulo to find the left over amount
-        # keeps track of which items have been compacted to check for loss of profit
-        # saves per item the following dict
-        # {"from": item, "makes": compact item, "amount": amount of compacted, "per": amount of item needed}
-        compacted_items = []
-        # Compactors
-        # loops once through item list because there are no double normal compacted items
-        if "compact" in upgrades_types:
-            static_items = list(self.variables["items"]["list"].items())
-            for item, amount in static_items:
-                if item in md.compactorList:
-                    compact_name = md.compactorList[item]["makes"]
-                    percompact = md.compactorList[item]["per"]
-                    compact_amount = int(amount / percompact)
-                    if compact_amount == 0:
-                        continue
-                    if "amount" in md.compactorList[item]:
-                        compact_amount *= md.compactorList[item]["amount"]
-                    left_over = amount % percompact
-                    if left_over == 0.0:  # floating point error may cause extremely small numbers that should have been 0 too not trigger this
-                        del self.variables["items"]["list"][item]
-                    else:
-                        self.variables["items"]["list"][item] = left_over
-                    self.variables["items"]["list"][compact_name] = compact_amount
-                    compacted_items.append({"from": item, **md.compactorList[item]})
-            pass
-
-        # Super compactor
-        # loops continously through the item list until is cannot find something to compact
-        if "enchant" in upgrades_types:
-            found_enchantable = True
-            safety_lock = 0
-            while found_enchantable is True:
-                safety_lock += 1
-                if safety_lock >= 10:  # safety to prevent an infinite while loop
-                    self.catch_warning("While-loop overflow, super compactor 3000")
-                    break
-                found_enchantable = False
-                static_items = list(self.variables["items"]["list"].items())
-                for item, amount in static_items:
-                    if item in md.enchanterList:
-                        enchanted_name = md.enchanterList[item]["makes"]
-                        perenchanted = md.enchanterList[item]["per"]
-                        enchanted_amount = int(amount / perenchanted)
-                        if enchanted_amount == 0:
-                            continue
-                        if "amount" in md.enchanterList[item]:
-                            enchanted_amount *= md.enchanterList[item]["amount"]
-                        left_over = amount % perenchanted
-                        if left_over == 0.0:
-                            del self.variables["items"]["list"][item]
-                        else:
-                            self.variables["items"]["list"][item] = left_over
-                        self.variables["items"]["list"][enchanted_name] = enchanted_amount
-                        compacted_items.append({"from": item, **md.enchanterList[item]})
-                        if enchanted_name in md.enchanterList:
-                            found_enchantable = True
+        # Apply compactors
+        compacted_items = self.get_compacted_drops(drops_list, upgrade_types)
 
         # storage calculations
-        # amount of storage measured in slots
-        available_storage = md.minion_chests[self.variables["chest"]["var"].get()]
-        if "storage" in md.minionList[minion_type] and minion_tier in md.minionList[minion_type]["storage"]:
-            available_storage += md.minionList[minion_type]["storage"][minion_tier]
-        else:
-            available_storage += md.standard_storage[minion_tier]
+        available_storage = self.get_available_storage(minion_type, minion_tier, setup_data)
+        used_storage = self.get_used_storage(drops_list)
+        fill_time = self.get_fill_time(minion_type, available_storage)
 
-        # WARNING: calculation for fill_time does not work with compactors and is not accurate for setup with multiple drops
-        # used_storage_slots calculations work fine.
-        used_storage = 0
-        used_storage_slots = 0
-        for itemtype, amount in self.variables["items"]["list"].items():
-            used_storage += amount / 64  # hypixel does not care about smaller max stack sizes
-            used_storage_slots += np.ceil(amount / 64)
-        fill_time = (emptytime_seconds * available_storage) / used_storage
         self.variables["filltime"]["var"].set(fill_time)
-        self.variables["used_storage"]["var"].set(used_storage_slots)
+        self.variables["used_storage"]["var"].set(used_storage)
         self.variables["available_storage"]["var"].set(available_storage)
 
         # multiply drops by minion amount
         # all processes as calculated above should be linear with minion amount
-        for itemtype in self.variables["items"]["list"].keys():
-            self.variables["items"]["list"][itemtype] *= minion_amount
+        for itemtype in drops_list.keys():
+            drops_list[itemtype] *= minion_amount
+        self.variables["items"]["list"].update(drops_list)
 
         # convert items into coins and xp
         # while keeping track where items get sold
@@ -1754,6 +1758,7 @@ class Calculator(tk.Tk):
                 compact_amount = 1
                 if "amount" in data:
                     compact_amount = data["amount"]
+                # make it get the sell location from itemSellLoc
                 cost = self.get_price(item, "sell", "bazaar") * per_compact
                 compact_cost = self.get_price(compact_item, "sell", "bazaar") * compact_amount
                 if cost - compact_cost > compact_tolerance:
