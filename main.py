@@ -1479,6 +1479,55 @@ class Calculator(tk.Tk):
         """
         return 0
 
+    def get_sell_location(self, hopper, setup_data):
+        sellto = "NPC"
+        hopper_multiplier = 1
+        minion_sellLoc = setup_data["sellLoc"]
+        if minion_sellLoc == "Bazaar":
+            sellto = "bazaar"
+        elif minion_sellLoc == "Best (NPC/Bazaar)":
+            sellto = "best"
+        elif minion_sellLoc == "Hopper":
+            hopper_multiplier = md.hopper_data[hopper]
+        return sellto, hopper_multiplier
+    
+    def get_item_profit(self, sell_location, hopper_multiplier, drops_list):
+        """makes a list of all prices and takes the one that matches the choice of sell_location or takes the maximum, while keeping track where items get sold"""
+        item_profit = 0.0
+        per_item_profit = {}
+        per_item_sell_location = {}
+        item_prices = {}
+        for itemtype, amount in drops_list.items():
+            item_prices.clear()
+            item_prices["NPC"] = self.get_price(itemtype, "sell", "npc")
+            item_prices["bazaar"] = self.get_price(itemtype, "sell", "bazaar")
+            # item_prices["custom"] = self.get_price(itemtype, "sell", "custom", force=True)  # might use later
+            if sell_location in item_prices:
+                per_item_sell_location[itemtype] = sell_location
+            else:
+                per_item_sell_location[itemtype] = max(item_prices, key=item_prices.get)
+            final_price = item_prices[per_item_sell_location[itemtype]]
+            per_item_profit[itemtype] = amount * final_price * hopper_multiplier
+            item_profit += amount * final_price
+        item_profit *= hopper_multiplier
+        return item_profit, per_item_profit, per_item_sell_location
+
+    def get_skill_xp(self, afk_toggle, mayor, drops_list, setup_data):
+        skill_xp = {}
+        for itemtype, amount in drops_list.items():
+            xptype, value = list(*md.itemList[itemtype]["xp"].items())
+            if value == 0:
+                continue
+            if xptype not in skill_xp:
+                skill_xp[xptype] = 0
+            skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "Wisdom"] / 100)
+        if mayor == "Derpy":
+            for xptype in skill_xp.keys():
+                skill_xp[xptype] *= 1.5
+        if afk_toggle and setup_data["playerHarvests"] and "combat" in skill_xp:
+            del skill_xp["combat"]
+        return skill_xp
+
     def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
         Return pet xp boosts for a given skill xp type.
@@ -1629,6 +1678,7 @@ class Calculator(tk.Tk):
         minion_tier = setup_data["miniontier"]
         minion_amount = setup_data["amount"]
         minion_fuel = md.fuel_options[setup_data["fuel"]]
+        minion_hopper = setup_data["hopper"]
         minion_beacon = setup_data["beacon"]
         mayor = setup_data["mayor"]
 
@@ -1702,54 +1752,16 @@ class Calculator(tk.Tk):
             drops_list[itemtype] *= minion_amount
         self.variables["items"]["list"].update(drops_list)
 
-        # convert items into coins and xp
-        # while keeping track where items get sold
-        # it makes a list of all prices and takes the one that matches the choice of sellLoc
-        minion_hopper = self.variables["hopper"]["var"].get()
-        minion_sellLoc = self.variables["sellLoc"]["var"].get()
-        coinsPerTime = 0.0
-        sellto = "NPC"
-        hopper_multiplier = 1
-        if minion_sellLoc == "Bazaar":
-            sellto = "bazaar"
-        elif minion_sellLoc == "Best (NPC/Bazaar)":
-            sellto = "best"
-        elif minion_sellLoc == "Hopper":
-            hopper_multiplier = md.hopper_data[minion_hopper]
-        prices = {}
+        sell_location, hopper_multiplier = self.get_sell_location(minion_hopper, setup_data)
         # Coins
-        if minion_sellLoc != "None":
-            for itemtype, amount in self.variables["items"]["list"].items():
-                prices.clear()
-                prices["NPC"] = self.get_price(itemtype, "sell", "npc")
-                prices["bazaar"] = self.get_price(itemtype, "sell", "bazaar")
-                # prices["custom"] = self.getPrice(itemtype, "sell", "custom", force=True)  # might use later
-                if sellto in prices:
-                    self.variables["itemSellLoc"]["list"][itemtype] = sellto
-                    final_price = prices[sellto]
-                else:
-                    self.variables["itemSellLoc"]["list"][itemtype] = max(prices, key=prices.get)
-                    final_price = prices[self.variables["itemSellLoc"]["list"][itemtype]]
-                self.variables["itemtypeProfit"]["list"][itemtype] = amount * final_price * hopper_multiplier
-                coinsPerTime += amount * final_price
+        item_profit, per_item_profit, per_item_sell_location = self.get_item_profit(sell_location, hopper_multiplier, drops_list)
         # XP
-        for itemtype, amount in self.variables["items"]["list"].items():
-            xptype, value = list(*md.itemList[itemtype]["xp"].items())
-            if value == 0:
-                continue
-            if xptype not in self.variables["xp"]["list"]:
-                self.variables["xp"]["list"][xptype] = 0
-            self.variables["xp"]["list"][xptype] += amount * value * (1 + self.variables["wisdom"]["list"][xptype].get() / 100)
-        if mayor == "Derpy":
-            for xptype in self.variables["xp"]["list"].keys():
-                self.variables["xp"]["list"][xptype] *= 1.5
-        coinsPerTime *= hopper_multiplier
-        self.variables["itemProfit"]["var"].set(coinsPerTime * timeratio)
-        if afk_toggle and self.variables["playerHarvests"]["var"].get() and "combat" in self.variables["xp"]["list"]:
-            del self.variables["xp"]["list"]["combat"]
+        skill_xp = self.get_skill_xp(afk_toggle, mayor, drops_list, setup_data)
+        self.variables["itemProfit"]["var"].set(item_profit * timeratio)
+        self.variables["xp"]["list"].update(skill_xp)
 
         # Check for over-compacting
-        if sellto in ["best", "bazaar"]:
+        if sell_location in ["best", "bazaar"]:
             overcompacting = []
             for data in compacted_items:
                 item = data["from"]
