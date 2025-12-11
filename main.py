@@ -1424,10 +1424,7 @@ class Calculator(tk.Tk):
             if "amount" in compactor_list[item]:
                 compacted_amount *= compactor_list[item]["amount"]
             left_over = amount % per_compacted
-            if left_over == 0.0:
-                del drops_list[item]
-            else:
-                drops_list[item] = left_over
+            drops_list[item] = left_over
             drops_list[compacted_name] = compacted_amount
             compacted_items.append({"from": item, **compactor_list[item]})
             if compacted_name in compactor_list:
@@ -1527,6 +1524,25 @@ class Calculator(tk.Tk):
         if afk_toggle and setup_data["playerHarvests"] and "combat" in skill_xp:
             del skill_xp["combat"]
         return skill_xp
+
+    def get_over_compacting(self, sell_location, compacted_items, per_item_sell_location, setup_notes):
+        if sell_location not in ["best", "bazaar"]:
+            return
+        over_compacting = []
+        for item_data in compacted_items:
+            item = item_data["from"]
+            compact_item = item_data["makes"]
+            per_compact = item_data["per"]
+            compact_amount = 1
+            if "amount" in item_data:
+                compact_amount = item_data["amount"]
+            cost = self.get_price(item, "sell", per_item_sell_location[item]) * per_compact
+            compact_cost = self.get_price(compact_item, "sell", per_item_sell_location[compact_item]) * compact_amount
+            if cost - compact_cost > compact_tolerance:
+                over_compacting.append(md.itemList[item]['display'])
+        if len(over_compacting) != 0:
+            setup_notes["Over-compacting"] = ', '.join(over_compacting)
+        return
 
     def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
         """
@@ -1761,35 +1777,21 @@ class Calculator(tk.Tk):
         self.variables["xp"]["list"].update(skill_xp)
 
         # Check for over-compacting
-        if sell_location in ["best", "bazaar"]:
-            overcompacting = []
-            for data in compacted_items:
-                item = data["from"]
-                compact_item = data["makes"]
-                per_compact = data["per"]
-                compact_amount = 1
-                if "amount" in data:
-                    compact_amount = data["amount"]
-                # make it get the sell location from itemSellLoc
-                cost = self.get_price(item, "sell", "bazaar") * per_compact
-                compact_cost = self.get_price(compact_item, "sell", "bazaar") * compact_amount
-                if cost - compact_cost > compact_tolerance:
-                    overcompacting.append(md.itemList[item]['display'])
-            if len(overcompacting) != 0:
-                self.variables["notes"]["list"]["Over-compacting"] = ', '.join(overcompacting)
-
+        setup_notes = {}
+        self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes)
+        
         # Pet leveling calculations
         # https://wiki.hypixel.net/Pets#Leveling
         # for Golden Dragon: special algorithm taking into account that pet items cannot be applied to Golden Dragon Eggs
         # the pet costs are manually added in pet_data
-        petProfitPerTime = 0.0
+        pet_profit = 0.0
         all_pets = {
-            "levelingpet": {"pet": self.variables["levelingpet"]["var"].get(), "pet_xp": {}, "levelled_pets": 0.0},
-            "expsharepet": {"pet": self.variables["expsharepet"]["var"].get(), "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
-            "expsharepetslot2": {"pet": self.variables["expsharepetslot2"]["var"].get(), "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
-            "expsharepetslot3": {"pet": self.variables["expsharepetslot3"]["var"].get(), "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
+            "levelingpet": {"pet": setup_data["levelingpet"], "pet_xp": {}, "levelled_pets": 0.0},
+            "expsharepet": {"pet": setup_data["expsharepet"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
+            "expsharepetslot2": {"pet": setup_data["expsharepetslot2"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
+            "expsharepetslot3": {"pet": setup_data["expsharepetslot3"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
         }
-        main_pet = self.variables["levelingpet"]["var"].get()
+        main_pet = setup_data["levelingpet"]
         main_pet_xp = all_pets["levelingpet"]["pet_xp"]
         if main_pet != "None":
             if main_pet in ["Golden Dragon", "Jade Dragon"]:
@@ -1832,14 +1834,14 @@ class Calculator(tk.Tk):
                 if pet_info["pet"] not in pet_costs:
                     self.variables["notes"]["list"]["Pet Costs"] = f"{pet_info['pet']} is not in pet_costs."
                 else:
-                    petProfitPerTime += self.variables["pets_levelled"]["list"][pet_slot] * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
+                    pet_profit += self.variables["pets_levelled"]["list"][pet_slot] * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
                 if pet_slot == "levelingpet" and (main_pet_item := self.variables["petxpboost"]["var"].get()) != "None":
-                    petProfitPerTime -= self.variables["pets_levelled"]["list"][pet_slot] * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
+                    pet_profit -= self.variables["pets_levelled"]["list"][pet_slot] * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
                 elif self.variables["expshareitem"]["var"].get():
-                    petProfitPerTime -= self.variables["pets_levelled"]["list"][pet_slot] * exp_share_price
+                    pet_profit -= self.variables["pets_levelled"]["list"][pet_slot] * exp_share_price
                 self.variables["pets_levelled"]["list"][pet_slot] *= timeratio
 
-        self.variables["petProfit"]["var"].set(petProfitPerTime * timeratio)
+        self.variables["petProfit"]["var"].set(pet_profit * timeratio)
 
         # calculating beacon and limited fuel cost
         fuelCostPerTime = 0.0
