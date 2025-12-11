@@ -673,6 +673,20 @@ class Calculator(tk.Tk):
         output_string = f'{reduced}{reduced_amounts[highest_reduction]}'
         return output_string
 
+    def deepmultiply(self, obj, multiplier):
+        if type(obj) is dict:
+            keys = obj.keys()
+        else:
+            keys = range(len(obj))
+        for key in keys:
+            if type(obj[key]) in [dict, list]:
+                self.deepmultiply(obj[key], multiplier)
+            elif type(obj[key]) is str:
+                continue
+            else:
+                obj[key] *= multiplier
+        return
+
     def update_gui_wisdom(self):
         """
         Updates the wisdom listbox
@@ -1476,7 +1490,7 @@ class Calculator(tk.Tk):
         """
         return 0
 
-    def get_sell_location(self, hopper, setup_data):
+    def get_sell_location(self, setup_data):
         sellto = "NPC"
         hopper_multiplier = 1
         minion_sellLoc = setup_data["sellLoc"]
@@ -1485,7 +1499,7 @@ class Calculator(tk.Tk):
         elif minion_sellLoc == "Best (NPC/Bazaar)":
             sellto = "best"
         elif minion_sellLoc == "Hopper":
-            hopper_multiplier = md.hopper_data[hopper]
+            hopper_multiplier = md.hopper_data[setup_data["hopper"]]
         return sellto, hopper_multiplier
     
     def get_item_profit(self, sell_location, hopper_multiplier, drops_list):
@@ -1631,6 +1645,209 @@ class Calculator(tk.Tk):
         gained_pet_xp += left_over_pet_xp
         return gained_pet_xp, left_over_pet_xp
 
+    def get_pet_profit(self, skill_xp, mayor, setup_pets, setup_notes, setup_data):
+        """
+        Pet levelling calculations: https://wiki.hypixel.net/Pets#Leveling,
+        for Golden Dragon: special algorithm taking into account that pet items cannot be applied to Golden Dragon Eggs,
+        the pet costs are manually added in pet_data
+        """
+        pet_profit = 0.0
+        main_pet = setup_pets["levelingpet"]["pet"]
+        if main_pet == "None":
+            return 0
+        main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
+        if "Dragon" in md.all_pets[main_pet]["rarity"]:
+            left_over_pet_xp = 0.0
+            for skill, amount in skill_xp.items():
+                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
+                main_pet_xp[skill], left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
+        else:
+            for skill, amount in skill_xp.items():
+                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
+                main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
+        exp_share_boost = 0.2 * setup_data["taming"] + 10 * (mayor == "Diana") + setup_data["toucan_attribute"]
+        exp_share_item = 15 * setup_data["expshareitem"]
+        for pet_slot, pet_info in setup_pets.items():
+            if pet_slot == "levelingpet":
+                continue
+            exp_share_pet = pet_info["pet"]
+            if exp_share_pet == "None":
+                continue
+            if "Dragon" in md.all_pets[exp_share_pet]["rarity"]:
+                if exp_share_boost == 0:
+                    continue
+                left_over_pet_xp = 0.0
+                for skill, amount in main_pet_xp.items():
+                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
+                    equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
+                    equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
+                    gained_pet_xp, left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
+                    pet_info["pet_xp"]["exp_share"] += gained_pet_xp
+            else:
+                for skill, amount in main_pet_xp.items():
+                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
+                    pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item) / 100) * non_matching
+            if mayor != "Diana":
+                break
+        exp_share_price = self.get_price("PET_ITEM_EXP_SHARE", "buy", "custom", True)
+        if exp_share_price == 0:
+            exp_share_price = self.get_price("PET_ITEM_EXP_SHARE_DROP", "buy", "bazaar") + 72 * self.get_price("ENCHANTED_GOLD", "buy", "bazaar")
+        for pet_slot, pet_info in setup_pets.items():
+            pets_levelled = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.all_pets[pet_info["pet"]]["rarity"]]
+            setup_pets[pet_slot]["levelled_pets"] = pets_levelled
+            if pet_info["pet"] not in pet_costs:
+                setup_notes["Pet Costs"] = f"{pet_info['pet']} is not in pet_costs."
+            else:
+                pet_profit += pets_levelled * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
+            if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "None":
+                pet_profit -= pets_levelled * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
+            if pet_slot != "levelingpet" and setup_data["expshareitem"]:
+                pet_profit -= pets_levelled * exp_share_price
+        return pet_profit
+
+    def get_finite_fuel_cost(self, minion_amount, minion_fuel, emptytime_seconds, setup_data):
+        fuel_cost = 0.0
+        needed_fuel = 0.0
+        if setup_data["beacon"] != 0:
+            if setup_data["scorched"]:
+                beacon_fuel_ID = "SCORCHED_POWER_CRYSTAL"
+            else:
+                beacon_fuel_ID = "POWER_CRYSTAL"
+            cost_per_crystal = self.get_price(beacon_fuel_ID, "buy", "bazaar")
+            fuel_cost += emptytime_seconds * cost_per_crystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (setup_data["B_constant"]))
+        if md.itemList[minion_fuel]["upgrade"]["duration"] != 0:
+            cost_per_fuel = self.get_price(minion_fuel, "buy", "bazaar")
+            needed_fuel = minion_amount * emptytime_seconds / md.itemList[minion_fuel]["upgrade"]["duration"]
+            fuel_cost += needed_fuel * cost_per_fuel
+        return fuel_cost, needed_fuel
+
+    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_notes, setup_data):
+        cost_per_part = {}
+        extra_cost = ""
+
+        # Single minion cost
+        cost_cache = {}
+        tiered_coin_cost = {}
+        tiered_extra_cost = {}
+        tier_loop = np.arange(minion_tier) + 1
+        for tier in tier_loop:
+            tiered_coin_cost[tier] = 0.0
+            if minion_type in md.extraMinionCosts:
+                if tier in md.extraMinionCosts[minion_type]:
+                    if "COINS" in md.extraMinionCosts[minion_type][tier]:
+                        tiered_coin_cost[tier] += md.extraMinionCosts[minion_type][tier]["COINS"]
+                    if len(md.extraMinionCosts[minion_type][tier]) > 1 or "COINS" not in md.extraMinionCosts[minion_type][tier]:
+                        tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in md.extraMinionCosts[minion_type][tier].items() if cost_type != "COINS"}
+            for item, amount in md.minionCosts[minion_type][tier].items():
+                if item not in cost_cache:
+                    cost_cache[item] = self.get_price(item, "buy", "bazaar")
+                tiered_coin_cost[tier] += amount * cost_cache[item]
+            if tier != 1:
+                tiered_coin_cost[tier] += tiered_coin_cost[tier - 1]
+            if tier - 1 in tiered_extra_cost:
+                if tier not in tiered_extra_cost:
+                    tiered_extra_cost[tier] = {}
+                for material, amount in tiered_extra_cost[tier - 1].items():
+                    if material not in tiered_extra_cost[tier]:
+                        tiered_extra_cost[tier][material] = 0
+                    tiered_extra_cost[tier][material] += amount
+        if len(tiered_extra_cost) != 0:
+            setup_notes["Extra cost"] = ", ".join([f"{amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()]) + " per minion"
+            extra_cost = ", ".join([f"{amount * minion_amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()])
+        cost_per_part["minion"] = tiered_coin_cost[minion_tier]
+
+        # Infinite fuel cost
+        if minion_fuel != "NONE" and md.itemList[minion_fuel]["upgrade"]["duration"] == 0:
+            if minion_fuel == "EVERBURNING_FLAME" and self.get_price("EVERBURNING_FLAME", "buy", "custom", True) == 0:
+                for item_ID, amount in md.upgrades_material_cost["EVERBURNING_FLAME"].items():
+                    cost_per_part["fuel"] = amount * self.get_price(item_ID, "buy", "bazaar")
+            else:
+                cost_per_part["fuel"] = self.get_price(minion_fuel, "buy", "bazaar")
+
+        # Hopper cost
+        if setup_data["hopper"] in ["Budget Hopper", "Enchanted Hopper"]:
+            hopper_ID = md.getID[setup_data["hopper"]]
+            cost_per_part["hopper"] = self.get_price(hopper_ID, "buy", "bazaar")
+
+        # Internal minion upgrades cost
+        for i, upgrade in enumerate(upgrades):
+            if upgrade != "NONE":
+                cost_per_part[f"upgrade{i + 1}"] = self.get_price(upgrade, "buy", "bazaar")
+
+        # Infusion cost
+        if setup_data["infusion"]:
+            cost_per_part["infusion"] = self.get_price("MITHRIL_INFUSION", "buy", "bazaar")
+
+        # Free Will costs
+        """
+        Amount of Free Wills needed per minion:
+        Let p be the chance to get a loyal minion.
+        Let X be a r.v. denoting the amount of Free Wills needed.
+        Using first step analysis we get
+        E(X) = (1- p)(E(X) + 1) + p * 1
+        E(X) = (1- p)E(X) + 1 - p + p
+        E(X) = E(X)- pE(X) + 1
+        E(X)= 1/p
+        """
+        free_will_price = self.get_price("FREE_WILL", "buy", "bazaar")
+        postcard_price = self.get_price("POSTCARD", "buy", "custom", True)
+        if postcard_price == 0:
+            # If no price found, use the free will price
+            final_postcard_cost = free_will_price
+        else:
+            final_postcard_cost = postcard_price
+        if setup_data["free_will"]:
+            tiered_free_will = {}
+            for tier in tier_loop:
+                free_wills_needed = 1 / (0.5 + 0.04 * (tier - 1))
+                # for each failed Free Will we need another minion and we get a postcard
+                # the last Free Will will not give a post card
+                free_wills_failed = free_wills_needed - 1
+                tiered_free_will[tier] = free_wills_failed * (tiered_coin_cost[tier] - final_postcard_cost) + free_wills_needed * free_will_price
+            optimal = min(tiered_free_will, key=tiered_free_will.get)
+            self.variables["optimal_tier_free_will"]["var"].set(optimal)
+            setup_notes["Free Will"] = f"per minion, apply {1 / (0.5 + 0.04 * (optimal - 1)):.2} Free Wills on Tier {optimal}"
+            cost_per_part["free_will"] = tiered_free_will[optimal]
+
+        # Storage Chest cost
+        if setup_data["chest"] != "None":
+            chest_ID = md.getID[setup_data["chest"]]
+            cost_per_part["chest"] = self.get_price(chest_ID, "buy", "bazaar")
+        
+        # multiply by minion amount
+        self.deepmultiply(cost_per_part, minion_amount)
+
+        # Beacon cost
+        if setup_data["beacon"] != 0 and not setup_data["B_acquired"]:
+            cost_per_part["beacon"] = 0
+            for i in np.arange(setup_data["beacon"]) + 1:
+                for item_ID, amount in md.upgrades_material_cost["beacon"][i].items():
+                    cost_per_part["beacon"] += amount * self.get_price(item_ID, "buy", "bazaar")
+
+        # Floating Crystal cost
+        if setup_data["crystal"] != "None":
+            cost_per_part["crystal"] = 0
+            for item_ID, amount in md.upgrades_material_cost["crystal"][setup_data["crystal"]].items():
+                cost_per_part["crystal"] += amount * self.get_price(item_ID, "buy", "bazaar")
+
+        # Postcard cost
+        if setup_data["postcard"]:
+            cost_per_part["postcard"] = final_postcard_cost
+
+        # Potato Talisman cost
+        if setup_data["potatoTalisman"]:
+            cost_per_part["potatoTalisman"] = self.get_price("POTATO_TALISMAN", "buy", "custom", True)
+
+        # Attribute costs
+        if setup_data["toucan_attribute"] != 0:
+            cost_per_part["toucan_attribute"] = md.attribute_shards["Epic"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", "buy", "bazaar")
+        if setup_data["falcon_attribute"] != 0:
+            cost_per_part["falcon_attribute"] = md.attribute_shards["Rare"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", "buy", "bazaar")
+
+
+        total_cost = sum(cost_per_part.values())
+        return total_cost, extra_cost, cost_per_part
+
     def catch_warning(self, warning_message):
         """
         Warning catching system used during calculations.
@@ -1693,9 +1910,7 @@ class Calculator(tk.Tk):
         minion_type = setup_data["minion"]
         minion_tier = setup_data["miniontier"]
         minion_amount = setup_data["amount"]
-        minion_fuel = md.fuel_options[setup_data["fuel"]]
-        minion_hopper = setup_data["hopper"]
-        minion_beacon = setup_data["beacon"]
+        minion_fuel = md.fuel_options[setup_data["fuel"]] 
         mayor = setup_data["mayor"]
 
         # Enchanted Clock uses offline calculations, but you can be on the island when using it to apply boosts that require a loaded island.
@@ -1764,11 +1979,10 @@ class Calculator(tk.Tk):
 
         # multiply drops by minion amount
         # all processes as calculated above should be linear with minion amount
-        for itemtype in drops_list.keys():
-            drops_list[itemtype] *= minion_amount
+        self.deepmultiply(drops_list, minion_amount)
         self.variables["items"]["list"].update(drops_list)
 
-        sell_location, hopper_multiplier = self.get_sell_location(minion_hopper, setup_data)
+        sell_location, hopper_multiplier = self.get_sell_location(setup_data)
         # Coins
         item_profit, per_item_profit, per_item_sell_location = self.get_item_profit(sell_location, hopper_multiplier, drops_list)
         # XP
@@ -1780,209 +1994,29 @@ class Calculator(tk.Tk):
         setup_notes = {}
         self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes)
         
-        # Pet leveling calculations
-        # https://wiki.hypixel.net/Pets#Leveling
-        # for Golden Dragon: special algorithm taking into account that pet items cannot be applied to Golden Dragon Eggs
-        # the pet costs are manually added in pet_data
-        pet_profit = 0.0
-        all_pets = {
+        # Pet leveling
+        setup_pets = {
             "levelingpet": {"pet": setup_data["levelingpet"], "pet_xp": {}, "levelled_pets": 0.0},
             "expsharepet": {"pet": setup_data["expsharepet"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
             "expsharepetslot2": {"pet": setup_data["expsharepetslot2"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
             "expsharepetslot3": {"pet": setup_data["expsharepetslot3"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
         }
-        main_pet = setup_data["levelingpet"]
-        main_pet_xp = all_pets["levelingpet"]["pet_xp"]
-        if main_pet != "None":
-            if main_pet in ["Golden Dragon", "Jade Dragon"]:
-                left_over_pet_xp = 0.0
-                for skill, amount in self.variables["xp"]["list"].items():
-                    pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
-                    main_pet_xp[skill], left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
-            else:
-                for skill, amount in self.variables["xp"]["list"].items():
-                    pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
-                    main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
-            exp_share_boost = 0.2 * self.variables["taming"]["var"].get() + 10 * (self.variables["mayor"]["var"].get() == "Diana") + self.variables["toucan_attribute"]["var"].get()
-            exp_share_item = 15 * self.variables["expshareitem"]["var"].get()
-            for pet_slot, pet_info in all_pets.items():
-                if pet_slot == "levelingpet":
-                    continue
-                exp_share_pet = pet_info["pet"]
-                if exp_share_pet != "None": 
-                    if exp_share_pet in ["Golden Dragon", "Jade Dragon"]:
-                        if exp_share_boost == 0:
-                            continue
-                        left_over_pet_xp = 0.0
-                        for skill, amount in main_pet_xp.items():
-                            non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
-                            equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
-                            equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
-                            gained_pet_xp, left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
-                            pet_info["pet_xp"]["exp_share"] += gained_pet_xp
-                    else:
-                        for skill, amount in main_pet_xp.items():
-                            non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
-                            pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (exp_share_pet != "Golden Dragon (lvl 1-100)")) / 100) * non_matching
-                if mayor != "Diana":
-                    break
-            exp_share_price = self.get_price("PET_ITEM_EXP_SHARE", "buy", "custom", True)
-            if exp_share_price == 0:
-                exp_share_price = self.get_price("PET_ITEM_EXP_SHARE_DROP", "buy", "bazaar") + 72 * self.get_price("ENCHANTED_GOLD", "buy", "bazaar")
-            for pet_slot, pet_info in all_pets.items():
-                self.variables["pets_levelled"]["list"][pet_slot] = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.all_pets[pet_info["pet"]]["rarity"]]
-                if pet_info["pet"] not in pet_costs:
-                    self.variables["notes"]["list"]["Pet Costs"] = f"{pet_info['pet']} is not in pet_costs."
-                else:
-                    pet_profit += self.variables["pets_levelled"]["list"][pet_slot] * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
-                if pet_slot == "levelingpet" and (main_pet_item := self.variables["petxpboost"]["var"].get()) != "None":
-                    pet_profit -= self.variables["pets_levelled"]["list"][pet_slot] * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
-                elif self.variables["expshareitem"]["var"].get():
-                    pet_profit -= self.variables["pets_levelled"]["list"][pet_slot] * exp_share_price
-                self.variables["pets_levelled"]["list"][pet_slot] *= timeratio
-
+        pet_profit = self.get_pet_profit(skill_xp, mayor, setup_pets, setup_notes, setup_data)
         self.variables["petProfit"]["var"].set(pet_profit * timeratio)
 
         # calculating beacon and limited fuel cost
-        fuelCostPerTime = 0.0
-        neededFuelPerTime = 0.0
-        if minion_beacon != 0:
-            if self.variables["scorched"]["var"].get():
-                beacon_fuel_ID = "SCORCHED_POWER_CRYSTAL"
-            else:
-                beacon_fuel_ID = "POWER_CRYSTAL"
-            costPerCrystal = self.get_price(beacon_fuel_ID, "buy", "bazaar")
-            fuelCostPerTime += emptytime_seconds * costPerCrystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (self.variables["B_constant"]["var"].get()))
-        if md.itemList[minion_fuel]["upgrade"]["duration"] != 0:
-            costPerFuel = self.get_price(minion_fuel, "buy", "bazaar")
-            neededFuelPerTime = minion_amount * emptytime_seconds / md.itemList[minion_fuel]["upgrade"]["duration"]
-            fuelCostPerTime += neededFuelPerTime * costPerFuel
-        self.variables["fuelcost"]["var"].set(fuelCostPerTime * timeratio)
-        self.variables["fuelamount"]["var"].set(np.max([neededFuelPerTime * timeratio, minion_amount]))
+        fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, emptytime_seconds, setup_data)
+        self.variables["fuelcost"]["var"].set(fuel_cost * timeratio)
+        self.variables["fuelamount"]["var"].set(np.max([needed_fuel * timeratio, minion_amount]))
+
+        # total profit
+        total_profit = item_profit + pet_profit - fuel_cost
 
         # Setup cost
-        total_cost = 0.0
-        # Single minion cost
-        cost_cache = {}
-        tiered_coin_cost = {}
-        tiered_extra_cost = {}
-        tier_loop = np.arange(minion_tier) + 1
-        for tier in tier_loop:
-            tiered_coin_cost[tier] = 0.0
-            if minion_type in md.extraMinionCosts:
-                if tier in md.extraMinionCosts[minion_type]:
-                    if "COINS" in md.extraMinionCosts[minion_type][tier]:
-                        tiered_coin_cost[tier] += md.extraMinionCosts[minion_type][tier]["COINS"]
-                    if len(md.extraMinionCosts[minion_type][tier]) > 1 or "COINS" not in md.extraMinionCosts[minion_type][tier]:
-                        tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in md.extraMinionCosts[minion_type][tier].items() if cost_type != "COINS"}
-            for item, amount in md.minionCosts[minion_type][tier].items():
-                if item not in cost_cache:
-                    cost_cache[item] = self.get_price(item, "buy", "bazaar")
-                tiered_coin_cost[tier] += amount * cost_cache[item]
-            if tier != 1:
-                tiered_coin_cost[tier] += tiered_coin_cost[tier - 1]
-            if tier - 1 in tiered_extra_cost:
-                if tier not in tiered_extra_cost:
-                    tiered_extra_cost[tier] = {}
-                for material, amount in tiered_extra_cost[tier - 1].items():
-                    if material not in tiered_extra_cost[tier]:
-                        tiered_extra_cost[tier][material] = 0
-                    tiered_extra_cost[tier][material] += amount
-        if len(tiered_extra_cost) != 0:
-            self.variables["notes"]["list"]["Extra cost"] = ", ".join([f"{amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()]) + " per minion"
-            self.variables["extracost"]["var"].set(", ".join([f"{amount * minion_amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()]))
-        else:
-            self.variables["extracost"]["var"].set("")
-        total_cost += tiered_coin_cost[minion_tier]
+        total_cost, extra_cost, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_notes, setup_data)
+        self.variables["extracost"]["var"].set(extra_cost)
 
-        # Infinite fuel cost
-        if minion_fuel != "NONE" and md.itemList[minion_fuel]["upgrade"]["duration"] == 0:
-            if minion_fuel == "EVERBURNING_FLAME" and self.get_price("EVERBURNING_FLAME", "buy", "custom", True) == 0:
-                for item_ID, amount in md.upgrades_material_cost["EVERBURNING_FLAME"].items():
-                    total_cost += amount * self.get_price(item_ID, "buy", "bazaar")
-            else:
-                total_cost += self.get_price(minion_fuel, "buy", "bazaar")
-
-        # Hopper cost
-        if minion_hopper in ["Budget Hopper", "Enchanted Hopper"]:
-            hopper_ID = md.getID[minion_hopper]
-            total_cost += self.get_price(hopper_ID, "buy", "bazaar")
-
-        # Internal minion upgrades cost
-        for upgrade in upgrades:
-            if upgrade != "NONE":
-                total_cost += self.get_price(upgrade, "buy", "bazaar")
-
-        # Infusion cost
-        if self.variables["infusion"]["var"].get() is True:
-            total_cost += self.get_price("MITHRIL_INFUSION", "buy", "bazaar")
-
-        # Free Will costs
-        """
-        Amount of Free Wills needed per minion:
-        Let p be the chance to get a loyal minion.
-        Let X be a r.v. denoting the amount of Free Wills needed.
-        Using first step analysis we get
-        E(X) = (1- p)(E(X) + 1) + p * 1
-        E(X) = (1- p)E(X) + 1 - p + p
-        E(X) = E(X)- pE(X) + 1
-        E(X)= 1/p
-        """
-        free_will_price = self.get_price("FREE_WILL", "buy", "bazaar")
-        postcard_price = self.get_price("POSTCARD", "buy", "custom", True)
-        if postcard_price == 0:
-            # If no price found, use the free will price
-            final_postcard_cost = free_will_price
-        else:
-            final_postcard_cost = postcard_price
-        if self.variables["free_will"]["var"].get() is True:
-            tiered_free_will = {}
-            for tier in tier_loop:
-                free_wills_needed = 1 / (0.5 + 0.04 * (tier - 1))
-                # for each failed Free Will we need another minion and we get a postcard
-                # the last Free Will will not give a post card
-                free_wills_failed = free_wills_needed - 1
-                tiered_free_will[tier] = free_wills_failed * (tiered_coin_cost[tier] - final_postcard_cost) + free_wills_needed * free_will_price
-            optimal = min(tiered_free_will, key=tiered_free_will.get)
-            self.variables["optimal_tier_free_will"]["var"].set(optimal)
-            self.variables["notes"]["list"]["Free Will"] = f"per minion, apply {1 / (0.5 + 0.04 * (optimal - 1)):.2} Free Wills on Tier {optimal}"
-            self.variables["freewillcost"]["var"].set(tiered_free_will[optimal] * minion_amount)
-
-        # Storage Chest cost
-        if self.variables["chest"]["var"].get() != "None":
-            chest_ID = md.getID[self.variables["chest"]["var"].get()]
-            total_cost += self.get_price(chest_ID, "buy", "bazaar")
-        
-        # multiply by minion amount
-        total_cost *= minion_amount
-
-        # Beacon cost
-        if minion_beacon != 0 and not self.variables["B_acquired"]["var"].get():
-            for i in np.arange(minion_beacon) + 1:
-                for item_ID, amount in md.upgrades_material_cost["beacon"][i].items():
-                    total_cost += amount * self.get_price(item_ID, "buy", "bazaar")
-
-        # Floating Crystal cost
-        if self.variables["crystal"]["var"].get() != "None":
-            for item_ID, amount in md.upgrades_material_cost["crystal"][self.variables["crystal"]["var"].get()].items():
-                total_cost += amount * self.get_price(item_ID, "buy", "bazaar")
-
-        # Postcard cost
-        if self.variables["postcard"]["var"].get():
-            total_cost += final_postcard_cost
-
-        # Potato Talisman cost
-        if self.variables["potatoTalisman"]["var"].get():
-            total_cost += self.get_price("POTATO_TALISMAN", "buy", "custom", True)
-
-        # Attribute costs
-        if self.variables["toucan_attribute"]["var"].get() != 0:
-            total_cost += md.attribute_shards["Epic"][self.variables["toucan_attribute"]["var"].get()] * self.get_price("SHARD_TOUCAN", "buy", "bazaar")
-        if self.variables["falcon_attribute"]["var"].get() != 0:
-            total_cost += md.attribute_shards["Rare"][self.variables["falcon_attribute"]["var"].get()] * self.get_price("SHARD_FALCON", "buy", "bazaar")
-
-
-        # Sending results to self.variables
+        # Sending results to self.variables (rework: put all time dependent outputs in a dict (standardized keys in __init__), and multiply by timeratio, then add all the time independent stuff and either return the dict or send it to self.variables depending on inGUI)
         self.variables["setupcost"]["var"].set(total_cost)
         self.variables["totalProfit"]["var"].set(self.variables["itemProfit"]["var"].get() + self.variables["petProfit"]["var"].get() - self.variables["fuelcost"]["var"].get())
 
@@ -1990,6 +2024,7 @@ class Calculator(tk.Tk):
         for loop_key in ["items", "itemtypeProfit", "xp"]:
             for item in self.variables[loop_key]["list"]:
                 self.variables[loop_key]["list"][item] *= timeratio
+        # use self.deepmultiply, and dont forget to apply timeratio to pets_levelled list
 
         # Construct ID
         setup_ID = self.construct_id(setup_data)
