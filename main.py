@@ -1042,13 +1042,28 @@ class Calculator(tk.Tk):
             template[key] = var_data["var"].get()
         return template
 
-    def construct_id(self, template):
+    def send_to_GUI(self, outputs):
+        for var_key in outputs:
+            if var_key not in self.variables:
+                self.catch_warning(f"Output {var_key} not found in self.variables")
+                continue
+            if self.variables[var_key]["vtype"] == "list":
+                self.variables[var_key]["list"].clear()
+                if type(self.variables[var_key]["list"]) is dict:
+                    self.variables[var_key]["list"].update(outputs[var_key])
+                else:
+                    self.variables[var_key]["list"].extend(outputs[var_key])
+            else:
+                self.variables[var_key]["var"].set(outputs[var_key])
+        return
+
+    def construct_id(self, setup_data):
         """
-        Generates the setup ID of the current inputted setup.
-        A setup ID consists of:
-            the version number of the minion calculator it was generated in\n
-            the index of the set value in "options" of each self.variable with "vtype" equal to "input" encoded in ASCII with an offset of 48\n
-            the set value surrounded by exclamation marks if a self.variable has an empty "options" list
+        Generates the setup ID of the provided setup data.
+        A setup ID consists of:\n
+        - the version number of the minion calculator it was generated in\n
+        - the index of the set value in "options" of each self.variable with "vtype" equal to "input" encoded in ASCII with an offset of 48\n
+        - the set value surrounded by exclamation marks if a self.variable has an empty "options" list
 
         Returns
         -------
@@ -1057,7 +1072,7 @@ class Calculator(tk.Tk):
 
         """
         setup_id = str(self.version.get()) + "!"
-        for key, val in template.items():
+        for key, val in setup_data.items():
             var_options = self.variables[key]["options"]
             if len(var_options) == 0:
                 if int(val) == val:
@@ -1083,20 +1098,20 @@ class Calculator(tk.Tk):
             Template structure for load_template().
 
         """
-        template = {}
+        setup_data = {}
         end_ver = ID.find("!")
         if end_ver == -1:
             print("WARNING: Invalid ID, could not find version number")
-            return template
+            return setup_data
         try:
             version = float(ID[0:end_ver])
         except Exception:
             print("WARNING: Invalid ID, could not find version number")
-            return template
+            return setup_data
         ID_index = end_ver + 1
         if version != self.version.get():
             print("WARNING: Invalid ID, Incompatible version")
-            return template
+            return setup_data
         try:
             for key, var_data in self.variables.items():
                 if var_data["vtype"] != "input":
@@ -1106,10 +1121,10 @@ class Calculator(tk.Tk):
                         print(f"WARNING: did not find {key}")
                         return
                     end_val = ID.find("!", ID_index + 1)
-                    template[key] = var_data["dtype"](ID[ID_index + 1:end_val])
+                    setup_data[key] = var_data["dtype"](ID[ID_index + 1:end_val])
                     ID_index = end_val + 1
                 else:
-                    template[key] = var_data["options"][ord(ID[ID_index]) - 48]
+                    setup_data[key] = var_data["options"][ord(ID[ID_index]) - 48]
                     ID_index += 1
         except Exception as error:
             if type(error) == IndexError:
@@ -1118,7 +1133,7 @@ class Calculator(tk.Tk):
             else:
                 print("ERROR: unknown error\ndumping error logs", error)
                 return {}
-        return template
+        return setup_data
 
     def get_price(self, ID, action="buy", location="bazaar", force=False):
         """
@@ -1383,6 +1398,7 @@ class Calculator(tk.Tk):
         return
 
     def get_inferno_drops(self, drops_list, spreading_info, replace_info, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data):
+        # https://wiki.hypixel.net/Inferno_Minion_Fuel
         if minion_fuel != "INFERNO_FUEL":
             return
         # distilate drops
@@ -1871,7 +1887,7 @@ class Calculator(tk.Tk):
         self.variables["notes"]["list"][note_name] = note_text
         return
 
-    def calculate(self, inGUI=False, setup_data=None):
+    def calculate(self, inGUI=False, setup_data=None, return_outputs=False):
         """
         Main calculation function
 
@@ -1894,17 +1910,9 @@ class Calculator(tk.Tk):
         if bazaar_auto_update:
             self.update_bazaar(cooldown_warning=False)
 
-        # clear list outputs from previous calculation
-        for var_key, var_data in self.variables.items():
-            if var_data["vtype"] == "list":
-                if var_key == "wisdom":
-                    continue
-                var_data["list"].clear()
-
         # Get inputs if none are given
         if setup_data is None:
             setup_data = self.get_inputs()
-
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -1912,13 +1920,12 @@ class Calculator(tk.Tk):
         minion_amount = setup_data["amount"]
         minion_fuel = md.fuel_options[setup_data["fuel"]] 
         mayor = setup_data["mayor"]
+        afk_toggle = setup_data["afk"]
 
         # Enchanted Clock uses offline calculations, but you can be on the island when using it to apply boosts that require a loaded island.
         # This clock_override replaces afk_toggle for these boosts
-        afk_toggle = setup_data["afk"]
-        clock_toggle = setup_data["enchanted_clock"]
         clock_override = False
-        if clock_toggle and afk_toggle:
+        if setup_data["enchanted_clock"] and afk_toggle:
             afk_toggle = False
             clock_override = True
 
@@ -1943,13 +1950,9 @@ class Calculator(tk.Tk):
 
         # time calculations
         emptytime_seconds, timeratio = self.get_emptytime_and_ratio(seconds_per_action, actions_per_harvest, setup_data)
-        self.variables["emptytime"]["var"].set(f"{self.emptytimeamount.get()} {self.emptytimelength.get()}")
-        self.variables["time"]["var"].set(f"{self.totaltimeamount.get()} {self.totaltimelength.get()}")
         
         # harvests per time
         harvests_per_time, drop_multiplier = self.get_harvests_per_time(emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier)
-        self.variables["actiontime"]["var"].set(seconds_per_action)
-        self.variables["harvests"]["var"].set(minion_amount * harvests_per_time * timeratio)
 
         # initialise drops list and get upgrade info
         drops_list = {}
@@ -1962,7 +1965,6 @@ class Calculator(tk.Tk):
         self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, emptytime_seconds)
         
         # Inferno minion fuel drops
-        # https://wiki.hypixel.net/Inferno_Minion_Fuel
         self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data)
 
         # Apply compactors
@@ -1973,22 +1975,15 @@ class Calculator(tk.Tk):
         used_storage = self.get_used_storage(drops_list)
         fill_time = self.get_fill_time(minion_type, available_storage)
 
-        self.variables["filltime"]["var"].set(fill_time)
-        self.variables["used_storage"]["var"].set(used_storage)
-        self.variables["available_storage"]["var"].set(available_storage)
-
         # multiply drops by minion amount
         # all processes as calculated above should be linear with minion amount
         self.deepmultiply(drops_list, minion_amount)
-        self.variables["items"]["list"].update(drops_list)
 
         sell_location, hopper_multiplier = self.get_sell_location(setup_data)
         # Coins
         item_profit, per_item_profit, per_item_sell_location = self.get_item_profit(sell_location, hopper_multiplier, drops_list)
         # XP
         skill_xp = self.get_skill_xp(afk_toggle, mayor, drops_list, setup_data)
-        self.variables["itemProfit"]["var"].set(item_profit * timeratio)
-        self.variables["xp"]["list"].update(skill_xp)
 
         # Check for over-compacting
         setup_notes = {}
@@ -2002,44 +1997,56 @@ class Calculator(tk.Tk):
             "expsharepetslot3": {"pet": setup_data["expsharepetslot3"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
         }
         pet_profit = self.get_pet_profit(skill_xp, mayor, setup_pets, setup_notes, setup_data)
-        self.variables["petProfit"]["var"].set(pet_profit * timeratio)
 
         # calculating beacon and limited fuel cost
         fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, emptytime_seconds, setup_data)
-        self.variables["fuelcost"]["var"].set(fuel_cost * timeratio)
-        self.variables["fuelamount"]["var"].set(np.max([needed_fuel * timeratio, minion_amount]))
 
         # total profit
         total_profit = item_profit + pet_profit - fuel_cost
 
         # Setup cost
         total_cost, extra_cost, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_notes, setup_data)
-        self.variables["extracost"]["var"].set(extra_cost)
-
-        # Sending results to self.variables (rework: put all time dependent outputs in a dict (standardized keys in __init__), and multiply by timeratio, then add all the time independent stuff and either return the dict or send it to self.variables depending on inGUI)
-        self.variables["setupcost"]["var"].set(total_cost)
-        self.variables["totalProfit"]["var"].set(self.variables["itemProfit"]["var"].get() + self.variables["petProfit"]["var"].get() - self.variables["fuelcost"]["var"].get())
-
-        # multiply final lists by timeratio
-        for loop_key in ["items", "itemtypeProfit", "xp"]:
-            for item in self.variables[loop_key]["list"]:
-                self.variables[loop_key]["list"][item] *= timeratio
-        # use self.deepmultiply, and dont forget to apply timeratio to pets_levelled list
 
         # Construct ID
         setup_ID = self.construct_id(setup_data)
-        self.variables["ID"]["var"].set(setup_ID)
-        self.variables["ID_container"]["list"].clear()
-        self.variables["ID_container"]["list"].append(setup_ID)
 
         # Get minion notes
-        if "notes" in md.minionList[self.variables["minion"]["var"].get()]:
-            self.variables["notes"]["list"].update(md.minionList[self.variables["minion"]["var"].get()]["notes"].copy())
+        if "notes" in md.minionList[minion_type]:
+            setup_notes.update(md.minionList[minion_type]["notes"])
 
+        # collect outputs
+        outputs = {
+            "petProfit": pet_profit,
+            "harvests": minion_amount * harvests_per_time,
+            "itemtypeProfit": per_item_profit,
+            "items": drops_list,
+            "itemProfit": item_profit,
+            "xp": skill_xp,
+            "fuelcost": fuel_cost,
+            "totalProfit": total_profit,
+            "fuelamount": needed_fuel,
+            "pets_levelled": {pet_slot: setup_pets[pet_slot]["levelled_pets"] for pet_slot in setup_pets.keys()}
+        }
 
+        self.deepmultiply(outputs, timeratio)
+        outputs["fuelamount"] = np.ceil(outputs["fuelamount"] / minion_amount) * minion_amount
+        outputs.update({
+            "available_storage": available_storage,
+            "itemSellLoc": per_item_sell_location,
+            "ID_container": [setup_ID],
+            "ID": setup_ID,
+            "extracost": extra_cost,
+            "setupcost": total_cost,
+            "filltime": fill_time,
+            "used_storage": used_storage,
+            "emptytime": f"{self.emptytimeamount.get()} {self.emptytimelength.get()}",
+            "time": f"{self.totaltimeamount.get()} {self.totaltimelength.get()}",
+            "actiontime": seconds_per_action
+        })
 
-        # Update listboxes
-        if inGUI is True:
+        # Update GUI
+        if inGUI:
+            self.send_to_GUI(outputs)
             if self.addons_auto_run["Rising Celsius Override"].get():
                 self.addons_list["Rising Celsius Override"](self)
             for addon_name, auto_run_bool in self.addons_auto_run.items():
@@ -2047,9 +2054,12 @@ class Calculator(tk.Tk):
                     continue
                 if auto_run_bool.get():
                     self.addons_list[addon_name](self)
-            self.update_gui()
+            self.update_listboxes()
             self.statusC.configure(bg="green")
             self.statusC.update()
+
+        if return_outputs:
+            return outputs
         return        
 
     def update_bazaar(self, cooldown_warning=True):
@@ -2148,7 +2158,7 @@ class Calculator(tk.Tk):
         md.itemList["POSTCARD"]["prices"]["custom"] = (raw_data["lowest"] + raw_data["secondLowest"]) / 2
         return
 
-    def update_gui(self):
+    def update_listboxes(self):
         """
         Creates an array for the listbox out of the list storage of self.variables with "vtype" equal to "list"
 
