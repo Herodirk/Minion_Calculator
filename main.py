@@ -674,6 +674,21 @@ class Calculator(tk.Tk):
         return output_string
 
     def deepmultiply(self, obj, multiplier):
+        """
+        Multiplies all number values in an object.
+
+        Parameters
+        ----------
+        obj : dict or list
+            The object.
+        multiplier : float or int
+            The multiplication amount.
+
+        Returns
+        -------
+        None.
+
+        """
         if type(obj) is dict:
             keys = obj.keys()
         else:
@@ -1033,16 +1048,38 @@ class Calculator(tk.Tk):
             return crafted_string
 
     def get_inputs(self):
-        template = {}
+        """
+        Gets the inputs of the GUI and returns them as setup data.
+
+        Returns
+        -------
+        dict
+            Setup data of the inputted setup.
+
+        """
+        setup_data = {}
         for key in self.ID_order:
             var_data = self.variables[key]
             if var_data["vtype"] != "input":
                 self.catch_warning("self.ID_order contains non-input variable")
                 continue
-            template[key] = var_data["var"].get()
-        return template
+            setup_data[key] = var_data["var"].get()
+        return setup_data
 
     def send_to_GUI(self, outputs):
+        """
+        sends outputs to the GUI.
+
+        Parameters
+        ----------
+        outputs : dict
+            dict containing variable keys as keys with the wanted value.
+
+        Returns
+        -------
+        None.
+
+        """
         for var_key in outputs:
             if var_key not in self.variables:
                 self.catch_warning(f"Output {var_key} not found in self.variables")
@@ -1187,6 +1224,20 @@ class Calculator(tk.Tk):
             return 0
 
     def get_upgrade_types(self, upgrades):
+        """
+        Gets the upgrade types of the given upgrades.
+
+        Parameters
+        ----------
+        upgrades : list
+            List of upgrade IDs.
+
+        Returns
+        -------
+        list
+            List of upgrade types.
+
+        """
         upgrade_types = []
         for upgrade in upgrades:
             for temp_type in md.itemList[upgrade]["upgrade"]["special"]["type"].split(", "):
@@ -1194,7 +1245,30 @@ class Calculator(tk.Tk):
         return upgrade_types
 
     def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
-        """Adds up speed boosts, uses the fact that booleans can be seen as 0 or 1 or false and true resp."""
+        """
+        Adds up speed boosts, uses the fact that booleans can be seen as 0 and 1 for false and true resp.
+
+        Parameters
+        ----------
+        minion : str
+            Minion type.
+        minion_fuel_id : str
+            Minion fuel ID.
+        upgrade_ids : list
+            List of upgrade IDs
+        afk_toggle : boolean
+            True if AFKing, False if offline
+        clock_override : boolean
+            True if using the Enchanted Clock
+        setup_data : dict
+            Needed setup data: amount, mayor, beacon, scorched, infusion, free_will, postcard, crystal,\n
+            potatoTalisman, afkpet, afkpetrarity, afkpetlvl
+
+        Returns
+        -------
+        float
+            Total additive speed boost.
+        """
         speed_boost = 0
         speed_boost += md.itemList[minion_fuel_id]["upgrade"]["speed"]
         speed_boost += md.itemList[upgrade_ids[0]]["upgrade"]["speed"] + md.itemList[upgrade_ids[1]]["upgrade"]["speed"]
@@ -1221,6 +1295,27 @@ class Calculator(tk.Tk):
         return speed_boost
 
     def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_data):
+        """
+        Multiplies together drop multipliers.
+
+        Parameters
+        ----------
+        minion : str
+            Minion type.
+        minion_fuel_id : str
+            Minion fuel ID.
+        upgrade_ids : list
+            List of upgrade IDs
+        afk_toggle : boolean
+            True if AFKing, False if offline
+        setup_data : dict
+            Needed setup data: playerHarvests, playerLooting, mayor
+
+        Returns
+        -------
+        float
+            Total multiplicative drop multiplier.
+        """
         drop_multiplier = 1
         if afk_toggle and setup_data["playerHarvests"] and (minion not in ["Fishing", "Pumpkin", "Melon"]):
             if minion in ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]:
@@ -1239,6 +1334,27 @@ class Calculator(tk.Tk):
         return drop_multiplier
     
     def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data, setup_notes):
+        """
+        Multiplies together drop multipliers.
+
+        Parameters
+        ----------
+        minion : str
+            Minion type.
+        upgrade_ids : list
+            List of upgrade IDs
+        afk_toggle : boolean
+            True if AFKing, False if offline
+        setup_data : dict
+            Needed setup data: playerHarvests, specialLayout
+        setup_notes : dict
+            setup notes
+
+        Returns
+        -------
+        int
+            Actions per harvest.
+        """
         actions_per_harvest = 2
         if minion == "Fishing":
             # only has harvests actions
@@ -1268,6 +1384,22 @@ class Calculator(tk.Tk):
         return actions_per_harvest
 
     def update_loot_table(self, minion, afk_toggle, setup_data):
+        """
+        Applies changes to the loot tables of the minions depending on things like AFKing or special layouts.
+
+        Parameters
+        ----------
+        minion : str
+            Minion type.
+        afk_toggle : boolean
+            True if AFKing, False if offline
+        setup_data : dict
+            Needed setup data: specialLayout
+
+        Returns
+        -------
+        None.
+        """
         if minion in ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle']:
             if afk_toggle:
                 # chopped trees have 4 blocks of wood, unknown why offline gives 3
@@ -1294,8 +1426,30 @@ class Calculator(tk.Tk):
                 md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 0.5 }
             else:
                 md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 }
+        return
 
     def get_seconds_per_action(self, minion, minion_tier, minion_fuel_id, speed_boost, setup_data):
+        """
+        Calculates total minion speed.
+
+        Parameters
+        ----------
+        minion : str
+            Minion type.
+        minion_tier : int
+            Minion tier, 1 to 12.
+        minion_fuel_id : 
+            Minion fuel ID
+        speed_boost : float
+            Total additive speed boost
+        setup_data : dict
+            Needed setup data: infernoGrade
+
+        Returns
+        -------
+        float
+            seconds per action.
+        """
         base_speed = md.minionList[minion]["speed"][minion_tier]
         secondsPaction = base_speed / (1 + speed_boost / 100)
         if minion_fuel_id == "INFERNO_FUEL":
@@ -1303,6 +1457,23 @@ class Calculator(tk.Tk):
         return secondsPaction
 
     def get_emptytime_and_ratio(self, seconds_per_action, actions_per_harvest, setup_data):
+        """
+        Calculates emptytime in seconds and the ratio between scaled time and empty time.
+
+        Parameters
+        ----------
+        seconds_per_action : float
+            Final seconds per action.
+        actions_per_harvest : int
+            Final actions per harvest.
+        setup_data : dict
+            Needed setup data: often_empty
+
+        Returns
+        -------
+        float, float
+            Time between empties in seconds, ratio between emptytime and scaled time.
+        """
         if setup_data["often_empty"]:
             emptytime_seconds = self.time_number(self.emptytimelength.get(), self.emptytimeamount.get(), seconds_per_action, actions_per_harvest)
             scaled_time_seconds = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), seconds_per_action, actions_per_harvest)
@@ -1313,6 +1484,27 @@ class Calculator(tk.Tk):
         return emptytime_seconds, timeratio
     
     def get_harvests_per_time(self, emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier):
+        """
+        Calculates the amount of harvests in the inputted emptytime.
+
+        Parameters
+        ----------
+        emptytime_seconds : float
+            Time between empties in seconds.
+        actions_per_harvest : int
+            Final actions per harvest.
+        seconds_per_action : float
+            Final seconds per action
+        afk_toggle : boolean
+            True if AFKing, False if offline
+        drop_multiplier : float
+            Total drop multiplier
+
+        Returns
+        -------
+        float, float
+            amount of harvests between empties, updated drop_multiplier if offline.
+        """
         if self.emptytimelength.get() == "Harvests":
             harvests_per_time = self.emptytimeamount.get()
         else:
@@ -1325,6 +1517,22 @@ class Calculator(tk.Tk):
         return harvests_per_time, drop_multiplier
 
     def get_upgrade_info(self, upgrade_ids, drops_list):
+        """
+        Generates
+        
+        Parameters
+        ----------
+        upgrade_ids : list
+            list of upgrade IDs
+        drops_list : dict
+            dict containing all drops of the setup
+
+        Returns
+        -------
+        dict, dict
+            spreading_info contains the average amount of a spreading item generated per drop\n
+            replace_info contains the replacements of original item ID as key and final item ID as value
+        """
         spreading_info = {}
         replace_info = {}
         for upgrade in upgrade_ids:
@@ -1339,6 +1547,15 @@ class Calculator(tk.Tk):
         return spreading_info, replace_info
     
     def add_drops(self, item, amount, drops_list, spreading_info=None, replace_info=None):
+        """
+        Adds drops to drops_list, automatically applies spreading_info and replace_info if given
+        
+        :param item: str, item ID of the drop
+        :param amount: float, amount of the drop
+        :param drops_list: dict, all drops of the setup
+        :param spreading_info: dict, the average amount of a spreading item generated per drop
+        :param replace_info: dict, the replacements of original item ID as key and final item ID as value
+        """
         if replace_info is not None and item in replace_info:
             item = replace_info[item]
         if item not in drops_list:
@@ -1350,11 +1567,34 @@ class Calculator(tk.Tk):
         return
 
     def get_base_drops(self, drops_list, spreading_info, replace_info, minion, harvests_per_time, drop_multiplier):
+        """
+        Gets generated base drops of the setup and adds them to drops_list
+        
+        :param drops_list: dict, all drops of the setup
+        :param spreading_info: dict, the average amount of a spreading item generated per drop
+        :param replace_info: dict, the replacements of original item ID as key and final item ID as value
+        :param minion: str, minion type
+        :param harvests_per_time: float, amount of harvests between empties
+        :param drop_multiplier: float, total drop multiplier
+        """
         for item, amount in md.minionList[minion]["drops"].items():
             self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, spreading_info, replace_info)
         return
 
     def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, emptytime_seconds):
+        """
+        Gets generated drops from upgrades of the setup and adds them to the drops_list
+        
+        :param drops_list: dict, all drops of the setup
+        :param spreading_info: dict, the average amount of a spreading item generated per drop
+        :param minion: str, minion type
+        :param minion_tier: int, minion tier, 1 to 12
+        :param drop_multiplier: float, total drop multiplier
+        :param upgrade_ids: list, upgrade IDs
+        :param harvests_per_time: float, amount of harvests between empties
+        :param afk_toggle: boolean, True if AFKing, False if offline
+        :param emptytime_seconds: float, seconds between empties
+        """
         for upgrade in upgrade_ids:
             upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
             specific_multiplier = 1
@@ -1398,7 +1638,22 @@ class Calculator(tk.Tk):
         return
 
     def get_inferno_drops(self, drops_list, spreading_info, replace_info, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data):
-        # https://wiki.hypixel.net/Inferno_Minion_Fuel
+        """
+        Gets generated inferno fuel drops and adds them to drops_list.
+        https://wiki.hypixel.net/Inferno_Minion_Fuel
+        
+        :param drops_list: dict, all drops of the setup
+        :param spreading_info: dict, the average amount of a spreading item generated per drop
+        :param replace_info: dict, the replacements of original item ID as key and final item ID as value
+        :param minion: str, minion type
+        :param minion_tier: int, minion tier, 1 to 12
+        :param minion_fuel: str, ID of minion fuel
+        :param drop_multiplier: float, total drop multiplier
+        :param harvests_per_time: float, amount of harvests between empties
+        :param emptytime_seconds: float, time between empties
+        :param afk_toggle: boolean, True if AFKing, False if offline
+        :param setup_data: needed setup data: infernoDistillate, infernoGrade, infernoEyedrops
+        """
         if minion_fuel != "INFERNO_FUEL":
             return
         # distilate drops
@@ -1438,7 +1693,14 @@ class Calculator(tk.Tk):
         return
 
     def apply_compactor(self, drops_list, compactor_list):
-        """compactor_list: {item: {"makes": compacted item, "amount": amount of compacted, "per": amount of item needed}, ...}"""
+        """
+        Applies given compacting rules to the drops list and returns a list of all compacted items
+        
+        :param drops_list: dict, all drops of the setup
+        :param compactor_list: dict of the form {item: {"makes": compacted item, "amount": amount of compacted, "per": amount of item needed}, ...}
+
+        :return compacted_items: list, IDs of items that got compacted
+        """
         compacted_items = []
         compactables = list(drops_list.keys())
         while compactables:
@@ -1462,6 +1724,13 @@ class Calculator(tk.Tk):
         return compacted_items
 
     def get_compacted_drops(self, drops_list, upgrade_types):
+        """
+        Gets compacted drops, returns a list of all compacted items
+        
+        :param drops_list: dict, all drops of the setup
+        :param upgrade_types: list, types of upgrades
+        :return compacted_items: list, IDs of items that got compacted
+        """
         compacted_items = []
         # Compactors
         if "compact" in upgrade_types:
@@ -1473,7 +1742,14 @@ class Calculator(tk.Tk):
         return compacted_items
 
     def get_available_storage(self, minion, minion_tier, setup_data):
-        """amount of available storage measured in slots"""
+        """
+        Gets amount of available storage measured in slots
+        
+        :param minion: str, minion type
+        :param minion_tier: int, minion tier, 1 to 12
+        :param setup_data: needed setup data: chest
+        :return available_storage: available storage measured in slots
+        """
         available_storage = md.minion_chests[setup_data["chest"]]
         if "storage" in md.minionList[minion] and minion_tier in md.minionList[minion]["storage"]:
             available_storage += md.minionList[minion]["storage"][minion_tier]
@@ -1482,7 +1758,12 @@ class Calculator(tk.Tk):
         return available_storage
     
     def get_used_storage(self, drops_list):
-        """amount of used storage measured in slots"""
+        """
+        Gets amount of used storage measured in slots
+        
+        :param drops_list: dict, all drops of the setup
+        :return used_storage_slots: used storage measured in slots
+        """
         used_storage_slots = 0
         for amount in drops_list.values():
             used_storage_slots += np.ceil(amount / 64)  # hypixel does not care about smaller max stack sizes
@@ -1507,6 +1788,13 @@ class Calculator(tk.Tk):
         return 0
 
     def get_sell_location(self, setup_data):
+        """
+        Gets sell location and hopper multiplier
+        
+        :param setup_data: needed setup data: sellLoc
+        :return sellto: str, general sell location
+        :return hopper_multiplier: float, hopper profit multiplier
+        """
         sellto = "NPC"
         hopper_multiplier = 1
         minion_sellLoc = setup_data["sellLoc"]
@@ -1519,7 +1807,16 @@ class Calculator(tk.Tk):
         return sellto, hopper_multiplier
     
     def get_item_profit(self, sell_location, hopper_multiplier, drops_list):
-        """makes a list of all prices and takes the one that matches the choice of sell_location or takes the maximum, while keeping track where items get sold"""
+        """
+        Makes a list of all prices and takes the one that matches the choice of sell_location or takes the maximum, while keeping track where items get sold
+        
+        :param sell_location: str, general sell location
+        :param hopper_multiplier: hopper profit multiplier
+        :param drops_list: dict, all drops of the setup
+        :return item_profit: float, total profit from drops
+        :return per_item_profit: dict, profit per item ID
+        :return per_item_sell_location: dict, final sell location per item ID
+        """""
         item_profit = 0.0
         per_item_profit = {}
         per_item_sell_location = {}
@@ -1540,6 +1837,16 @@ class Calculator(tk.Tk):
         return item_profit, per_item_profit, per_item_sell_location
 
     def get_skill_xp(self, afk_toggle, mayor, drops_list, setup_data):
+        """
+        Get amount of total skill xp, after having wisdom and mayor applied.
+        Hypixel's bonus skill xp doesn't seem to apply to minions
+        
+        :param afk_toggle: boolean, True if AFKing, False if offline
+        :param mayor: str, mayor
+        :param drops_list: dict, all drops of the setup
+        :param setup_data: needed setup data: playerHarvests, combatWisdom, miningWisdom, farmingWisdom, fishingWisdom, foragingWisdom, alchemyWisdom
+        :return skill_xp: dict, gained skill xp per type
+        """
         skill_xp = {}
         for itemtype, amount in drops_list.items():
             xptype, value = list(*md.itemList[itemtype]["xp"].items())
@@ -1556,6 +1863,14 @@ class Calculator(tk.Tk):
         return skill_xp
 
     def get_over_compacting(self, sell_location, compacted_items, per_item_sell_location, setup_notes):
+        """
+        Checks for all compacted items if compacting them loses value
+        
+        :param sell_location: str, general sell location
+        :param compacted_items: list, IDs of items that got compacted
+        :param per_item_sell_location: dict, final sell location per item ID
+        :param setup_notes: dict, setup notes
+        """
         if sell_location not in ["best", "bazaar"]:
             return
         over_compacting = []
@@ -1661,16 +1976,29 @@ class Calculator(tk.Tk):
         gained_pet_xp += left_over_pet_xp
         return gained_pet_xp, left_over_pet_xp
 
-    def get_pet_profit(self, skill_xp, mayor, setup_pets, setup_notes, setup_data):
+    def get_pet_profit(self, skill_xp, mayor, setup_notes, setup_data):
         """
-        Pet levelling calculations: https://wiki.hypixel.net/Pets#Leveling,
-        for Golden Dragon: special algorithm taking into account that pet items cannot be applied to Golden Dragon Eggs,
+        Get total profit from pet levelling\n
+        Pet levelling calculations: https://wiki.hypixel.net/Pets#Leveling,\n
+        for Golden Dragon: special algorithm taking into account that pet items cannot be applied to Golden Dragon Eggs,\n
         the pet costs are manually added in pet_data
+        
+        :param skill_xp: dict, gained skill xp per type
+        :param mayor: str, mayor
+        :param setup_notes: dict, setup notes
+        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost
+        :return pet_profit: total profit from pets
         """
         pet_profit = 0.0
-        main_pet = setup_pets["levelingpet"]["pet"]
+        main_pet = setup_data["levelingpet"]
         if main_pet == "None":
-            return 0
+            return 0, {}
+        setup_pets = {
+            "levelingpet": {"pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0},
+            "expsharepet": {"pet": setup_data["expsharepet"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
+            "expsharepetslot2": {"pet": setup_data["expsharepetslot2"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
+            "expsharepetslot3": {"pet": setup_data["expsharepetslot3"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
+        }
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         if "Dragon" in md.all_pets[main_pet]["rarity"]:
             left_over_pet_xp = 0.0
@@ -1719,9 +2047,17 @@ class Calculator(tk.Tk):
                 pet_profit -= pets_levelled * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
                 pet_profit -= pets_levelled * exp_share_price
-        return pet_profit
+        return pet_profit, setup_pets
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, emptytime_seconds, setup_data):
+        """
+        get cost per emptytime for the finite fuel and beacon fuel
+        
+        :param minion_amount: int, minion amount
+        :param minion_fuel: str, ID of minion fuel
+        :param emptytime_seconds: float, time between empties in seconds
+        :param setup_data: needed setup data: beacon, scorched, B_constant
+        """
         fuel_cost = 0.0
         needed_fuel = 0.0
         if setup_data["beacon"] != 0:
@@ -1738,6 +2074,20 @@ class Calculator(tk.Tk):
         return fuel_cost, needed_fuel
 
     def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_notes, setup_data):
+        """
+        Gets cost of all parts of the setup
+        
+        :param minion_type: str, minion type
+        :param minion_tier: int, minion tier, 1 to 12
+        :param minion_amount: int, minion amount
+        :param minion_fuel: str, ID of minion fuel
+        :param upgrades: list, IDs of upgrades
+        :param setup_notes: dict, setup notes
+        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potatoTalisman, toucan_attribute, falcon_attribute
+        :return total_cost: float, total setup cost
+        :return extra_cost: str, total extra cost 
+        :return cost_per_part: dict, cost per setup part
+        """
         cost_per_part = {}
         extra_cost = ""
 
@@ -1988,13 +2338,7 @@ class Calculator(tk.Tk):
         self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes)
         
         # Pet leveling
-        setup_pets = {
-            "levelingpet": {"pet": setup_data["levelingpet"], "pet_xp": {}, "levelled_pets": 0.0},
-            "expsharepet": {"pet": setup_data["expsharepet"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
-            "expsharepetslot2": {"pet": setup_data["expsharepetslot2"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
-            "expsharepetslot3": {"pet": setup_data["expsharepetslot3"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
-        }
-        pet_profit = self.get_pet_profit(skill_xp, mayor, setup_pets, setup_notes, setup_data)
+        pet_profit, setup_pets = self.get_pet_profit(skill_xp, mayor, setup_notes, setup_data)
 
         # calculating beacon and limited fuel cost
         fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, emptytime_seconds, setup_data)
