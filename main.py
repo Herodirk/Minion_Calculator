@@ -1238,7 +1238,7 @@ class Calculator(tk.Tk):
             drop_multiplier *= 2
         return drop_multiplier
     
-    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data):
+    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data, setup_notes):
         actions_per_harvest = 2
         if minion == "Fishing":
             # only has harvests actions
@@ -1249,14 +1249,14 @@ class Calculator(tk.Tk):
                 actions_per_harvest = 1
             if setup_data["playerHarvests"]:
                 if minion in ["Fishing", "Pumpkin", "Melon"]:
-                    self.set_note("Player Harvests", "Player Harvesting does not work with this minion")
+                    setup_notes["Player Harvests"] = "Player Harvesting does not work with this minion"
                 else:
                     actions_per_harvest = 1
                     if minion in ["Gravel"]:
                         upgrade_ids.append("FLINT_SHOVEL")
-                        self.set_note("Player Tools", "Assuming Player is using Flint Shovel")
+                        setup_notes["Player Tools"] = "Assuming Player is using Flint Shovel"
                     if minion in ["Ice"]:
-                        self.set_note("Player Tools", "Assuming Player is using Silk Touch")
+                        setup_notes["Player Tools"] = "Assuming Player is using Silk Touch"
             elif setup_data["specialLayout"]:
                 if minion in ["Cobblestone", "Mycelium", "Ice"]:
                     # cobblestone generator, regrowing mycelium, freezing water
@@ -1882,10 +1882,6 @@ class Calculator(tk.Tk):
             self.variables["notes"]["list"]["WARNING"] = "Check terminal for warning"
         print("WARNING: " + warning_message)
         return
-    
-    def set_note(self, note_name, note_text):
-        self.variables["notes"]["list"][note_name] = note_text
-        return
 
     def calculate(self, inGUI=False, setup_data=None, return_outputs=False):
         """
@@ -1921,6 +1917,10 @@ class Calculator(tk.Tk):
         minion_fuel = md.fuel_options[setup_data["fuel"]] 
         mayor = setup_data["mayor"]
         afk_toggle = setup_data["afk"]
+        
+        # create shared lists
+        setup_notes = {}
+        drops_list = {}
 
         # Enchanted Clock uses offline calculations, but you can be on the island when using it to apply boosts that require a loaded island.
         # This clock_override replaces afk_toggle for these boosts
@@ -1940,7 +1940,7 @@ class Calculator(tk.Tk):
         drop_multiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
 
         # AFKing, Special Layouts and Player Harvests influences
-        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data)
+        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data, setup_notes)
 
         # AFK loot table changes
         self.update_loot_table(minion_type, afk_toggle, setup_data)
@@ -1955,7 +1955,6 @@ class Calculator(tk.Tk):
         harvests_per_time, drop_multiplier = self.get_harvests_per_time(emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier)
 
         # initialise drops list and get upgrade info
-        drops_list = {}
         spreading_info, replace_info = self.get_upgrade_info(upgrades, drops_list)
         
         # base drops
@@ -1986,7 +1985,6 @@ class Calculator(tk.Tk):
         skill_xp = self.get_skill_xp(afk_toggle, mayor, drops_list, setup_data)
 
         # Check for over-compacting
-        setup_notes = {}
         self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes)
         
         # Pet leveling
@@ -2041,7 +2039,8 @@ class Calculator(tk.Tk):
             "used_storage": used_storage,
             "emptytime": f"{self.emptytimeamount.get()} {self.emptytimelength.get()}",
             "time": f"{self.totaltimeamount.get()} {self.totaltimelength.get()}",
-            "actiontime": seconds_per_action
+            "actiontime": seconds_per_action,
+            "notes": setup_notes
         })
 
         # Update GUI
