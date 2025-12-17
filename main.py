@@ -1383,7 +1383,7 @@ class Calculator(tk.Tk):
                     # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
         return actions_per_harvest
 
-    def update_loot_table(self, minion, afk_toggle, setup_data):
+    def update_loot_table(self, minion, minion_fuel_id, afk_toggle, setup_data):
         """
         Applies changes to the loot tables of the minions depending on things like AFKing or special layouts.
 
@@ -1391,6 +1391,8 @@ class Calculator(tk.Tk):
         ----------
         minion : str
             Minion type.
+        minion_fuel_id : str
+            Minion fuel ID
         afk_toggle : boolean
             True if AFKing, False if offline
         setup_data : dict
@@ -1406,7 +1408,7 @@ class Calculator(tk.Tk):
                 md.minionList[minion]["drops"][md.getID[f"{minion} Log"]] = 4
             else:
                 md.minionList[minion]["drops"][md.getID[f"{minion} Log"]] = 3
-        if minion == "Gravel":
+        elif minion == "Gravel":
             if afk_toggle:
                 # vanilla minecraft chance for gravel to become flint
                 md.minionList[minion]["drops"]["GRAVEL"] = 0.9
@@ -1414,18 +1416,27 @@ class Calculator(tk.Tk):
             else:
                 md.minionList[minion]["drops"]["GRAVEL"] = 1
                 md.minionList[minion]["drops"]["FLINT"] = 0
-        if minion == "Pumpkin":
+        elif minion == "Pumpkin":
             if afk_toggle:
                 # it just does this, idk, ask Hypixel
                 md.minionList[minion]["drops"]["PUMPKIN"] = 1
             else:
                 md.minionList[minion]["drops"]["PUMPKIN"] = 3
-        if minion == "Flower":
-            if afk_toggle and setup_data["specialLayout"]:
+        elif minion == "Flower":
+            if minion_fuel_id == "THORNY_VINES":
+                md.minionList[minion]["drops"] = { "WILD_ROSE": 2 }
+            elif afk_toggle and setup_data["specialLayout"]:
                 # tall flowers blocked by low ceiling
                 md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 0.5 }
             else:
                 md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 }
+        elif minion == "Sunflower":
+            if minion_fuel_id == "DAYSWITCH":
+                md.minionList[minion]["drops"] = { "DOUBLE_PLANT": 2 }
+            elif minion_fuel_id == "NIGHTSWITCH":
+                md.minionList[minion]["drops"] = { "MOONFLOWER": 2 }
+            else:
+                md.minionList[minion]["drops"] = { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 }
         return
 
     def get_seconds_per_action(self, minion, minion_tier, minion_fuel_id, speed_boost, setup_data):
@@ -2293,7 +2304,7 @@ class Calculator(tk.Tk):
         actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data, setup_notes)
 
         # AFK loot table changes
-        self.update_loot_table(minion_type, afk_toggle, setup_data)
+        self.update_loot_table(minion_type, minion_fuel, afk_toggle, setup_data)
 
         # calculate final minion speed
         seconds_per_action = self.get_seconds_per_action(minion_type, minion_tier, minion_fuel, speed_boost, setup_data)

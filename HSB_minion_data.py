@@ -743,6 +743,51 @@ itemList = {
         "prices": { 'npc': 576 },
         'xp': { 'foraging': 57.6 }
     },
+    "WILD_ROSE": {
+        'display': 'Wild Rose',
+        "prices": { 'npc': 4 },
+        'xp': { 'farming': 0.3 }  # correct (2025-12-17)
+    },
+    "ENCHANTED_WILD_ROSE": {
+        'display': 'Enchanted Wild Rose',
+        "prices": { 'npc': 640 },
+        'xp': { 'farming': 48 }  # correct (2025-12-17)
+    },
+    "COMPACTED_WILD_ROSE": {
+        'display': 'Compacted Wild Rose',
+        "prices": { 'npc': 102400 },
+        'xp': { 'farming': 7680 }  # check, amount and type
+    },
+    "DOUBLE_PLANT": {
+        'display': 'Sunflower',
+        "prices": { 'npc': 4 },
+        'xp': { 'farming': 0.3 }  # correct (2025-12-17)
+    },
+    "ENCHANTED_SUNFLOWER": {
+        'display': 'Enchanted Sunflower',
+        "prices": { 'npc': 640 },
+        'xp': { 'farming': 48 }  # correct (2025-12-17)
+    },
+    "COMPACTED_SUNFLOWER": {
+        'display': 'Compacted Sunflower',
+        "prices": { 'npc': 102400 },
+        'xp': { 'farming': 7680 }  # check
+    },
+    "MOONFLOWER": {
+        'display': 'Moonflower',
+        "prices": { 'npc': 4 },
+        'xp': { 'farming': 0.3 }  # correct (2025-12-17)
+    },
+    "ENCHANTED_MOONFLOWER": {
+        'display': 'Enchanted Moonflower',
+        "prices": { 'npc': 640 },
+        'xp': { 'farming': 48 }  # correct (2025-12-17)
+    },
+    "COMPACTED_MOONFLOWER": {
+        'display': 'Compacted Moonflower',
+        "prices": { 'npc': 102400 },
+        'xp': { 'farming': 7680 }  # check
+    },
     'RAW_FISH': {
         'display': 'Raw Cod',
         "prices": { 'npc': 6 },
@@ -1303,6 +1348,21 @@ itemList = {
         "prices": { "custom": 1 },  # this custom price will be automatically updated by the calculator based on grade and distilate
         "upgrade": { 'speed': 0, 'drop': 1, 'duration': 86400 }
     },
+    'THORNY_VINES': {
+        'display': 'Thorny Vines',
+        "prices": {},
+        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
+    },
+    'DAYSWITCH': {
+        'display': 'Dayswitch',
+        "prices": {},
+        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
+    },
+    'NIGHTSWITCH': {
+        'display': 'Nightswitch',
+        "prices": {},
+        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
+    },
     'BUDGET_HOPPER': {
         'display': 'Budget Hopper',
         "prices": { "custom": 10000 }
@@ -1775,7 +1835,10 @@ fuel_options = {
     "Magma Bucket": "MAGMA_BUCKET",
     "Plasma Bucket": "PLASMA_BUCKET",
     "Everburning Flame": "EVERBURNING_FLAME",
-    "Inferno Minion Fuel": "INFERNO_FUEL"
+    "Inferno Minion Fuel": "INFERNO_FUEL",
+    "Dayswitch": "DAYSWITCH",
+    "Nightswitch": "NIGHTSWITCH",
+    "Thorny Vines": "THORNY_VINES"
 }
 
 upgrade_options = {
@@ -1910,6 +1973,12 @@ enchanterList = {
     'ENCHANTED_NETHER_STALK': { 'makes': 'MUTANT_NETHER_STALK', 'per': 160 },
     'YELLOW_FLOWER': { 'makes': 'ENCHANTED_DANDELION', 'per': 160 },
     'RED_ROSE': { 'makes': 'ENCHANTED_POPPY', 'per': 576 },
+    'WILD_ROSE': { 'makes': 'ENCHANTED_WILD_ROSE', 'per': 160 },
+    'ENCHANTED_WILD_ROSE': { 'makes': 'COMPACTED_WILD_ROSE', 'per': 160 },
+    'DOUBLE_PLANT': { 'makes': 'ENCHANTED_SUNFLOWER', 'per': 160 },
+    'ENCHANTED_SUNFLOWER': { 'makes': 'COMPACTED_SUNFLOWER', 'per': 160 },
+    'MOONFLOWER': { 'makes': 'ENCHANTED_MOONFLOWER', 'per': 160 },
+    'ENCHANTED_MOONFLOWER': { 'makes': 'COMPACTED_MOONFLOWER', 'per': 160 },
     'RAW_FISH': { 'makes': 'ENCHANTED_RAW_FISH', 'per': 160 },
     'RAW_FISH:1': { 'makes': 'ENCHANTED_RAW_SALMON', 'per': 160 },
     'RAW_FISH:3': { 'makes': 'ENCHANTED_PUFFERFISH', 'per': 160 },
@@ -2328,6 +2397,11 @@ minionList = {
         "storage": { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15, 9: 15, 10: 15, 11: 15, 12: 15 },
         "notes": { "Special Layout": "only spawn, no large flowers (water flushing, low roof)" }
     },
+    "Sunflower": {
+        "drops": { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 },
+        "speed": { 1: 24, 2: 23, 3: 22, 4: 21, 5: 20, 6: 19, 7: 18, 8: 17, 9: 16, 10: 15, 11: 14, 12: 13},
+        "storage": { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 }
+    },
     "Fishing": {
         "drops": { "RAW_FISH": 0.54, "RAW_FISH:1": 0.225, "RAW_FISH:3": 0.117, "RAW_FISH:2": 0.036, "PRISMARINE_CRYSTALS": (2 + (11 / 15)) / 100, "PRISMARINE_SHARD": (2 + (11 / 15)) / 100, "SPONGE": (2 + (11 / 15)) / 100 },  # good average (2025-10-24)
         "speed": { 1: 75, 2: 75, 3: 67, 4: 67, 5: 59, 6: 59, 7: 51, 8: 51, 9: 43, 10: 43, 11: 35, 12: 30 },
@@ -2554,6 +2628,7 @@ minionCosts = {
     "Sugar Cane": minionCostTypes(["SUGAR_CANE", "ENCHANTED_SUGAR", "ENCHANTED_SUGAR_CANE"], "expensive enchanted", True),
     "Nether Wart": minionCostTypes(["NETHER_STALK", "ENCHANTED_NETHER_STALK"], "single enchanted", True),
     "Flower": minionCostTypes(["YELLOW_FLOWER", "ENCHANTED_DANDELION", "ENCHANTED_POPPY"], "double enchanted", True, {1: {}}),
+    "Sunflower": {1: {"DOUBLE_PLANT": 128}, 2: {"DOUBLE_PLANT": 160}, 3: {"DOUBLE_PLANT": 320}, 4: {"DOUBLE_PLANT": 512}, 5: {"ENCHANTED_SUNFLOWER": 8}, 6: {"ENCHANTED_SUNFLOWER": 24}, 7: {"ENCHANTED_SUNFLOWER": 64}, 8: {"ENCHANTED_SUNFLOWER": 128}, 9: {"ENCHANTED_SUNFLOWER": 512}, 10: {"COMPACTED_SUNFLOWER": 8}, 11: {"COMPACTED_SUNFLOWER": 16}, 12: {"COMPACTED_SUNFLOWER": 32}},
     "Fishing": {1: {'RAW_FISH': 64}, 2: {'RAW_FISH': 128}, 3: {'RAW_FISH': 256}, 4: {'RAW_FISH': 512}, 5: {'ENCHANTED_RAW_FISH': 8}, 6: {'ENCHANTED_RAW_FISH': 24}, 7: {'ENCHANTED_RAW_FISH': 64}, 8: {'ENCHANTED_RAW_FISH': 128}, 9: {'ENCHANTED_RAW_FISH': 256}, 10: {'ENCHANTED_RAW_FISH': 512}, 11: {'ENCHANTED_COOKED_FISH': 8}, 12: {'ENCHANTED_COOKED_FISH': 16}},
     "Zombie": minionCostTypes(["ROTTEN_FLESH", "ENCHANTED_ROTTEN_FLESH"], "single enchanted", False),
     "Revenant": {},
