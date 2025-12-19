@@ -40,17 +40,19 @@ external_add_ons = {**Hero_addons.add_ons_package}
 # the name will show up on the button, the funtion will only get the argument calculator=self sent to it.
 # the support for this is limited and will be improved later
 
-# Bazaar settings
-bazaar_auto_update = True
+# API settings
+API_auto_update = True
 # If true, bazaar automatically updates before performing calculation
-bazaar_cooldown = 60  # seconds
+API_cooldown = 300  # seconds
 # Time limit in seconds between each automatic update
-compact_tolerance = 10000  # coins
-# Minimum coin loss per compacting action for the calculator to make a note of coin loss
 
 # Output settings
+compact_tolerance = 10000  # coins
+# Minimum coin loss per compacting action for the calculator to make a note of coin loss
 output_to_clipboard = True
 # If true, Short Output and Share Output also get saved in your clipboard
+debug_mode = False
+# Toggle for debug mode
 
 # Visual settings
 color_palette = "dark_red"
@@ -189,14 +191,14 @@ class Calculator(tk.Tk):
         super().__init__()
         # Use Hero UI Manager to initialize the window and the frames with grids
         self.huim = Hero_UI_Manager.H_UI_M(main=self, version="MINION", windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
-        print("BOOTING: Hero UI Manager loaded")
+        self.booting_msg("Hero UI Manager loaded")
         self.huim.createControls()
         self.huim.createFrames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
         self.huim.createFrames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
-        print("BOOTING: Framework set up")
+        self.booting_msg("Framework set up")
         self.version = self.huim.defVar(dtype=float, initial=1.2)
-        print(f"BOOTING: Calculator version {self.version.get()}")
+        self.booting_msg("Calculator version {self.version.get()}")
 
         # The calculator stores all important variables into this dict
         # the keys "vtype", "dtype", "frame", "noWidget" and "switch_initial"
@@ -332,7 +334,7 @@ class Calculator(tk.Tk):
 
         self.notesAnchor = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="")
 
-        print("BOOTING: self.variables initialized")
+        self.booting_msg("self.variables initialized")
 
         # Create widgets for controls menu and placing them
         self.creditLB = self.huim.genLabel(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
@@ -349,7 +351,7 @@ class Calculator(tk.Tk):
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggleSwitch("addons"))
-        self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_bazaar)
+        self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_prices)
         # self.status, self.statusO = self.huim.defVarO(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
         controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.bazaarB, self.addonsB]
@@ -486,7 +488,7 @@ class Calculator(tk.Tk):
             widget[-1].place(in_=self.addons_buttons[addon_name], anchor="w", relx=1, rely=0.5, x=10)
             self.addons_buttons[addon_name].grid(row=number % 8, column=(int(number / 8)) * 2)
 
-        print("BOOTING: Widgets placed")
+        self.booting_msg("Widgets placed")
 
         # Create switches with Hero UI Manager for the extended minion options
         self.huim.defSwitch("pet_leveling", [*self.variables["taming"]["widget"], *self.variables["petxpboost"]["widget"], *self.variables["beastmaster"]["widget"],
@@ -523,7 +525,7 @@ class Calculator(tk.Tk):
         self.huim.createShowHideToggle("afk", "afking")
         self.huim.createShowHideToggle("beacon", "beacon")
         
-        print("BOOTING: Switches activated")
+        self.booting_msg("Switches activated")
 
         self.dependent_variables = {"afkpetrarity": "afkpet", "afkpetlvl": "afkpet", "playerHarvests": "afk", "emptytime": "often_empty", "freewillcost": "free_will", "expshareitem": "expsharepet"}
         # dependent variables are only active when another specified variable is not equivalent to 0,
@@ -599,16 +601,42 @@ class Calculator(tk.Tk):
             "sellLoc",
             "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper",
         ]
-        print("BOOTING: Output orders defined")
+        self.booting_msg("Output orders defined")
 
         # Load bazaar prices
-        print("BOOTING: Connecting to bazaar")
-        self.bazaar_timer = 0
-        self.update_bazaar(cooldown_warning=False)
-        print("BOOTING: Ready")
+        self.API_timer = 0
+        self.update_prices(cooldown_warning=False)
+        self.booting_msg("Ready")
         return
 
-#%% functions
+    def system_msg(self, msg_type, message):
+        print(msg_type.upper() + ": " + message)
+        return
+    
+    def booting_msg(self, message):
+        self.system_msg("BOOTING", message)
+        return
+
+    def info_msg(self, message):
+        self.system_msg("INFO", message)
+        return
+    
+    def warning_msg(self, message):
+        self.system_msg("WARNING", message)
+        return
+    
+    def error_msg(self, message):
+        self.system_msg("ERROR", message)
+        return
+
+    def output_msg(self, message):
+        self.system_msg("OUTPUT", "\n" + message + "\n\n")
+        return
+
+    def debug_msg(self, message):
+        if not debug_mode:
+            self.system_msg("DEBUG", message)
+        return
 
     def time_number(self, time_length, time_amount, seconds_per_action=0.0, actions_per_harvest=1.0):
         """
@@ -885,7 +913,7 @@ class Calculator(tk.Tk):
             self.clipboard_clear()
             self.clipboard_append(crafted_string)
         if toTerminal is True:
-            print(crafted_string, "\n")
+            self.output_msg(crafted_string)
             return
         else:
             return crafted_string
@@ -1042,7 +1070,7 @@ class Calculator(tk.Tk):
             self.clipboard_clear()
             self.clipboard_append(crafted_string)
         if toTerminal:
-            print(crafted_string, "\n")
+            self.output_msg(crafted_string)
             return
         else:
             return crafted_string
@@ -1061,7 +1089,7 @@ class Calculator(tk.Tk):
         for key in self.ID_order:
             var_data = self.variables[key]
             if var_data["vtype"] != "input":
-                self.catch_warning("self.ID_order contains non-input variable")
+                self.warning_msg("self.ID_order contains non-input variable")
                 continue
             setup_data[key] = var_data["var"].get()
         return setup_data
@@ -1082,7 +1110,7 @@ class Calculator(tk.Tk):
         """
         for var_key in outputs:
             if var_key not in self.variables:
-                self.catch_warning(f"Output {var_key} not found in self.variables")
+                self.warning_msg(f"Output {var_key} not found in self.variables")
                 continue
             if self.variables[var_key]["vtype"] == "list":
                 self.variables[var_key]["list"].clear()
@@ -1138,16 +1166,16 @@ class Calculator(tk.Tk):
         setup_data = {}
         end_ver = ID.find("!")
         if end_ver == -1:
-            print("WARNING: Invalid ID, could not find version number")
+            self.warning_msg("Invalid ID, could not find version number")
             return setup_data
         try:
             version = float(ID[0:end_ver])
         except Exception:
-            print("WARNING: Invalid ID, could not find version number")
+            self.warning_msg("Invalid ID, could not find version number")
             return setup_data
         ID_index = end_ver + 1
         if version != self.version.get():
-            print("WARNING: Invalid ID, Incompatible version")
+            self.warning_msg("Invalid ID, Incompatible version")
             return setup_data
         try:
             for key, var_data in self.variables.items():
@@ -1155,7 +1183,7 @@ class Calculator(tk.Tk):
                     continue
                 if len(var_data["options"]) == 0:
                     if ID[ID_index] != "!":
-                        print(f"WARNING: did not find {key}")
+                        self.warning_msg(f"did not find {key}")
                         return
                     end_val = ID.find("!", ID_index + 1)
                     setup_data[key] = var_data["dtype"](ID[ID_index + 1:end_val])
@@ -1165,10 +1193,10 @@ class Calculator(tk.Tk):
                     ID_index += 1
         except Exception as error:
             if type(error) == IndexError:
-                print("WARNING: Invalid ID, ID incomplete")
+                self.warning_msg("Invalid ID, ID incomplete")
                 return {}
             else:
-                print("ERROR: unknown error\ndumping error logs", error)
+                self.error_msg("unknown error\ndumping error logs\n" + error)
                 return {}
         return setup_data
 
@@ -1210,17 +1238,17 @@ class Calculator(tk.Tk):
             if location in md.itemList[ID]["prices"]:
                 return multiplier * md.itemList[ID]["prices"][location]
             elif force:
-                print("WARNING:", ID, "no forced cost found")
+                self.warning_msg("no forced cost found for " + ID)
                 return 0
             elif "npc" in md.itemList[ID]["prices"]:
                 return multiplier * md.itemList[ID]["prices"]["npc"]
             elif "custom" in md.itemList[ID]["prices"]:
                 return md.itemList[ID]["prices"]["custom"]
             else:
-                print("WARNING:", ID, "no cost found")
+                self.warning_msg("no cost found for " + ID)
                 return 0
         else:
-            print("WARNING:", ID, "not in itemList")
+            self.warning_msg(ID + " not in itemList")
             return 0
 
     def get_upgrade_types(self, upgrades):
@@ -2225,25 +2253,6 @@ class Calculator(tk.Tk):
         total_cost = sum(cost_per_part.values())
         return total_cost, extra_cost, cost_per_part
 
-    def catch_warning(self, warning_message):
-        """
-        Warning catching system used during calculations.
-
-        Parameters
-        ----------
-        warning_message : string
-            Warning text.
-
-        Returns
-        -------
-        None.
-
-        """
-        if "WARNING" not in self.variables["notes"]["list"]:
-            self.variables["notes"]["list"]["WARNING"] = "Check terminal for warning"
-        print("WARNING: " + warning_message)
-        return
-
     def calculate(self, inGUI=False, setup_data=None, return_outputs=False):
         """
         Main calculation function
@@ -2264,8 +2273,8 @@ class Calculator(tk.Tk):
             self.statusC.update()
 
         # auto update bazaar
-        if bazaar_auto_update:
-            self.update_bazaar(cooldown_warning=False)
+        if API_auto_update:
+            self.update_prices(cooldown_warning=False)
 
         # Get inputs if none are given
         if setup_data is None:
@@ -2416,43 +2425,32 @@ class Calculator(tk.Tk):
             return outputs
         return        
 
-    def update_bazaar(self, cooldown_warning=True):
+    def call_bazaar(self):
         """
-        Checks if a bazaar_cooldown amount of seconds has passed,
         calls to Hypixel API for most recent bazaar data,
         handles that data to calculate accurate buy and sell prices.
         To get accurate prices, it takes a top percentage (top 10% default) of the orders and takes the average of them.
-
-        Parameters
-        ----------
-        cooldown_warning : bool
-            Toggle if a terminal message should be printed if the bazaar update cooldown has not passed yet.
 
         Returns
         -------
         None
 
         """
-        if time.time() - self.bazaar_timer < bazaar_cooldown and self.bazaar_timer != 0:
-            if cooldown_warning:
-                print("BAZAAR: Bazaar is on cooldown")
-            return
-        print("BAZAAR: Calling Bazaar")
+        self.info_msg("Calling Bazaar")
         try:
             f = urllib.request.urlopen(r"https://api.hypixel.net/v2/skyblock/bazaar")
             call_data = f.read().decode('utf-8')
         except Exception as error:
-            print(f"ERROR: Could not finish API call\n{error}")
+            self.error_msg(f"Could not finish Bazaar API call\n{error}")
             return
         raw_data = json.loads(call_data)
         if "success" not in raw_data or raw_data["success"] is False:
-            print("ERROR: API call was unsuccessful")
+            self.error_msg("Bazaar API call was unsuccessful")
             return
-        print("BAZAAR: Bazaar call successful")
-        self.bazaar_timer = raw_data["lastUpdated"] / 1000
-        self.variables["bazaar_update_txt"]["var"].set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(self.bazaar_timer)))
+        self.info_msg("Bazaar call successful")
+        self.API_timer = raw_data["lastUpdated"] / 1000
+        self.variables["bazaar_update_txt"]["var"].set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(self.API_timer)))
         top_percent = 0.1
-        print("BAZAAR: Processing data")
         for itemtype, item_data in md.itemList.items():
             if itemtype not in raw_data["products"]:
                 continue
@@ -2461,7 +2459,7 @@ class Calculator(tk.Tk):
                 if top_amount == 0:
                     item_data["prices"][f"{action}Price"] = 0
                     if "npc" not in item_data["prices"]:
-                        print(f"BAZAAR: no {action} supply for {itemtype}")
+                        self.warning_msg(f"no {action} supply for {itemtype}")
                     continue
                 counter = top_amount
                 top_sum = 0
@@ -2479,20 +2477,18 @@ class Calculator(tk.Tk):
                 top_price = raw_data["products"][itemtype][f"{action}_summary"][0]["pricePerUnit"]
                 if top_price / top_percent_avg_price >= 2.5:
                     item_data["prices"][f"{action}Price"] = top_price
-                    print(f"BAZAAR: bottom heavy {action} supply for {itemtype}, taking top order price")
+                    self.info_msg(f"bottom heavy {action} supply for {itemtype}, taking top order price")
                 else:
                     item_data["prices"][f"{action}Price"] = top_percent_avg_price
-        print("BAZAAR: Processing complete")
-        print("AH: Updating Postcard price")
-        self.update_ah()
         return
 
-    def update_ah(self):
+    def call_auction_house(self, item_id):
         """
-        Currently: Updates price of Postcard.
-        In the future: Updates Auction House prices.
+        API call to SkyCofl to update Auction House price of the given item.
 
         AH data from https://sky.coflnet.com/data
+
+        :param item_id: item ID
 
         Returns
         -------
@@ -2501,15 +2497,30 @@ class Calculator(tk.Tk):
         """
 
         try:
-            postcard_url = r"https://sky.coflnet.com/api/item/price/POSTCARD/bin"
+            postcard_url = r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin"
             req = urllib.request.Request(postcard_url, headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)", })
-            f = urllib.request.urlopen(req)
-            call_data = f.read().decode('utf-8')
+            call_data = urllib.request.urlopen(req).read().decode('utf-8')
         except Exception as error:
-            print(f"ERROR: Could not finish API call to Coflnet\n{error}")
+            self.error_msg(f"Could not finish SkyCofl API call for {item_id}\n{error}")
             return
         raw_data = json.loads(call_data)
-        md.itemList["POSTCARD"]["prices"]["custom"] = (raw_data["lowest"] + raw_data["secondLowest"]) / 2
+        return (raw_data["lowest"] + raw_data["secondLowest"]) / 2
+
+    def update_prices(self, cooldown_warning=True):
+        """
+        Updates item prices.
+
+        If API_cooldown is done, also update API
+        
+        :param cooldown_warning: bool, toggle if a terminal message should be printed if the bazaar update cooldown has not passed yet.
+        """
+        if time.time() - self.API_timer < API_cooldown and self.API_timer != 0:
+            if cooldown_warning:
+                self.info_msg("API update is on cooldown")
+        else:
+            self.call_bazaar()
+            self.info_msg("Updating Auction House prices")
+            md.itemList["POSTCARD"]["prices"]["custom"] = self.call_auction_house("POSTCARD")
         return
 
     def update_listboxes(self):
