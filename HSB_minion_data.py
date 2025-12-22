@@ -19,7 +19,9 @@ some of these are on the auction house and have "(AH)" behind "# not in bazaar",
 these AH only items must have their custom prices updated manually,
 each of these items has a date behind them showing when they were last updated.
 
-There are a few illogical things here. If information has been confirmed, there is "# correct" behind it with the date of the test.
+If information has been checked, there is "# correct" behind it with the date of the test.
+If information has been checked but still isn't a logical value, then there is "# correct inaccuracy" behind it with the date of the test.
+These are inaccuracies from Hypixel and they can correct them at any point in time, so they should be checked regularly
 If that date is missing, it was confirmed by an old test and might need to be checked again.
 """
 
@@ -52,26 +54,29 @@ smelting_data = {
 #%% item list
 
 itemList = {
+    # The following items do not exist
     "NONE": {
-        'display': "None",  # not in bazaar (doesn't exist)
+        'display': "None",
         "prices": { "custom": 0 },
         "upgrade": { 'speed': 0, 'drop': 1, 'duration': 0, 'special': { "type": "None" } }
     },
     'CUSTOM': {
-        'display': 'Custom',  # not in bazaar (doesn't exist)
+        'display': 'Custom',
         "prices": { 'custom': 1 },
         'xp': { 'combat': 1 }
     },
     'COMPACTED_CUSTOM': {
-        'display': 'Compacted Custom',  # not in bazaar (doesn't exist)
+        'display': 'Compacted Custom',
         "prices": { 'custom': 4 },
         'xp': { 'combat': 4 }
     },
     'ENCHANTED_CUSTOM': {
-        'display': 'Enchanted Custom',  # not in bazaar (doesn't exist)
+        'display': 'Enchanted Custom',
         "prices": { 'custom': 160 },
         'xp': { 'combat': 160 }
     },
+
+    # Minion Drops and Minion Crafting Materials
     'LUSH_BERBERIS': {
         'display': 'Lush Berberis',
         "prices": { 'npc': 3 },
@@ -165,7 +170,7 @@ itemList = {
     'ENCHANTED_GLOWSTONE': {
         'display': 'Enchanted Glowstone',
         "prices": { 'npc': 51200 },
-        'xp': { 'mining': 6144 }  # correct
+        'xp': { 'mining': 6144 }  # correct inaccuracy
     },
     'GRAVEL': {
         'display': 'Gravel',
@@ -288,31 +293,31 @@ itemList = {
         'xp': { 'mining': 0.4 }
     },
     'ENCHANTED_SNOW_BLOCK': {
-        'display': 'Enchanted Snow Block',  # correct
-        "prices": { 'npc': 600 },
+        'display': 'Enchanted Snow Block',
+        "prices": { 'npc': 600 },  # correct inaccuracy (2025-12-22)
         'xp': { 'mining': 64 }
     },
     'COAL': {
         'display': 'Coal',
-        "prices": { 'npc': 2 },
+        "prices": { 'npc': 1 },  # correct (2025-12-22)
         'xp': { 'mining': 0.3 },
         'upgrade': { 'speed': 5, 'drop': 1, 'duration': 1800 }
     },
     'COAL_BLOCK': {
         'display': 'Block of Coal',  # not in bazaar
-        "prices": { 'npc': 18 },
+        "prices": { 'npc': 9 },  # correct (2025-12-22)
         'xp': { 'mining': 2.7 },
         'upgrade': { 'speed': 5, 'drop': 1, 'duration': 18000 }
     },
     'ENCHANTED_COAL': {
         'display': 'Enchanted Coal',
-        "prices": { 'npc': 320 },
+        "prices": { 'npc': 160 },  # correct (2025-12-22)
         'xp': { 'mining': 48 },
         'upgrade': { 'speed': 10, 'drop': 1, 'duration': 86400 }
     },
     'ENCHANTED_COAL_BLOCK': {
         'display': 'Enchanted Coal Block',
-        "prices": { 'npc': 51000 },  # correct
+        "prices": { 'npc': 25500 },  # correct inaccuracy (2025-12-22)
         'xp': { 'mining': 7680 }
     },
     'IRON_ORE': {
@@ -592,7 +597,8 @@ itemList = {
     },
     'ENCHANTED_GOLDEN_CARROT': {
         'display': 'Enchanted Golden Carrot',
-        "prices": { 'npc': 61440 }  # correct
+        "prices": { 'npc': 76800 },  # correct (2025-12-18)
+        'xp': { 'farming': 0 }  # correct inaccuracy (2025-12-18)
     },
     'POTATO_ITEM': {
         'display': 'Potato',
@@ -609,6 +615,11 @@ itemList = {
         "prices": { 'npc': 76800 },
         'xp': { 'farming': 2560 }
     },
+    "FRENCH_FRIES": {
+        'display': "French Fries",
+        'prices': { "npc": 1 },
+        'xp': { 'farming': 0 }
+    },
     'RED_MUSHROOM': {
         'display': 'Red Mushroom',
         "prices": { 'npc': 10 },
@@ -621,13 +632,13 @@ itemList = {
     },
     'HUGE_MUSHROOM_2': {
         'display': 'Red Mushroom Block',
-        "prices": { 'npc': 10 },  # correct
-        'xp': { 'farming': 0.3 }  # correct
+        "prices": { 'npc': 10 },  # correct inaccuracy
+        'xp': { 'farming': 0.3 }  # correct inaccuracy
     },
     'HUGE_MUSHROOM_1': {
         'display': 'Brown Mushroom Block',
-        "prices": { 'npc': 10 },  # correct
-        'xp': { 'farming': 0.3 }  # correct
+        "prices": { 'npc': 10 },  # correct inaccuracy
+        'xp': { 'farming': 0.3 }  # correct inaccuracy
     },
     'ENCHANTED_RED_MUSHROOM': {
         'display': 'Enchanted Red Mushroom',
@@ -641,13 +652,13 @@ itemList = {
     },
     'ENCHANTED_HUGE_MUSHROOM_2': {
         'display': 'Enchanted Red Mushroom Block',
-        "prices": { 'npc': 51200 },
-        'xp': { 'farming': 1536 }
+        "prices": { 'npc': 256000 },  # correct (2025-12-18)
+        'xp': { 'farming': 1536 }  # correct inaccuracy (2025-12-22)
     },
     'ENCHANTED_HUGE_MUSHROOM_1': {
         'display': 'Enchanted Brown Mushroom Block',
-        "prices": { 'npc': 51200 },
-        'xp': { 'farming': 1536 }
+        "prices": { 'npc': 256000 },  # correct (2025-12-18)
+        'xp': { 'farming': 1536 }  # correct inaccuracy (2025-12-22)
     },
     'CACTUS': {
         'display': 'Cactus',
@@ -662,12 +673,12 @@ itemList = {
     'ENCHANTED_CACTUS_GREEN': {
         'display': 'Enchanted Cactus Green',
         "prices": { 'npc': 480 },
-        'xp': { 'farming': 80 }  # correct
+        'xp': { 'farming': 80 }  # correct inaccuracy
     },
     'ENCHANTED_CACTUS': {
         'display': 'Enchanted Cactus',
         "prices": { 'npc': 76800 },
-        'xp': { 'farming': 12800 }  # correct
+        'xp': { 'farming': 12800 }  # correct inaccuracy
     },
     'INK_SACK:3': {
         'display': 'Cocoa Beans',
@@ -681,7 +692,8 @@ itemList = {
     },
     'ENCHANTED_COOKIE': {
         'display': 'Enchanted Cookie',
-        "prices": { 'npc': 61500 }  # correct
+        "prices": { 'npc': 76800 },  # correct (2025-12-18)
+        'xp': { 'farming': 0}  # correct inaccuracy (2025-12-19)
     },
     'SUGAR_CANE': {
         'display': 'Sugar Cane',
@@ -756,7 +768,7 @@ itemList = {
     "COMPACTED_WILD_ROSE": {
         'display': 'Compacted Wild Rose',
         "prices": { 'npc': 102400 },
-        'xp': { 'farming': 7680 }  # check, amount and type
+        'xp': { 'farming': 7680 }  # correct (2025-12-21)
     },
     "DOUBLE_PLANT": {
         'display': 'Sunflower',
@@ -771,7 +783,7 @@ itemList = {
     "COMPACTED_SUNFLOWER": {
         'display': 'Compacted Sunflower',
         "prices": { 'npc': 102400 },
-        'xp': { 'farming': 7680 }  # check
+        'xp': { 'farming': 7680 }  # correct (2025-12-21)
     },
     "MOONFLOWER": {
         'display': 'Moonflower',
@@ -786,7 +798,7 @@ itemList = {
     "COMPACTED_MOONFLOWER": {
         'display': 'Compacted Moonflower',
         "prices": { 'npc': 102400 },
-        'xp': { 'farming': 7680 }  # check
+        'xp': { 'farming': 7680 }  # correct (2025-12-21)
     },
     'RAW_FISH': {
         'display': 'Raw Cod',
@@ -896,7 +908,7 @@ itemList = {
     'ENCHANTED_ENDER_PEARL': {
         'display': 'Enchanted Ender Pearl',
         "prices": { 'npc': 140 },
-        'xp': { 'combat': 9 }
+        'xp': { 'combat': 9 }  # correct inaccuracy
     },
     'ENCHANTED_EYE_OF_ENDER': {
         'display': 'Enchanted Eye of Ender',
@@ -910,7 +922,7 @@ itemList = {
     'ABSOLUTE_ENDER_PEARL': {
         'display': 'Absolute Ender Pearl',
         "prices": { 'npc': 11200 },
-        'xp': { 'combat': 720 }  # correct
+        'xp': { 'combat': 720 }  # correct inaccuracy
     },
     'CRUDE_GABAGOOL': {
         'display': 'Crude Gabagool',
@@ -939,12 +951,12 @@ itemList = {
     },
     'INFERNO_VERTEX': {
         'display': 'Inferno Vertex',
-        "prices": { 'npc': 0, "custom": 6500000 },
+        "prices": { 'npc': 0 },
         'xp': { 'combat': 0 }
     },
     'INFERNO_APEX': {
         'display': 'Inferno Apex',
-        "prices": { 'npc': 0, "custom": 150000000 },
+        "prices": { 'npc': 0 },
         'xp': { 'combat': 0 }
     },
     'REAPER_PEPPER': {
@@ -1014,7 +1026,7 @@ itemList = {
     'ENCHANTED_STRING': {
         'display': 'Enchanted String',
         "prices": { 'npc': 576 },  # correct
-        'xp': { 'combat': 38 }  # correct
+        'xp': { 'combat': 38 }  # correct inaccuracy
     },
     'ENCHANTED_SPIDER_EYE': {
         'display': 'Enchanted Spider Eye',
@@ -1068,11 +1080,7 @@ itemList = {
     'ENCHANTED_GHAST_TEAR': {
         'display': 'Enchanted Ghast Tear',
         "prices": { 'npc': 80 },
-        'xp': { 'combat': 7.5 }  # correct
-    },
-    'SILVER_FANG': {
-        'display': 'Silver Fang',  # no xp entry is correct, cannot be made in minion
-        "prices": { 'npc': 2000 }
+        'xp': { 'combat': 7.5 }  # correct inaccuracy
     },
     'SLIME_BALL': {
         'display': 'Slimeball',
@@ -1112,7 +1120,7 @@ itemList = {
     'ENCHANTED_LEATHER': {
         'display': 'Enchanted Leather',
         "prices": { 'npc': 480 },  # correct
-        'xp': { 'farming': 115 }  # correct
+        'xp': { 'farming': 115 }  # correct inaccuracy
     },
     'PORK': {
         'display': 'Raw Porkchop',  # correct
@@ -1157,7 +1165,7 @@ itemList = {
     'ENCHANTED_EGG': {
         'display': 'Enchanted Egg',
         "prices": { 'npc': 432 },  # correct
-        'xp': { 'farming': 115 },  # correct
+        'xp': { 'farming': 115 },  # correct inaccuracy
         "upgrade": {
             'speed': 0, 'drop': 1,
             'special': { "type": "add", "item": { "EGG": 1 } }
@@ -1166,12 +1174,12 @@ itemList = {
     'SUPER_EGG': {
         'display': 'Super Enchanted Egg',
         "prices": { 'npc': 0 },  # correct
-        'xp': { 'farming': 16560 }
+        'xp': { 'farming': 16560 }  # check xp amount
     },
     'OMEGA_EGG': {
         'display': 'Omega Enchanted Egg',
         "prices": { 'npc': 0 },
-        'xp': { 'farming': 149040 }
+        'xp': { 'farming': 149040 }  # check xp amount
     },
     'WOOL': {
         'display': 'White Wool',
@@ -1231,7 +1239,7 @@ itemList = {
     'ENCHANTED_RABBIT_HIDE': {
         'display': 'Enchanted Rabbit Hide',  # both correct
         "prices": { 'npc': 800 },
-        'xp': { 'farming': 115 }
+        'xp': { 'farming': 115 }  # correct inaccuracy
     },
     'LOG': {
         'display': 'Oak Log',
@@ -1293,6 +1301,46 @@ itemList = {
         "prices": { 'npc': 320 },
         'xp': { 'foraging': 16 }
     },
+
+    # Minion Crafting
+    'SILVER_FANG': {  # correcet: cannot be made in ghast minion
+        'display': 'Silver Fang',
+        "prices": { 'npc': 2000 }
+    },
+    "REVENANT_FLESH": {
+        'display': "Revenant Flesh",
+        "prices": { "npc": 1 }
+    },
+    "REVENANT_VISCERA": {
+        'display': "Revenant Viscera",
+        "prices": { "npc": 128 }
+    },
+    "TARANTULA_WEB": {
+        'display': "Tarantula Web",
+        "prices": { "npc": 1 }
+    },
+    "TARANTULA_SILK": {
+        'display': "Tarantula Silk",
+        "prices": { "npc": 128 }
+    },
+    "NULL_SPHERE": {
+        'display': "Null Sphere",
+        "prices": {}
+    },
+    "NULL_OVOID": {
+        'display': "Null Ovoid",
+        "prices": {}
+    },
+    "DERELICT_ASHE": {
+        'display': "Derelict Ashe",
+        "prices": {}
+    },
+    "MOLTEN_POWDER": {
+        'display': "Molten Powder",
+        "prices": {}
+    },
+
+    # The following items are fuel
     'ENCHANTED_CHARCOAL': {
         'display': 'Enchanted Charcoal',
         "prices": {},
@@ -1363,14 +1411,18 @@ itemList = {
         "prices": {},
         "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
     },
+
+    # Hoppers
     'BUDGET_HOPPER': {
         'display': 'Budget Hopper',
-        "prices": { "custom": 10000 }
+        "prices": {}
     },
     'ENCHANTED_HOPPER': {
         'display': 'Enchanted Hopper',
-        "prices": { "custom": 1200000 }
+        "prices": {}
     },
+
+    # Upgrades
     'AUTO_SMELTER': {
         'display': 'Auto Smelter',
         "prices": {},
@@ -1499,102 +1551,34 @@ itemList = {
             'special': { "type": "generate", "item": { "PURPLE_CANDY": 1 }, "chance": 0.00015 }
         }
     },
-    'INFERNO_FUEL_BLOCK': {
-        'display': 'Inferno Fuel Block',
-        "prices": { "custom": 65000 }
+    "HUNTER_KNIFE": {
+        'display': "Hunter Knife",
+        "prices": { "custom": 500000 },  # 500k from Rusty
+        "upgrade": {
+            'speed': 0, 'drop': 1,
+            'special': { "type": "replace", "list": { "POTATO_ITEM": "FRENCH_FRIES" } }
+        }
     },
-    'HYPERGOLIC_GABAGOOL': {
-        'display': 'Hypergolic Gabagool',
-        "prices": { "custom": 5500000 }
-    },
-    'HEAVY_GABAGOOL': {
-        'display': 'Heavy Gabagool',
-        "prices": { "custom": 500000 }
-    },
-    'FUEL_GABAGOOL': {
-        'display': 'Fuel Gabagool',
-        "prices": { "custom": 20000 }
-    },
-    'MAGMA_CREAM_DISTILLATE': {
-        'display': 'Magma Cream Distillate',
-        "prices": { "custom": 5000 }
-    },
-    'BLAZE_ROD_DISTILLATE': {
-        'display': 'Blaze Rod Distillate',
-        "prices": { "custom": 5500 }
-    },
-    'NETHER_STALK_DISTILLATE': {
-        'display': 'Nether Wart Distillate',
-        "prices": { "custom": 5000 }
-    },
-    'GLOWSTONE_DUST_DISTILLATE': {
-        'display': 'Glowstone Distillate',
-        "prices": { "custom": 4900 }
-    },
-    'CRUDE_GABAGOOL_DISTILLATE': {
-        'display': 'Gabagool Distillate',
-        "prices": { "custom": 85000 }
-    },
-    'CAPSAICIN_EYEDROPS_NO_CHARGES': {
-        'display': 'Capsaicin Eyedrops',
-        "prices": { "custom": 1700000 }
-    },
+
+    # Beacon Fuel
     "POWER_CRYSTAL": {
         'display': 'Power Crystal',
-        "prices": { "custom": 600000 },
+        "prices": {},
         'duration': 172800
     },
     "SCORCHED_POWER_CRYSTAL": {
         'display': 'Scorched Power Crystal',
-        "prices": { "custom": 2000000 },
+        "prices": {},
         'duration': 172800
     },
+
+    # Other Upgrades
     "MITHRIL_INFUSION": {
         'display': "Mithril Infusion",
-        "prices": { "custom": 6500000 }
+        "prices": {}
     },
-    "STARFALL": {
-        'display': "Starfall",
-        "prices": { "custom": 1500 }
-    },
-    "PLASMA": {
-        'display': "Plasma",
-        "prices": { "custom": 20000 }
-    },
-    "REVENANT_FLESH": {
-        'display': "Revenant Flesh",
-        "prices": { "custom": 20 }
-    },
-    "REVENANT_VISCERA": {
-        'display': "Revenant Viscera",
-        "prices": { "custom": 85000 }
-    },
-    "NULL_SPHERE": {
-        'display': "Null Sphere",
-        "prices": { "custom": 10 }
-    },
-    "NULL_OVOID": {
-        'display': "Null Ovoid",
-        "prices": { "custom": 120000 }
-    },
-    "DERELICT_ASHE": {
-        'display': "Derelict Ashe",
-        "prices": { "custom": 900 }
-    },
-    "MOLTEN_POWDER": {
-        'display': "Molten Powder",
-        "prices": { "custom": 250000 }
-    },
-    "TARANTULA_WEB": {
-        'display': "Tarantula Web",
-        "prices": { "custom": 350 }
-    },
-    "TARANTULA_SILK": {
-        'display': "Tarantula Silk",
-        "prices": { "custom": 250000 }
-    },
-    "FLAMES": {
-        'display': "Flames",
+    'CAPSAICIN_EYEDROPS_NO_CHARGES': {
+        'display': 'Capsaicin Eyedrops',
         "prices": {}
     },
     "FREE_WILL": {
@@ -1604,6 +1588,10 @@ itemList = {
     "POTATO_TALISMAN": {
         'display': "Potato Talisman",  # not in bazaar (AH)
         'prices': { "custom": 45000000 }
+    },
+    "POTATO_RING": {
+        'display': "Potato Ring",  # not in bazaar (AH)
+        'prices': { "custom": 300000000 }
     },
     "SMALL_ENCHANTED_CHEST": {
         'display': "Small Storage",
@@ -1625,24 +1613,64 @@ itemList = {
         'display': "XX-Large Storage",
         'prices': {}
     },
+
+
+    # Other Crafting Materials
+    'INFERNO_FUEL_BLOCK': {
+        'display': 'Inferno Fuel Block',
+        "prices": {}
+    },
+    'HYPERGOLIC_GABAGOOL': {
+        'display': 'Hypergolic Gabagool',
+        "prices": {}
+    },
+    'HEAVY_GABAGOOL': {
+        'display': 'Heavy Gabagool',
+        "prices": {}
+    },
+    'FUEL_GABAGOOL': {
+        'display': 'Fuel Gabagool',
+        "prices": {}
+    },
+    'MAGMA_CREAM_DISTILLATE': {
+        'display': 'Magma Cream Distillate',
+        "prices": {}
+    },
+    'BLAZE_ROD_DISTILLATE': {
+        'display': 'Blaze Rod Distillate',
+        "prices": {}
+    },
+    'NETHER_STALK_DISTILLATE': {
+        'display': 'Nether Wart Distillate',
+        "prices": {}
+    },
+    'GLOWSTONE_DUST_DISTILLATE': {
+        'display': 'Glowstone Distillate',
+        "prices": {}
+    },
+    'CRUDE_GABAGOOL_DISTILLATE': {
+        'display': 'Gabagool Distillate',
+        "prices": {}
+    },
+    "STARFALL": {
+        'display': "Starfall",
+        "prices": {}
+    },
+    "PLASMA": {
+        'display': "Plasma",
+        "prices": {}
+    },
+    "FLAMES": {
+        'display': "Flames",
+        "prices": {}
+    },
     "PRISMARINE:1": {
         'display': "Prismarine Bricks",
         'prices': { 'npc': 5 },
         'xp': { 'mining': 0 }
     },
-    "HUNTER_KNIFE": {
-        'display': "Hunter Knife",
-        "prices": { "custom": 500000 },  # 500k from Rusty
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "replace", "list": { "POTATO_ITEM": "FRENCH_FRIES" } }
-        }
-    },
-    "FRENCH_FRIES": {
-        'display': "French Fries",
-        'prices': { "npc": 1 },
-        'xp': { 'farming': 0 }
-    },
+
+    # Pet Items
     'PET_ITEM_MINING_SKILL_BOOST_COMMON': {
         'display': 'Common Mining Exp Boost',  # not in bazaar (Zog)
         'prices': { 'custom': 60000 }
@@ -1723,6 +1751,8 @@ itemList = {
         "display": "Exp Share Core",
         "prices": {}
     },
+
+    # Attribute Shards
     "SHARD_TOUCAN": {
         "display": "Toucan",
         "prices": {}
@@ -1731,25 +1761,59 @@ itemList = {
         "display": "Falcon",
         "prices": {}
     },
-    # The following items are on the Auction House, but can be created from items from the bazaar
+
+    # The following items are not on bazaar, but can be created from items from the bazaar
     # If the custom price of an item here is set to 0, the equivalent price from bazaar will be calculated
     # Otherwise it will use the inputted number.
     'EVERBURNING_FLAME': {
         'display': 'Everburning Flame',  # not in bazaar (AH)
-        "prices": { "custom": 0 },
+        "prices": { "custom": 0 },  # equivalent bazaar price: 1 Plasma Bucket, 16 Flames, 2 Enchanted Sulphur Cubes, 2 Enchanted Red Sand Cubes
         "upgrade": { 'speed': 40, 'drop': 1, 'duration': 0 }
     },
-    # equivalent bazaar price: 1 Plasma Bucket, 16 Flames, 2 Enchanted Sulphur Cubes, 2 Enchanted Red Sand Cubes
     "POSTCARD": {
         'display': "Postcard",  # not in bazaar (AH)
-        'prices': { "custom": 0 }
+        'prices': { "custom": 0 }  # equivalent bazaar price: taken from Auction House through https://sky.coflnet.com/data
     },
-    # equivalent bazaar price: taken from Auction House through https://sky.coflnet.com/data
     "PET_ITEM_EXP_SHARE": {
         'display': "Exp Share",
-        'prices': { "custom": 0 }
+        'prices': { "custom": 0 }  # equivalent bazaar price: Exp Share price = Exp Share Core price + 72 * Enchanted Gold price
     },
-    # equivalent bazaar price: Exp Share price = Exp Share Core price + 72 * Enchanted Gold price
+    "FARM_CRYSTAL": {
+        'display': "Farm Crystal",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "WOODCUTTING_CRYSTAL": {
+        'display': "Woddcutting Crystal",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "MITHRIL_CRYSTAL": {
+        'display': "Mithril Crystal",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "WINTER_ISLAND_CRYSTAL": {
+        'display': "Winter Crystal",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "BEACON_1": {
+        'display': "Beacon I",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "BEACON_2": {
+        'display': "Beacon II",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "BEACON_3": {
+        'display': "Beacon III",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "BEACON_4": {
+        'display': "Beacon IV",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
+    "BEACON_5": {
+        'display': "Beacon V",
+        'prices': { "custom": 0 }  # equivalent bazaar price:
+    },
 }
 
 #%% Inferno minion List
@@ -1956,17 +2020,20 @@ enchanterList = {
     'PUMPKIN': { 'makes': 'ENCHANTED_PUMPKIN', 'per': 160 },
     'ENCHANTED_PUMPKIN': { 'makes': 'POLISHED_PUMPKIN', 'per': 160 },
     'CARROT_ITEM': { 'makes': 'ENCHANTED_CARROT', 'per': 160 },
+    'ENCHANTED_CARROT': { 'makes': 'ENCHANTED_GOLDEN_CARROT', 'per': 160 },
     'POTATO_ITEM': { 'makes': 'ENCHANTED_POTATO', 'per': 160 },
     'ENCHANTED_POTATO': { 'makes': 'ENCHANTED_BAKED_POTATO', 'per': 160 },
     'RED_MUSHROOM': { 'makes': 'ENCHANTED_RED_MUSHROOM', 'per': 160 },
     'BROWN_MUSHROOM': { 'makes': 'ENCHANTED_BROWN_MUSHROOM', 'per': 160 },
     'HUGE_MUSHROOM_2': { 'makes': 'ENCHANTED_RED_MUSHROOM', 'amount': 9, 'per': 160 },
     'HUGE_MUSHROOM_1': { 'makes': 'ENCHANTED_BROWN_MUSHROOM', 'amount': 9, 'per': 160 },
-    'ENCHANTED_RED_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_2', 'per': 32 },
-    'ENCHANTED_BROWN_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_1', 'per': 32 },
+    'ENCHANTED_RED_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_2', 'per': 160 },  # correct (2025-12-22)
+    'ENCHANTED_BROWN_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_1', 'per': 160 },  # correct (2025-12-22)
     'INK_SACK:2': { 'makes': 'ENCHANTED_CACTUS_GREEN', 'per': 160 },
+    'CACTUS': { 'makes': 'ENCHANTED_CACTUS_GREEN', 'per': 160 },  # correct (2025-12-17)
     'ENCHANTED_CACTUS_GREEN': { 'makes': 'ENCHANTED_CACTUS', 'per': 160 },
     'INK_SACK:3': { 'makes': 'ENCHANTED_COCOA', 'per': 160 },
+    'ENCHANTED_COCOA': { 'makes': 'ENCHANTED_COOKIE', 'per': 160 },  # correct (2025-12-19)
     'SUGAR_CANE': { 'makes': 'ENCHANTED_SUGAR', 'per': 160 },
     'ENCHANTED_SUGAR': { 'makes': 'ENCHANTED_SUGAR_CANE', 'per': 160 },
     'NETHER_STALK': { 'makes': 'ENCHANTED_NETHER_STALK', 'per': 160 },
@@ -2645,7 +2712,7 @@ minionCosts = {
     "Enderman": {1: {"ENDER_PEARL": 64}, 2: {"ENDER_PEARL": 128}, 3: {"ENCHANTED_ENDER_PEARL": 8}, 4: {"ENCHANTED_ENDER_PEARL": 24}, 5: {"ENCHANTED_ENDER_PEARL": 48}, 6: {"ENCHANTED_ENDER_PEARL": 96}, 7: {"ENCHANTED_EYE_OF_ENDER": 8}, 8: {"ENCHANTED_EYE_OF_ENDER": 24}, 9: {"ENCHANTED_EYE_OF_ENDER": 48}, 10: {"ENCHANTED_EYE_OF_ENDER": 96}, 11: {"ENCHANTED_EYE_OF_ENDER": 192}},
     "Ghast": {1: {"GHAST_TEAR": 64}, 2: {"GHAST_TEAR": 128}, 3: {"GHAST_TEAR": 256}, 4: {"GHAST_TEAR": 512}, 5: {"ENCHANTED_GHAST_TEAR": 256}, 6: {"ENCHANTED_GHAST_TEAR": 512}, 7: {"SILVER_FANG": 32}, 8: {"SILVER_FANG": 64}, 9: {"SILVER_FANG": 128}, 10: {"SILVER_FANG": 256}, 11: {"SILVER_FANG": 512}, 12: {"SILVER_FANG": 1024}},
     "Slime": minionCostTypes(["SLIME_BALL", "ENCHANTED_SLIME_BALL", "ENCHANTED_SLIME_BLOCK"], "double enchanted", False),
-    "Cow": {1: {"RAW_BEEF": 64}, 2: {"RAW_BEEF": 128}, 3: {"RAW_BEEF": 256}, 4: {"RAW_BEEF": 512}, 5: {"ENCHANTED_RAW_BEEF": 8}, 6: {"ENCHANTED_RAW_BEEF": 24}, 7: {"ENCHANTED_RAW_BEEF": 64}, 8: {"ENCHANTED_RAW_BEEF": 128}, 9: {"ENCHANTED_RAW_BEEF": 256}, 10: {"ENCHANTED_RAW_BEEF": 512}, 11: {"ENCHANTED_LEATHER": 512}, 12: {"ENCHANTED_LEATHER": 1028}},  # correct, first launch of 0.23.1 has 1028 instead of the expected 1024
+    "Cow": {1: {"RAW_BEEF": 64}, 2: {"RAW_BEEF": 128}, 3: {"RAW_BEEF": 256}, 4: {"RAW_BEEF": 512}, 5: {"ENCHANTED_RAW_BEEF": 8}, 6: {"ENCHANTED_RAW_BEEF": 24}, 7: {"ENCHANTED_RAW_BEEF": 64}, 8: {"ENCHANTED_RAW_BEEF": 128}, 9: {"ENCHANTED_RAW_BEEF": 256}, 10: {"ENCHANTED_RAW_BEEF": 512}, 11: {"ENCHANTED_LEATHER": 512}, 12: {"ENCHANTED_LEATHER": 1028}},  # correct inaccuracy, first launch of 0.23.1 has 1028 instead of the expected 1024
     "Pig": minionCostTypes(["PORK", "ENCHANTED_PORK", "ENCHANTED_GRILLED_PORK"], "double enchanted", True, {1: {"PORK": 64}, 2: {"PORK": 128}, 3: {"PORK": 256}}),
     "Chicken": minionCostTypes(["RAW_CHICKEN", "ENCHANTED_RAW_CHICKEN"], "single enchanted", True, {1: {"RAW_CHICKEN": 64}, 2: {"RAW_CHICKEN": 128}, 3: {"RAW_CHICKEN": 256}}),
     "Sheep": minionCostTypes(["MUTTON", "ENCHANTED_MUTTON", "ENCHANTED_COOKED_MUTTON"], "double enchanted", True, {1: {"MUTTON": 64}, 2: {"MUTTON": 128}, 3: {"MUTTON": 256}}),

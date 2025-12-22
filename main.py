@@ -198,7 +198,7 @@ class Calculator(tk.Tk):
         self.huim.createFrames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
         self.booting_msg("Framework set up")
         self.version = self.huim.defVar(dtype=float, initial=1.2)
-        self.booting_msg("Calculator version {self.version.get()}")
+        self.booting_msg(f"Calculator version {self.version.get()}")
 
         # The calculator stores all important variables into this dict
         # the keys "vtype", "dtype", "frame", "noWidget" and "switch_initial"
