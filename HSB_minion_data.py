@@ -1671,7 +1671,7 @@ itemList = {
     "WINTER_ISLAND_CRYSTAL": {
         'display': "Winter Crystal",
         'prices': {},
-        "recipe": { "RED_GIFT": 3867 }
+        "recipe": { "WINTER_ISLAND": 1 }
     },
 
     # Chests
@@ -1782,6 +1782,11 @@ itemList = {
     "PET_ITEM_EXP_SHARE_DROP": {
         "display": "Exp Share Core",
         "prices": {}
+    },
+    "WINTER_ISLAND": {
+        "display": "Winter Island",
+        "prices": {},
+        "AH": True
     },
 
     # Pet Items

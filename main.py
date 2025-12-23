@@ -2577,6 +2577,10 @@ class Calculator(tk.Tk):
         md.itemList[item_id]["prices"]["buyPrice"] = 0
         md.itemList[item_id]["prices"]["sellPrice"] = 0
         for material_id, amount in md.itemList[item_id]["recipe"].items():
+            if "AH" in md.itemList[material_id]:
+                md.itemList[item_id]["prices"]["buyPrice"] += amount * md.itemList[material_id]["prices"]["custom"]
+                md.itemList[item_id]["prices"]["sellPrice"] += amount * md.itemList[material_id]["prices"]["custom"]
+                continue
             md.itemList[item_id]["prices"]["buyPrice"] += amount * md.itemList[material_id]["prices"]["buyPrice"]
             md.itemList[item_id]["prices"]["sellPrice"] += amount * md.itemList[material_id]["prices"]["sellPrice"]
         return
