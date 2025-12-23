@@ -5,8 +5,8 @@
 Main file for the minion calculator.
 To start the calculator: run this file with a local python interpreter
 
-Bazaar data from https://api.hypixel.net
-AH data from https://sky.coflnet.com/data (currently only Postcard)
+Bazaar and NPC price data from https://api.hypixel.net
+AH data from https://sky.coflnet.com/data
 """
 
 
@@ -43,7 +43,7 @@ external_add_ons = {**Hero_addons.add_ons_package}
 # API settings
 API_auto_update = True
 # If true, bazaar automatically updates before performing calculation
-API_cooldown = 300  # seconds
+API_cooldown = 120  # seconds
 # Time limit in seconds between each automatic update
 
 # Output settings
@@ -603,8 +603,13 @@ class Calculator(tk.Tk):
         ]
         self.booting_msg("Output orders defined")
 
-        # Load bazaar prices
+        # Load prices
         self.API_timer = 0
+        self.bazaar_items = []
+        self.AH_items = []
+        self.recipe_items = []
+        self.init_prices()
+        self.booting_msg("Updated NPC prices")
         self.update_prices(cooldown_warning=False)
         self.booting_msg("Ready")
         return
@@ -1240,10 +1245,10 @@ class Calculator(tk.Tk):
             elif force:
                 self.warning_msg("no forced cost found for " + ID)
                 return 0
-            elif "npc" in md.itemList[ID]["prices"]:
-                return multiplier * md.itemList[ID]["prices"]["npc"]
             elif "custom" in md.itemList[ID]["prices"]:
                 return md.itemList[ID]["prices"]["custom"]
+            elif "npc" in md.itemList[ID]["prices"]:
+                return multiplier * md.itemList[ID]["prices"]["npc"]
             else:
                 self.warning_msg("no cost found for " + ID)
                 return 0
@@ -1455,9 +1460,9 @@ class Calculator(tk.Tk):
                 md.minionList[minion]["drops"] = { "WILD_ROSE": 2 }
             elif afk_toggle and setup_data["specialLayout"]:
                 # tall flowers blocked by low ceiling
-                md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 0.5 }
+                md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 8, "RED_ROSE:2": 0.5 / 8, "RED_ROSE:3": 0.5 / 8, "RED_ROSE:4": 0.5 / 8, "RED_ROSE:5": 0.5 / 8, "RED_ROSE:6": 0.5 / 8, "RED_ROSE:7": 0.5 / 8, "RED_ROSE:8": 0.5 / 8 }
             else:
-                md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "SMALL_FLOWER": 1 / 3, "LARGE_FLOWER": 1 / 6 }
+                md.minionList[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 11, "RED_ROSE:2": 0.5 / 11, "RED_ROSE:3": 0.5 / 11, "RED_ROSE:4": 0.5 / 11, "RED_ROSE:5": 0.5 / 11, "RED_ROSE:6": 0.5 / 11, "RED_ROSE:7": 0.5 / 11, "RED_ROSE:8": 0.5 / 11, "DOUBLE_PLANT:1": 0.5 / 11, "DOUBLE_PLANT:4": 0.5 / 11, "DOUBLE_PLANT:5": 0.5 / 11 }
         elif minion == "Sunflower":
             if minion_fuel_id == "DAYSWITCH":
                 md.minionList[minion]["drops"] = { "DOUBLE_PLANT": 2 }
@@ -2072,9 +2077,6 @@ class Calculator(tk.Tk):
                     pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item) / 100) * non_matching
             if mayor != "Diana":
                 break
-        exp_share_price = self.get_price("PET_ITEM_EXP_SHARE", "buy", "custom", True)
-        if exp_share_price == 0:
-            exp_share_price = self.get_price("PET_ITEM_EXP_SHARE_DROP", "buy", "bazaar") + 72 * self.get_price("ENCHANTED_GOLD", "buy", "bazaar")
         for pet_slot, pet_info in setup_pets.items():
             pets_levelled = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.all_pets[pet_info["pet"]]["rarity"]]
             setup_pets[pet_slot]["levelled_pets"] = pets_levelled
@@ -2085,7 +2087,7 @@ class Calculator(tk.Tk):
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "None":
                 pet_profit -= pets_levelled * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pets_levelled * exp_share_price
+                pet_profit -= pets_levelled * self.get_price("PET_ITEM_EXP_SHARE", "buy", "bazaar")
         return pet_profit, setup_pets
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, emptytime_seconds, setup_data):
@@ -2163,11 +2165,7 @@ class Calculator(tk.Tk):
 
         # Infinite fuel cost
         if minion_fuel != "NONE" and md.itemList[minion_fuel]["upgrade"]["duration"] == 0:
-            if minion_fuel == "EVERBURNING_FLAME" and self.get_price("EVERBURNING_FLAME", "buy", "custom", True) == 0:
-                for item_ID, amount in md.upgrades_material_cost["EVERBURNING_FLAME"].items():
-                    cost_per_part["fuel"] = amount * self.get_price(item_ID, "buy", "bazaar")
-            else:
-                cost_per_part["fuel"] = self.get_price(minion_fuel, "buy", "bazaar")
+            cost_per_part["fuel"] = self.get_price(minion_fuel, "buy", "bazaar")
 
         # Hopper cost
         if setup_data["hopper"] in ["Budget Hopper", "Enchanted Hopper"]:
@@ -2224,16 +2222,16 @@ class Calculator(tk.Tk):
 
         # Beacon cost
         if setup_data["beacon"] != 0 and not setup_data["B_acquired"]:
-            cost_per_part["beacon"] = 0
-            for i in np.arange(setup_data["beacon"]) + 1:
-                for item_ID, amount in md.upgrades_material_cost["beacon"][i].items():
-                    cost_per_part["beacon"] += amount * self.get_price(item_ID, "buy", "bazaar")
+            cost_per_part["beacon"] = self.get_price(f"BEACON_{setup_data["beacon"]}", "buy", "bazaar")
+            # will fix display to ID translation later
 
         # Floating Crystal cost
         if setup_data["crystal"] != "None":
-            cost_per_part["crystal"] = 0
-            for item_ID, amount in md.upgrades_material_cost["crystal"][setup_data["crystal"]].items():
-                cost_per_part["crystal"] += amount * self.get_price(item_ID, "buy", "bazaar")
+            if setup_data["crystal"] == "Winter + Mithril Crystal":
+                cost_per_part["crystal"] = self.get_price("WINTER_ISLAND_CRYSTAL", "buy", "bazaar") + self.get_price("MITHRIL_CRYSTAL", "buy", "bazaar")
+            else:
+                cost_per_part["crystal"] = self.get_price(setup_data["crystal"].replace(" ", "_").upper().replace("WINTER", "WINTER_ISLAND"), "buy", "bazaar")
+                # will fix display to ID translation later
 
         # Postcard cost
         if setup_data["postcard"]:
@@ -2425,6 +2423,60 @@ class Calculator(tk.Tk):
             return outputs
         return        
 
+    def init_prices(self):
+        """
+        calls to Hypixel's Item and Bazaar API,
+        handles that data to get NPC prices and check which items are on Bazaar.
+        Also checks md.itemList for all recipe and AH items
+
+        Returns
+        -------
+        None
+
+        """
+        self.info_msg("Calling Bazaar")
+        try:
+            f = urllib.request.urlopen(r"https://api.hypixel.net/v2/skyblock/bazaar")
+            bazaar_call_data = f.read().decode('utf-8')
+        except Exception as error:
+            self.error_msg(f"Could not finish Bazaar API call\n{error}")
+            return
+        raw_bazaar_data = json.loads(bazaar_call_data)
+        if "success" not in raw_bazaar_data or raw_bazaar_data["success"] is False:
+            self.error_msg("Bazaar API call was unsuccessful")
+            return
+        self.info_msg("Bazaar call successful")
+        
+        self.info_msg("Calling Item API")
+        try:
+            f = urllib.request.urlopen(r"https://api.hypixel.net/resources/skyblock/items")
+            item_call_data = f.read().decode('utf-8')
+        except Exception as error:
+            self.error_msg(f"Could not finish Item API call\n{error}")
+            return
+        raw_item_data = json.loads(item_call_data)
+        if "success" not in raw_item_data or raw_item_data["success"] is False:
+            self.error_msg("Item API call was unsuccessful")
+            return
+        self.info_msg("Item API call successful")
+        dict_item_data = {}
+        for item_data in raw_item_data["items"]:
+            dict_item_data[item_data["id"]] = item_data
+        
+        for item_id in md.itemList.keys():
+            if item_id in dict_item_data and "npc_sell_price" in dict_item_data[item_id]:
+                md.itemList[item_id]["prices"]["npc"] = dict_item_data[item_id]["npc_sell_price"]
+            elif "npc" not in md.itemList[item_id]["prices"]:
+                md.itemList[item_id]["prices"]["npc"] = 0
+            if item_id in raw_bazaar_data["products"]:
+                self.bazaar_items.append(item_id)
+            elif "recipe" in md.itemList[item_id]:
+                self.recipe_items.append(item_id)
+            elif "AH" in md.itemList[item_id] and md.itemList[item_id]["AH"]:
+                self.AH_items.append(item_id)
+        return  
+
+
     def call_bazaar(self):
         """
         calls to Hypixel API for most recent bazaar data,
@@ -2451,19 +2503,19 @@ class Calculator(tk.Tk):
         self.API_timer = raw_data["lastUpdated"] / 1000
         self.variables["bazaar_update_txt"]["var"].set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(self.API_timer)))
         top_percent = 0.1
-        for itemtype, item_data in md.itemList.items():
-            if itemtype not in raw_data["products"]:
+        for item_id in self.bazaar_items:
+            if item_id not in raw_data["products"]:
                 continue
             for action in ["buy", "sell"]:
-                top_amount = top_percent * sum([order["amount"] for order in raw_data["products"][itemtype][f"{action}_summary"]])
+                top_amount = top_percent * sum([order["amount"] for order in raw_data["products"][item_id][f"{action}_summary"]])
                 if top_amount == 0:
-                    item_data["prices"][f"{action}Price"] = 0
-                    if "npc" not in item_data["prices"]:
-                        self.warning_msg(f"no {action} supply for {itemtype}")
+                    md.itemList[item_id]["prices"][f"{action}Price"] = 0
+                    if "npc" not in md.itemList[item_id]["prices"]:
+                        self.warning_msg(f"no {action} supply for {item_id}")
                     continue
                 counter = top_amount
                 top_sum = 0
-                for order in raw_data["products"][itemtype][f"{action}_summary"]:
+                for order in raw_data["products"][item_id][f"{action}_summary"]:
                     if counter <= 0:
                         break
                     if counter >= order["amount"]:
@@ -2474,12 +2526,12 @@ class Calculator(tk.Tk):
                         counter = 0
                         break
                 top_percent_avg_price = top_sum / top_amount
-                top_price = raw_data["products"][itemtype][f"{action}_summary"][0]["pricePerUnit"]
+                top_price = raw_data["products"][item_id][f"{action}_summary"][0]["pricePerUnit"]
                 if top_price / top_percent_avg_price >= 2.5:
-                    item_data["prices"][f"{action}Price"] = top_price
-                    self.info_msg(f"bottom heavy {action} supply for {itemtype}, taking top order price")
+                    md.itemList[item_id]["prices"][f"{action}Price"] = top_price
+                    self.info_msg(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
-                    item_data["prices"][f"{action}Price"] = top_percent_avg_price
+                    md.itemList[item_id]["prices"][f"{action}Price"] = top_percent_avg_price
         return
 
     def call_auction_house(self, item_id):
@@ -2497,8 +2549,8 @@ class Calculator(tk.Tk):
         """
 
         try:
-            postcard_url = r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin"
-            req = urllib.request.Request(postcard_url, headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)", })
+            AH_bin_url = r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin"
+            req = urllib.request.Request(AH_bin_url, headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)", })
             call_data = urllib.request.urlopen(req).read().decode('utf-8')
         except Exception as error:
             self.error_msg(f"Could not finish SkyCofl API call for {item_id}\n{error}")
@@ -2506,21 +2558,46 @@ class Calculator(tk.Tk):
         raw_data = json.loads(call_data)
         return (raw_data["lowest"] + raw_data["secondLowest"]) / 2
 
+    def update_recipe_price(self, item_id):
+        """
+        Calculates equivalent bazaar price for recipe items
+        
+        :param item_id: str, item ID that has a recipe
+        
+        Returns
+        -------
+        None.
+        """
+        if item_id not in md.itemList:
+            self.error_msg(f"{item_id} not in md.itemList (self.update_recipe_price)")
+            return
+        if "recipe" not in md.itemList[item_id]:
+            self.error_msg(f"{item_id} is not a recipe item (self.update_recipe_price)")
+            return
+        md.itemList[item_id]["prices"]["buyPrice"] = 0
+        md.itemList[item_id]["prices"]["sellPrice"] = 0
+        for material_id, amount in md.itemList[item_id]["recipe"].items():
+            md.itemList[item_id]["prices"]["buyPrice"] += amount * md.itemList[material_id]["prices"]["buyPrice"]
+            md.itemList[item_id]["prices"]["sellPrice"] += amount * md.itemList[material_id]["prices"]["sellPrice"]
+        return
+
     def update_prices(self, cooldown_warning=True):
         """
-        Updates item prices.
-
-        If API_cooldown is done, also update API
+        If API_cooldown is done, update prices
         
         :param cooldown_warning: bool, toggle if a terminal message should be printed if the bazaar update cooldown has not passed yet.
         """
         if time.time() - self.API_timer < API_cooldown and self.API_timer != 0:
             if cooldown_warning:
                 self.info_msg("API update is on cooldown")
-        else:
-            self.call_bazaar()
-            self.info_msg("Updating Auction House prices")
-            md.itemList["POSTCARD"]["prices"]["custom"] = self.call_auction_house("POSTCARD")
+            return
+        self.call_bazaar()
+        self.info_msg("Updating Auction House prices")
+        for item_id in self.AH_items:
+            md.itemList[item_id]["prices"]["custom"] = self.call_auction_house(item_id)
+        self.info_msg("Updating Recipe prices")
+        for item_id in self.recipe_items:
+            self.update_recipe_price(item_id)
         return
 
     def update_listboxes(self):
