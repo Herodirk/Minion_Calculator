@@ -1595,7 +1595,7 @@ itemList = {
         "recipe": {"ENCHANTED_IRON": 2},
         "upgrade": {
             'speed': 0, 'drop': 1,
-            'special': { "type": "add", "item": { "WOOL": 2 } }  # probably correct, not entirely sure
+            'special': { "type": "add", "item": { "WOOL": 1 } }  # total of 2 wool per spawn and harvest while offline, so adds 1. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
         }
     },
     'SLEEPY_HOLLOW': {
@@ -2208,7 +2208,7 @@ pet_xp_boosts = {
 
 floating_crystals = {
     "None": { 0: [] },
-    "Farm Crystal": { 10: ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart'] },
+    "Farm Crystal": { 10: ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower'] },
     "Woodcutting Crystal": { 10: ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle', "Flower"] },  # flower minion is correct
     "Mithril Crystal": { 10: ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Red Sand', 'Mycelium', 'Ice', 'Snow', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril', 'Hard Stone'] },
     "Winter Crystal": { 5: ["Snow", "Ice"] },
@@ -2261,7 +2261,7 @@ boost_pets = {
     },
     "Rabbit": {
         "Legendary": [0, 0.3], "Mythic": [0, 0.3],
-        "affects": ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart']
+        "affects": ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower']
     },
     "Snail": {
         "Common": [0, 0.1], "Uncommon": [0, 0.2],
@@ -2789,7 +2789,7 @@ minionCosts = {
     "Enderman": {1: {"ENDER_PEARL": 64}, 2: {"ENDER_PEARL": 128}, 3: {"ENCHANTED_ENDER_PEARL": 8}, 4: {"ENCHANTED_ENDER_PEARL": 24}, 5: {"ENCHANTED_ENDER_PEARL": 48}, 6: {"ENCHANTED_ENDER_PEARL": 96}, 7: {"ENCHANTED_EYE_OF_ENDER": 8}, 8: {"ENCHANTED_EYE_OF_ENDER": 24}, 9: {"ENCHANTED_EYE_OF_ENDER": 48}, 10: {"ENCHANTED_EYE_OF_ENDER": 96}, 11: {"ENCHANTED_EYE_OF_ENDER": 192}},
     "Ghast": {1: {"GHAST_TEAR": 64}, 2: {"GHAST_TEAR": 128}, 3: {"GHAST_TEAR": 256}, 4: {"GHAST_TEAR": 512}, 5: {"ENCHANTED_GHAST_TEAR": 256}, 6: {"ENCHANTED_GHAST_TEAR": 512}, 7: {"SILVER_FANG": 32}, 8: {"SILVER_FANG": 64}, 9: {"SILVER_FANG": 128}, 10: {"SILVER_FANG": 256}, 11: {"SILVER_FANG": 512}, 12: {"SILVER_FANG": 1024}},
     "Slime": minionCostTypes(["SLIME_BALL", "ENCHANTED_SLIME_BALL", "ENCHANTED_SLIME_BLOCK"], "double enchanted", False),
-    "Cow": {1: {"RAW_BEEF": 64}, 2: {"RAW_BEEF": 128}, 3: {"RAW_BEEF": 256}, 4: {"RAW_BEEF": 512}, 5: {"ENCHANTED_RAW_BEEF": 8}, 6: {"ENCHANTED_RAW_BEEF": 24}, 7: {"ENCHANTED_RAW_BEEF": 64}, 8: {"ENCHANTED_RAW_BEEF": 128}, 9: {"ENCHANTED_RAW_BEEF": 256}, 10: {"ENCHANTED_RAW_BEEF": 512}, 11: {"ENCHANTED_LEATHER": 512}, 12: {"ENCHANTED_LEATHER": 1028}},  # correct inaccuracy, first launch of 0.23.1 has 1028 instead of the expected 1024
+    "Cow": {1: {"RAW_BEEF": 64}, 2: {"RAW_BEEF": 128}, 3: {"RAW_BEEF": 256}, 4: {"RAW_BEEF": 512}, 5: {"ENCHANTED_RAW_BEEF": 8}, 6: {"ENCHANTED_RAW_BEEF": 24}, 7: {"ENCHANTED_RAW_BEEF": 64}, 8: {"ENCHANTED_RAW_BEEF": 128}, 9: {"ENCHANTED_RAW_BEEF": 256}, 10: {"ENCHANTED_RAW_BEEF": 512}, 11: {"ENCHANTED_LEATHER": 512}, 12: {"ENCHANTED_LEATHER": 1024}},  # correct
     "Pig": minionCostTypes(["PORK", "ENCHANTED_PORK", "ENCHANTED_GRILLED_PORK"], "double enchanted", True, {1: {"PORK": 64}, 2: {"PORK": 128}, 3: {"PORK": 256}}),
     "Chicken": minionCostTypes(["RAW_CHICKEN", "ENCHANTED_RAW_CHICKEN"], "single enchanted", True, {1: {"RAW_CHICKEN": 64}, 2: {"RAW_CHICKEN": 128}, 3: {"RAW_CHICKEN": 256}}),
     "Sheep": minionCostTypes(["MUTTON", "ENCHANTED_MUTTON", "ENCHANTED_COOKED_MUTTON"], "double enchanted", True, {1: {"MUTTON": 64}, 2: {"MUTTON": 128}, 3: {"MUTTON": 256}}),

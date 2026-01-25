@@ -832,44 +832,60 @@ class H_UI_M():
 #%% Hero Variable Manager
 
 class Hvar():
-    def __init__(self, hk, key, vtype, dtype, display, frame, initial, width=0, height=0, options=[], command=None, noWidget=False, switch_initial=None, checkbox_text=None):
-        hk.main.var_dict[key] = self
-        self.vtype = vtype
-        self.dtype = dtype
-        self.display = display
-        self.frame = frame
-        self.initial = initial
+    def __init__(self, huim, key, vtype, dtype, display, frame, initial, auto_item_id=False, fancy_display=None, widget_width=0, widget_height=0, options=[], command=None, no_widget=False, switch_initial=None, checkbox_text=None):
+        if key in huim.main.var_dict:
+            print(f"warning: {key} already exists in variable dictionary, overwriting it")
+        huim.main.var_dict[key] = self  # define in variable dictionary
+        # Mandatory data:
+        self.vtype = vtype  # str, variable type
+        self.dtype = dtype  # type, data type
+        self.name_display = display  # str, display name of variable
+        self.fancy_name_display = fancy_display  # str, fancy display name of variable
+        self.auto_item_id = auto_item_id  # bool, toggle for automacially switching between display name and ID for items
+        self.frame = frame  # str, ID of Tk Frame in huim.main.frames
+        self.initial = initial  # {self.dtype}, initial value of the variable
+
+        # Optional data:
         if self.dtype == bool:
             self.options = [False, True]
         else:
-            self.options = options
-        self.command = command
-        self.noWidget = noWidget
-        self.switch_initial = switch_initial
-        self.list_width = width
-        self.list_height = height
-        self.checkbox_text = checkbox_text
+            self.options = options  # list (dict if auto_item_id) containing possible values (display names as keys, IDs as values for dict), empty list if no restrictions
+        self.command = command  # callable, function to run when input changed 
+        self.no_widget = no_widget  # bool, toggle for making Tk widget parts
+        self.switch_initial = switch_initial  # bool or None, initial state of the output switch, None if no output switch
+        self.list_box_width = widget_width  # int, width of listbox in characters
+        self.list_box_height = widget_height  # int, height of listbox in amount of lines
+        self.checkbox_text = checkbox_text  # str, text added next to the checkbox
+
+        # Generated data:
         self.tkvar = None
         self.widget = None
         self.switch_output = None
 
-        if self.vtype == "input" and self.noWidget is False:
-            self.tkvar, self.widget = hk.defVarI(dtype=self.dtype, frame=hk.main.frames[self.frame],
-                                                 L_text=f"{self.display}:", initial=self.initial,
+        if self.vtype == "input" and self.no_widget is False:
+            self.tkvar, self.widget = huim.defVarI(dtype=self.dtype, frame=huim.main.frames[self.frame],
+                                                 L_text=f"{self.name_display}:", initial=self.initial,
                                                  options=self.options, cmd=self.command, checkbox_text=self.checkbox_text)
         elif self.vtype == "output":
-            self.tkvar, self.widget = hk.defVarO(dtype=self.dtype, frame=hk.main.frames[self.frame],
-                                                 L_text=f"{self.display}:", initial=self.initial,)
-        elif self.vtype == "input" and self.noWidget is True:
-            self.tkvar = hk.defVar(dtype=self.dtype, initial=self.initial)
+            self.tkvar, self.widget = huim.defVarO(dtype=self.dtype, frame=huim.main.frames[self.frame],
+                                                 L_text=f"{self.name_display}:", initial=self.initial,)
+        elif self.vtype == "input" and self.no_widget is True:  # will be fully replaced by storage vtype
+            self.tkvar = huim.defVar(dtype=self.dtype, initial=self.initial)
+        elif self.vtype == "storage":
+                self.tkvar = self.huim.defVar(dtype=self.dtype, initial=self.initial)
         elif self.vtype == "list":
-            self.tkvar, self.widget = hk.defListO(frame=hk.main.frames[self.frame], L_text=f"{self.display}:", h=self.list_height, w=self.list_width)
-        if self.switch_initial is not None and self.noWidget is False:
-            self.switch_output, widget = hk.defVarI(dtype=bool, frame=hk.main.frames[self.frame], L_text="", initial=self.switch_initial)
+            self.tkvar, self.widget = huim.defListO(frame=huim.main.frames[self.frame], L_text=f"{self.name_display}:", h=self.list_box_height, w=self.list_box_width)
+        if self.switch_initial is not None and self.no_widget is False:
+            self.switch_output, widget = huim.defVarI(dtype=bool, frame=huim.main.frames[self.frame], L_text="", initial=self.switch_initial)
             self.widget.append(widget[-1])
 
     def get(self):
         return self.tkvar.get()
+    
+    def get_display(self, fancy):
+        if fancy and self.fancy_name_display is not None:
+            return self.fancy_name_display
+        return self.name_display
 
     def set(self, value):
         self.tkvar.set(value)

@@ -538,7 +538,7 @@ class Calculator(tk.Tk):
                             'crystal', 'postcard', 'infusion', 'free_will', 'afk', 'afkpet', 'afkpetrarity', 'afkpetlvl', 'enchanted_clock', 'specialLayout', 'potatoTalisman', 'playerHarvests', "playerLooting",
                             'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
                             'ID', 'setupcost', 'freewillcost', 'extracost', 'actiontime', 'fuelamount', 'sellLoc', 'bazaar_update_txt', 'bazaar_taxes', 'bazaar_flipper', 'notes',
-                            'time', 'often_empty', 'emptytime', 'harvests', 'used_storage', 'items', 'itemSellLoc',
+                            'emptytime', 'time', 'harvests', 'used_storage', 'items', 'itemSellLoc',
                             'itemProfit', 'itemtypeProfit', 'xp', 'petProfit', 'pets_levelled',
                             'fuelcost', 'totalProfit', 'addons_output_container']
 
@@ -561,7 +561,6 @@ class Calculator(tk.Tk):
             "Fuel Info": {"\n> ": ["infernoGrade", "infernoDistillate", "infernoEyedrops"]},
             "afk": {"\n> ": ["afkpet", "afkpetrarity", "afkpetlvl", "enchanted_clock", "specialLayout", "potatoTalisman"]},
             "playerHarvests": {"\n> ": ["playerLooting"]},
-            "often_empty": None,
             "wisdom": None,
             "mayor": None,
             "levelingpet": {
@@ -571,8 +570,8 @@ class Calculator(tk.Tk):
             "**Setup Information**": {"\n> ": ("ID", "setupcost", "freewillcost", "extracost", "actiontime", "fuelamount")},
             "Bazaar Info": {"\n> ": ["sellLoc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
             "notes": None,
-            "**Outputs** for ": {"": {"time"}},
             "emptytime": None,
+            "**Outputs** for ": {"": {"time"}},
             "harvests": None,
             "used_storage": None,
             "items": None,
@@ -1660,9 +1659,6 @@ class Calculator(tk.Tk):
                     for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
                         self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list)
                 else:
-                    if "ENCHANTED_SHEARS" == upgrade:
-                        # No wool gets added from Enchanted Shears when offline
-                        specific_multiplier = 0
                     for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
                         self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list, spreading_info)
             elif upgrade_type == "timer":
