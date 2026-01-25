@@ -1595,7 +1595,7 @@ itemList = {
         "recipe": {"ENCHANTED_IRON": 2},
         "upgrade": {
             'speed': 0, 'drop': 1,
-            'special': { "type": "add", "item": { "WOOL": 1 } }  # total of 2 wool per spawn and harvest while offline, so adds 1. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
+            'special': { "type": "add", "item": { "WOOL": 2 } }  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
         }
     },
     'SLEEPY_HOLLOW': {

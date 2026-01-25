@@ -1415,7 +1415,7 @@ class Calculator(tk.Tk):
                     # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
         return actions_per_harvest
 
-    def update_loot_table(self, minion, minion_fuel_id, afk_toggle, setup_data):
+    def update_loot_table(self, minion, minion_fuel_id, upgrades, afk_toggle, setup_data):
         """
         Applies changes to the loot tables of the minions depending on things like AFKing or special layouts.
 
@@ -1454,6 +1454,11 @@ class Calculator(tk.Tk):
                 md.minionList[minion]["drops"]["PUMPKIN"] = 1
             else:
                 md.minionList[minion]["drops"]["PUMPKIN"] = 3
+        elif minion == "Sheep":
+            if "ENCHANTED_SHEARS" in upgrades:
+                md.minionList[minion]["drops"]["WOOL"] = 0
+            else:
+                md.minionList[minion]["drops"]["WOOL"] = 1
         elif minion == "Flower":
             if minion_fuel_id == "THORNY_VINES":
                 md.minionList[minion]["drops"] = { "WILD_ROSE": 2 }
@@ -2307,7 +2312,7 @@ class Calculator(tk.Tk):
         actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data, setup_notes)
 
         # AFK loot table changes
-        self.update_loot_table(minion_type, minion_fuel, afk_toggle, setup_data)
+        self.update_loot_table(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
 
         # calculate final minion speed
         seconds_per_action = self.get_seconds_per_action(minion_type, minion_tier, minion_fuel, speed_boost, setup_data)
