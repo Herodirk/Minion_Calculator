@@ -106,7 +106,7 @@ class H_UI_M():
 
         self.style = ttk.Style()
         self.style.theme_create(
-            "minion_calculator", parent="clam",
+            "calculator", parent="clam",
             settings={
                 "TCombobox": {
                     "configure": {
@@ -132,7 +132,7 @@ class H_UI_M():
                 }
             }
         )
-        self.style.theme_use('minion_calculator')
+        self.style.theme_use('calculator')
         return
 
     def createControls(self, relControlsHeight=0.07):
@@ -799,7 +799,7 @@ class H_UI_M():
         widgets_dict = {}
         for var_key in variables:
             options = self.main.var_dict[var_key].options
-            L_text = self.main.var_dict[var_key].display
+            L_text = self.main.var_dict[var_key].get_display()
             var = self.main.var_dict[var_key].tkvar
 
             if options is None:
@@ -897,13 +897,17 @@ class Hvar():
         self.tkvar.set(value)
         return
     
-    def update_listbox(self, format_function=lambda x: x) -> None:
+    def update_listbox(self, key_format_function=lambda x: x, value_format_function=lambda x: x, filter=lambda key, val: True) -> None:
         listbox_list = []
         if self.dtype is dict:
             for key, val in self.list.items():
-                listbox_list.append(f'{format_function(key)}: {val}')
+                if not filter(key, val):
+                    continue
+                listbox_list.append(f'{key_format_function(key)}: {value_format_function(val)}')
         elif self.dtype is list:
             for val in self.list:
-                listbox_list.append(format_function(val))
+                if not filter(None, val):
+                    continue
+                listbox_list.append(key_format_function(val))
         self.set(listbox_list)
         return
