@@ -62,7 +62,7 @@ color_palettes = {
 #%% Hero UI Manager
 
 class H_UI_M():
-    def __init__(self, main, version, windowTitle, windowWidth, windowHeight, palette="dark"):
+    def __init__(self, main, windowTitle, windowWidth, windowHeight, palette="dark"):
         """
         H_UI_M: Hero UI Manager, main class for Hero UI Manager functions
         Initializes Hero UI Manager. Sets the chosen color palette. Configures the main window. Creates dict variables for storage of switches and frames.
@@ -86,7 +86,6 @@ class H_UI_M():
 
         """
         self.main = main
-        self.version = version
         self.main.title(windowTitle)
         self.main.colors = color_palettes[palette]
         self.main.configure(width=windowWidth, height=windowHeight, background=self.main.colors["background"])
@@ -229,7 +228,7 @@ class H_UI_M():
         else:
             return tk.Label(frm, text=txt, background=self.main.colors["frame_background"])
 
-    def defVar(self, dtype, initial=None):
+    def def_var(self, dtype, initial=None):
         """
         defVar: define variable
         Generate Tkinter variable for booleans, integers, strings or floats with an optional initial value.
@@ -255,11 +254,15 @@ class H_UI_M():
             var = tk.StringVar(self.main)
         elif dtype == float:
             var = tk.DoubleVar(self.main)
+        elif dtype == list:
+            var = tk.StringVar(self.main)
+        elif dtype == dict:
+            var = tk.StringVar(self.main)
         if initial is not None:
             var.set(initial)
         return var
 
-    def defVarI(self, dtype, frame, L_text, initial=None, options=[], cmd=None, checkbox_text=None):
+    def def_input_var(self, dtype, frame, L_text, initial=None, options=None, cmd=None, checkbox_text=None, w=None, h=None):
         """
         defVarI: define variable input
         Generates a Tkinter variable, a label and an input widget.
@@ -278,11 +281,15 @@ class H_UI_M():
         initial : something of type dtype, optional
             Inital value for the Tkinter variable. Set to None for default initial value. The default is None.
         options : list, optional
-            List of options for an option menu. List must contain items of type dtype. The default is [].
+            List of options for an option menu. List must contain items of type dtype. The default is None.
         cmd : function, optional
             Function that runs when an option in the option menu is. The default is None.
         checkbox_text : str, optional
             Text that will be displayed next to the checkbox if dtype is bool
+        w : int, optional
+            Width of the widget. None for default size. The default is None.
+        h : int, optional
+            Height of the widget. None for default size. The default is None.
 
         Returns
         -------
@@ -292,24 +299,28 @@ class H_UI_M():
             List containing the label and the input widget.
 
         """
-        var = self.defVar(dtype, initial=initial)
+        var = self.def_var(dtype, initial=initial)
         if dtype != bool:
-            if len(options) != 0:
-                entry = ttk.Combobox(frame, textvariable=var, values=options, state="readonly", width=1 + len(str(max(options, key=lambda x: len(str(x))))), height=20)
+            if options is not None:
+                input_widget = ttk.Combobox(frame, textvariable=var, values=options, state="readonly", width=1 + len(str(max(options, key=lambda x: len(str(x))))), height=20)
                 if cmd is not None:
-                    entry.bind('<<ComboboxSelected>>', lambda void_event: cmd(var.get()))
+                    input_widget.bind('<<ComboboxSelected>>', lambda void_event: cmd(var.get()))
             else:
-                entry = tk.Entry(frame, textvariable=var)
+                input_widget = tk.Entry(frame, textvariable=var)
         else:
-            entry = tk.Checkbutton(frame, variable=var, background=self.main.colors["frame_background"], command=cmd)
+            input_widget = tk.Checkbutton(frame, variable=var, background=self.main.colors["frame_background"], command=cmd)
             if checkbox_text is not None:
-                entry.configure(text=checkbox_text)
+                input_widget.configure(text=checkbox_text)
         label = self.genLabel(frm=frame, txt=L_text)
-        return var, [label, entry]
+        if w is not None:
+            input_widget.configure(width=w)
+        if h is not None:
+            input_widget.configure(height=h)
+        return var, [label, input_widget]
 
-    def defVarO(self, frame, dtype, L_text, initial=None):
+    def def_output_var(self, frame, dtype, L_text, initial=None, w=None, h=None):
         """
-        defVarO: define variable output
+        def_output_var: define output variable
         Generates a Tkinter variable, a label and an variable label.
         The variable label is connected to the Tkinter variable.
 
@@ -318,11 +329,15 @@ class H_UI_M():
         frame : tk.Frame
             Frame where the label and output widget will be generated in.
         dtype : type
-            Data type for the Tkinter variable. Accepted options are bool, int, str or float.
+            Data type for the Tkinter variable. Accepted options are bool, int, str, float, list or dict.
         L_text : str
             String used for the label.
         initial : something of type dtype, optional
             Inital value for the Tkinter variable. Set to None for default initial value. The default is None.
+        w : int, optional
+            Width of the widget. None for default size. The default is None.
+        h : int, optional
+            Height of the widget. None for default size. The default is None.
 
         Returns
         -------
@@ -332,44 +347,51 @@ class H_UI_M():
             List containing the label and the variable label.
 
         """
-        var = self.defVar(dtype, initial=initial)
+        var = self.def_var(dtype, initial=initial)
         text_label = self.genLabel(frm=frame, txt=L_text)
-        var_label = self.genLabel(frm=frame, txt=var, txtvar=True)
-        return var, [text_label, var_label]
-
-    def defListO(self, frame, L_text, w=None, h=None):
-        """
-        defListO: define list output
-        Generates a Tkinter variable, a label and a list box.
-        The list box is connected to the Tkinter variable.
-
-        Parameters
-        ----------
-        frame : tk.Frame
-            Frame where the label and output widget will be generated in.
-        L_text : str
-            String used for the label.
-        w : int, optional
-            Width of the list box. None for default size. The default is None.
-        h : int, optional
-            Height of the list box. None for default size. The default is None.
-
-        Returns
-        -------
-        var : tk.BooleanVar, tk.IntVar, tk.StringVar or tk.DoubleVar
-            Fully constructed Tkinter variable ready for use.
-        list
-            List containing the label and the list box.
-
-        """
-        var = self.defVar(str, initial=[])
-        text_label = self.genLabel(frm=frame, txt=L_text)
-        output_list = tk.Listbox(frame, listvariable=var)
+        if dtype in [list, dict]:
+            output_widget = tk.Listbox(frame, listvariable=var)
+        else:
+            output_widget = self.genLabel(frm=frame, txt=var, txtvar=True)
         if w is not None:
-            output_list.configure(width=w)
+            output_widget.configure(width=w)
         if h is not None:
-            output_list.configure(height=h)
-        return var, [text_label, output_list]
+            output_widget.configure(height=h)
+        return var, [text_label, output_widget]
+
+    # def defListO(self, frame, L_text, w=None, h=None):
+    #     """
+    #     defListO: define list output
+    #     Generates a Tkinter variable, a label and a list box.
+    #     The list box is connected to the Tkinter variable.
+
+    #     Parameters
+    #     ----------
+    #     frame : tk.Frame
+    #         Frame where the label and output widget will be generated in.
+    #     L_text : str
+    #         String used for the label.
+    #     w : int, optional
+    #         Width of the list box. None for default size. The default is None.
+    #     h : int, optional
+    #         Height of the list box. None for default size. The default is None.
+
+    #     Returns
+    #     -------
+    #     var : tk.BooleanVar, tk.IntVar, tk.StringVar or tk.DoubleVar
+    #         Fully constructed Tkinter variable ready for use.
+    #     list
+    #         List containing the label and the list box.
+
+    #     """
+    #     var = self.def_var(str, initial=[])
+    #     text_label = self.genLabel(frm=frame, txt=L_text)
+    #     output_list = tk.Listbox(frame, listvariable=var)
+    #     if w is not None:
+    #         output_list.configure(width=w)
+    #     if h is not None:
+    #         output_list.configure(height=h)
+    #     return var, [text_label, output_list]
 
     def fill_grid(self, grid_arr, grid_frame, stick='w'):
         """
@@ -560,8 +582,6 @@ class H_UI_M():
             return lambda x: self.toggleSwitch(ID, x)
         elif controlvar is None:
             return lambda: self.toggleSwitch(ID, None)
-        elif self.version == "MINION":
-            return lambda: self.toggleSwitch(ID, self.main.variables[controlvar]["var"].get())
         else:
             return lambda: self.toggleSwitch(ID, self.main.var_dict[controlvar].get())
 
@@ -583,20 +603,14 @@ class H_UI_M():
         -------
         None.
         """
-        if self.version == "MINION":
-            button_frame = self.main.variables[parent_var_key]["frame"]
-        else:
-            button_frame = self.main.var_dict[parent_var_key].frame
+        button_frame = self.main.var_dict[parent_var_key].frame
         if type(ID) is str:
             button = tk.Button(self.main.frames[button_frame], text="Toggle extra options", border=0, borderwidth=0, command=self.createSwitchCall(ID))
         elif str(type(ID)) == "<class 'function'>":
             button = tk.Button(self.main.frames[button_frame], text="Toggle extra options", border=0, borderwidth=0, command=ID)
         if place_args is None:
             return button
-        if self.version == "MINION":
-            button_anchor = self.main.variables[parent_var_key]["widget"][-1]
-        else:
-            button_anchor = self.main.var_dict[parent_var_key].widget[-1]
+        button_anchor = self.main.var_dict[parent_var_key].widget[-1]
         button.place(in_=button_anchor, **place_args)
         return
 
@@ -784,22 +798,11 @@ class H_UI_M():
 
         widgets_dict = {}
         for var_key in variables:
-            if self.version == "MINION":
-                options = self.main.variables[var_key]["options"]
-            else:
-                options = self.main.var_dict[var_key].options
+            options = self.main.var_dict[var_key].options
+            L_text = self.main.var_dict[var_key].display
+            var = self.main.var_dict[var_key].tkvar
 
-            if self.version == "MINION":
-                L_text = self.main.variables[var_key]["display"]
-            else:
-                L_text = self.main.var_dict[var_key].display
-
-            if self.version == "MINION":
-                var = self.main.variables[var_key]["var"]
-            else:
-                var = self.main.var_dict[var_key].tkvar
-
-            if len(options) == 0:
+            if options is None:
                 input_widget = tk.Entry(self.edit_vars_inputs, textvariable=var)
             else:
                 input_widget = tk.OptionMenu(self.edit_vars_inputs, var, *options)
@@ -813,12 +816,8 @@ class H_UI_M():
 
     def edit_confirm(self, exit_func, vars=[]):
         try:
-            if self.version == "MINION":
-                for var_key in vars: 
-                    self.main.variables[var_key]["var"].get()
-            else:
-                for var_key in vars:
-                    self.main.var_dict[var_key].get()
+            for var_key in vars:
+                self.main.var_dict[var_key].get()
         except tk._tkinter.TclError:
             print("WARNING: Inputted wrong data type, please try again")
         else:
@@ -832,16 +831,16 @@ class H_UI_M():
 #%% Hero Variable Manager
 
 class Hvar():
-    def __init__(self, huim, key, vtype, dtype, display, frame, initial, auto_item_id=False, fancy_display=None, widget_width=0, widget_height=0, options=[], command=None, no_widget=False, switch_initial=None, checkbox_text=None):
+    def __init__(self, huim: H_UI_M, key: str, vtype: str, dtype: type, display: str, initial, frame: str=None, fancy_display: str=None , widget_width:int=None, widget_height: int=None, options: list | dict=None, command=None, switch_initial: None | bool=None, checkbox_text: None | str=None, tags: list| None=None):
         if key in huim.main.var_dict:
             print(f"warning: {key} already exists in variable dictionary, overwriting it")
         huim.main.var_dict[key] = self  # define in variable dictionary
         # Mandatory data:
-        self.vtype = vtype  # str, variable type
+        self.key = key  # unique identifier 
+        self.vtype = vtype  # str, variable type ("input", "output", "storage")
         self.dtype = dtype  # type, data type
         self.name_display = display  # str, display name of variable
         self.fancy_name_display = fancy_display  # str, fancy display name of variable
-        self.auto_item_id = auto_item_id  # bool, toggle for automacially switching between display name and ID for items
         self.frame = frame  # str, ID of Tk Frame in huim.main.frames
         self.initial = initial  # {self.dtype}, initial value of the variable
 
@@ -849,44 +848,62 @@ class Hvar():
         if self.dtype == bool:
             self.options = [False, True]
         else:
-            self.options = options  # list (dict if auto_item_id) containing possible values (display names as keys, IDs as values for dict), empty list if no restrictions
+            self.options = options  # list or dict containing allowed values (for dict: display names as keys, automatic .get() translation as values), empty list if no restrictions
         self.command = command  # callable, function to run when input changed 
-        self.no_widget = no_widget  # bool, toggle for making Tk widget parts
         self.switch_initial = switch_initial  # bool or None, initial state of the output switch, None if no output switch
-        self.list_box_width = widget_width  # int, width of listbox in characters
-        self.list_box_height = widget_height  # int, height of listbox in amount of lines
+        self.widget_width = widget_width  # int, width of listbox in characters
+        self.widget_height = widget_height  # int, height of listbox in amount of lines
         self.checkbox_text = checkbox_text  # str, text added next to the checkbox
+        self.tags = tags  # list, tags of the variable
 
         # Generated data:
         self.tkvar = None
+        self.list = None
+        if self.dtype in [list, dict]:
+            self.list = self.initial
         self.widget = None
+        self.translation = None
+        if type(self.options) is dict:
+            self.translation = self.options
+            self.options = list(self.options.keys())
         self.switch_output = None
 
-        if self.vtype == "input" and self.no_widget is False:
-            self.tkvar, self.widget = huim.defVarI(dtype=self.dtype, frame=huim.main.frames[self.frame],
+        if self.vtype == "input":
+            self.tkvar, self.widget = huim.def_input_var(dtype=self.dtype, frame=huim.main.frames[self.frame],
                                                  L_text=f"{self.name_display}:", initial=self.initial,
                                                  options=self.options, cmd=self.command, checkbox_text=self.checkbox_text)
         elif self.vtype == "output":
-            self.tkvar, self.widget = huim.defVarO(dtype=self.dtype, frame=huim.main.frames[self.frame],
-                                                 L_text=f"{self.name_display}:", initial=self.initial,)
-        elif self.vtype == "input" and self.no_widget is True:  # will be fully replaced by storage vtype
-            self.tkvar = huim.defVar(dtype=self.dtype, initial=self.initial)
+            self.tkvar, self.widget = huim.def_output_var(dtype=self.dtype, frame=huim.main.frames[self.frame],
+                                                 L_text=f"{self.name_display}:", initial=self.initial,
+                                                 h=self.widget_height, w=self.widget_width)
         elif self.vtype == "storage":
-                self.tkvar = self.huim.defVar(dtype=self.dtype, initial=self.initial)
-        elif self.vtype == "list":
-            self.tkvar, self.widget = huim.defListO(frame=huim.main.frames[self.frame], L_text=f"{self.name_display}:", h=self.list_box_height, w=self.list_box_width)
-        if self.switch_initial is not None and self.no_widget is False:
-            self.switch_output, widget = huim.defVarI(dtype=bool, frame=huim.main.frames[self.frame], L_text="", initial=self.switch_initial)
+            self.tkvar = huim.def_var(dtype=self.dtype, initial=self.initial)
+        if self.switch_initial is not None:
+            self.switch_output, widget = huim.def_input_var(dtype=bool, frame=huim.main.frames[self.frame], L_text="", initial=self.switch_initial)
             self.widget.append(widget[-1])
 
     def get(self):
-        return self.tkvar.get()
+        if self.translation is None:
+            return self.tkvar.get()
+        else:
+            return self.translation[self.tkvar.get()]
     
-    def get_display(self, fancy):
+    def get_display(self, fancy: bool=False) -> str:
         if fancy and self.fancy_name_display is not None:
             return self.fancy_name_display
         return self.name_display
 
-    def set(self, value):
+    def set(self, value) -> None:
         self.tkvar.set(value)
+        return
+    
+    def update_listbox(self, format_function=lambda x: x) -> None:
+        listbox_list = []
+        if self.dtype is dict:
+            for key, val in self.list.items():
+                listbox_list.append(f'{format_function(key)}: {val}')
+        elif self.dtype is list:
+            for val in self.list:
+                listbox_list.append(format_function(val))
+        self.set(listbox_list)
         return

@@ -21,7 +21,7 @@ try:
     from copy import deepcopy
     import webbrowser
     import HSB_minion_data as md
-    import Hero_UI_Manager
+    import Hero_UI_Manager as HPM
     import official_calculator_add_ons as Hero_addons
 except ModuleNotFoundError as import_error:
     missing_package = import_error.name
@@ -190,14 +190,14 @@ class Calculator(tk.Tk):
     def __init__(self):
         super().__init__()
         # Use Hero UI Manager to initialize the window and the frames with grids
-        self.huim = Hero_UI_Manager.H_UI_M(main=self, version="MINION", windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
+        self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
         self.booting_msg("Hero UI Manager loaded")
         self.huim.createControls()
         self.huim.createFrames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
         self.huim.createFrames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
         self.booting_msg("Framework set up")
-        self.version = self.huim.defVar(dtype=float, initial=1.2)
+        self.version = self.huim.def_var(dtype=float, initial=1.2)
         self.booting_msg(f"Calculator version {self.version.get()}")
 
         # The calculator stores all important variables into this dict
@@ -211,130 +211,106 @@ class Calculator(tk.Tk):
         #     "w" and "h" are the width and height of the listbox widget.
         #     "list" is a normal list-like variable, most of the time a dict. This is the actual storage of the list.
         #     "var" is connected to the listbox, "list" can be shaped and put into "var" in the function self.update_GUI()
-        self.variables = {
-            "minion": {"vtype": "input", "dtype": str, "display": "Minion", "frame": "inputs_minion_grid", "initial": "Custom", "options": list(md.minionList.keys()), "command": lambda x: self.multiswitch("minion", x)},
-            "miniontier": {"vtype": "input", "dtype": int, "display": "Tier", "frame": "inputs_minion_grid", "initial": 12, "options": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "command": lambda x: self.multiswitch("minion", x)},
-            "amount": {"vtype": "input", "dtype": int, "display": "Amount", "frame": "inputs_minion_grid", "initial": 1, "options": [], "command": None},
-            "fuel": {"vtype": "input", "dtype": str, "display": "Fuel", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.fuel_options.keys()), "command": lambda x: self.multiswitch("fuel", x)},
-            "infernoGrade": {"vtype": "input", "dtype": str, "display": "Grade", "frame": "inputs_minion_grid", "initial": "Hypergolic Gabagool", "options": [md.itemList[grade]["display"] for grade in md.infernofuel_data["grades"].keys()], "command": None},
-            "infernoDistillate": {"vtype": "input", "dtype": str, "display": "Distillate", "frame": "inputs_minion_grid", "initial": "Gabagool Distillate", "options": [md.itemList[dist]["display"] for dist in md.infernofuel_data["distilates"].keys()], "command": None},
-            "infernoEyedrops": {"vtype": "input", "dtype": bool, "display": "Eyedrops", "frame": "inputs_minion_grid", "initial": True, "options": [False, True], "command": None},
-            "hopper": {"vtype": "input", "dtype": str, "display": "Hopper", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.hopper_data.keys()), "command": None},
-            "upgrade1": {"vtype": "input", "dtype": str, "display": "Upgrade 1", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.upgrade_options.keys()), "command": None},
-            "upgrade2": {"vtype": "input", "dtype": str, "display": "Upgrade 2", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.upgrade_options.keys()), "command": None},
-            "chest": {"vtype": "input", "dtype": str, "display": "Chest", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.minion_chests.keys()), "command": None},
-            "beacon": {"vtype": "input", "dtype": int, "display": "Beacon", "frame": "inputs_minion_grid", "initial": 0, "options": [0, 1, 2, 3, 4, 5], "command": self.huim.createSwitchCall("beacon", controlvar="self")},
-            "scorched": {"vtype": "input", "dtype": bool, "display": "Scorched", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
-            "B_constant": {"vtype": "input", "dtype": bool, "display": "Free Fuel Beacon", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
-            "B_acquired": {"vtype": "input", "dtype": bool, "display": "Acquired Beacon", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
-            "infusion": {"vtype": "input", "dtype": bool, "display": "Infusion", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
-            "crystal": {"vtype": "input", "dtype": str, "display": "Crystal", "frame": "inputs_minion_grid", "initial": "None", "options": list(md.floating_crystals.keys()), "command": None},
-            "free_will": {"vtype": "input", "dtype": bool, "display": "Free Will", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": self.huim.createSwitchCall("free_will", controlvar="free_will")},
-            "postcard": {"vtype": "input", "dtype": bool, "display": "Postcard", "frame": "inputs_minion_grid", "initial": False, "options": [False, True], "command": None},
-            "afk": {"vtype": "input", "dtype": bool, "display": "AFK", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": lambda: self.multiswitch("afk", None)},
-            "afkpet": {"vtype": "input", "dtype": str, "display": "AFK Pet", "frame": "inputs_player_grid", "initial": "None", "options": list(md.boost_pets.keys()), "command": None},
-            "afkpetrarity": {"vtype": "input", "dtype": str, "display": "AFK Pet Rarity", "frame": "inputs_player_grid", "initial": "Legendary", "options": ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"], "command": None},
-            "afkpetlvl": {"vtype": "input", "dtype": float, "display": "AFK Pet level", "frame": "inputs_player_grid", "initial": 0.0, "options": [], "command": None},
-            "enchanted_clock": {"vtype": "input", "dtype": bool, "display": "Enchanted Clock", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": None},
-            "specialLayout": {"vtype": "input", "dtype": bool, "display": "Special Layout", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": None},
-            "playerHarvests": {"vtype": "input", "dtype": bool, "display": "Player Harvests", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": None},
-            "playerLooting": {"vtype": "input", "dtype": int, "display": "Looting", "frame": "inputs_player_grid", "initial": 0, "options": [0, 1, 2, 3, 4 ,5], "command": None},
-            "potatoTalisman": {"vtype": "input", "dtype": bool, "display": "Potato talisman", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": None},
-            "combatWisdom": {"vtype": "input", "noWidget": True, "dtype": float, "display": "Combat", "initial": 0.0, "options": []},
-            "miningWisdom": {"vtype": "input", "noWidget": True, "dtype": float, "display": "Mining", "initial": 0.0, "options": []},
-            "farmingWisdom": {"vtype": "input", "noWidget": True, "dtype": float, "display": "Farming", "initial": 0.0, "options": []},
-            "fishingWisdom": {"vtype": "input", "noWidget": True, "dtype": float, "display": "Fishing", "initial": 0.0, "options": []},
-            "foragingWisdom": {"vtype": "input", "noWidget": True, "dtype": float, "display": "Foraging", "initial": 0.0, "options": []},
-            "alchemyWisdom": {"vtype": "input", "noWidget": True, "dtype": float, "display": "Alchemy", "initial": 0.0, "options": []},
-            "wisdom": {"vtype": "list", "display": "Wisdom", "frame": "inputs_player_grid", "w": None, "h": 6, "list": {}},
-            "mayor": {"vtype": "input", "dtype": str, "display": "Mayor", "frame": "inputs_player_grid", "initial": "None", "options": ["None", "Aatrox", "Cole", "Diana", "Diaz", "Finnegan", "Foxy", "Marina", "Paul", "Jerry", "Derpy", "Scorpius"], "command": lambda x: self.multiswitch("mayors", x)},
-            "levelingpet": {"vtype": "input", "dtype": str, "display": "Leveling pet", "frame": "inputs_player_grid", "initial": "None", "options": list(md.all_pets.keys()), "command": lambda x: self.multiswitch("pet_leveling", x)},
-            "taming": {"vtype": "input", "dtype": float, "display": "Taming", "frame": "inputs_player_grid", "initial": 0.0, "options": [], "command": None},
-            "falcon_attribute": {"vtype": "input", "dtype": int, "display": "Battle Experience", "frame": "inputs_player_grid", "initial": 0, "options": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "command": None},
-            "toucan_attribute": {"vtype": "input", "dtype": int, "display": "Why Not More", "frame": "inputs_player_grid", "initial": 0, "options": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "command": None},
-            "petxpboost": {"vtype": "input", "dtype": str, "display": "Pet XP boost", "frame": "inputs_player_grid", "initial": "None", "options": list(md.pet_xp_boosts.keys()), "command": None},
-            "beastmaster": {"vtype": "input", "dtype": float, "display": "Beastmaster", "frame": "inputs_player_grid", "initial": 0.0, "options": [], "command": None},
-            "expsharepet": {"vtype": "input", "dtype": str, "display": "Exp Share pet", "frame": "inputs_player_grid", "initial": "None", "options": list(md.all_pets.keys()), "command": None},
-            "expsharepetslot2": {"vtype": "input", "dtype": str, "display": "Exp Share pet 2", "frame": "inputs_player_grid", "initial": "None", "options": list(md.all_pets.keys()), "command": None},
-            "expsharepetslot3": {"vtype": "input", "dtype": str, "display": "Exp Share pet 3", "frame": "inputs_player_grid", "initial": "None", "options": list(md.all_pets.keys()), "command": None},
-            "expshareitem": {"vtype": "input", "dtype": bool, "display": "Exp Share pet item", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": None},
-            "often_empty": {"vtype": "input", "dtype": bool, "display": "Empty Often", "frame": "inputs_player_grid", "initial": False, "options": [False, True], "command": self.huim.createSwitchCall("emptytime", controlvar="often_empty")},
-            "sellLoc": {"vtype": "input", "dtype": str, "display": "Sell Location", "frame": "inputs_player_grid", "initial": "Best (NPC/Bazaar)", "options": ["Best (NPC/Bazaar)", "Bazaar", "Hopper", "NPC"], "command": self.huim.createSwitchCall("NPC_Bazaar", controlvar="self")},
-            "bazaar_sell_type": {"vtype": "input", "dtype": str, "display": "Bazaar sell type", "frame": "inputs_player_grid", "initial": "Sell Offer", "options": list(md.bazaar_sell_types.keys()), "command": None},
-            "bazaar_buy_type": {"vtype": "input", "dtype": str, "display": "Bazaar buy type", "frame": "inputs_player_grid", "initial": "Buy Order", "options": list(md.bazaar_buy_types.keys()), "command": None},
-            "bazaar_taxes": {"vtype": "input", "dtype": bool, "display": "Bazaar taxes", "frame": "inputs_player_grid", "initial": True, "options": [False, True], "command": self.huim.createSwitchCall("bazaar_tax", controlvar="bazaar_taxes")},
-            "bazaar_flipper": {"vtype": "input", "dtype": int, "display": "Bazaar Flipper", "frame": "inputs_player_grid", "initial": 1, "options": [0, 1, 2], "command": None},
-            "ID": {"vtype": "output", "dtype": str, "display": "Setup ID", "frame": "outputs_setup_grid", "initial": "", "switch_initial": True},
-            "ID_container": {"vtype": "list", "display": "ID", "frame": "outputs_setup_grid", "w": 35, "h": 1, "list": [], "switch_initial": False, "IDtoDisplay": False},
-            "time": {"vtype": "output", "dtype": str, "display": "Time", "frame": "outputs_setup_grid", "initial": "1.0 Days", "switch_initial": True},
-            "time_seconds": {"vtype": "storage", "dtype": float, "initial": 86400.0},
-            "emptytime": {"vtype": "output", "dtype": str, "display": "Empty Time", "fancy_display": "Empty every", "frame": "outputs_setup_grid", "initial": "1.0 Days", "switch_initial": True},
-            "actiontime": {"vtype": "output", "dtype": float, "display": "Action time (s)", "frame": "outputs_setup_grid", "initial": 0.0, "switch_initial": False},
-            "harvests": {"vtype": "output", "dtype": float, "display": "Harvests", "frame": "outputs_setup_grid", "initial": 0.0, "switch_initial": False},
-            "items": {"vtype": "list", "display": "Item amounts", "frame": "outputs_setup_grid", "w": 35, "h": None, "list": {}, "switch_initial": False, "IDtoDisplay": True},
-            "itemSellLoc": {"vtype": "list", "display": "Sell locations", "frame": "outputs_profit_grid", "w": 35, "h": None, "list": {}, "switch_initial": False, "IDtoDisplay": True},
-            "filltime": {"vtype": "output", "dtype": float, "display": "Fill time", "frame": "outputs_setup_grid", "initial": 0.0, "switch_initial": False},
-            "used_storage": {"vtype": "output", "dtype": int, "display": "Used Storage", "frame": "outputs_setup_grid", "initial": 0, "switch_initial": False},
-            "itemtypeProfit": {"vtype": "list", "display": "Itemtype profits", "fancy_display": "Profits per item type", "frame": "outputs_profit_grid", "w": 35, "h": None, "list": {}, "switch_initial": False, "IDtoDisplay": True},
-            "itemProfit": {"vtype": "output", "dtype": float, "display": "Total item profit", "frame": "outputs_profit_grid", "initial": 0.0, "switch_initial": False},
-            "xp": {"vtype": "list", "display": "XP amounts", "frame": "outputs_setup_grid", "w": 35, "h": 4, "list": {}, "switch_initial": False},
-            "pets_levelled": {"vtype": "list", "display": "Pets Levelled", "frame": "outputs_setup_grid",  "w": 35, "h": 4, "list": {}, "switch_initial": False},
-            "petProfit": {"vtype": "output", "dtype": float, "display": "Pet profit", "frame": "outputs_profit_grid", "initial": 0.0, "switch_initial": False},
-            "fuelcost": {"vtype": "output", "dtype": float, "display": "Fuel cost", "frame": "outputs_profit_grid", "initial": 0.0, "switch_initial": False},
-            "fuelamount": {"vtype": "output", "dtype": float, "display": "Fuel amount", "frame": "outputs_setup_grid", "initial": 0.0, "switch_initial": False},
-            "totalProfit": {"vtype": "output", "dtype": float, "display": "Total profit", "frame": "outputs_profit_grid", "initial": 0.0, "switch_initial": True},
-            "notes": {"vtype": "list", "display": "Notes", "frame": "outputs_setup_grid", "w": 50, "h": 4, "list": {}, "switch_initial": False},
-            "bazaar_update_txt": {"vtype": "output", "dtype": str, "display": "Bazaar data", "frame": "outputs_profit_grid", "initial": "Not Loaded", "switch_initial": True},
-            "setupcost": {"vtype": "output", "dtype": float, "display": "Setup cost", "frame": "outputs_profit_grid", "initial": 0.0, "switch_initial": True},
-            "freewillcost": {"vtype": "output", "dtype": float, "display": "Free Will cost", "fancy_display": "+ Average Free Will cost", "frame": "outputs_profit_grid", "initial": 0.0, "switch_initial": True},
-            "extracost": {"vtype": "storage", "dtype": str, "display": "Extra cost", "fancy_display": "+ Extra cost", "initial": ""},
-            "optimal_tier_free_will": {"vtype": "storage", "dtype": int, "initial": 1},
-            "available_storage": {"vtype": "storage", "dtype": int, "initial": 0},
-            "addons_output_container": {"vtype": "list", "display": "Add-on Outputs", "frame": "addons_output_grid", "w": 65, "h": 20, "list": {}, "switch_initial": False, "IDtoDisplay": False},
-        }
+        
+        self.template = HPM.Hvar(self.huim, key="template", vtype="input", display="Templates", initial="Choose Template", dtype=str, frame="inputs_minion_grid", options=list(templateList.keys()), command=self.load_template)
+        self.load_ID = HPM.Hvar(self.huim, key="load_id", vtype="input", dtype=str, frame="inputs_minion_grid", display="Load ID", initial="")
+        self.minion = HPM.Hvar(self.huim, key="minion", vtype="input", dtype=str, display="Minion", frame="inputs_minion_grid", initial="Custom", options=list(md.minionList.keys()), command=lambda x: self.multiswitch('minion', x))
+        self.miniontier = HPM.Hvar(self.huim, key="miniontier", vtype="input", dtype=int, display="Tier", frame="inputs_minion_grid", initial=12, options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], command=lambda x: self.multiswitch('minion', x))
+        self.amount = HPM.Hvar(self.huim, key="amount", vtype="input", dtype=int, display="Amount", frame="inputs_minion_grid", initial=1, options=None)
+        self.fuel = HPM.Hvar(self.huim, key="fuel", vtype="input", dtype=str, display="Fuel", frame="inputs_minion_grid", initial="None", options=md.fuel_options, command=lambda x: self.multiswitch('fuel', x))     
+        self.inferno_grade = HPM.Hvar(self.huim, key="inferno_grade", vtype="input", dtype=str, display="Grade", frame="inputs_minion_grid", initial="Hypergolic Gabagool", options=[md.itemList[grade]['display'] for grade in md.infernofuel_data['grades'].keys()])
+        self.inferno_distillate = HPM.Hvar(self.huim, key="inferno_distillate", vtype="input", dtype=str, display="Distillate", frame="inputs_minion_grid", initial="Gabagool Distillate", options=[md.itemList[dist]["display"] for dist in md.infernofuel_data["distilates"].keys()])
+        self.inferno_eyedrops = HPM.Hvar(self.huim, key="inferno_eyedrops", vtype="input", dtype=bool, display="Eyedrops", frame="inputs_minion_grid", initial=True)
+        self.hopper = HPM.Hvar(self.huim, key="hopper", vtype="input", dtype=str, display="Hopper", frame="inputs_minion_grid", initial="None", options=list(md.hopper_data.keys()))
+        self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=list(md.upgrade_options.keys()))
+        self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=list(md.upgrade_options.keys()))
+        self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="None", options=list(md.minion_chests.keys()))
+        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=int, display="Beacon", frame="inputs_minion_grid", initial=0, options=[0, 1, 2, 3, 4, 5], command=self.huim.createSwitchCall("beacon", controlvar="self"))
+        self.scorched = HPM.Hvar(self.huim, key="scorched", vtype="input", dtype=bool, display="Scorched", frame="inputs_minion_grid", initial=False)
+        self.B_constant = HPM.Hvar(self.huim, key="B_constant", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
+        self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
+        self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
+        self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=list(md.floating_crystals.keys()))
+        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.createSwitchCall("free_will", controlvar="free_will"))  
+        self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
+        self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
+        self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=list(md.boost_pets.keys()))
+        self.afkpet_rarity = HPM.Hvar(self.huim, key="afkpet_rarity", vtype="input", dtype=str, display="AFK Pet Rarity", frame="inputs_player_grid", initial="Legendary", options=['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'])
+        self.afkpet_lvl = HPM.Hvar(self.huim, key="afkpet_lvl", vtype="input", dtype=float, display="AFK Pet level", frame="inputs_player_grid", initial=0.0)
+        self.enchanted_clock = HPM.Hvar(self.huim, key="enchanted_clock", vtype="input", dtype=bool, display="Enchanted Clock", frame="inputs_player_grid", initial=False)
+        self.special_layout = HPM.Hvar(self.huim, key="special_layout", vtype="input", dtype=bool, display="Special Layout", frame="inputs_player_grid", initial=False)
+        self.player_harvests = HPM.Hvar(self.huim, key="player_harvests", vtype="input", dtype=bool, display="Player Harvests", frame="inputs_player_grid", initial=False)
+        self.player_looting = HPM.Hvar(self.huim, key="player_looting", vtype="input", dtype=int, display="Looting", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5])
+        self.potato_talisman = HPM.Hvar(self.huim, key="potato_talisman", vtype="input", dtype=bool, display="Potato talisman", frame="inputs_player_grid", initial=False)  # change to Potato Accessory with an options list
+        self.combat_wisdom = HPM.Hvar(self.huim, key="combat_wisdom", vtype="storage", dtype=float, display="Combat", initial=0.0)
+        self.mining_wisdom = HPM.Hvar(self.huim, key="mining_wisdom", vtype="storage", dtype=float, display="Mining", initial=0.0)
+        self.farming_wisdom = HPM.Hvar(self.huim, key="farming_wisdom", vtype="storage", dtype=float, display="Farming", initial=0.0)
+        self.fishing_wisdom = HPM.Hvar(self.huim, key="fishing_wisdom", vtype="storage", dtype=float, display="Fishing", initial=0.0)
+        self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="storage", dtype=float, display="Foraging", initial=0.0)
+        self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="storage", dtype=float, display="Alchemy", initial=0.0)
+        self.wisdom = HPM.Hvar(self.huim, key="wisdom", vtype="output", dtype=dict, display="Wisdom", frame="inputs_player_grid", widget_width=None, widget_height=6, initial={'combat': self.combat_wisdom.tkvar, 'mining': self.mining_wisdom.tkvar, 'farming': self.farming_wisdom.tkvar, 'fishing': self.fishing_wisdom.tkvar, 'foraging': self.foraging_wisdom.tkvar, 'alchemy': self.alchemy_wisdom.tkvar})
+        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=['None', 'Aatrox', 'Cole', 'Diana', 'Diaz', 'Finnegan', 'Foxy', 'Marina', 'Paul', 'Jerry', 'Derpy', 'Scorpius'], command=lambda x: self.multiswitch("mayors", x))
+        self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()), command=lambda x: self.multiswitch("pet_leveling", x))
+        self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
+        self.falcon_attribute = HPM.Hvar(self.huim, key="falcon_attribute", vtype="input", dtype=int, display="Battle Experience", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        self.toucan_attribute = HPM.Hvar(self.huim, key="toucan_attribute", vtype="input", dtype=int, display="Why Not More", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        self.petxpboost = HPM.Hvar(self.huim, key="petxpboost", vtype="input", dtype=str, display="Pet XP boost", frame="inputs_player_grid", initial="None", options=list(md.pet_xp_boosts.keys()))
+        self.beastmaster = HPM.Hvar(self.huim, key="beastmaster", vtype="input", dtype=float, display="Beastmaster", frame="inputs_player_grid", initial=0.0)
+        self.expsharepet = HPM.Hvar(self.huim, key="expsharepet", vtype="input", dtype=str, display="Exp Share pet", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
+        self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
+        self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
+        self.expshareitem = HPM.Hvar(self.huim, key="expshareitem", vtype="input", dtype=bool, display="Exp Share pet item", frame="inputs_player_grid", initial=False)
+        self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.createSwitchCall("emptytime", controlvar="scale_time"))
+        self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=['Best (NPC/Bazaar)', 'Bazaar', 'Hopper', 'NPC'], command=self.huim.createSwitchCall("NPC_Bazaar", controlvar="self"))
+        self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="Sell Offer", options=list(md.bazaar_sell_types.keys()))     
+        self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="Buy Order", options=list(md.bazaar_buy_types.keys()))
+        self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Bazaar taxes", frame="inputs_player_grid", initial=True, command=self.huim.createSwitchCall("bazaar_tax", controlvar="bazaar_taxes"))
+        self.bazaar_flipper = HPM.Hvar(self.huim, key="bazaar_flipper", vtype="input", dtype=int, display="Bazaar Flipper", frame="inputs_player_grid", initial=1, options=[0, 1, 2])
+        self.ID = HPM.Hvar(self.huim, key="ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
+        self.ID_container = HPM.Hvar(self.huim, key="ID_container", vtype="output", dtype=list, display="ID", frame="outputs_setup_grid", widget_width=35, widget_height=1, initial=[], switch_initial=False)
+        self.time = HPM.Hvar(self.huim, key="time", vtype="output", dtype=str, display="Time", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
+        self.time_seconds = HPM.Hvar(self.huim, key="time_seconds", vtype="storage", dtype=float, display="Time (s)", initial=86400.0)
+        self.emptytime = HPM.Hvar(self.huim, key="emptytime", vtype="output", dtype=str, display="Empty Time", fancy_display="Empty every", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
+        self.actiontime = HPM.Hvar(self.huim, key="actiontime", vtype="output", dtype=float, display="Action time (s)", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
+        self.harvests = HPM.Hvar(self.huim, key="harvests", vtype="output", dtype=float, display="Harvests", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
+        self.items = HPM.Hvar(self.huim, key="items", vtype="output", dtype=dict, display="Item amounts", frame="outputs_setup_grid", widget_width=35, widget_height=None, initial="{}", switch_initial=False)
+        self.item_sell_loc = HPM.Hvar(self.huim, key="item_sellLoc", vtype="output", dtype=dict, display="Sell locations", frame="outputs_profit_grid", widget_width=35, widget_height=None, initial="{}", switch_initial=False)      
+        self.filltime = HPM.Hvar(self.huim, key="filltime", vtype="output", dtype=float, display="Fill time", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
+        self.used_storage = HPM.Hvar(self.huim, key="used_storage", vtype="output", dtype=int, display="Used Storage", frame="outputs_setup_grid", initial=0, switch_initial=False)
+        self.itemtype_profit = HPM.Hvar(self.huim, key="itemtype_profit", vtype="output", dtype=dict, display="Itemtype profits", fancy_display="Profits per item type", frame="outputs_profit_grid", widget_width=35, widget_height=None, initial={}, switch_initial=False)
+        self.item_profit = HPM.Hvar(self.huim, key="item_profit", vtype="output", dtype=float, display="Total item profit", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
+        self.xp = HPM.Hvar(self.huim, key="xp", vtype="output", dtype=dict, display="XP amounts", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)
+        self.pets_levelled = HPM.Hvar(self.huim, key="pets_levelled", vtype="output", dtype=dict, display="Pets Levelled", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)       
+        self.pet_profit = HPM.Hvar(self.huim, key="pet_profit", vtype="output", dtype=float, display="Pet profit", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
+        self.fuelcost = HPM.Hvar(self.huim, key="fuelcost", vtype="output", dtype=float, display="Fuel cost", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
+        self.fuelamount = HPM.Hvar(self.huim, key="fuelamount", vtype="output", dtype=float, display="Fuel amount", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
+        self.total_profit = HPM.Hvar(self.huim, key="total_profit", vtype="output", dtype=float, display="Total profit", frame="outputs_profit_grid", initial=0.0, switch_initial=True)
+        self.notes = HPM.Hvar(self.huim, key="notes", vtype="output", dtype=dict, display="Notes", frame="outputs_setup_grid", widget_width=50, widget_height=4, initial={}, switch_initial=False)
+        self.bazaar_update_txt = HPM.Hvar(self.huim, key="bazaar_update_txt", vtype="output", dtype=str, display="Bazaar data", frame="outputs_profit_grid", initial="Not Loaded", switch_initial=True)
+        self.setupcost = HPM.Hvar(self.huim, key="setupcost", vtype="output", dtype=float, display="Setup cost", frame="outputs_profit_grid", initial=0.0, switch_initial=True)
+        self.freewillcost = HPM.Hvar(self.huim, key="freewillcost", vtype="output", dtype=float, display="Free Will cost", fancy_display="+ Average Free Will cost", frame="outputs_profit_grid", initial=0.0, switch_initial=True)
+        self.extracost = HPM.Hvar(self.huim, key="extracost", vtype="storage", dtype=str, display="Extra cost", fancy_display="+ Extra cost", initial="")
+        self.optimal_tier_free_will = HPM.Hvar(self.huim, key="optimal_tier_free_will", vtype="storage", dtype=int, display="Optimal Tier Free Will", initial=1)
+        self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="storage", dtype=int, display="Available Storage", initial=0)
+        self.addons_output_container = HPM.Hvar(self.huim, key="addons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="addons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
 
-        # determining input/output types according to "vtype", "noWidget" and "switch_initial"
-        # the other values are send to Hero UI Manager. Hero UI Manager creates the Tkinter variable and widgets (stored in "var" and "widget" respectively)
-        for var_key, var_data in self.variables.items():
-            if var_data["vtype"] == "input" and "noWidget" not in var_data:
-                var_data["var"], var_data["widget"] = self.huim.defVarI(dtype=var_data["dtype"], frame=self.frames[var_data["frame"]],
-                                                                      L_text=f"{var_data['display']}:", initial=var_data["initial"],
-                                                                      options=var_data["options"], cmd=var_data["command"])
-            elif var_data["vtype"] == "output":
-                var_data["var"], var_data["widget"] = self.huim.defVarO(dtype=var_data["dtype"], frame=self.frames[var_data["frame"]],
-                                                                      L_text=f"{var_data['display']}:", initial=var_data["initial"])
-            elif var_data["vtype"] == "input" and "noWidget" in var_data:
-                var_data["var"] = self.huim.defVar(dtype=var_data["dtype"], initial=var_data["initial"])
-            elif var_data["vtype"] == "list":
-                var_data["var"], var_data["widget"] = self.huim.defListO(frame=self.frames[var_data["frame"]], L_text=f"{var_data['display']}:", h=var_data["h"], w=var_data["w"])
-            elif var_data["vtype"] == "storage":
-                var_data["var"] = self.huim.defVar(dtype=var_data["dtype"], initial=var_data["initial"])
-            if "switch_initial" in var_data:
-                self.variables[var_key]["output_switch"], widget = self.huim.defVarI(dtype=bool, frame=self.frames[self.variables[var_key]["frame"]], L_text="", initial=self.variables[var_key]["switch_initial"])
-                var_data["widget"].append(widget[-1])
+        self.emptytime_amount = HPM.Hvar(self.huim, key="emptytime_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
+        self.emptytime_length = HPM.Hvar(self.huim, key="emptytime_length", vtype="input", dtype=str, display="Empty Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.scaledtime_amount = HPM.Hvar(self.huim, key="scaledtime_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
+        self.scaledtime_length = HPM.Hvar(self.huim, key="scaledtime_length", vtype="input", dtype=str, display="Scaled Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.emptytime_length.widget[-1].place(in_=self.emptytime_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.scaledtime_length.widget[-1].place(in_=self.scaledtime_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
-        # define left over Tkinter variables and widgets that didnt fit in self.variables
-        self.template, self.templateI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_minion_grid"], L_text="Templates:", initial="Choose Template", options=list(templateList.keys()), cmd=self.load_template)
-        self.loadID, self.loadIDI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_minion_grid"], L_text="Load ID:")
 
-        for skill in ['combat', 'mining', 'farming', 'fishing', 'foraging', 'alchemy']:
-            self.variables["wisdom"]["list"][skill] = self.variables[f"{skill}Wisdom"]["var"]
         self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(self.update_gui_wisdom, ["combatWisdom", "miningWisdom", "farmingWisdom", "fishingWisdom", "foragingWisdom", "alchemyWisdom"]))
-        self.wisdomB.place(in_=self.variables["wisdom"]["widget"][-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.wisdomB.place(in_=self.wisdom.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.rising_celsius_override = False
 
-        self.emptytimeamount, self.emptytimeamountI = self.huim.defVarI(dtype=float, frame=self.frames["inputs_player_grid"], L_text="Empty Time span:", initial=1.0)
-        self.emptytimelength, self.emptytimelengthI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_player_grid"], L_text="Empty Time Length:", initial="Days", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
-        self.emptytimelengthI[-1].place(in_=self.emptytimeamountI[-1], relx=1, x=3, rely=0.5, anchor='w')
-
-        self.totaltimeamount, self.totaltimeamountI = self.huim.defVarI(dtype=float, frame=self.frames["inputs_player_grid"], L_text="Total Time span:", initial=1.0)
-        self.totaltimelength, self.totaltimelengthI = self.huim.defVarI(dtype=str, frame=self.frames["inputs_player_grid"], L_text="Total Time Length:", initial="Days", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
-        self.totaltimelengthI[-1].place(in_=self.totaltimeamountI[-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.notesAnchor = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="")
 
-        self.booting_msg("self.variables initialized")
+        self.booting_msg("variables initialized")
 
         # Create widgets for controls menu and placing them
         self.creditLB = self.huim.genLabel(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
@@ -352,7 +328,7 @@ class Calculator(tk.Tk):
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggleSwitch("addons"))
         self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_prices)
-        # self.status, self.statusO = self.huim.defVarO(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
+        # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
         controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.bazaarB, self.addonsB]
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
@@ -375,106 +351,106 @@ class Calculator(tk.Tk):
         # Defining the order of widgets and placing them for all the grids
         self.grids = {
             "inputs_minion_grid": {
-                "template": self.templateI,
-                "ID": self.loadIDI,
+                "template": self.template.widget,
+                "load_ID": self.load_ID.widget,
                 "minion_label": [None, miniontitleLB],
-                "minion": self.variables["minion"]["widget"],
-                "miniontier": self.variables["miniontier"]["widget"],
-                "amount": self.variables["amount"]["widget"],
-                "fuel": self.variables["fuel"]["widget"],
-                "infernoGrade": self.variables["infernoGrade"]["widget"],
-                "infernoDistillate": self.variables["infernoDistillate"]["widget"],
-                "infernoEyedrops": self.variables["infernoEyedrops"]["widget"],
-                "hopper": self.variables["hopper"]["widget"],
-                "upgrade1": self.variables["upgrade1"]["widget"],
-                "upgrade2": self.variables["upgrade2"]["widget"],
-                "chest": self.variables["chest"]["widget"],
-                "infusion": self.variables["infusion"]["widget"],
-                "free_will": self.variables["free_will"]["widget"],
+                "minion": self.minion.widget,
+                "miniontier": self.miniontier.widget,
+                "amount": self.amount.widget,
+                "fuel": self.fuel.widget,
+                "inferno_grade": self.inferno_grade.widget,
+                "inferno_distillate": self.inferno_distillate.widget,
+                "inferno_eyedrops": self.inferno_eyedrops.widget,
+                "hopper": self.hopper.widget,
+                "upgrade1": self.upgrade1.widget,
+                "upgrade2": self.upgrade2.widget,
+                "chest": self.chest.widget,
+                "infusion": self.infusion.widget,
+                "free_will": self.free_will.widget,
                 "island_label": [None, islandtitleLB],
-                "beacon": self.variables["beacon"]["widget"],
-                "scorched": self.variables["scorched"]["widget"],
-                "B_constant": self.variables["B_constant"]["widget"],
-                "B_acquired": self.variables["B_acquired"]["widget"],
-                "crystal": self.variables["crystal"]["widget"],
-                "postcard": self.variables["postcard"]["widget"],
+                "beacon": self.beacon.widget,
+                "scorched": self.scorched.widget,
+                "B_constant": self.B_constant.widget,
+                "B_acquired": self.B_acquired.widget,
+                "crystal": self.crystal.widget,
+                "postcard": self.postcard.widget,
             },
             "inputs_player_grid": {
                 "player_label": [None, playertitleLB],
-                "afk": self.variables["afk"]["widget"],
-                "afkpet": self.variables["afkpet"]["widget"],
-                "afkpetrarity": self.variables["afkpetrarity"]["widget"],
-                "afkpetlvl": self.variables["afkpetlvl"]["widget"],
-                "enchanted_clock": self.variables["enchanted_clock"]["widget"],
-                "specialLayout": self.variables["specialLayout"]["widget"],
-                "playerHarvests": self.variables["playerHarvests"]["widget"],
-                "playerLooting": self.variables["playerLooting"]["widget"],
-                "potatoTalisman": self.variables["potatoTalisman"]["widget"],
-                "wisdom": self.variables["wisdom"]["widget"],
-                "mayor": self.variables["mayor"]["widget"],
-                "levelingpet": self.variables["levelingpet"]["widget"],
+                "afk": self.afk.widget,
+                "afkpet": self.afkpet.widget,
+                "afkpet_rarity": self.afkpet_rarity.widget,
+                "afkpet_lvl": self.afkpet_lvl.widget,
+                "enchanted_clock": self.enchanted_clock.widget,
+                "special_layout": self.special_layout.widget,
+                "player_harvests": self.player_harvests.widget,
+                "player_looting": self.player_looting.widget,
+                "potato_talisman": self.potato_talisman.widget,
+                "wisdom": self.wisdom.widget,
+                "mayor": self.mayor.widget,
+                "levelingpet": self.levelingpet.widget,
                 "toggle_levelingpet_options": [None, self.huim.createShowHideToggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
-                "taming": self.variables["taming"]["widget"],
-                "falcon_attribute": self.variables["falcon_attribute"]["widget"],
-                "petxpboost": self.variables["petxpboost"]["widget"],
-                "beastmaster": self.variables["beastmaster"]["widget"],
-                "expsharepet": self.variables["expsharepet"]["widget"],
-                "expsharepetslot2": self.variables["expsharepetslot2"]["widget"],
-                "expsharepetslot3": self.variables["expsharepetslot3"]["widget"],
-                "toucan_attribute": self.variables["toucan_attribute"]["widget"],
-                "expshareitem": self.variables["expshareitem"]["widget"],
+                "taming": self.taming.widget,
+                "falcon_attribute": self.falcon_attribute.widget,
+                "petxpboost": self.petxpboost.widget,
+                "beastmaster": self.beastmaster.widget,
+                "expsharepet": self.expsharepet.widget,
+                "expsharepetslot2": self.expsharepetslot2.widget,
+                "expsharepetslot3": self.expsharepetslot3.widget,
+                "toucan_attribute": self.toucan_attribute.widget,
+                "expshareitem": self.expshareitem.widget,
                 "timing_label": [None, timingtitleLB],
-                "totaltime": self.totaltimeamountI,
-                "often_empty": self.variables["often_empty"]["widget"],
-                "emptytime": self.emptytimeamountI,
+                "emptytime_amount": self.emptytime_amount.widget,
+                "scaled_time": self.scale_time.widget,
+                "scaledtime_amount": self.scaledtime_amount.widget,
                 "market_label": [None, markettitleLB],
-                "sellLoc": self.variables["sellLoc"]["widget"],
-                "bazaar_sell_type": self.variables["bazaar_sell_type"]["widget"],
-                "bazaar_buy_type": self.variables["bazaar_buy_type"]["widget"],
-                "bazaar_taxes": self.variables["bazaar_taxes"]["widget"],
-                "bazaar_flipper": self.variables["bazaar_flipper"]["widget"]
+                "sell_loc": self.sell_loc.widget,
+                "bazaar_sell_type": self.bazaar_sell_type.widget,
+                "bazaar_buy_type": self.bazaar_buy_type.widget,
+                "bazaar_taxes": self.bazaar_taxes.widget,
+                "bazaar_flipper": self.bazaar_flipper.widget
             },
             "outputs_setup_grid": {
                 "labels": [None, setupoutputsLB, setupprintLB],
-                "ID": [self.variables["ID"]["widget"][0], self.variables["ID_container"]["widget"][1], self.variables["ID"]["widget"][2]],
-                "time": self.variables["time"]["widget"],
-                "emptytime": self.variables["emptytime"]["widget"],
-                "actiontime": self.variables["actiontime"]["widget"],
-                "fuelamount": self.variables["fuelamount"]["widget"],
-                "notes": [self.variables["notes"]["widget"][0], None, self.variables["notes"]["widget"][2]],
+                "ID": [self.ID.widget[0], self.ID_container.widget[1], self.ID.widget[2]],
+                "time": self.time.widget,
+                "emptytime": self.emptytime.widget,
+                "actiontime": self.actiontime.widget,
+                "fuelamount": self.fuelamount.widget,
+                "notes": [self.notes.widget[0], None, self.notes.widget[2]],
                 "notes_anchor": [self.notesAnchor],
                 "notes_space_1": [None],
                 "notes_space_2": [None],
                 "notes_space_3": [None],
                 "minions_labels": [None, minionoutputsLB, minionprintLB],
-                "harvests": self.variables["harvests"]["widget"],
-                "items": self.variables["items"]["widget"],
-                "used_storage": self.variables["used_storage"]["widget"],
-                "xp": self.variables["xp"]["widget"],
-                "pets_levelled": self.variables["pets_levelled"]["widget"],
+                "harvests": self.harvests.widget,
+                "items": self.items.widget,
+                "used_storage": self.used_storage.widget,
+                "xp": self.xp.widget,
+                "pets_levelled": self.pets_levelled.widget,
             },
             "outputs_profit_grid": {
                 "labels": [None, profitoutputsLB, profitprintLB],
-                "bazaar_update_txt": self.variables["bazaar_update_txt"]["widget"],
-                "setupcost": self.variables["setupcost"]["widget"],
-                "freewillcost": self.variables["freewillcost"]["widget"],
-                "itemSellLoc": self.variables["itemSellLoc"]["widget"],
-                "itemtypeProfit": self.variables["itemtypeProfit"]["widget"],
-                "itemProfit": self.variables["itemProfit"]["widget"],
-                "petProfit": self.variables["petProfit"]["widget"],
-                "fuelcost": self.variables["fuelcost"]["widget"],
-                "totalProfit": self.variables["totalProfit"]["widget"]
+                "bazaar_update_txt": self.bazaar_update_txt.widget,
+                "setupcost": self.setupcost.widget,
+                "freewillcost": self.freewillcost.widget,
+                "item_sell_loc": self.item_sell_loc.widget,
+                "itemtype_profit": self.itemtype_profit.widget,
+                "item_profit": self.item_profit.widget,
+                "pet_profit": self.pet_profit.widget,
+                "fuelcost": self.fuelcost.widget,
+                "total_profit": self.total_profit.widget
             },
             "addons_output_grid": {
                 "labels": [None, addonsoutputsLB, addonsprintLB],
-                "addons_output_container": [None, self.variables["addons_output_container"]["widget"][1], self.variables["addons_output_container"]["widget"][2]]
+                "addons_output_container": [None, self.addons_output_container.widget[1], self.addons_output_container.widget[2]]
             },
         }
         for grid_key in self.grids.keys():
             self.huim.fill_grid(self.grids[grid_key].values(), self.frames[grid_key])
 
-        self.variables["notes"]["widget"][1].place(in_=self.notesAnchor, relx=1, x=5, rely=0, anchor='nw')
-        self.variables["notes"]["widget"][1].tkraise()
+        self.notes.widget[1].place(in_=self.notesAnchor, relx=1, x=5, rely=0, anchor='nw')
+        self.notes.widget[1].tkraise()
 
         # Add-ons buttons
         self.addons_list = {**external_add_ons}
@@ -484,7 +460,7 @@ class Calculator(tk.Tk):
             addon_name, addon_function = addon_info
             button_function = lambda func=addon_function: func(self)
             self.addons_buttons[addon_name] = tk.Button(self.frames["addons_buttons_grid"], text=addon_name, command=button_function)
-            self.addons_auto_run[addon_name], widget = self.huim.defVarI(dtype=bool, frame=self.frames["addons_buttons_grid"], L_text="", initial=False)
+            self.addons_auto_run[addon_name], widget = self.huim.def_input_var(dtype=bool, frame=self.frames["addons_buttons_grid"], L_text="", initial=False)
             widget[-1].place(in_=self.addons_buttons[addon_name], anchor="w", relx=1, rely=0.5, x=10)
             self.addons_buttons[addon_name].grid(row=number % 8, column=(int(number / 8)) * 2)
 
@@ -831,7 +807,6 @@ class Calculator(tk.Tk):
 
     def output_data(self, toTerminal=True):
         """
-        WARNING: OUTDATED, PLEASE USE FANCY OUTPUT
         Generates a short output string with all relavent inputs and chosen ouputs.
         The order of these inputs and output in the output string is defined in self.outputOrder in __init__().
         If toTerminal is True it also prints the string to terminal.
