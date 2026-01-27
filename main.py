@@ -139,7 +139,7 @@ templateList = {
     },
     "Maxed Inferno Minion": {
         "minion": "Inferno",
-        "amount": 31,
+        "amount": 32,
         "fuel": "Inferno Minion Fuel",
         "inferno_grade": "Hypergolic Gabagool",
         "inferno_distillate": "Gabagool Distillate",
@@ -297,6 +297,7 @@ class Calculator(tk.Tk):
         self.empty_time_length = HPM.Hvar(self.huim, key="empty_time_length", vtype="input", dtype=str, display="Empty Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
         self.scaled_time_length = HPM.Hvar(self.huim, key="scaled_time_length", vtype="input", dtype=str, display="Scaled Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
 
         self.empty_time_length.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_length.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -304,9 +305,6 @@ class Calculator(tk.Tk):
         self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0)
         self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(lambda: self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0), ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]))
         self.wisdomB.place(in_=self.wisdom.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
-
-        self.rising_celsius_override = False
-
 
         self.notesAnchor = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="")
 
@@ -361,6 +359,7 @@ class Calculator(tk.Tk):
                 "inferno_grade": self.inferno_grade.widget,
                 "inferno_distillate": self.inferno_distillate.widget,
                 "inferno_eyedrops": self.inferno_eyedrops.widget,
+                "rising_celsius_override": self.rising_celsius_override.widget,
                 "hopper": self.hopper.widget,
                 "upgrade1": self.upgrade1.widget,
                 "upgrade2": self.upgrade2.widget,
@@ -478,6 +477,8 @@ class Calculator(tk.Tk):
                           loc="grid", control="Best (NPC/Bazaar)", negate=False, initial=True)
         self.huim.defSwitch("infernofuel", [*self.inferno_grade.widget, *self.inferno_distillate.widget, *self.inferno_eyedrops.widget],
                           loc="grid", control="Inferno Minion Fuel", negate=False, initial=False)
+        self.huim.defSwitch("rising_celsius", [*self.rising_celsius_override.widget],
+                          loc="grid", control="Inferno", negate=False, initial=False)
         self.huim.defSwitch("beacon", [*self.scorched.widget, *self.B_constant.widget, *self.B_acquired.widget],
                           loc="grid", control=0, negate=True, initial=False)
         self.huim.defSwitch("potato", [*self.potato_talisman.widget],
@@ -509,7 +510,8 @@ class Calculator(tk.Tk):
         self.key_replace_bool = ["infusion", "free_will", "postcard"]  # variables that are booleans that need their display name outputted instead of the boolean value
 
         # Define output orders for Short Output (self.outputOrder) and Share Output (self.fancyOrder)
-        self.outputOrder = ['fuel', 'hopper', 'upgrade1', 'upgrade2', 'chest',
+        self.outputOrder = ['fuel', "inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override",
+                            'hopper', 'upgrade1', 'upgrade2', 'chest',
                             'beacon', 'scorched', 'B_constant', 'B_acquired',
                             'crystal', 'postcard', 'infusion', 'free_will', 'afk', 'afkpet', 'afkpet_rarity', 'afkpet_lvl', 'enchanted_clock', 'special_layout', 'potato_talisman', 'player_harvests', "player_looting",
                             'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
@@ -534,7 +536,7 @@ class Calculator(tk.Tk):
                 "\n> Permanent: ": {"infusion", "free_will"}
             },
             "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
-            "Fuel Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]},
+            "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
             "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_talisman"]},
             "player_harvests": {"\n> ": ["player_looting"]},
             "wisdom": None,
@@ -563,9 +565,10 @@ class Calculator(tk.Tk):
         }
 
         self.ID_order = [
-            "minion", "miniontier", "amount", "fuel", "inferno_grade", "inferno_distillate", "inferno_eyedrops",
+            "minion", "miniontier", "amount", "fuel",
             "hopper", "upgrade1", "upgrade2", "chest", "beacon", "scorched", "B_constant", "B_acquired",
             "infusion", "crystal", "free_will", "postcard",
+            "inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override",
             "afk", "afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout",
             "player_harvests", "player_looting", "potato_talisman",
             "combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom",
@@ -730,6 +733,7 @@ class Calculator(tk.Tk):
                 self.miniontier.set(list(md.minionList[self.minion.get()]["speed"].keys())[-1])
             if type(control) == str:
                 self.huim.toggleSwitch("potato", control + str(self.afk.get()))
+                self.huim.toggleSwitch("rising_celsius", control)
         elif multi_ID == "fuel":
             self.huim.toggleSwitch("infernofuel", control)
             self.huim.toggleSwitch("fuel_amount", md.itemList[md.fuel_options[control]]["upgrade"]["duration"])
@@ -806,10 +810,13 @@ class Calculator(tk.Tk):
         string_parts = {}
         for var_key in self.outputOrder:
             if var_key in self.dependent_variables:
-                if self.var_dict[self.dependent_variables[var_key]].get() in ["None", "0", "0.0", "", False]:
+                if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
                     continue
             elif var_key in ["expsharepetslot2", "expsharepetslot3"]:
                 if self.mayor.get() != "Diana":
+                    continue
+            elif var_key in ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]:
+                if self.fuel.get(False) != "Inferno Minion Fuel":
                     continue
             if self.var_dict[var_key].get_output_switch() is False:
                 if (var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list):
@@ -850,14 +857,12 @@ class Calculator(tk.Tk):
                 string_parts[var_key] = display + ": " + ", ".join(formatted_list)
                 continue
 
-            val = self.var_dict[var_key].get()
+            val = self.var_dict[var_key].get(False)
             if vtype == "input":
                 if val in ["None", 0, 0.0]:
                     continue
                 if dtype in [int, float, bool]:
                     string_parts[var_key] = f"{display}: {val}"
-                elif val == "Inferno Minion Fuel":
-                    string_parts[var_key] = f'Inferno Minion Fuel ({self.inferno_grade.get()}, {self.inferno_distillate.get()}, Capcaisin: {self.inferno_eyedrops.get()})'
                 else:
                     string_parts[var_key] = f"{val}"
             else:
@@ -899,13 +904,25 @@ class Calculator(tk.Tk):
             The part of the Share Output for the inputted variable key.
 
         """
-        force = False  # force is a toggle for output variables that can be equivalent to 0 but still have to be outputted
+        # Special cases that can stop variables from outputting
         if var_key in self.dependent_variables:  # special case: dependent variables
             if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
                 return None
         elif var_key in ["expsharepetslot2", "expsharepetslot3"]:  # special case: slots only active during Diana
             if self.mayor.get() != "Diana":
                 return None
+        elif var_key in ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]:  # special case: fuel attributes only relevant for Inferno Minion Fuel
+            if self.fuel.get(False) != "Inferno Minion Fuel":
+                return None
+        elif var_key in ["rising_celsius_override"]:  # special case: Rising Celsius only applies to Inferno minions
+            if self.minion.get() != "Inferno":
+                return None
+        elif var_key == "extracost":  # special case: setup cost is turned off
+            if self.setupcost.get_output_switch() is False:
+                return None
+
+        # Output switch
+        force = False  # force is a toggle for output variables that can be equivalent to 0 but still have to be outputted due to output switch
         output_switch_val = self.var_dict[var_key].get_output_switch()
         if output_switch_val is False:
             # special cases: output switch set to false, but forced output anyway
@@ -915,6 +932,8 @@ class Calculator(tk.Tk):
                 return None
         elif output_switch_val is True:
             force = True
+
+        # Special cases that can override the formatting
         if var_key == "wisdom":  # special case: wisdom being separate variables
             wisdoms = {list_key: var.get() for list_key, var in self.wisdom.list.items() if (var.get() not in ["None", 0, 0.0] and list_key in self.xp.list)}
             if len(wisdoms) != 0:
@@ -934,11 +953,6 @@ class Calculator(tk.Tk):
                 val = f"`{self.var_dict[var_key].get_display(True)}`"
             else:
                 return None
-        elif var_key == "extracost":  # special case: setup cost is turned off
-            if self.setupcost.get_output_switch() is False:
-                return None
-            else:
-                val = f"`{self.var_dict[var_key].get()}`"
         elif var_key == "ID":  # special case: spoiler lines around setup ID
             val = f"||{self.var_dict[var_key].get()}||".replace("\\", r"\\")
         elif self.var_dict[var_key].dtype in [dict, list]:
@@ -1004,7 +1018,7 @@ class Calculator(tk.Tk):
                 continue
             if header == "Beacon Info" and self.beacon.get() == 0:
                 continue
-            if header == "Fuel Info" and self.fuel.get() != "Inferno Minion Fuel":
+            if header == "Inferno Info" and self.minion.get() != "Inferno" and self.fuel.get(False) != "Inferno Minion Fuel":
                 continue
             if header == "Bazaar Info" and self.bazaar_update_txt.get_output_switch() is False:
                 continue
@@ -1030,20 +1044,26 @@ class Calculator(tk.Tk):
         else:
             return crafted_string
 
-    def get_inputs(self):
+    def get_from_GUI(self, var_keys, translate=True):
         """
-        Gets the inputs of the GUI and returns them as setup data.
+        Gets the requested variables of the GUI and returns them as a dict.
 
         Returns
         -------
         dict
-            Setup data of the inputted setup.
+            values of the requested variables.
 
         """
-        setup_data = {}
-        for var_key in self.ID_order:
-            setup_data[var_key] = self.var_dict[var_key].get()
-        return setup_data
+        var_values = {}
+        for var_key in var_keys:
+            if var_key not in self.var_dict:
+                self.warning_msg(f"{var_key} key not in self.var_dict")
+                continue
+            if self.var_dict[var_key].dtype in [dict, list]:
+                var_values[var_key] = deepcopy(self.var_dict[var_key].list)
+            else:
+                var_values[var_key] = self.var_dict[var_key].get(translate)
+        return var_values
 
     def send_to_GUI(self, outputs):
         """
@@ -1247,7 +1267,7 @@ class Calculator(tk.Tk):
             True if using the Enchanted Clock
         setup_data : dict
             Needed setup data: amount, mayor, beacon, scorched, infusion, free_will, postcard, crystal,\n
-            potato_talisman, afkpet, afkpet_rarity, afkpet_lvl
+            potato_talisman, afkpet, afkpet_rarity, afkpet_lvl, rising_celsius_override
 
         Returns
         -------
@@ -1266,7 +1286,7 @@ class Calculator(tk.Tk):
         if setup_data["beacon"] != 0:
             speed_boost += 1 * setup_data["scorched"]
         if minion == "Inferno":
-            if self.rising_celsius_override:
+            if setup_data["rising_celsius_override"]:
                 speed_boost += 180
             else:
                 speed_boost += 18 * min(10, setup_data["amount"])
@@ -2234,7 +2254,7 @@ class Calculator(tk.Tk):
 
         # Get inputs if none are given
         if setup_data is None:
-            setup_data = self.get_inputs()
+            setup_data = self.get_from_GUI(self.ID_order)
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -2366,11 +2386,8 @@ class Calculator(tk.Tk):
         # Update GUI
         if inGUI:
             self.send_to_GUI(outputs)
-            if self.addons_auto_run["Rising Celsius Override"].get():
-                self.addons_list["Rising Celsius Override"](self)
+            self.addons_output_container.list.clear()
             for addon_name, auto_run_bool in self.addons_auto_run.items():
-                if addon_name == "Rising Celsius Override":
-                    continue
                 if auto_run_bool.get():
                     self.addons_list[addon_name](self)
             self.update_listboxes()
