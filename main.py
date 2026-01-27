@@ -222,8 +222,8 @@ class Calculator(tk.Tk):
         self.inferno_distillate = HPM.Hvar(self.huim, key="inferno_distillate", vtype="input", dtype=str, display="Distillate", frame="inputs_minion_grid", initial="Gabagool Distillate", options=[md.itemList[dist]["display"] for dist in md.infernofuel_data["distilates"].keys()])
         self.inferno_eyedrops = HPM.Hvar(self.huim, key="inferno_eyedrops", vtype="input", dtype=bool, display="Eyedrops", frame="inputs_minion_grid", initial=True)
         self.hopper = HPM.Hvar(self.huim, key="hopper", vtype="input", dtype=str, display="Hopper", frame="inputs_minion_grid", initial="None", options=list(md.hopper_data.keys()))
-        self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=list(md.upgrade_options.keys()))
-        self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=list(md.upgrade_options.keys()))
+        self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
+        self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
         self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="None", options=list(md.minion_chests.keys()))
         self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=int, display="Beacon", frame="inputs_minion_grid", initial=0, options=[0, 1, 2, 3, 4, 5], command=self.huim.createSwitchCall("beacon", controlvar="self"))
         self.scorched = HPM.Hvar(self.huim, key="scorched", vtype="input", dtype=bool, display="Scorched", frame="inputs_minion_grid", initial=False)
@@ -260,27 +260,27 @@ class Calculator(tk.Tk):
         self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
         self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
         self.expshareitem = HPM.Hvar(self.huim, key="expshareitem", vtype="input", dtype=bool, display="Exp Share pet item", frame="inputs_player_grid", initial=False)
-        self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.createSwitchCall("emptytime", controlvar="scale_time"))
+        self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.createSwitchCall("scaled_time_switch", controlvar="scale_time"))
         self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=['Best (NPC/Bazaar)', 'Bazaar', 'Hopper', 'NPC'], command=self.huim.createSwitchCall("NPC_Bazaar", controlvar="self"))
-        self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="Sell Offer", options=list(md.bazaar_sell_types.keys()))     
+        self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="Sell Offer", options=list(md.bazaar_sell_types.keys()))
         self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="Buy Order", options=list(md.bazaar_buy_types.keys()))
         self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Bazaar taxes", frame="inputs_player_grid", initial=True, command=self.huim.createSwitchCall("bazaar_tax", controlvar="bazaar_taxes"))
         self.bazaar_flipper = HPM.Hvar(self.huim, key="bazaar_flipper", vtype="input", dtype=int, display="Bazaar Flipper", frame="inputs_player_grid", initial=1, options=[0, 1, 2])
         self.ID = HPM.Hvar(self.huim, key="ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
         self.ID_container = HPM.Hvar(self.huim, key="ID_container", vtype="output", dtype=list, display="ID", frame="outputs_setup_grid", widget_width=35, widget_height=1, initial=[], switch_initial=False)
-        self.time = HPM.Hvar(self.huim, key="time", vtype="output", dtype=str, display="Time", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
+        self.scaled_time = HPM.Hvar(self.huim, key="scaled_time", vtype="output", dtype=str, display="Scaled Time", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
         self.time_seconds = HPM.Hvar(self.huim, key="time_seconds", vtype="storage", dtype=float, display="Time (s)", initial=86400.0)
-        self.emptytime = HPM.Hvar(self.huim, key="emptytime", vtype="output", dtype=str, display="Empty Time", fancy_display="Empty every", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
+        self.empty_time = HPM.Hvar(self.huim, key="empty_time", vtype="output", dtype=str, display="Empty Time", fancy_display="Empty every", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
         self.actiontime = HPM.Hvar(self.huim, key="actiontime", vtype="output", dtype=float, display="Action time (s)", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
         self.harvests = HPM.Hvar(self.huim, key="harvests", vtype="output", dtype=float, display="Harvests", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
-        self.items = HPM.Hvar(self.huim, key="items", vtype="output", dtype=dict, display="Item amounts", frame="outputs_setup_grid", widget_width=35, widget_height=None, initial="{}", switch_initial=False)
-        self.item_sell_loc = HPM.Hvar(self.huim, key="item_sell_loc", vtype="output", dtype=dict, display="Sell locations", frame="outputs_profit_grid", widget_width=35, widget_height=None, initial="{}", switch_initial=False)      
+        self.items = HPM.Hvar(self.huim, key="items", vtype="output", dtype=dict, display="Item amounts", frame="outputs_setup_grid", widget_width=35, widget_height=None, initial={}, switch_initial=False, tags=["item_ID_to_display"])
+        self.item_sell_loc = HPM.Hvar(self.huim, key="item_sell_loc", vtype="output", dtype=dict, display="Sell locations", frame="outputs_profit_grid", widget_width=35, widget_height=None, initial={}, switch_initial=False, tags=["item_ID_to_display"])
         self.filltime = HPM.Hvar(self.huim, key="filltime", vtype="output", dtype=float, display="Fill time", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
         self.used_storage = HPM.Hvar(self.huim, key="used_storage", vtype="output", dtype=int, display="Used Storage", frame="outputs_setup_grid", initial=0, switch_initial=False)
-        self.itemtype_profit = HPM.Hvar(self.huim, key="itemtype_profit", vtype="output", dtype=dict, display="Itemtype profits", fancy_display="Profits per item type", frame="outputs_profit_grid", widget_width=35, widget_height=None, initial={}, switch_initial=False)
+        self.itemtype_profit = HPM.Hvar(self.huim, key="itemtype_profit", vtype="output", dtype=dict, display="Itemtype profits", fancy_display="Profits per item type", frame="outputs_profit_grid", widget_width=35, widget_height=None, initial={}, switch_initial=False, tags=["item_ID_to_display"])
         self.item_profit = HPM.Hvar(self.huim, key="item_profit", vtype="output", dtype=float, display="Total item profit", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
         self.xp = HPM.Hvar(self.huim, key="xp", vtype="output", dtype=dict, display="XP amounts", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)
-        self.pets_levelled = HPM.Hvar(self.huim, key="pets_levelled", vtype="output", dtype=dict, display="Pets Levelled", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)       
+        self.pets_levelled = HPM.Hvar(self.huim, key="pets_levelled", vtype="output", dtype=dict, display="Pets Levelled", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)
         self.pet_profit = HPM.Hvar(self.huim, key="pet_profit", vtype="output", dtype=float, display="Pet profit", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
         self.fuelcost = HPM.Hvar(self.huim, key="fuelcost", vtype="output", dtype=float, display="Fuel cost", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
         self.fuelamount = HPM.Hvar(self.huim, key="fuelamount", vtype="output", dtype=float, display="Fuel amount", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
@@ -293,13 +293,13 @@ class Calculator(tk.Tk):
         self.optimal_tier_free_will = HPM.Hvar(self.huim, key="optimal_tier_free_will", vtype="storage", dtype=int, display="Optimal Tier Free Will", initial=1)
         self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="storage", dtype=int, display="Available Storage", initial=0)
         self.addons_output_container = HPM.Hvar(self.huim, key="addons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="addons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
+        self.empty_time_amount = HPM.Hvar(self.huim, key="empty_time_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
+        self.empty_time_length = HPM.Hvar(self.huim, key="empty_time_length", vtype="input", dtype=str, display="Empty Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
+        self.scaled_time_length = HPM.Hvar(self.huim, key="scaled_time_length", vtype="input", dtype=str, display="Scaled Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
 
-        self.emptytime_amount = HPM.Hvar(self.huim, key="emptytime_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
-        self.emptytime_length = HPM.Hvar(self.huim, key="emptytime_length", vtype="input", dtype=str, display="Empty Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
-        self.scaledtime_amount = HPM.Hvar(self.huim, key="scaledtime_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
-        self.scaledtime_length = HPM.Hvar(self.huim, key="scaledtime_length", vtype="input", dtype=str, display="Scaled Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
-        self.emptytime_length.widget[-1].place(in_=self.emptytime_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
-        self.scaledtime_length.widget[-1].place(in_=self.scaledtime_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.empty_time_length.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.scaled_time_length.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0)
         self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(lambda: self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0), ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]))
@@ -400,9 +400,9 @@ class Calculator(tk.Tk):
                 "toucan_attribute": self.toucan_attribute.widget,
                 "expshareitem": self.expshareitem.widget,
                 "timing_label": [None, timingtitleLB],
-                "emptytime_amount": self.emptytime_amount.widget,
+                "empty_time_amount": self.empty_time_amount.widget,
                 "scaled_time": self.scale_time.widget,
-                "scaledtime_amount": self.scaledtime_amount.widget,
+                "scaled_time_amount": self.scaled_time_amount.widget,
                 "market_label": [None, markettitleLB],
                 "sell_loc": self.sell_loc.widget,
                 "bazaar_sell_type": self.bazaar_sell_type.widget,
@@ -413,8 +413,8 @@ class Calculator(tk.Tk):
             "outputs_setup_grid": {
                 "labels": [None, setupoutputsLB, setupprintLB],
                 "ID": [self.ID.widget[0], self.ID_container.widget[1], self.ID.widget[2]],
-                "time": self.time.widget,
-                "emptytime": self.emptytime.widget,
+                "empty_time": self.empty_time.widget,
+                "scaled_time": self.scaled_time.widget,
                 "actiontime": self.actiontime.widget,
                 "fuelamount": self.fuelamount.widget,
                 "notes": [self.notes.widget[0], None, self.notes.widget[2]],
@@ -490,7 +490,7 @@ class Calculator(tk.Tk):
                           loc="grid", control=True, negate=False, initial=False)
         self.huim.defSwitch("fuel_amount", [*self.fuelamount.widget],
                           loc="grid", control=0, negate=True, initial=False)
-        self.huim.defSwitch("emptytime", [*self.scaledtime_amount.widget, *self.emptytime.widget],
+        self.huim.defSwitch("scaled_time_switch", [*self.scaled_time_amount.widget, *self.scaled_time.widget],
                           loc="grid", control=True, negate=False, initial=False)
         self.huim.defSwitch("free_will", [*self.freewillcost.widget],
                           loc="grid", control=True, negate=False, initial=False)
@@ -503,7 +503,7 @@ class Calculator(tk.Tk):
         
         self.booting_msg("Switches activated")
 
-        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "emptytime": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet"}
+        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet"}
         # dependent variables are only active when another specified variable is not equivalent to 0,
         # this overrides forced outputs as inactive variables might not be equivalent to 0
         self.key_replace_bool = ["infusion", "free_will", "postcard"]  # variables that are booleans that need their display name outputted instead of the boolean value
@@ -514,7 +514,7 @@ class Calculator(tk.Tk):
                             'crystal', 'postcard', 'infusion', 'free_will', 'afk', 'afkpet', 'afkpet_rarity', 'afkpet_lvl', 'enchanted_clock', 'special_layout', 'potato_talisman', 'player_harvests', "player_looting",
                             'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
                             'ID', 'setupcost', 'freewillcost', 'extracost', 'actiontime', 'fuelamount', 'sell_loc', 'bazaar_update_txt', 'bazaar_taxes', 'bazaar_flipper', 'notes',
-                            'emptytime', 'time', 'harvests', 'used_storage', 'items', 'item_sell_loc',
+                            'empty_time', 'scaled_time', 'harvests', 'used_storage', 'items', 'item_sell_loc',
                             'item_profit', 'itemtype_profit', 'xp', 'pet_profit', 'pets_levelled',
                             'fuelcost', 'total_profit', 'addons_output_container']
 
@@ -546,8 +546,8 @@ class Calculator(tk.Tk):
             "**Setup Information**": {"\n> ": ("ID", "setupcost", "freewillcost", "extracost", "actiontime", "fuelamount")},
             "Bazaar Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
             "notes": None,
-            "emptytime": None,
-            "**Outputs** for ": {"": {"time"}},
+            "empty_time": None,
+            "**Outputs** for ": {"": {"scaled_time"}},
             "harvests": None,
             "used_storage": None,
             "items": None,
@@ -572,9 +572,8 @@ class Calculator(tk.Tk):
             "mayor",
             "levelingpet", "taming", "falcon_attribute", "toucan_attribute", "petxpboost", "beastmaster",
             "expsharepet", "expsharepetslot2", "expsharepetslot3", "expshareitem",
-            "scale_time",
-            "sell_loc",
-            "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper",
+            "sell_loc", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper",
+            "empty_time_amount", "empty_time_length", "scale_time", "scaled_time_amount", "scaled_time_length",
         ]
         self.booting_msg("Output orders defined")
 
@@ -710,26 +709,6 @@ class Calculator(tk.Tk):
                 obj[key] *= multiplier
         return
 
-    # def update_gui_wisdom(self):
-    #     """
-    #     Updates the wisdom listbox
-    #     Does not display wisdom values equal to 0
-
-    #     Returns
-    #     -------
-    #     None.
-
-    #     """
-    #     display_wisdoms = []
-    #     for skill, var in self.wisdom.list.items():
-    #         val = var.get()
-    #         if val == 0.0:
-    #             continue
-    #         display_wisdoms.append(f"{skill}: {val}")
-    #     self.wisdom.set(display_wisdoms)
-        
-    #     return
-
     def multiswitch(self, multi_ID, control):
         """
         Function for switches that were too complicated for Hero UI Manager to handle.
@@ -802,7 +781,7 @@ class Calculator(tk.Tk):
                     self.var_dict[setting].command()
                 else:
                     self.var_dict[setting].command(variable)
-            if "Wisdom" in setting:
+            if "_wisdom" in setting:
                 self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0)
         return
 
@@ -823,45 +802,45 @@ class Calculator(tk.Tk):
             Output string. If toTerminal is True, this function returns None.
 
         """
-        crafted_string = f'{self.variables["amount"]["var"].get()}x {self.variables["minion"]["var"].get()} t{self.variables["miniontier"]["var"].get()}; '
+        crafted_string = f'{self.amount.get()}x {self.minion.get()} t{self.miniontier.get()}; '
         string_parts = {}
         for var_key in self.outputOrder:
             if var_key in self.dependent_variables:
-                if self.variables[self.dependent_variables[var_key]]["var"].get() in ["None", "0", "0.0", "", False]:
+                if self.var_dict[self.dependent_variables[var_key]].get() in ["None", "0", "0.0", "", False]:
                     continue
             elif var_key in ["expsharepetslot2", "expsharepetslot3"]:
-                if self.variables["mayor"]["var"].get() != "Diana":
+                if self.mayor.get() != "Diana":
                     continue
-            if "output_switch" in self.variables[var_key]:
-                if self.variables[var_key]["output_switch"].get() is False:
-                    if (var_key == "notes" and self.variables["special_layout"]["var"].get() is True and "Special Layout" in self.variables["notes"]["list"]):
-                        string_parts["notes"] = "Notes: Special Layout: " + self.variables['notes']['list']['Special Layout']
-                    else:
-                        continue
+            if self.var_dict[var_key].get_output_switch() is False:
+                if (var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list):
+                    string_parts["notes"] = "Notes: Special Layout: " + self.notes.list['Special Layout']
+                else:
+                    continue
             if var_key == "wisdom":
-                wisdoms = {list_key: var.get() for list_key, var in self.variables["wisdom"]["list"].items() if (var.get() not in ["None", 0, 0.0] and list_key in self.variables["xp"]["list"])}
+                wisdoms = {list_key: var.get() for list_key, var in self.wisdom.list.items() if (var.get() not in ["None", 0, 0.0] and list_key in self.xp.list)}
                 if len(wisdoms) != 0:
-                    string_parts["widsom"] = self.variables["wisdom"]["display"] + ": " + ", ".join(f"{wisdom_type}: {wisdom_val}" for wisdom_type, wisdom_val in wisdoms.items())
+                    string_parts["widsom"] = self.wisdom.get_display() + ": " + ", ".join(f"{wisdom_type}: {wisdom_val}" for wisdom_type, wisdom_val in wisdoms.items())
                 continue
             if var_key == "bazaar_update_txt":
-                string_parts["bazaar_update_txt"] = f'Bazaar info: {self.variables["bazaar_sell_type"]["var"].get()}, {self.variables["bazaar_buy_type"]["var"].get()}, Last updated at {self.variables["bazaar_update_txt"]["var"].get()}'
+                string_parts["bazaar_update_txt"] = f'Bazaar info: {self.bazaar_sell_type.get()}, {self.bazaar_buy_type.get()}, Last updated at {self.bazaar_update_txt.get()}'
                 continue
             if var_key == "extracost":
-                if self.variables["setupcost"]["output_switch"].get() is False:
+                if self.setupcost.get_output_switch() is False:
                     continue
 
-            vtype = self.variables[var_key]["vtype"]
-            display = self.variables[var_key]["display"]
-            if vtype == "list":
-                if len(self.variables[var_key]["list"]) == 0:
+            vtype = self.var_dict[var_key].vtype
+            display = self.var_dict[var_key].get_display()
+            dtype = self.var_dict[var_key].dtype
+            if dtype in [list, dict]:
+                if len(self.var_dict[var_key].list) == 0:
                     continue
                 formatting_function = lambda x: x
-                if "IDtoDisplay" in self.variables[var_key] and self.variables[var_key]["IDtoDisplay"] is True:
+                if self.var_dict[var_key].has_tag("item_ID_to_display"):
                     formatting_function = lambda x: md.itemList[x]['display']
                 elif var_key == "pets_levelled":
-                    formatting_function = lambda x: self.variables[x]["var"].get()
+                    formatting_function = lambda x: self.var_dict[x].get()
                 formatted_list = []
-                for list_key, list_val in self.variables[var_key]["list"].items():
+                for list_key, list_val in self.var_dict[var_key].list.items():
                     if var_key == "pets_levelled" and formatting_function(list_key) == "None":
                         continue
                     if type(list_val) in [float, int]:
@@ -871,15 +850,14 @@ class Calculator(tk.Tk):
                 string_parts[var_key] = display + ": " + ", ".join(formatted_list)
                 continue
 
-            dtype = self.variables[var_key]["dtype"]
-            val = self.variables[var_key]["var"].get()
+            val = self.var_dict[var_key].get()
             if vtype == "input":
                 if val in ["None", 0, 0.0]:
                     continue
                 if dtype in [int, float, bool]:
                     string_parts[var_key] = f"{display}: {val}"
                 elif val == "Inferno Minion Fuel":
-                    string_parts[var_key] = f'Inferno Minion Fuel ({self.variables["inferno_grade"]["var"].get()}, {self.variables["inferno_distillate"]["var"].get()}, Capcaisin: {self.variables["inferno_eyedrops"]["var"].get()})'
+                    string_parts[var_key] = f'Inferno Minion Fuel ({self.inferno_grade.get()}, {self.inferno_distillate.get()}, Capcaisin: {self.inferno_eyedrops.get()})'
                 else:
                     string_parts[var_key] = f"{val}"
             else:
@@ -901,7 +879,7 @@ class Calculator(tk.Tk):
     def prep_fancy_data(self, var_key, display=True, newline=False):
         """
         Subfunction for fancyOutput().
-        This function generate the part of the Share Output for the inputted self.variables key
+        This function generate the part of the Share Output for the inputted variable key
         with toggles if the self.variable "display" should be shown and if a new line should be put at the end.
         Returns None if the self.variable has "output_switch" set to False.
         Returns None if the value of the self.variable is equivalent to 0, except if "output_switch" is True.
@@ -909,7 +887,7 @@ class Calculator(tk.Tk):
         Parameters
         ----------
         var_key : str
-            A self.variables key.
+            A variable key.
         display : bool, optional
             Toggle for if the self.variable "display" should be shown. The default is True.
         newline : bool, optional
@@ -918,61 +896,61 @@ class Calculator(tk.Tk):
         Returns
         -------
         str
-            The part of the Share Output for the inputted self.variables key.
+            The part of the Share Output for the inputted variable key.
 
         """
         force = False  # force is a toggle for output variables that can be equivalent to 0 but still have to be outputted
         if var_key in self.dependent_variables:  # special case: dependent variables
-            if self.variables[self.dependent_variables[var_key]]["var"].get() in ["None", "0", "0.0", "", False]:
+            if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
                 return None
         elif var_key in ["expsharepetslot2", "expsharepetslot3"]:  # special case: slots only active during Diana
-            if self.variables["mayor"]["var"].get() != "Diana":
+            if self.mayor.get() != "Diana":
                 return None
-        if "output_switch" in self.variables[var_key]:
-            if self.variables[var_key]["output_switch"].get() is False:
-                # special cases: output switch set to false, but forced output anyway
-                if var_key == "notes" and self.variables["special_layout"]["var"].get() is True and "Special Layout" in self.variables["notes"]["list"]:
-                    return f"Notes:\n> Special Layout: `{self.variables['notes']['list']['Special Layout']}`"
-                else:
-                    return None
+        output_switch_val = self.var_dict[var_key].get_output_switch()
+        if output_switch_val is False:
+            # special cases: output switch set to false, but forced output anyway
+            if var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list:
+                return f"Notes:\n> Special Layout: `{self.notes.list['Special Layout']}`"
             else:
-                force = True
+                return None
+        elif output_switch_val is True:
+            force = True
         if var_key == "wisdom":  # special case: wisdom being separate variables
-            wisdoms = {list_key: var.get() for list_key, var in self.variables["wisdom"]["list"].items() if (var.get() not in ["None", 0, 0.0] and list_key in self.variables["xp"]["list"])}
+            wisdoms = {list_key: var.get() for list_key, var in self.wisdom.list.items() if (var.get() not in ["None", 0, 0.0] and list_key in self.xp.list)}
             if len(wisdoms) != 0:
-                return self.variables["wisdom"]["display"] + ":\n> " + ", ".join(f"{wisdom_type}: `{wisdom_val}`" for wisdom_type, wisdom_val in wisdoms.items())
+                return self.wisdom.get_display(True) + ":\n> " + ", ".join(f"{wisdom_type}: `{wisdom_val}`" for wisdom_type, wisdom_val in wisdoms.items())
             return None
         elif var_key == "beacon":  # special case: add "Beacon" and put the tier in roman numerals
-            val = {0: "", 1: "`Beacon I`", 2: "`Beacon II`", 3: "`Beacon III`", 4: "`Beacon IV`", 5: "`Beacon V`"}[self.variables[var_key]["var"].get()]
+            val = {0: "", 1: "`Beacon I`", 2: "`Beacon II`", 3: "`Beacon III`", 4: "`Beacon IV`", 5: "`Beacon V`"}[self.var_dict[var_key].get()]
         elif var_key == "used_storage":  # special case: add available storage to output
-            val = f"`{self.variables[var_key]['var'].get()}` (out of `{self.variables['available_storage']['var'].get()}`)"
+            val = f"`{self.var_dict[var_key].get()}` (out of `{self.available_storage.get()}`)"
         elif var_key == "chest":  # special case: add " Storage" after the size
-            if self.variables[var_key]["var"].get() == "None":
+            if self.var_dict[var_key].get(False) == "None":
                 val = ""
             else:
-                val = f"`{self.variables[var_key]['var'].get()} Storage`"
+                val = f"`{self.var_dict[var_key].get(False)} Storage`"
         elif var_key in self.key_replace_bool:  # special case: output key instead of the boolean
-            if self.variables[var_key]["var"].get() is True:
-                val = f"`{self.variables[var_key]['display']}`"
+            if self.var_dict[var_key].get() is True:
+                val = f"`{self.var_dict[var_key].get_display(True)}`"
             else:
                 return None
         elif var_key == "extracost":  # special case: setup cost is turned off
-            if self.variables["setupcost"]["output_switch"].get() is False:
+            if self.setupcost.get_output_switch() is False:
                 return None
             else:
-                val = f"`{self.variables[var_key]['var'].get()}`"
+                val = f"`{self.var_dict[var_key].get()}`"
         elif var_key == "ID":  # special case: spoiler lines around setup ID
-            val = f"||{self.variables[var_key]['var'].get()}||".replace("\\", r"\\")
-        elif self.variables[var_key]["vtype"] == "list":
-            if len(self.variables[var_key]["list"]) == 0:
+            val = f"||{self.var_dict[var_key].get()}||".replace("\\", r"\\")
+        elif self.var_dict[var_key].dtype in [dict, list]:
+            if len(self.var_dict[var_key].list) == 0:
                 return None
             formatting_function = lambda x: x
-            if "IDtoDisplay" in self.variables[var_key] and self.variables[var_key]["IDtoDisplay"] is True:
+            if self.var_dict[var_key].has_tag("item_ID_to_display"):
                 formatting_function = lambda x: md.itemList[x]['display']
             elif var_key == "pets_levelled":
-                formatting_function = lambda x: self.variables[x]["var"].get()
+                formatting_function = lambda x: self.var_dict[x].get()
             formatted_list = []
-            for list_key, list_val in self.variables[var_key]["list"].items():
+            for list_key, list_val in self.var_dict[var_key].list.items():
                 if var_key == "pets_levelled" and formatting_function(list_key) == "None":
                     continue
                 if type(list_val) in [float, int]:
@@ -980,20 +958,17 @@ class Calculator(tk.Tk):
                 else:
                     formatted_list.append(f"{formatting_function(list_key)}: `{list_val}`")
             val = "\n> " + ", ".join(formatted_list)
-        elif self.variables[var_key]["dtype"] in [int, float]:
-            val = f"`{self.reduced_number(self.variables[var_key]['var'].get())}`"
+        elif self.var_dict[var_key].dtype in [int, float]:
+            val = f"`{self.reduced_number(self.var_dict[var_key].get())}`"
         else:
-            val = f"`{self.variables[var_key]['var'].get()}`"
+            val = f"`{self.var_dict[var_key].get(False)}`"
         if val in ["`None`", "`0`", "`0.0`", "", "``", "`False`"] and force is False:
             return None
         if var_key == "freewillcost":
-            val += f" (optimal: apply on t{self.variables['optimal_tier_free_will']['var'].get()})"
+            val += f" (optimal: apply on t{self.optimal_tier_free_will.get()})"
         return_str = ""
         if display:
-            if "fancy_display" in self.variables[var_key]:
-                return_str += f"{self.variables[var_key]['fancy_display']}: "
-            else:
-                return_str += f"{self.variables[var_key]['display']}: "
+            return_str += f"{self.var_dict[var_key].get_display(True)}: "
         return_str += f"{val}"
         if newline:
             return_str += "\n"
@@ -1015,23 +990,23 @@ class Calculator(tk.Tk):
             Output string. If toTerminal is True, this function returns None.
 
         """
-        crafted_string = f'{self.variables["amount"]["var"].get()}x **{self.variables["minion"]["var"].get()} t{self.variables["miniontier"]["var"].get()}**'
+        crafted_string = f'{self.amount.get()}x **{self.minion.get()} t{self.miniontier.get()}**'
         for key in self.fancyOrder:
             line_str = ""
             header = ""
             force_line = False
-            if key in self.variables:
+            if key in self.var_dict:
                 header = self.prep_fancy_data(key)
                 force_line = True
             else:
                 header = key
             if header is None:
                 continue
-            if header == "Beacon Info" and self.variables["beacon"]["var"].get() == 0:
+            if header == "Beacon Info" and self.beacon.get() == 0:
                 continue
-            if header == "Fuel Info" and self.variables["fuel"]["var"].get() != "Inferno Minion Fuel":
+            if header == "Fuel Info" and self.fuel.get() != "Inferno Minion Fuel":
                 continue
-            if header == "Bazaar Info" and self.variables["bazaar_update_txt"]["output_switch"].get() is False:
+            if header == "Bazaar Info" and self.bazaar_update_txt.get_output_switch() is False:
                 continue
             if type(self.fancyOrder[key]) is dict:
                 for sub_key, key_arr in self.fancyOrder[key].items():
@@ -1066,12 +1041,8 @@ class Calculator(tk.Tk):
 
         """
         setup_data = {}
-        for key in self.ID_order:
-            var_data = self.var_dict[key]
-            if var_data.vtype != "input":
-                self.warning_msg("self.ID_order contains non-input variable")
-                continue
-            setup_data[key] = var_data["var"].get()
+        for var_key in self.ID_order:
+            setup_data[var_key] = self.var_dict[var_key].get()
         return setup_data
 
     def send_to_GUI(self, outputs):
@@ -1089,17 +1060,17 @@ class Calculator(tk.Tk):
 
         """
         for var_key in outputs:
-            if var_key not in self.variables:
-                self.warning_msg(f"Output {var_key} not found in self.variables")
+            if var_key not in self.var_dict:
+                self.warning_msg(f"Output {var_key} not found in self.var_dict")
                 continue
-            if self.variables[var_key]["vtype"] == "list":
-                self.variables[var_key]["list"].clear()
-                if type(self.variables[var_key]["list"]) is dict:
-                    self.variables[var_key]["list"].update(outputs[var_key])
+            if (var_dtype := self.var_dict[var_key].dtype) in [dict, list]:
+                self.var_dict[var_key].list.clear()
+                if var_dtype is dict:
+                    self.var_dict[var_key].list.update(outputs[var_key])
                 else:
-                    self.variables[var_key]["list"].extend(outputs[var_key])
+                    self.var_dict[var_key].list.extend(outputs[var_key])
             else:
-                self.variables[var_key]["var"].set(outputs[var_key])
+                self.var_dict[var_key].set(outputs[var_key])
         return
 
     def construct_id(self, setup_data):
@@ -1117,9 +1088,16 @@ class Calculator(tk.Tk):
 
         """
         setup_id = str(self.version.get()) + "!"
-        for key, val in setup_data.items():  # replace with self.ID_order??
-            var_options = self.variables[key]["options"]
-            if len(var_options) == 0:
+        for var_key in self.ID_order:
+            if var_key not in setup_data:
+                self.warning_msg(f"(construct_id) {var_key} key not in setup_data, assuming default value")
+                val = self.var_dict[var_key].initial
+            elif self.var_dict[var_key].translation is not None:
+                val = md.itemList[setup_data[var_key]]["display"]
+            else:
+                val = setup_data[var_key]
+            var_options = self.var_dict[var_key].options
+            if var_options is None:
                 if int(val) == val:
                     val = int(val)
                 setup_id += "!" + str(val) + "!"
@@ -1158,18 +1136,16 @@ class Calculator(tk.Tk):
             self.warning_msg("Invalid ID, Incompatible version")
             return setup_data
         try:
-            for key, var_data in self.variables.items():  # replace with self.ID_order?
-                if var_data["vtype"] != "input":
-                    continue
-                if len(var_data["options"]) == 0:
+            for var_key in self.ID_order:
+                if self.var_dict[var_key].options is None:
                     if ID[ID_index] != "!":
-                        self.warning_msg(f"did not find {key}")
+                        self.warning_msg(f"did not find {var_key}")
                         return
                     end_val = ID.find("!", ID_index + 1)
-                    setup_data[key] = var_data["dtype"](ID[ID_index + 1:end_val])
+                    setup_data[var_key] = self.var_dict[var_key].dtype(ID[ID_index + 1:end_val])
                     ID_index = end_val + 1
                 else:
-                    setup_data[key] = var_data["options"][ord(ID[ID_index]) - 48]
+                    setup_data[var_key] = self.var_dict[var_key].options[ord(ID[ID_index]) - 48]
                     ID_index += 1
         except Exception as error:
             if type(error) == IndexError:
@@ -1180,15 +1156,16 @@ class Calculator(tk.Tk):
                 return {}
         return setup_data
 
-    def get_price(self, ID, action="buy", location="bazaar", force=False):
+    def get_price(self, ID, setup_data, action="buy", location="bazaar", force=False):
         """
         Returns the price of an item from ID, transaction type and location of transaction.
-        Uses self.variables "bazaar_buy_type" and "bazaar_sell_type" for bazaar specifics.
 
         Parameters
         ----------
         ID : str
             Skyblock Item ID of which the price is needed.
+        setup_data : dict
+            needed setup data: bazaar_buy_type, bazaar_sell_type, bazaar_taxes, bazaar_flipper, mayor.
         action : str, optional
             Type of transaction. "buy" or "sell". The default is "buy".
         location : str, optional
@@ -1204,12 +1181,12 @@ class Calculator(tk.Tk):
         multiplier = 1
         if location == "bazaar":
             if action == "buy":
-                location = md.bazaar_buy_types[self.variables["bazaar_buy_type"]["var"].get()]
+                location = md.bazaar_buy_types[setup_data["bazaar_buy_type"]]
             elif action == "sell":
-                location = md.bazaar_sell_types[self.variables["bazaar_sell_type"]["var"].get()]
-                if self.variables["bazaar_taxes"]["var"].get():
-                    bazaar_tax = 0.0125 - 0.00125 * self.variables["bazaar_flipper"]["var"].get()  # turn this into a self.calculate function with setup_data
-                    if self.variables["mayor"]["var"].get() == "Derpy":
+                location = md.bazaar_sell_types[setup_data["bazaar_sell_type"]]
+                if setup_data["bazaar_taxes"]:
+                    bazaar_tax = 0.0125 - 0.00125 * setup_data["bazaar_flipper"]
+                    if setup_data["mayor"] == "Derpy":
                         bazaar_tax *= 4
                     multiplier = 1 - bazaar_tax
         elif location == "npc" and action == "buy":
@@ -1480,9 +1457,9 @@ class Calculator(tk.Tk):
             secondsPaction /= 1 + md.infernofuel_data["grades"][md.getID[setup_data["inferno_grade"]]]
         return secondsPaction
 
-    def get_emptytime_and_ratio(self, seconds_per_action, actions_per_harvest, setup_data):
+    def get_time_constants(self, seconds_per_action, actions_per_harvest, setup_data):
         """
-        Calculates emptytime in seconds and the ratio between scaled time and empty time.
+        Calculates empty_time in seconds and the ratio between scaled time and empty time.
 
         Parameters
         ----------
@@ -1491,29 +1468,29 @@ class Calculator(tk.Tk):
         actions_per_harvest : int
             Final actions per harvest.
         setup_data : dict
-            Needed setup data: scale_time
+            Needed setup data: empty_time_length, empty_time_amount, scale_time, scaled_time_length, scaled_time_amount
 
         Returns
         -------
         float, float
-            Time between empties in seconds, ratio between emptytime and scaled time.
+            Time between empties in seconds, ratio between empty_time and scaled time.
         """
+        empty_time_seconds = self.time_number(setup_data["empty_time_length"], setup_data["empty_time_amount"], seconds_per_action, actions_per_harvest)
+        empty_time_str = scaled_time_str = f"{setup_data["empty_time_amount"]} {setup_data["empty_time_length"]}"
+        timeratio = 1
         if setup_data["scale_time"]:
-            emptytime_seconds = self.time_number(self.emptytimelength.get(), self.emptytimeamount.get(), seconds_per_action, actions_per_harvest)
-            scaled_time_seconds = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), seconds_per_action, actions_per_harvest)
-            timeratio = scaled_time_seconds / emptytime_seconds
-        else:
-            emptytime_seconds = self.time_number(self.totaltimelength.get(), self.totaltimeamount.get(), seconds_per_action, actions_per_harvest)
-            timeratio = 1
-        return emptytime_seconds, timeratio
+            scaled_time_seconds = self.time_number(setup_data["scaled_time_length"], setup_data["scaled_time_amount"], seconds_per_action, actions_per_harvest)
+            scaled_time_str = f"{setup_data["scaled_time_amount"]} {setup_data["scaled_time_length"]}"
+            timeratio = scaled_time_seconds / empty_time_seconds
+        return empty_time_seconds, timeratio, empty_time_str, scaled_time_str
     
-    def get_harvests_per_time(self, emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier):
+    def get_harvests_per_time(self, empty_time_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier, setup_data):
         """
-        Calculates the amount of harvests in the inputted emptytime.
+        Calculates the amount of harvests in the inputted empty_time.
 
         Parameters
         ----------
-        emptytime_seconds : float
+        empty_time_seconds : float
             Time between empties in seconds.
         actions_per_harvest : int
             Final actions per harvest.
@@ -1523,16 +1500,18 @@ class Calculator(tk.Tk):
             True if AFKing, False if offline
         drop_multiplier : float
             Total drop multiplier
+        setup_data : dict
+            needed setup data: empty_time_length, empty_time_amount
 
         Returns
         -------
         float, float
             amount of harvests between empties, updated drop_multiplier if offline.
         """
-        if self.emptytimelength.get() == "Harvests":
-            harvests_per_time = self.emptytimeamount.get()
+        if setup_data["empty_time_length"] == "Harvests":
+            harvests_per_time = setup_data["empty_time_amount"]
         else:
-            harvests_per_time = emptytime_seconds / (actions_per_harvest * seconds_per_action)
+            harvests_per_time = empty_time_seconds / (actions_per_harvest * seconds_per_action)
         
         # drop multiplier online/offline mode
         if not afk_toggle:
@@ -1605,7 +1584,7 @@ class Calculator(tk.Tk):
             self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, spreading_info, replace_info)
         return
 
-    def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, emptytime_seconds):
+    def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, empty_time_seconds):
         """
         Gets generated drops from upgrades of the setup and adds them to the drops_list
         
@@ -1617,7 +1596,7 @@ class Calculator(tk.Tk):
         :param upgrade_ids: list, upgrade IDs
         :param harvests_per_time: float, amount of harvests between empties
         :param afk_toggle: boolean, True if AFKing, False if offline
-        :param emptytime_seconds: float, seconds between empties
+        :param empty_time_seconds: float, seconds between empties
         """
         for upgrade in upgrade_ids:
             upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
@@ -1655,10 +1634,10 @@ class Calculator(tk.Tk):
                     specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
                 effective_cooldown = md.itemList[upgrade]["upgrade"]["special"]["cooldown"]
                 for cooldown_item, cooldown_amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                    self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * emptytime_seconds / effective_cooldown, drops_list)
+                    self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
         return
 
-    def get_inferno_drops(self, drops_list, spreading_info, replace_info, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data):
+    def get_inferno_drops(self, drops_list, spreading_info, replace_info, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data):
         """
         Gets generated inferno fuel drops and adds them to drops_list.
         https://wiki.hypixel.net/Inferno_Minion_Fuel
@@ -1671,9 +1650,9 @@ class Calculator(tk.Tk):
         :param minion_fuel: str, ID of minion fuel
         :param drop_multiplier: float, total drop multiplier
         :param harvests_per_time: float, amount of harvests between empties
-        :param emptytime_seconds: float, time between empties
+        :param empty_time_seconds: float, time between empties
         :param afk_toggle: boolean, True if AFKing, False if offline
-        :param setup_data: needed setup data: inferno_distillate, inferno_grade, inferno_eyedrops
+        :param setup_data: needed setup data: inferno_distillate, inferno_grade, inferno_eyedrops, setup data for self.get_price
         """
         if minion_fuel != "INFERNO_FUEL":
             return
@@ -1697,7 +1676,7 @@ class Calculator(tk.Tk):
                 if item == "INFERNO_APEX" and minion_tier >= 10:  # Apex Minion perk
                     chance *= 2
                 self.add_drops(item, multiplier * chance * harvests_per_time, drops_list)
-            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", emptytime_seconds / md.itemList[minion_fuel]["upgrade"]["duration"], drops_list)
+            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", empty_time_seconds / md.itemList[minion_fuel]["upgrade"]["duration"], drops_list)
 
         # calculate fuel cost
         infernofuel_components = {
@@ -1708,7 +1687,7 @@ class Calculator(tk.Tk):
         }
         costPerInfernofuel = 0
         for component_ID, amount in infernofuel_components.items():
-            costPerInfernofuel += amount * self.get_price(component_ID, action="buy", location="bazaar")
+            costPerInfernofuel += amount * self.get_price(component_ID, setup_data, action="buy", location="bazaar")
         md.itemList["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
         # the fuel cost is put into the item data to be used later in the general fuel cost calculator
         return
@@ -1793,7 +1772,7 @@ class Calculator(tk.Tk):
     def get_fill_time(self, minion, available_storage):
         # WARNING: calculation for fill_time does not work with compactors and is not accurate for setup with multiple drops
         # used_storage_slots calculations work fine.
-        # fill_time = (emptytime_seconds * available_storage) / used_storage
+        # fill_time = (empty_time_seconds * available_storage) / used_storage
 
         """ 
         Rework idea:
@@ -1827,13 +1806,14 @@ class Calculator(tk.Tk):
             hopper_multiplier = md.hopper_data[setup_data["hopper"]]
         return sellto, hopper_multiplier
     
-    def get_item_profit(self, sell_location, hopper_multiplier, drops_list):
+    def get_item_profit(self, sell_location, hopper_multiplier, drops_list, setup_data):
         """
         Makes a list of all prices and takes the one that matches the choice of sell_location or takes the maximum, while keeping track where items get sold
         
         :param sell_location: str, general sell location
         :param hopper_multiplier: hopper profit multiplier
         :param drops_list: dict, all drops of the setup
+        :param setup_data: dict, needed setup data: setup data for self.get_price
         :return item_profit: float, total profit from drops
         :return per_item_profit: dict, profit per item ID
         :return per_item_sell_location: dict, final sell location per item ID
@@ -1844,9 +1824,9 @@ class Calculator(tk.Tk):
         item_prices = {}
         for itemtype, amount in drops_list.items():
             item_prices.clear()
-            item_prices["NPC"] = self.get_price(itemtype, "sell", "npc")
-            item_prices["bazaar"] = self.get_price(itemtype, "sell", "bazaar")
-            # item_prices["custom"] = self.get_price(itemtype, "sell", "custom", force=True)  # might use later
+            item_prices["NPC"] = self.get_price(itemtype, setup_data, "sell", "npc")
+            item_prices["bazaar"] = self.get_price(itemtype, setup_data, "sell", "bazaar")
+            # item_prices["custom"] = self.get_price(itemtype, setup_data, "sell", "custom", force=True)  # might use later
             if sell_location in item_prices:
                 per_item_sell_location[itemtype] = sell_location
             else:
@@ -1875,7 +1855,7 @@ class Calculator(tk.Tk):
                 continue
             if xptype not in skill_xp:
                 skill_xp[xptype] = 0
-            skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "Wisdom"] / 100)
+            skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
         if mayor == "Derpy":
             for xptype in skill_xp.keys():
                 skill_xp[xptype] *= 1.5
@@ -1883,7 +1863,7 @@ class Calculator(tk.Tk):
             del skill_xp["combat"]
         return skill_xp
 
-    def get_over_compacting(self, sell_location, compacted_items, per_item_sell_location, setup_notes):
+    def get_over_compacting(self, sell_location, compacted_items, per_item_sell_location, setup_notes, setup_data):
         """
         Checks for all compacted items if compacting them loses value
         
@@ -1891,6 +1871,7 @@ class Calculator(tk.Tk):
         :param compacted_items: list, IDs of items that got compacted
         :param per_item_sell_location: dict, final sell location per item ID
         :param setup_notes: dict, setup notes
+        :param setup_data: needed setup data: setup data for self.get_price
         """
         if sell_location not in ["best", "bazaar"]:
             return
@@ -1902,15 +1883,15 @@ class Calculator(tk.Tk):
             compact_amount = 1
             if "amount" in item_data:
                 compact_amount = item_data["amount"]
-            cost = self.get_price(item, "sell", per_item_sell_location[item]) * per_compact
-            compact_cost = self.get_price(compact_item, "sell", per_item_sell_location[compact_item]) * compact_amount
+            cost = self.get_price(item, setup_data, "sell", per_item_sell_location[item]) * per_compact
+            compact_cost = self.get_price(compact_item, setup_data, "sell", per_item_sell_location[compact_item]) * compact_amount
             if cost - compact_cost > compact_tolerance:
                 over_compacting.append(md.itemList[item]['display'])
         if len(over_compacting) != 0:
             setup_notes["Over-compacting"] = ', '.join(over_compacting)
         return
 
-    def get_pet_xp_boosts(self, pet, xp_type, exp_share=False):
+    def get_pet_xp_boosts(self, pet, xp_type, setup_data, exp_share=False):
         """
         Return pet xp boosts for a given skill xp type.
         All boosts except pet item are multiplied together before returning.
@@ -1922,6 +1903,8 @@ class Calculator(tk.Tk):
             Pet for the calculation, must be a pet from pet_data.
         xp_type : str
             Type of skill XP.
+        setup_data : dict
+            needed setup data: taming, beastmaster, petxpboost, mayor, falcon_attribute
         exp_share : bool
             Toggle for if the xp is given through Exp Share. Default is False.
 
@@ -1941,19 +1924,19 @@ class Calculator(tk.Tk):
                 non_matching = 1 / 3
         if exp_share:
             return non_matching
-        petxpbonus = (1 + self.variables["taming"]["var"].get() / 100) * (1 + self.variables["beastmaster"]["var"].get() / 100) * non_matching
-        if md.pet_xp_boosts[self.variables["petxpboost"]["var"].get()][0] in [xp_type, "all"]:
-            pet_item = 1 + md.pet_xp_boosts[self.variables["petxpboost"]["var"].get()][1] / 100  # turn this function into a self.calculate function using setup_data
+        petxpbonus = (1 + setup_data["taming"] / 100) * (1 + setup_data["beastmaster"] / 100) * non_matching
+        if md.pet_xp_boosts[setup_data["petxpboost"]][0] in [xp_type, "all"]:
+            pet_item = 1 + md.pet_xp_boosts[setup_data["petxpboost"]][1] / 100
         else:
             pet_item = 1
-        if self.variables["mayor"]["var"].get() == "Diana":
+        if setup_data["mayor"] == "Diana":
             petxpbonus *= 1.35
         if xp_type in ["mining", "fishing"]:
             petxpbonus *= 1.5
         if pet == "Reindeer":
             petxpbonus *= 2
-        if xp_type in ["combat"] and self.variables["falcon_attribute"]["var"].get() != 0:
-            petxpbonus *= (1 + self.variables["falcon_attribute"]["var"].get() / 100)
+        if xp_type in ["combat"] and setup_data["falcon_attribute"] != 0:
+            petxpbonus *= (1 + setup_data["falcon_attribute"] / 100)
         return petxpbonus, pet_item
 
     def dragon_xp(self, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
@@ -2007,7 +1990,7 @@ class Calculator(tk.Tk):
         :param skill_xp: dict, gained skill xp per type
         :param mayor: str, mayor
         :param setup_notes: dict, setup notes
-        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost
+        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost, setup data for self.get_price
         :return pet_profit: total profit from pets
         """
         pet_profit = 0.0
@@ -2062,19 +2045,19 @@ class Calculator(tk.Tk):
             else:
                 pet_profit += pets_levelled * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "None":
-                pet_profit -= pets_levelled * self.get_price(md.getID[main_pet_item], "buy", "custom", True)
+                pet_profit -= pets_levelled * self.get_price(md.getID[main_pet_item], setup_data, "buy", "custom", True)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pets_levelled * self.get_price("PET_ITEM_EXP_SHARE", "buy", "bazaar")
+                pet_profit -= pets_levelled * self.get_price("PET_ITEM_EXP_SHARE", setup_data, "buy", "bazaar")
         return pet_profit, setup_pets
 
-    def get_finite_fuel_cost(self, minion_amount, minion_fuel, emptytime_seconds, setup_data):
+    def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
         """
-        get cost per emptytime for the finite fuel and beacon fuel
+        get cost per empty_time for the finite fuel and beacon fuel
         
         :param minion_amount: int, minion amount
         :param minion_fuel: str, ID of minion fuel
-        :param emptytime_seconds: float, time between empties in seconds
-        :param setup_data: needed setup data: beacon, scorched, B_constant
+        :param empty_time_seconds: float, time between empties in seconds
+        :param setup_data: needed setup data: beacon, scorched, B_constant, setup data for self.get_price
         """
         fuel_cost = 0.0
         needed_fuel = 0.0
@@ -2083,11 +2066,11 @@ class Calculator(tk.Tk):
                 beacon_fuel_ID = "SCORCHED_POWER_CRYSTAL"
             else:
                 beacon_fuel_ID = "POWER_CRYSTAL"
-            cost_per_crystal = self.get_price(beacon_fuel_ID, "buy", "bazaar")
-            fuel_cost += emptytime_seconds * cost_per_crystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (setup_data["B_constant"]))
+            cost_per_crystal = self.get_price(beacon_fuel_ID, setup_data, "buy", "bazaar")
+            fuel_cost += empty_time_seconds * cost_per_crystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (setup_data["B_constant"]))
         if md.itemList[minion_fuel]["upgrade"]["duration"] != 0:
-            cost_per_fuel = self.get_price(minion_fuel, "buy", "bazaar")
-            needed_fuel = minion_amount * emptytime_seconds / md.itemList[minion_fuel]["upgrade"]["duration"]
+            cost_per_fuel = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
+            needed_fuel = minion_amount * empty_time_seconds / md.itemList[minion_fuel]["upgrade"]["duration"]
             fuel_cost += needed_fuel * cost_per_fuel
         return fuel_cost, needed_fuel
 
@@ -2101,7 +2084,7 @@ class Calculator(tk.Tk):
         :param minion_fuel: str, ID of minion fuel
         :param upgrades: list, IDs of upgrades
         :param setup_notes: dict, setup notes
-        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_talisman, toucan_attribute, falcon_attribute
+        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_talisman, toucan_attribute, falcon_attribute, setup data for self.get_price
         :return total_cost: float, total setup cost
         :return extra_cost: str, total extra cost 
         :return cost_per_part: dict, cost per setup part
@@ -2124,7 +2107,7 @@ class Calculator(tk.Tk):
                         tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in md.extraMinionCosts[minion_type][tier].items() if cost_type != "COINS"}
             for item, amount in md.minionCosts[minion_type][tier].items():
                 if item not in cost_cache:
-                    cost_cache[item] = self.get_price(item, "buy", "bazaar")
+                    cost_cache[item] = self.get_price(item, setup_data, "buy", "bazaar")
                 tiered_coin_cost[tier] += amount * cost_cache[item]
             if tier != 1:
                 tiered_coin_cost[tier] += tiered_coin_cost[tier - 1]
@@ -2142,21 +2125,21 @@ class Calculator(tk.Tk):
 
         # Infinite fuel cost
         if minion_fuel != "NONE" and md.itemList[minion_fuel]["upgrade"]["duration"] == 0:
-            cost_per_part["fuel"] = self.get_price(minion_fuel, "buy", "bazaar")
+            cost_per_part["fuel"] = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
 
         # Hopper cost
         if setup_data["hopper"] in ["Budget Hopper", "Enchanted Hopper"]:
             hopper_ID = md.getID[setup_data["hopper"]]
-            cost_per_part["hopper"] = self.get_price(hopper_ID, "buy", "bazaar")
+            cost_per_part["hopper"] = self.get_price(hopper_ID, setup_data, "buy", "bazaar")
 
         # Internal minion upgrades cost
         for i, upgrade in enumerate(upgrades):
             if upgrade != "NONE":
-                cost_per_part[f"upgrade{i + 1}"] = self.get_price(upgrade, "buy", "bazaar")
+                cost_per_part[f"upgrade{i + 1}"] = self.get_price(upgrade, setup_data, "buy", "bazaar")
 
         # Infusion cost
         if setup_data["infusion"]:
-            cost_per_part["infusion"] = self.get_price("MITHRIL_INFUSION", "buy", "bazaar")
+            cost_per_part["infusion"] = self.get_price("MITHRIL_INFUSION", setup_data, "buy", "bazaar")
 
         # Free Will costs
         """
@@ -2169,8 +2152,8 @@ class Calculator(tk.Tk):
         E(X) = E(X)- pE(X) + 1
         E(X)= 1/p
         """
-        free_will_price = self.get_price("FREE_WILL", "buy", "bazaar")
-        postcard_price = self.get_price("POSTCARD", "buy", "custom", True)
+        free_will_price = self.get_price("FREE_WILL", setup_data, "buy", "bazaar")
+        postcard_price = self.get_price("POSTCARD", setup_data, "buy", "custom", True)
         if postcard_price == 0:
             # If no price found, use the free will price
             final_postcard_cost = free_will_price
@@ -2192,23 +2175,21 @@ class Calculator(tk.Tk):
         # Storage Chest cost
         if setup_data["chest"] != "None":
             chest_ID = md.getID[setup_data["chest"]]
-            cost_per_part["chest"] = self.get_price(chest_ID, "buy", "bazaar")
+            cost_per_part["chest"] = self.get_price(chest_ID, setup_data, "buy", "bazaar")
         
         # multiply by minion amount
         self.deepmultiply(cost_per_part, minion_amount)
 
         # Beacon cost
         if setup_data["beacon"] != 0 and not setup_data["B_acquired"]:
-            cost_per_part["beacon"] = self.get_price(f"BEACON_{setup_data["beacon"]}", "buy", "bazaar")
-            # will fix display to ID translation later
+            cost_per_part["beacon"] = self.get_price(f"BEACON_{setup_data["beacon"]}", setup_data, "buy", "bazaar")
 
         # Floating Crystal cost
         if setup_data["crystal"] != "None":
             if setup_data["crystal"] == "Winter + Mithril Crystal":
-                cost_per_part["crystal"] = self.get_price("WINTER_ISLAND_CRYSTAL", "buy", "bazaar") + self.get_price("MITHRIL_CRYSTAL", "buy", "bazaar")
+                cost_per_part["crystal"] = self.get_price("WINTER_ISLAND_CRYSTAL", setup_data, "buy", "bazaar") + self.get_price("MITHRIL_CRYSTAL", setup_data, "buy", "bazaar")
             else:
-                cost_per_part["crystal"] = self.get_price(setup_data["crystal"].replace(" ", "_").upper().replace("WINTER", "WINTER_ISLAND"), "buy", "bazaar")
-                # will fix display to ID translation later
+                cost_per_part["crystal"] = self.get_price(setup_data["crystal"].replace(" ", "_").upper().replace("WINTER", "WINTER_ISLAND"), setup_data, "buy", "bazaar")
 
         # Postcard cost
         if setup_data["postcard"]:
@@ -2216,13 +2197,13 @@ class Calculator(tk.Tk):
 
         # Potato Talisman cost
         if setup_data["potato_talisman"]:
-            cost_per_part["potato_talisman"] = self.get_price("POTATO_TALISMAN", "buy", "custom", True)
+            cost_per_part["potato_talisman"] = self.get_price("POTATO_TALISMAN", setup_data, "buy", "custom", True)
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
-            cost_per_part["toucan_attribute"] = md.attribute_shards["Epic"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", "buy", "bazaar")
+            cost_per_part["toucan_attribute"] = md.attribute_shards["Epic"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
         if setup_data["falcon_attribute"] != 0:
-            cost_per_part["falcon_attribute"] = md.attribute_shards["Rare"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", "buy", "bazaar")
+            cost_per_part["falcon_attribute"] = md.attribute_shards["Rare"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
 
 
         total_cost = sum(cost_per_part.values())
@@ -2259,7 +2240,7 @@ class Calculator(tk.Tk):
         minion_type = setup_data["minion"]
         minion_tier = setup_data["miniontier"]
         minion_amount = setup_data["amount"]
-        minion_fuel = md.fuel_options[setup_data["fuel"]] 
+        minion_fuel = setup_data["fuel"]
         mayor = setup_data["mayor"]
         afk_toggle = setup_data["afk"]
         
@@ -2275,7 +2256,7 @@ class Calculator(tk.Tk):
             clock_override = True
 
         # list upgrades types
-        upgrades = [md.upgrade_options[setup_data["upgrade1"]], md.upgrade_options[setup_data["upgrade2"]]]
+        upgrades = [setup_data["upgrade1"], setup_data["upgrade2"]]
         upgrade_types = self.get_upgrade_types(upgrades)
 
         # adding up minion speed bonus
@@ -2294,10 +2275,10 @@ class Calculator(tk.Tk):
         seconds_per_action = self.get_seconds_per_action(minion_type, minion_tier, minion_fuel, speed_boost, setup_data)
 
         # time calculations
-        emptytime_seconds, timeratio = self.get_emptytime_and_ratio(seconds_per_action, actions_per_harvest, setup_data)
+        empty_time_seconds, timeratio, empty_time_str, scaled_time_str = self.get_time_constants(seconds_per_action, actions_per_harvest, setup_data)
         
         # harvests per time
-        harvests_per_time, drop_multiplier = self.get_harvests_per_time(emptytime_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier)
+        harvests_per_time, drop_multiplier = self.get_harvests_per_time(empty_time_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier, setup_data)
 
         # initialise drops list and get upgrade info
         spreading_info, replace_info = self.get_upgrade_info(upgrades, drops_list)
@@ -2306,10 +2287,10 @@ class Calculator(tk.Tk):
         self.get_base_drops(drops_list, spreading_info, replace_info, minion_type, harvests_per_time, drop_multiplier)
 
         # upgrade drops
-        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, emptytime_seconds)
+        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, empty_time_seconds)
         
         # Inferno minion fuel drops
-        self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, emptytime_seconds, afk_toggle, setup_data)
+        self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data)
 
         # Apply compactors
         compacted_items = self.get_compacted_drops(drops_list, upgrade_types)
@@ -2325,18 +2306,18 @@ class Calculator(tk.Tk):
 
         sell_location, hopper_multiplier = self.get_sell_location(setup_data)
         # Coins
-        item_profit, per_item_profit, per_item_sell_location = self.get_item_profit(sell_location, hopper_multiplier, drops_list)
+        item_profit, per_item_profit, per_item_sell_location = self.get_item_profit(sell_location, hopper_multiplier, drops_list, setup_data)
         # XP
         skill_xp = self.get_skill_xp(afk_toggle, mayor, drops_list, setup_data)
 
         # Check for over-compacting
-        self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes)
+        self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes, setup_data)
         
         # Pet leveling
         pet_profit, setup_pets = self.get_pet_profit(skill_xp, mayor, setup_notes, setup_data)
 
         # calculating beacon and limited fuel cost
-        fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, emptytime_seconds, setup_data)
+        fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, empty_time_seconds, setup_data)
 
         # total profit
         total_profit = item_profit + pet_profit - fuel_cost
@@ -2376,11 +2357,11 @@ class Calculator(tk.Tk):
             "setupcost": total_cost,
             "filltime": fill_time,
             "used_storage": used_storage,
-            "emptytime": f"{self.emptytimeamount.get()} {self.emptytimelength.get()}",
-            "time": f"{self.totaltimeamount.get()} {self.totaltimelength.get()}",
+            "empty_time": empty_time_str,
+            "scaled_time": scaled_time_str,
             "actiontime": seconds_per_action,
             "notes": setup_notes
-        })
+        }), 
 
         # Update GUI
         if inGUI:
@@ -2583,34 +2564,25 @@ class Calculator(tk.Tk):
 
     def update_listboxes(self):
         """
-        Creates an array for the listbox out of the list storage of self.variables with "vtype" equal to "list"
+        Calls .update_listbox() for all variables that are of dtype list or dict.
+        Except wisdom
 
         Returns
         -------
         None.
 
         """
-        listbox_list = []
-        for var_key, var_data in self.variables.items():
-            if var_data["vtype"] == "list":
+        for var_key in self.var_dict:
+            if self.var_dict[var_key].dtype in [list, dict]:
                 if var_key == "wisdom":
                     continue
+                if var_key == "pets_levelled":
+                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x].get(), filter=lambda key, val: self.var_dict[key].get() != "None")
+                    continue
                 format_function = lambda x: x
-                if "IDtoDisplay" in var_data and var_data["IDtoDisplay"] is True:  # turn this into .update_listbox() of Hvar, use tags to keep track of which vars need ID to Display
+                if self.var_dict[var_key].has_tag("item_ID_to_display"):
                     format_function = lambda x: md.itemList[x]["display"]
-                elif var_key == "pets_levelled":  # hardcode pets_levelled into this function
-                    format_function = lambda x: self.variables[x]["var"].get()
-
-                listbox_list.clear()
-                if type(var_data["list"]) is dict:
-                    for key, val in var_data["list"].items():
-                        if var_key == "pets_levelled" and format_function(key) == "None":
-                            continue
-                        listbox_list.append(f'{format_function(key)}: {val}')
-                elif type(var_data["list"]) is list:
-                    for val in var_data["list"]:
-                        listbox_list.append(format_function(val))
-                var_data["var"].set(listbox_list)
+                self.var_dict[var_key].update_listbox(key_format_function=format_function)
         return
 
     def collect_addon_output(self, output_name, output_str):

@@ -848,7 +848,7 @@ class Hvar():
         if self.dtype == bool:
             self.options = [False, True]
         else:
-            self.options = options  # list or dict containing allowed values (for dict: display names as keys, automatic .get() translation as values), empty list if no restrictions
+            self.options = options  # list containing allowed values, None if no restrictions. If given as dict: allowed values as keys, automatic translation for .get() as values. Dict saved in self.translation, list of keys saved in self.options
         self.command = command  # callable, function to run when input changed 
         self.switch_initial = switch_initial  # bool or None, initial state of the output switch, None if no output switch
         self.widget_width = widget_width  # int, width of listbox in characters
@@ -866,7 +866,7 @@ class Hvar():
         if type(self.options) is dict:
             self.translation = self.options
             self.options = list(self.options.keys())
-        self.switch_output = None
+        self.tk_output_switch = None
 
         if self.vtype == "input":
             self.tkvar, self.widget = huim.def_input_var(dtype=self.dtype, frame=huim.main.frames[self.frame],
@@ -879,25 +879,39 @@ class Hvar():
         elif self.vtype == "storage":
             self.tkvar = huim.def_var(dtype=self.dtype, initial=self.initial)
         if self.switch_initial is not None:
-            self.switch_output, widget = huim.def_input_var(dtype=bool, frame=huim.main.frames[self.frame], L_text="", initial=self.switch_initial)
+            self.tk_output_switch, widget = huim.def_input_var(dtype=bool, frame=huim.main.frames[self.frame], L_text="", initial=self.switch_initial)
             self.widget.append(widget[-1])
 
-    def get(self):
-        if self.translation is None:
+    def get(self, translate=True):
+        if (self.translation is None) or (translate is False):
             return self.tkvar.get()
-        else:
+        elif translate:
             return self.translation[self.tkvar.get()]
-    
+
     def get_display(self, fancy: bool=False) -> str:
         if fancy and self.fancy_name_display is not None:
             return self.fancy_name_display
         return self.name_display
 
+    def get_output_switch(self):
+        if self.tk_output_switch is None:
+            return None
+        else:
+            return self.tk_output_switch.get()
+
+    def has_tag(self, tag):
+        if self.tags is None:
+            return False
+        else:
+            return tag in self.tags
+
     def set(self, value) -> None:
         self.tkvar.set(value)
         return
-    
+
     def update_listbox(self, key_format_function=lambda x: x, value_format_function=lambda x: x, filter=lambda key, val: True) -> None:
+        if self.dtype not in [dict, list]:
+            return
         listbox_list = []
         if self.dtype is dict:
             for key, val in self.list.items():
