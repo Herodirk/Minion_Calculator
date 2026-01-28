@@ -225,13 +225,13 @@ class Calculator(tk.Tk):
         self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
         self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
         self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="None", options=list(md.minion_chests.keys()))
-        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=int, display="Beacon", frame="inputs_minion_grid", initial=0, options=[0, 1, 2, 3, 4, 5], command=self.huim.createSwitchCall("beacon", controlvar="self"))
+        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=int, display="Beacon", frame="inputs_minion_grid", initial=0, options=[0, 1, 2, 3, 4, 5], command=self.huim.create_switch_call("beacon", controlvar="self"))
         self.scorched = HPM.Hvar(self.huim, key="scorched", vtype="input", dtype=bool, display="Scorched", frame="inputs_minion_grid", initial=False)
         self.B_constant = HPM.Hvar(self.huim, key="B_constant", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
         self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
         self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
         self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=list(md.floating_crystals.keys()))
-        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.createSwitchCall("free_will", controlvar="free_will"))  
+        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("free_will", controlvar="free_will"))  
         self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
         self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
         self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=list(md.boost_pets.keys()))
@@ -260,11 +260,11 @@ class Calculator(tk.Tk):
         self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
         self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()))
         self.expshareitem = HPM.Hvar(self.huim, key="expshareitem", vtype="input", dtype=bool, display="Exp Share pet item", frame="inputs_player_grid", initial=False)
-        self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.createSwitchCall("scaled_time_switch", controlvar="scale_time"))
-        self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=['Best (NPC/Bazaar)', 'Bazaar', 'Hopper', 'NPC'], command=self.huim.createSwitchCall("NPC_Bazaar", controlvar="self"))
+        self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.create_switch_call("scaled_time_switch", controlvar="scale_time"))
+        self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=['Best (NPC/Bazaar)', 'Bazaar', 'Hopper', 'NPC'], command=self.huim.create_switch_call("NPC_Bazaar", controlvar="self"))
         self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="Sell Offer", options=list(md.bazaar_sell_types.keys()))
         self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="Buy Order", options=list(md.bazaar_buy_types.keys()))
-        self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Bazaar taxes", frame="inputs_player_grid", initial=True, command=self.huim.createSwitchCall("bazaar_tax", controlvar="bazaar_taxes"))
+        self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Bazaar taxes", frame="inputs_player_grid", initial=True, command=self.huim.create_switch_call("bazaar_tax", controlvar="bazaar_taxes"))
         self.bazaar_flipper = HPM.Hvar(self.huim, key="bazaar_flipper", vtype="input", dtype=int, display="Bazaar Flipper", frame="inputs_player_grid", initial=1, options=[0, 1, 2])
         self.ID = HPM.Hvar(self.huim, key="ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
         self.ID_container = HPM.Hvar(self.huim, key="ID_container", vtype="output", dtype=list, display="ID", frame="outputs_setup_grid", widget_width=35, widget_height=1, initial=[], switch_initial=False)
@@ -324,7 +324,7 @@ class Calculator(tk.Tk):
         self.fancyoutputB = tk.Button(self.frames["controls"], text='Share Output', command=self.fancy_output)
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
-        self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggleSwitch("addons"))
+        self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
         self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_prices)
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
@@ -388,7 +388,7 @@ class Calculator(tk.Tk):
                 "wisdom": None,
                 "mayor": None,
                 "levelingpet": None,
-                "toggle_levelingpet_options": [None, self.huim.createShowHideToggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
+                "toggle_levelingpet_options": [None, self.huim.create_show_hide_toggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
                 "taming": None,
                 "falcon_attribute": None,
                 "petxpboost": None,
@@ -466,41 +466,36 @@ class Calculator(tk.Tk):
         self.booting_msg("Widgets placed")
 
         # Create switches with Hero UI Manager for the extended minion options
-        self.huim.defSwitch("pet_leveling", [*self.taming.widget, *self.petxpboost.widget, *self.beastmaster.widget,
-                                           *self.expsharepet.widget, *self.expshareitem.widget,
-                                           *self.pets_levelled.widget, *self.pet_profit.widget,
-                                           *self.falcon_attribute.widget, *self.toucan_attribute.widget],
-                          loc="grid", control="None", negate=True, initial=False)
-        self.huim.defSwitch("exp_share_diana", [*self.expsharepetslot2.widget, *self.expsharepetslot3.widget],
-                          loc="grid", control="DianaTrue", negate=False, initial=False)
-        self.huim.defSwitch("NPC_Bazaar", [*self.item_sell_loc.widget],
-                          loc="grid", control="Best (NPC/Bazaar)", negate=False, initial=True)
-        self.huim.defSwitch("infernofuel", [*self.inferno_grade.widget, *self.inferno_distillate.widget, *self.inferno_eyedrops.widget],
-                          loc="grid", control="Inferno Minion Fuel", negate=False, initial=False)
-        self.huim.defSwitch("rising_celsius", [*self.rising_celsius_override.widget],
-                          loc="grid", control="Inferno", negate=False, initial=False)
-        self.huim.defSwitch("beacon", [*self.scorched.widget, *self.B_constant.widget, *self.B_acquired.widget],
-                          loc="grid", control=0, negate=True, initial=False)
-        self.huim.defSwitch("potato", [*self.potato_talisman.widget],
-                          loc="grid", control="PotatoTrue", negate=False, initial=False)
-        self.huim.defSwitch("bazaar_tax", [*self.bazaar_flipper.widget],
-                          loc="grid", control=1, negate=False, initial=True)
-        self.huim.defSwitch("afking", [*self.afkpet.widget, *self.afkpet_rarity.widget, *self.afkpet_lvl.widget,
-                                     *self.enchanted_clock.widget, *self.special_layout.widget,
-                                     *self.player_harvests.widget, *self.player_looting.widget],
-                          loc="grid", control=True, negate=False, initial=False)
-        self.huim.defSwitch("fuel_amount", [*self.fuelamount.widget],
-                          loc="grid", control=0, negate=True, initial=False)
-        self.huim.defSwitch("scaled_time_switch", [*self.scaled_time_amount.widget, *self.scaled_time.widget],
-                          loc="grid", control=True, negate=False, initial=False)
-        self.huim.defSwitch("free_will", [*self.freewillcost.widget],
-                          loc="grid", control=True, negate=False, initial=False)
-        self.huim.defSwitch(ID="addons", obj=self.frames["addons_main"],
-                          loc={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
+        self.huim.def_switch("pet_leveling", widget_references=["taming", "petxpboost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "falcon_attribute", "toucan_attribute"],
+                            locations="grid", control="None", negate=True, initial=False)
+        self.huim.def_switch("exp_share_diana", widget_references=["expsharepetslot2", "expsharepetslot3"],
+                            locations="grid", control="DianaTrue", negate=False, initial=False)
+        self.huim.def_switch("NPC_Bazaar", widget_references="item_sell_loc",
+                            locations="grid", control="Best (NPC/Bazaar)", negate=False, initial=True)
+        self.huim.def_switch("infernofuel", widget_references=["inferno_grade", "inferno_distillate", "inferno_eyedrops"],
+                            locations="grid", control="Inferno Minion Fuel", negate=False, initial=False)
+        self.huim.def_switch("rising_celsius", widget_references="rising_celsius_override",
+                            locations="grid", control="Inferno", negate=False, initial=False)
+        self.huim.def_switch("beacon", widget_references=["scorched", "B_constant", "B_acquired"],
+                            locations="grid", control=0, negate=True, initial=False)
+        self.huim.def_switch("potato", widget_references="potato_talisman",
+                            locations="grid", control="PotatoTrue", negate=False, initial=False)
+        self.huim.def_switch("bazaar_tax", widget_references="bazaar_flipper",
+                            locations="grid", control=1, negate=False, initial=True)
+        self.huim.def_switch("afking", widget_references=["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "player_harvests", "player_looting"],
+                            locations="grid", control=True, negate=False, initial=False)
+        self.huim.def_switch("fuel_amount", widget_references="fuelamount",
+                            locations="grid", control=0, negate=True, initial=False)
+        self.huim.def_switch("scaled_time_switch", widget_references=["scaled_time_amount", "scaled_time"],
+                            locations="grid", control=True, negate=False, initial=False)
+        self.huim.def_switch("free_will", widget_references="freewillcost",
+                            locations="grid", control=True, negate=False, initial=False)
+        self.huim.def_switch(ID="addons", widget_references=self.frames["addons_main"],
+                            locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
         
         # Show/Hide toggle buttons for large amount of extended options
-        self.huim.createShowHideToggle("afk", "afking")
-        self.huim.createShowHideToggle("beacon", "beacon")
+        self.huim.create_show_hide_toggle("afk", "afking")
+        self.huim.create_show_hide_toggle("beacon", "beacon")
         
         self.booting_msg("Switches activated")
 
@@ -732,23 +727,23 @@ class Calculator(tk.Tk):
             if type(control) == str or self.miniontier.get() not in md.minionList[self.minion.get()]["speed"].keys():
                 self.miniontier.set(list(md.minionList[self.minion.get()]["speed"].keys())[-1])
             if type(control) == str:
-                self.huim.toggleSwitch("potato", control + str(self.afk.get()))
-                self.huim.toggleSwitch("rising_celsius", control)
+                self.huim.toggle_switch("potato", control + str(self.afk.get()))
+                self.huim.toggle_switch("rising_celsius", control)
         elif multi_ID == "fuel":
-            self.huim.toggleSwitch("infernofuel", control)
-            self.huim.toggleSwitch("fuel_amount", md.itemList[md.fuel_options[control]]["upgrade"]["duration"])
+            self.huim.toggle_switch("infernofuel", control)
+            self.huim.toggle_switch("fuel_amount", md.itemList[md.fuel_options[control]]["upgrade"]["duration"])
         elif multi_ID == "afk":
             afkState = self.afk.get()
-            self.huim.toggleSwitch("afking", afkState)
-            self.huim.toggleSwitch("potato", self.minion.get() + str(afkState))
+            self.huim.toggle_switch("afking", afkState)
+            self.huim.toggle_switch("potato", self.minion.get() + str(afkState))
         elif multi_ID == "pet_leveling":
-            self.huim.toggleSwitch("pet_leveling", control)
+            self.huim.toggle_switch("pet_leveling", control)
             mayor = self.mayor.get()
             pet_leveling_state = self.switches["pet_leveling"]["state"]
-            self.huim.toggleSwitch("exp_share_diana", mayor + str(pet_leveling_state))
+            self.huim.toggle_switch("exp_share_diana", mayor + str(pet_leveling_state))
         elif multi_ID == "mayors":
             pet_leveling_state = self.switches["pet_leveling"]["state"]
-            self.huim.toggleSwitch("exp_share_diana", control + str(pet_leveling_state))
+            self.huim.toggle_switch("exp_share_diana", control + str(pet_leveling_state))
         return
 
     def load_template(self, template_name):
