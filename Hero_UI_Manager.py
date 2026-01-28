@@ -359,39 +359,23 @@ class H_UI_M():
             output_widget.configure(height=h)
         return var, [text_label, output_widget]
 
-    # def defListO(self, frame, L_text, w=None, h=None):
-    #     """
-    #     defListO: define list output
-    #     Generates a Tkinter variable, a label and a list box.
-    #     The list box is connected to the Tkinter variable.
-
-    #     Parameters
-    #     ----------
-    #     frame : tk.Frame
-    #         Frame where the label and output widget will be generated in.
-    #     L_text : str
-    #         String used for the label.
-    #     w : int, optional
-    #         Width of the list box. None for default size. The default is None.
-    #     h : int, optional
-    #         Height of the list box. None for default size. The default is None.
-
-    #     Returns
-    #     -------
-    #     var : tk.BooleanVar, tk.IntVar, tk.StringVar or tk.DoubleVar
-    #         Fully constructed Tkinter variable ready for use.
-    #     list
-    #         List containing the label and the list box.
-
-    #     """
-    #     var = self.def_var(str, initial=[])
-    #     text_label = self.genLabel(frm=frame, txt=L_text)
-    #     output_list = tk.Listbox(frame, listvariable=var)
-    #     if w is not None:
-    #         output_list.configure(width=w)
-    #     if h is not None:
-    #         output_list.configure(height=h)
-    #     return var, [text_label, output_list]
+    def create_grid(self, grid_dict):
+        """
+        Creates a 2 dimensional array of widgets out of a dict consisting of
+        values: None or list filled with widgets and/or None
+        keys: if value is None, key should be a variable key
+        
+        :param grid_dict: dict definition for the grid
+        :return: 2 dimensional grid array of widgets
+        :rtype: list
+        """
+        grid_arr = []
+        for key, val in grid_dict.items():
+            if val is None:
+                grid_arr.append(self.main.var_dict[key].widget)
+            else:
+                grid_arr.append(val)
+        return grid_arr
 
     def fill_grid(self, grid_arr, grid_frame, stick='w'):
         """
