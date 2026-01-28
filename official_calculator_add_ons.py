@@ -10,9 +10,9 @@ The Official Add-ons include:
 - Days to Repay Setup
 - Basic Minion Loop
 - Bad Luck Inferno
-- Rising Celsius Override
 - Inferno Minion Loop
 - Old Corrupted Frags (inactive)
+- Old Enchanted Hopper (inactive)
 """
 
 import numpy as np

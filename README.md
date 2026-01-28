@@ -16,6 +16,7 @@ Bazaar and NPC price data from https://api.hypixel.net<br>
 AH data from https://sky.coflnet.com/data (currently only Postcard)
 
 Current major limitations:<br>
+| inaccurate averages for Cactus and Sugar Cane minion while AFKing<br>
 | Inferno drop chances might be inaccurate<br>
 | Pet prices have to be updated manually<br>
 | Unconfirmed average wool amount from Enchanted Shears<br>

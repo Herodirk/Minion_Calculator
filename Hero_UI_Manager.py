@@ -102,6 +102,7 @@ class H_UI_M():
         self.main.switches = {}
         self.main.frames = {}
         self.main.var_dict = {}
+        self.reduced_amounts = {0: "", 1: "k", 2: "M", 3: "B", 4: "T", 5: "Qd"}
         self.edit_vars_active = False
 
         self.style = ttk.Style()
@@ -135,7 +136,9 @@ class H_UI_M():
         self.style.theme_use('calculator')
         return
 
-    def createControls(self, relControlsHeight=0.07):
+    ### Frame creation
+
+    def create_controls(self, relControlsHeight=0.07):
         """
         Saves and places controls frame with Stop button.
 
@@ -156,7 +159,7 @@ class H_UI_M():
         self.main.stopB.place(relx=0.99, rely=0.5, anchor="e")
         return
 
-    def createFrames(self, parent, frame_keys=[], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0.07):
+    def create_frames(self, parent, frame_keys=[], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0.07):
         """
         Saves and places frames according to inputted matrix.
         Maxtric can be any size. Fill empty spaces with None.
@@ -201,7 +204,9 @@ class H_UI_M():
                         self.main.frames[key + "_grid"].place(rely=1 - grid_size, relx=1 - grid_size, relwidth=grid_size, relheight=grid_size)
         return
 
-    def genLabel(self, frm, txt, txtvar=False):
+    ### Variable and Widget creation
+
+    def create_label(self, frm, txt, txtvar=False):
         """
         genLabel: generate label
         Generates a label object in the specified frame with the specified text
@@ -311,7 +316,7 @@ class H_UI_M():
             input_widget = tk.Checkbutton(frame, variable=var, background=self.main.colors["frame_background"], command=cmd)
             if checkbox_text is not None:
                 input_widget.configure(text=checkbox_text)
-        label = self.genLabel(frm=frame, txt=L_text)
+        label = self.create_label(frm=frame, txt=L_text)
         if w is not None:
             input_widget.configure(width=w)
         if h is not None:
@@ -348,16 +353,18 @@ class H_UI_M():
 
         """
         var = self.def_var(dtype, initial=initial)
-        text_label = self.genLabel(frm=frame, txt=L_text)
+        text_label = self.create_label(frm=frame, txt=L_text)
         if dtype in [list, dict]:
             output_widget = tk.Listbox(frame, listvariable=var)
         else:
-            output_widget = self.genLabel(frm=frame, txt=var, txtvar=True)
+            output_widget = self.create_label(frm=frame, txt=var, txtvar=True)
         if w is not None:
             output_widget.configure(width=w)
         if h is not None:
             output_widget.configure(height=h)
         return var, [text_label, output_widget]
+
+    ### Widget placement
 
     def create_grid(self, grid_dict):
         """
@@ -402,7 +409,7 @@ class H_UI_M():
         for rowindex, row in enumerate(grid_arr):
             for colindex, col in enumerate(row):
                 if col is None:
-                    self.genLabel(frm=grid_frame, txt="").grid(row=rowindex, column=colindex)
+                    self.create_label(frm=grid_frame, txt="").grid(row=rowindex, column=colindex)
                     continue
                 col.grid(row=rowindex, column=colindex, sticky=stick)
         return
@@ -445,6 +452,8 @@ class H_UI_M():
             else:
                 widget.place(in_=prev_widget, relx=rel_next[0], x=abs_next[0], rely=rel_next[1], y=abs_next[1], anchor=anc)
             prev_widget = widget
+
+    ### Switch management
 
     def def_switch(self, ID, widget_references, locations, control=None, negate=False, initial=True):
         """
@@ -614,6 +623,97 @@ class H_UI_M():
         button_anchor = self.main.var_dict[parent_var_key].widget[-1]
         button.place(in_=button_anchor, **place_args)
         return
+
+    ### Data management
+
+    def reduced_number(self, number, decimal=2):
+        """
+        Rounds a number to the inputted amount of decimal places and adds a letter to large numbers like M for million.
+
+        Parameters
+        ----------
+        number : float
+            The number to round.
+        decimal : int, optional
+            Amount of decial places to round to. The default is 2.
+
+        Returns
+        -------
+        str
+            Rounded number with a size indicator letter if needed.
+
+        """
+        if number == 0.0:
+            return str(0)
+        elif np.abs(number) < 1:
+            return str(np.round(number, decimal - 1 + int(np.abs(np.floor(np.log10(np.abs(number)))))))
+        highest_reduction = min(int(np.floor(np.log10(np.abs(number))) / 3), len(self.reduced_amounts) - 1)
+        reduced = np.round((number / (10 ** (3 * highest_reduction))), decimal)
+        output_string = f'{reduced}{self.reduced_amounts[highest_reduction]}'
+        return output_string
+
+    def deepmultiply(self, obj, multiplier):
+        """
+        Multiplies all number values in an object.
+
+        Parameters
+        ----------
+        obj : dict or list
+            The object.
+        multiplier : float or int
+            The multiplication amount.
+
+        Returns
+        -------
+        None.
+
+        """
+        if type(obj) is dict:
+            keys = obj.keys()
+        else:
+            keys = range(len(obj))
+        for key in keys:
+            if type(obj[key]) in [dict, list]:
+                self.deepmultiply(obj[key], multiplier)
+            elif type(obj[key]) is str:
+                continue
+            else:
+                obj[key] *= multiplier
+        return
+
+    def time_number(self, time_unit, time_amount, custom_time_unit_seconds=1.0):
+        """
+        Translates time amount and length into seconds.
+
+        Parameters
+        ----------
+        time_unit : str
+            A time unit, "Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", or a custom unit, defined by custom_time_unit_seconds.
+        time_amount : float
+            Amount of time units.
+        custom_time_unit_seconds : float, optional
+            Amount of seconds per custom time length. Used when time_length does not match any normal units of time. The default is 1.0.
+
+        Returns
+        -------
+        float
+            The inputted time amount and length as seconds.
+
+        """
+        if time_unit == "Years":
+            return 31536000 * time_amount
+        elif time_unit == "Weeks":
+            return 604800 * time_amount
+        elif time_unit == "Days":
+            return 86400 * time_amount
+        elif time_unit == "Hours":
+            return 3600 * time_amount
+        elif time_unit == "Minutes":
+            return 60 * time_amount
+        elif time_unit == "Seconds":
+            return 1 * time_amount
+        else:
+            return custom_time_unit_seconds * time_amount
 
     def input_args(self, func, execute=False):
         """
@@ -789,7 +889,7 @@ class H_UI_M():
         self.edit_vars_mainframe = tk.Frame(self.main, background=self.main.colors["background"])
         self.edit_vars_mainframe.place(anchor="c", relx=0.5, rely=0.5, relwidth=0.2, relheight=0.5)
         
-        self.createFrames(self.edit_vars_mainframe, frame_keys=[["edit_vars"]], grid_frames=True, grid_size=0.96, border=0.04, relControlsHeight=0.1)
+        self.create_frames(self.edit_vars_mainframe, frame_keys=[["edit_vars"]], grid_frames=True, grid_size=0.96, border=0.04, relControlsHeight=0.1)
         self.edit_vars_options = tk.Frame(self.edit_vars_mainframe, background=self.main.colors["controls_frame"])
         self.edit_vars_options.place(rely=0.9, relheight=0.1, relwidth=1)
 
@@ -807,7 +907,7 @@ class H_UI_M():
                 input_widget = tk.Entry(self.edit_vars_inputs, textvariable=var)
             else:
                 input_widget = tk.OptionMenu(self.edit_vars_inputs, var, *options)
-            widgets_dict[var_key] = [self.genLabel(frm=self.edit_vars_inputs, txt=L_text + ":"), input_widget]
+            widgets_dict[var_key] = [self.create_label(frm=self.edit_vars_inputs, txt=L_text + ":"), input_widget]
 
         self.fill_grid(widgets_dict.values(), self.edit_vars_inputs)
 
@@ -840,9 +940,9 @@ class Hvar():
         self.key = key  # unique identifier 
         self.vtype = vtype  # str, variable type ("input", "output", "storage")
         self.dtype = dtype  # type, data type
-        self.name_display = display  # str, display name of variable
-        self.fancy_name_display = fancy_display  # str, fancy display name of variable
-        self.frame = frame  # str, ID of Tk Frame in huim.main.frames
+        self.name_display = display  # str, human-readable display name of variable
+        self.fancy_name_display = fancy_display  # str, fancy display name of variable, if None, self.name_display is used
+        self.frame = frame  # str, ID of Tk Frame in huim.main.frames where the widgets get made
         self.initial = initial  # {self.dtype}, initial value of the variable
 
         # Optional data:
@@ -852,8 +952,8 @@ class Hvar():
             self.options = options  # list containing allowed values, None if no restrictions. If given as dict: allowed values as keys, automatic translation for .get() as values. Dict saved in self.translation, list of keys saved in self.options
         self.command = command  # callable, function to run when input changed 
         self.switch_initial = switch_initial  # bool or None, initial state of the output switch, None if no output switch
-        self.widget_width = widget_width  # int, width of listbox in characters
-        self.widget_height = widget_height  # int, height of listbox in amount of lines
+        self.widget_width = widget_width  # int, width of widget in characters
+        self.widget_height = widget_height  # int, height of widget in amount of lines
         self.checkbox_text = checkbox_text  # str, text added next to the checkbox
         self.tags = tags  # list, tags of the variable
 

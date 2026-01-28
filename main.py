@@ -178,13 +178,7 @@ pet_costs = {
 # and the custom prices in md.itemList (see HSB_minion_data.py)
 
 
-#%% Lists you should not touch
-
-reduced_amounts = {0: "", 1: "k", 2: "M", 3: "B", 4: "T", 5: "Qd"}
-
-
 #%% Main Class
-
 
 class Calculator(tk.Tk):
     def __init__(self):
@@ -192,26 +186,15 @@ class Calculator(tk.Tk):
         # Use Hero UI Manager to initialize the window and the frames with grids
         self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
         self.booting_msg("Hero UI Manager loaded")
-        self.huim.createControls()
-        self.huim.createFrames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
+        self.huim.create_controls()
+        self.huim.create_frames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
-        self.huim.createFrames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
+        self.huim.create_frames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
         self.booting_msg("Framework set up")
         self.version = self.huim.def_var(dtype=float, initial=1.2)
         self.booting_msg(f"Calculator version {self.version.get()}")
 
-        # The calculator stores all important variables into this dict
-        # the keys "vtype", "dtype", "frame", "noWidget" and "switch_initial"
-        #     change how and where the calculator makes the inputs and outputs for each variable
-        # "display" is used whenever a human-readable form of the variable is needed
-        # "fancy_display" is used for markdown output, if it doesn't exist for a variable, "display" is used
-        # "initial" is the initial value of the variable
-        # "options" is a list of options for the variable, also used for encoding and decoding setup IDs
-        # for "vtype" equal to list are extra keys: "w", "h" and "list".
-        #     "w" and "h" are the width and height of the listbox widget.
-        #     "list" is a normal list-like variable, most of the time a dict. This is the actual storage of the list.
-        #     "var" is connected to the listbox, "list" can be shaped and put into "var" in the function self.update_GUI()
-        
+        # Define variables
         self.template = HPM.Hvar(self.huim, key="template", vtype="input", display="Templates", initial="Choose Template", dtype=str, frame="inputs_minion_grid", options=list(templateList.keys()), command=self.load_template)
         self.load_ID = HPM.Hvar(self.huim, key="load_id", vtype="input", dtype=str, frame="inputs_minion_grid", display="Load ID", initial="")
         self.minion = HPM.Hvar(self.huim, key="minion", vtype="input", dtype=str, display="Minion", frame="inputs_minion_grid", initial="Custom", options=list(md.minionList.keys()), command=lambda x: self.multiswitch('minion', x))
@@ -294,29 +277,29 @@ class Calculator(tk.Tk):
         self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="storage", dtype=int, display="Available Storage", initial=0)
         self.addons_output_container = HPM.Hvar(self.huim, key="addons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="addons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
         self.empty_time_amount = HPM.Hvar(self.huim, key="empty_time_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
-        self.empty_time_length = HPM.Hvar(self.huim, key="empty_time_length", vtype="input", dtype=str, display="Empty Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.empty_time_unit = HPM.Hvar(self.huim, key="empty_time_unit", vtype="input", dtype=str, display="Empty Time unit", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
-        self.scaled_time_length = HPM.Hvar(self.huim, key="scaled_time_length", vtype="input", dtype=str, display="Scaled Time length", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
+        self.scaled_time_unit = HPM.Hvar(self.huim, key="scaled_time_unit", vtype="input", dtype=str, display="Scaled Time unit", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
 
-        self.empty_time_length.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
-        self.scaled_time_length.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0)
         self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(lambda: self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0), ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]))
         self.wisdomB.place(in_=self.wisdom.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
-        self.notesAnchor = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="")
+        self.notesAnchor = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="")
 
         self.booting_msg("variables initialized")
 
         # Create widgets for controls menu and placing them
-        self.creditLB = self.huim.genLabel(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
+        self.creditLB = self.huim.create_label(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
         self.creditLB.place(in_=self.stopB, x=-10, rely=0.5, y=-1, anchor="e")
-        self.manualLB = self.huim.genLabel(frm=self.frames["controls"], txt="Online Manual:\nCalculator Manual")
+        self.manualLB = self.huim.create_label(frm=self.frames["controls"], txt="Online Manual:\nCalculator Manual")
         self.manualLB.place(in_=self.creditLB, x=-10, rely=0.5, anchor="e")
         self.manualLB.bind("<Button-1>", lambda void_event: webbrowser.open(r"https://herodirk.github.io/"))
-        self.API_creditLB = self.huim.genLabel(frm=self.frames["controls"], txt="Bazaar data from Hypixel API,\nAH data from SkyCofl API")
+        self.API_creditLB = self.huim.create_label(frm=self.frames["controls"], txt="Bazaar data from Hypixel API,\nAH data from SkyCofl API")
         self.API_creditLB.place(in_=self.manualLB, x=-10, rely=0.5, anchor="e")
         self.API_creditLB.bind("<Button-1>", lambda click_event: webbrowser.open(r"https://api.hypixel.net/") if click_event.y < 18 else webbrowser.open(r"https://sky.coflnet.com/data"))
 
@@ -332,19 +315,19 @@ class Calculator(tk.Tk):
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
-        miniontitleLB = self.huim.genLabel(frm=self.frames["inputs_minion_grid"], txt="\nMinion options")
-        islandtitleLB = self.huim.genLabel(frm=self.frames["inputs_minion_grid"], txt="\nIsland options")
-        playertitleLB = self.huim.genLabel(frm=self.frames["inputs_player_grid"], txt="Player options")
-        timingtitleLB = self.huim.genLabel(frm=self.frames["inputs_player_grid"], txt="\nTime options")
-        markettitleLB = self.huim.genLabel(frm=self.frames["inputs_player_grid"], txt="\nMarket options")
-        setupoutputsLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Setup Information")
-        setupprintLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Share")
-        minionoutputsLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Minion Outputs")
-        minionprintLB = self.huim.genLabel(frm=self.frames["outputs_setup_grid"], txt="Share")
-        profitoutputsLB = self.huim.genLabel(frm=self.frames["outputs_profit_grid"], txt="Profit Outputs")
-        profitprintLB = self.huim.genLabel(frm=self.frames["outputs_profit_grid"], txt="Share")
-        addonsprintLB = self.huim.genLabel(frm=self.frames["addons_output_grid"], txt="Share")
-        addonsoutputsLB = self.huim.genLabel(frm=self.frames["addons_output_grid"], txt="Add-on Outputs")
+        miniontitleLB = self.huim.create_label(frm=self.frames["inputs_minion_grid"], txt="\nMinion options")
+        islandtitleLB = self.huim.create_label(frm=self.frames["inputs_minion_grid"], txt="\nIsland options")
+        playertitleLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="Player options")
+        timingtitleLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="\nTime options")
+        markettitleLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="\nMarket options")
+        setupoutputsLB = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="Setup Information")
+        setupprintLB = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="Share")
+        minionoutputsLB = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="Minion Outputs")
+        minionprintLB = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="Share")
+        profitoutputsLB = self.huim.create_label(frm=self.frames["outputs_profit_grid"], txt="Profit Outputs")
+        profitprintLB = self.huim.create_label(frm=self.frames["outputs_profit_grid"], txt="Share")
+        addonsprintLB = self.huim.create_label(frm=self.frames["addons_output_grid"], txt="Share")
+        addonsoutputsLB = self.huim.create_label(frm=self.frames["addons_output_grid"], txt="Add-on Outputs")
 
         # Defining the order of widgets and placing them for all the grids
         self.grids = {
@@ -571,7 +554,7 @@ class Calculator(tk.Tk):
             "levelingpet", "taming", "falcon_attribute", "toucan_attribute", "petxpboost", "beastmaster",
             "expsharepet", "expsharepetslot2", "expsharepetslot3", "expshareitem",
             "sell_loc", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper",
-            "empty_time_amount", "empty_time_length", "scale_time", "scaled_time_amount", "scaled_time_length",
+            "empty_time_amount", "empty_time_unit", "scale_time", "scaled_time_amount", "scaled_time_unit",
         ]
         self.booting_msg("Output orders defined")
 
@@ -613,98 +596,6 @@ class Calculator(tk.Tk):
     def debug_msg(self, message):
         if not debug_mode:
             self.system_msg("DEBUG", message)
-        return
-
-    def time_number(self, time_length, time_amount, seconds_per_action=0.0, actions_per_harvest=1.0):
-        """
-        Translates time amount and length into seconds.
-
-        Parameters
-        ----------
-        time_length : str
-            A time unit, "Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests".
-        time_amount : float
-            Amount of time units.
-        secondsPaction : float, optional
-            Seconds per action. Used to calculate the amount of seconds in one harvest. The default is 0.0.
-        actionsPerHarvest : float, optional
-            Actions per harvest. Used to calculate the amount of seconds in one harvest. The default is 1.0.
-
-        Returns
-        -------
-        float
-            The inputted time amount and length as seconds.
-
-        """
-        if time_length == "Years":
-            return 31536000 * time_amount
-        if time_length == "Weeks":
-            return 604800 * time_amount
-        if time_length == "Days":
-            return 86400 * time_amount
-        if time_length == "Hours":
-            return 3600 * time_amount
-        if time_length == "Minutes":
-            return 60 * time_amount
-        if time_length == "Seconds":
-            return 1 * time_amount
-        if time_length == "Harvests":
-            return seconds_per_action * actions_per_harvest * time_amount
-        return 1 * time_amount
-
-    def reduced_number(self, number, decimal=2):
-        """
-        Rounds a number to the inputted amount of decimal places and adds a letter to large numbers like M for million.
-
-        Parameters
-        ----------
-        number : float
-            The number to round.
-        decimal : int, optional
-            Amount of decial places to round to. The default is 2.
-
-        Returns
-        -------
-        str
-            Rounded number with a size indicator letter if needed.
-
-        """
-        if number == 0.0:
-            return str(0)
-        elif np.abs(number) < 1:
-            return str(np.round(number, decimal - 1 + int(np.abs(np.floor(np.log10(np.abs(number)))))))
-        highest_reduction = min(int(np.floor(np.log10(np.abs(number))) / 3), len(reduced_amounts) - 1)
-        reduced = np.round((number / (10 ** (3 * highest_reduction))), decimal)
-        output_string = f'{reduced}{reduced_amounts[highest_reduction]}'
-        return output_string
-
-    def deepmultiply(self, obj, multiplier):
-        """
-        Multiplies all number values in an object.
-
-        Parameters
-        ----------
-        obj : dict or list
-            The object.
-        multiplier : float or int
-            The multiplication amount.
-
-        Returns
-        -------
-        None.
-
-        """
-        if type(obj) is dict:
-            keys = obj.keys()
-        else:
-            keys = range(len(obj))
-        for key in keys:
-            if type(obj[key]) in [dict, list]:
-                self.deepmultiply(obj[key], multiplier)
-            elif type(obj[key]) is str:
-                continue
-            else:
-                obj[key] *= multiplier
         return
 
     def multiswitch(self, multi_ID, control):
@@ -846,7 +737,7 @@ class Calculator(tk.Tk):
                     if var_key == "pets_levelled" and formatting_function(list_key) == "None":
                         continue
                     if type(list_val) in [float, int]:
-                        formatted_list.append(f"{formatting_function(list_key)}: {self.reduced_number(list_val)}")
+                        formatted_list.append(f"{formatting_function(list_key)}: {self.huim.reduced_number(list_val)}")
                     else:
                         formatted_list.append(f"{formatting_function(list_key)}: {list_val}")
                 string_parts[var_key] = display + ": " + ", ".join(formatted_list)
@@ -862,7 +753,7 @@ class Calculator(tk.Tk):
                     string_parts[var_key] = f"{val}"
             else:
                 if dtype in [int, float]:
-                    string_parts[var_key] = f"{display}: {self.reduced_number(val)}"
+                    string_parts[var_key] = f"{display}: {self.huim.reduced_number(val)}"
                 else:
                     string_parts[var_key] = f"{display}: {val}"
 
@@ -963,12 +854,12 @@ class Calculator(tk.Tk):
                 if var_key == "pets_levelled" and formatting_function(list_key) == "None":
                     continue
                 if type(list_val) in [float, int]:
-                    formatted_list.append(f"{formatting_function(list_key)}: `{self.reduced_number(list_val)}`")
+                    formatted_list.append(f"{formatting_function(list_key)}: `{self.huim.reduced_number(list_val)}`")
                 else:
                     formatted_list.append(f"{formatting_function(list_key)}: `{list_val}`")
             val = "\n> " + ", ".join(formatted_list)
         elif self.var_dict[var_key].dtype in [int, float]:
-            val = f"`{self.reduced_number(self.var_dict[var_key].get())}`"
+            val = f"`{self.huim.reduced_number(self.var_dict[var_key].get())}`"
         else:
             val = f"`{self.var_dict[var_key].get(False)}`"
         if val in ["`None`", "`0`", "`0.0`", "", "``", "`False`"] and force is False:
@@ -1483,19 +1374,19 @@ class Calculator(tk.Tk):
         actions_per_harvest : int
             Final actions per harvest.
         setup_data : dict
-            Needed setup data: empty_time_length, empty_time_amount, scale_time, scaled_time_length, scaled_time_amount
+            Needed setup data: empty_time_unit, empty_time_amount, scale_time, scaled_time_unit, scaled_time_amount
 
         Returns
         -------
         float, float
             Time between empties in seconds, ratio between empty_time and scaled time.
         """
-        empty_time_seconds = self.time_number(setup_data["empty_time_length"], setup_data["empty_time_amount"], seconds_per_action, actions_per_harvest)
-        empty_time_str = scaled_time_str = f"{setup_data["empty_time_amount"]} {setup_data["empty_time_length"]}"
+        empty_time_seconds = self.huim.time_number(setup_data["empty_time_unit"], setup_data["empty_time_amount"], seconds_per_action * actions_per_harvest)
+        empty_time_str = scaled_time_str = f"{setup_data["empty_time_amount"]} {setup_data["empty_time_unit"]}"
         timeratio = 1
         if setup_data["scale_time"]:
-            scaled_time_seconds = self.time_number(setup_data["scaled_time_length"], setup_data["scaled_time_amount"], seconds_per_action, actions_per_harvest)
-            scaled_time_str = f"{setup_data["scaled_time_amount"]} {setup_data["scaled_time_length"]}"
+            scaled_time_seconds = self.huim.time_number(setup_data["scaled_time_unit"], setup_data["scaled_time_amount"], seconds_per_action * actions_per_harvest)
+            scaled_time_str = f"{setup_data["scaled_time_amount"]} {setup_data["scaled_time_unit"]}"
             timeratio = scaled_time_seconds / empty_time_seconds
         return empty_time_seconds, timeratio, empty_time_str, scaled_time_str
     
@@ -1516,14 +1407,14 @@ class Calculator(tk.Tk):
         drop_multiplier : float
             Total drop multiplier
         setup_data : dict
-            needed setup data: empty_time_length, empty_time_amount
+            needed setup data: empty_time_unit, empty_time_amount
 
         Returns
         -------
         float, float
             amount of harvests between empties, updated drop_multiplier if offline.
         """
-        if setup_data["empty_time_length"] == "Harvests":
+        if setup_data["empty_time_unit"] == "Harvests":
             harvests_per_time = setup_data["empty_time_amount"]
         else:
             harvests_per_time = empty_time_seconds / (actions_per_harvest * seconds_per_action)
@@ -2193,7 +2084,7 @@ class Calculator(tk.Tk):
             cost_per_part["chest"] = self.get_price(chest_ID, setup_data, "buy", "bazaar")
         
         # multiply by minion amount
-        self.deepmultiply(cost_per_part, minion_amount)
+        self.huim.deepmultiply(cost_per_part, minion_amount)
 
         # Beacon cost
         if setup_data["beacon"] != 0 and not setup_data["B_acquired"]:
@@ -2317,7 +2208,7 @@ class Calculator(tk.Tk):
 
         # multiply drops by minion amount
         # all processes as calculated above should be linear with minion amount
-        self.deepmultiply(drops_list, minion_amount)
+        self.huim.deepmultiply(drops_list, minion_amount)
 
         sell_location, hopper_multiplier = self.get_sell_location(setup_data)
         # Coins
@@ -2361,7 +2252,7 @@ class Calculator(tk.Tk):
             "pets_levelled": {pet_slot: setup_pets[pet_slot]["levelled_pets"] for pet_slot in setup_pets.keys()}
         }
 
-        self.deepmultiply(outputs, timeratio)
+        self.huim.deepmultiply(outputs, timeratio)
         outputs["fuelamount"] = np.ceil(outputs["fuelamount"] / minion_amount) * minion_amount
         outputs.update({
             "available_storage": available_storage,
