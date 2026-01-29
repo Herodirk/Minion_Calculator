@@ -39,7 +39,7 @@ smelting_data = {
     'COBBLESTONE': 'STONE',
     'SAND': 'GLASS',
     'SAND:1': 'GLASS',
-    'CLAY_BALL': 'CLAY_BRICK',
+    'CLAY_BALL': 'BRICKS',  # correct (2026-1-29)
     'IRON_ORE': 'IRON_INGOT',
     'GOLD_ORE': 'GOLD_INGOT',
     'CACTUS': 'INK_SACK:2',
@@ -57,7 +57,13 @@ itemList = {
     # The following items do not exist
     "NONE": {
         'display': "None",
-        "prices": { "npc": 0 },
+        "prices": { "npc": 0, "custom": 0 },
+        "hopper_selling_rate": 1,
+        "storage_slots": 0,
+        "exp_boost_type": "all",
+        "exp_boost_amount": 0,
+        "crystal_boost": 0,
+        "affected_minions": [],
         "upgrade": { 'speed': 0, 'drop': 1, 'duration': 0, 'special': { "type": "None" } }
     },
     'CUSTOM': {
@@ -1467,10 +1473,12 @@ itemList = {
     # Hoppers
     'BUDGET_HOPPER': {
         'display': 'Budget Hopper',
+        "hopper_selling_rate": 0.5,
         "prices": {}
     },
     'ENCHANTED_HOPPER': {
         'display': 'Enchanted Hopper',
+        "hopper_selling_rate": 0.7,
         "prices": {}
     },
 
@@ -1655,44 +1663,64 @@ itemList = {
     # Floating Crystals
     "FARM_CRYSTAL": {
         'display': "Farm Crystal",
+        "crystal_boost": 10,
+        "affected_minions": ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower'],
         'prices': {},
         "recipe": { "ENCHANTED_PUMPKIN": 96, "ENCHANTED_QUARTZ": 1 }
     },
     "WOODCUTTING_CRYSTAL": {
-        'display': "Woddcutting Crystal",
+        'display': "Woodcutting Crystal",
+        "crystal_boost": 10,
+        "affected_minions": ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle', "Flower"],  # Flower minion is correct
         'prices': {},
         "recipe": { "ENCHANTED_SPRUCE_LOG": 96, "ENCHANTED_QUARTZ": 1 }
     },
     "MITHRIL_CRYSTAL": {
         'display': "Mithril Crystal",
+        "crystal_boost": 10,
+        "affected_minions": ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Red Sand', 'Mycelium', 'Ice', 'Snow', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril', 'Hard Stone'],
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 16, "ENCHANTED_QUARTZ": 1 }
     },
     "WINTER_ISLAND_CRYSTAL": {
         'display': "Winter Crystal",
+        "crystal_boost": 5,
+        "affected_minions": ["Snow", "Ice"],
         'prices': {},
         "recipe": { "WINTER_ISLAND": 1 }
+    },
+    "MITHRIL_WINTER_CRYSTAL": {
+        'display': "Mithril + Winter Crystal",  # not a real item
+        "crystal_boost": 15,  # correct
+        "affected_minions": ["Snow", "Ice"],
+        'prices': {},
+        "recipe": { "MITHRIL_CRYSTAL": 1, "WINTER_ISLAND_CRYSTAL": 1 }
     },
 
     # Chests
     "SMALL_ENCHANTED_CHEST": {
         'display': "Small Storage",
+        "storage_slots": 3,
         'prices': {}
     },
     "MEDIUM_ENCHANTED_CHEST": {
         'display': "Medium Storage",
+        "storage_slots": 9,
         'prices': {}
     },
     "LARGE_ENCHANTED_CHEST": {
         'display': "Large Storage",
+        "storage_slots": 15,
         'prices': {}
     },
     "XLARGE_ENCHANTED_CHEST": {
         'display': "X-Large Storage",
+        "storage_slots": 21,
         'prices': {}
     },
     "XXLARGE_ENCHANTED_CHEST": {
         'display': "XX-Large Storage",
+        "storage_slots": 27,
         'prices': {}
     },
 
@@ -1792,87 +1820,125 @@ itemList = {
     # Pet Items
     'PET_ITEM_MINING_SKILL_BOOST_COMMON': {
         'display': 'Common Mining Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "mining",
+        "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_MINING_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Mining Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "mining",
+        "exp_boost_amount": 30,
         'prices': { 'custom': 250000 }
     },
     'PET_ITEM_MINING_SKILL_BOOST_RARE': {
         'display': 'Rare Mining Exp Boost',
+        "exp_boost_type": "mining",
+        "exp_boost_amount": 40,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_FARMING_SKILL_BOOST_COMMON': {
         'display': 'Common Farming Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "farming",
+        "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_FARMING_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Farming Exp Boost',
+        "exp_boost_type": "farming",
+        "exp_boost_amount": 30,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_FARMING_SKILL_BOOST_RARE': {
         'display': 'Rare Farming Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "farming",
+        "exp_boost_amount": 40,
         'prices': { 'custom': 500000 }
     },
     'PET_ITEM_FARMING_SKILL_BOOST_EPIC': {
         'display': 'Epic Farming Exp Boost',  # not in bazaar (Duncan)
+        "exp_boost_type": "farming",
+        "exp_boost_amount": 50,
         'prices': { 'custom': 1500000 }
     },
     'PET_ITEM_FISHING_SKILL_BOOST_COMMON': {
         'display': 'Common Fishing Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "fishing",
+        "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_FISHING_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Fishing Exp Boost',
+        "exp_boost_type": "fishing",
+        "exp_boost_amount": 30,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_FISHING_SKILL_BOOST_RARE': {
         'display': 'Rare Fishing Exp Boost',
+        "exp_boost_type": "fishing",
+        "exp_boost_amount": 40,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_FISHING_SKILL_BOOST_EPIC': {
         'display': 'Epic Fishing Exp Boost',
+        "exp_boost_type": "fishing",
+        "exp_boost_amount": 50,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_COMMON': {
         'display': 'Common Combat Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "combat",
+        "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Combat Exp Boost',
+        "exp_boost_type": "combat",
+        "exp_boost_amount": 30,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_RARE': {
         'display': 'Rare Combat Exp Boost',
+        "exp_boost_type": "combat",
+        "exp_boost_amount": 40,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_EPIC': {
         'display': 'Epic Combat Exp Boost',
+        "exp_boost_type": "combat",
+        "exp_boost_amount": 50,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_FORAGING_SKILL_BOOST_COMMON': {
         'display': 'Common Foraging Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "foraging",
+        "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_FORAGING_SKILL_BOOST_EPIC': {
         'display': 'Epic Foraging Exp Boost',
+        "exp_boost_type": "foraging",
+        "exp_boost_amount": 50,
         'prices': {},
         "AH": True
     },
     'PET_ITEM_ALL_SKILLS_BOOST_COMMON': {
         'display': 'All Skills Exp Boost',  # not in bazaar (Zog)
+        "exp_boost_type": "all",
+        "exp_boost_amount": 10,
         'prices': { 'custom': 50000 }
     },
     'ALL_SKILLS_SUPER_BOOST': {
         'display': 'All Skills Exp Super-Boost',
+        "exp_boost_type": "all",
+        "exp_boost_amount": 20,
         'prices': {},
         "AH": True
     },
@@ -1895,7 +1961,21 @@ itemList = {
 
 #%% Inferno minion List
 
-infernofuel_data = {
+inferno_fuel_grade_options = {
+    'Hypergolic Gabagool': 'HYPERGOLIC_GABAGOOL',
+    'Heavy Gabagool': 'HEAVY_GABAGOOL',
+    'Fuel Gabagool': 'FUEL_GABAGOOL',
+}
+
+inferno_fuel_distillate_options = {
+    'Magma Cream Distillate': 'MAGMA_CREAM_DISTILLATE',
+    'Blaze Rod Distillate': 'BLAZE_ROD_DISTILLATE',
+    'Nether Wart Distillate': 'NETHER_STALK_DISTILLATE',
+    'Glowstone Distillate': 'GLOWSTONE_DUST_DISTILLATE',
+    'Gabagool Distillate': 'CRUDE_GABAGOOL_DISTILLATE',
+}
+
+inferno_fuel_data = {
     'grades': { 'HYPERGOLIC_GABAGOOL': 20, 'HEAVY_GABAGOOL': 15, 'FUEL_GABAGOOL': 10 },
     'distilates': {
         'MAGMA_CREAM_DISTILLATE': ["MAGMA_CREAM", 2],
@@ -1916,47 +1996,12 @@ infernofuel_data = {
 #%% Option lists with display to ID translator
 
 getID = {
-    'Hypergolic Gabagool': 'HYPERGOLIC_GABAGOOL',
-    'Heavy Gabagool': 'HEAVY_GABAGOOL',
-    'Fuel Gabagool': 'FUEL_GABAGOOL',
-    'Magma Cream Distillate': 'MAGMA_CREAM_DISTILLATE',
-    'Blaze Rod Distillate': 'BLAZE_ROD_DISTILLATE',
-    'Nether Wart Distillate': 'NETHER_STALK_DISTILLATE',
-    'Glowstone Distillate': 'GLOWSTONE_DUST_DISTILLATE',
-    'Gabagool Distillate': 'CRUDE_GABAGOOL_DISTILLATE',
-    'Capsaicin Eyedrops': 'CAPSAICIN_EYEDROPS_NO_CHARGES',
-    "Budget Hopper": "BUDGET_HOPPER",
-    "Enchanted Hopper": "ENCHANTED_HOPPER",
     'Oak Log': 'LOG',
     'Spruce Log': 'LOG:1',
     'Birch Log': 'LOG:2',
     'Dark Oak Log': 'LOG_2:1',
     'Acacia Log': 'LOG_2',
     'Jungle Log': 'LOG:3',
-    'Small': "SMALL_ENCHANTED_CHEST",
-    'Medium': "MEDIUM_ENCHANTED_CHEST",
-    'Large': "LARGE_ENCHANTED_CHEST",
-    'X-Large': "XLARGE_ENCHANTED_CHEST",
-    'XX-Large': "XXLARGE_ENCHANTED_CHEST",
-    'Common Mining Exp Boost': 'PET_ITEM_MINING_SKILL_BOOST_COMMON',
-    'Uncommon Mining Exp Boost': 'PET_ITEM_MINING_SKILL_BOOST_UNCOMMON',
-    'Rare Mining Exp Boost': 'PET_ITEM_MINING_SKILL_BOOST_RARE',
-    'Common Farming Exp Boost': 'PET_ITEM_FARMING_SKILL_BOOST_COMMON',
-    'Uncommon Farming Exp Boost': 'PET_ITEM_FARMING_SKILL_BOOST_UNCOMMON',
-    'Rare Farming Exp Boost': 'PET_ITEM_FARMING_SKILL_BOOST_RARE',
-    'Epic Farming Exp Boost': 'PET_ITEM_FARMING_SKILL_BOOST_EPIC',
-    'Common Fishing Exp Boost': 'PET_ITEM_FISHING_SKILL_BOOST_COMMON',
-    'Uncommon Fishing Exp Boost': 'PET_ITEM_FISHING_SKILL_BOOST_UNCOMMON',
-    'Rare Fishing Exp Boost': 'PET_ITEM_FISHING_SKILL_BOOST_RARE',
-    'Epic Fishing Exp Boost': 'PET_ITEM_FISHING_SKILL_BOOST_EPIC',
-    'Common Combat Exp Boost': 'PET_ITEM_COMBAT_SKILL_BOOST_COMMON',
-    'Uncommon Combat Exp Boost': 'PET_ITEM_COMBAT_SKILL_BOOST_UNCOMMON',
-    'Rare Combat Exp Boost': 'PET_ITEM_COMBAT_SKILL_BOOST_RARE',
-    'Epic Combat Exp Boost': 'PET_ITEM_COMBAT_SKILL_BOOST_EPIC',
-    'Common Foraging Exp Boost': 'PET_ITEM_FORAGING_SKILL_BOOST_COMMON',
-    'Epic Foraging Exp Boost': 'PET_ITEM_FORAGING_SKILL_BOOST_EPIC',
-    'All Skills Exp Boost': 'PET_ITEM_ALL_SKILLS_BOOST_COMMON',
-    'All Skills Exp Super-Boost': 'ALL_SKILLS_SUPER_BOOST',
 }
 
 fuel_options = {
@@ -2179,55 +2224,70 @@ enchanterList = {
 
 
 #%% pet xp boost items
-# perhaps merge with their entries in itemList?
 
-pet_xp_boosts = {
-    "None": ["all", 0],
-    'Common Mining Exp Boost': ['mining', 20],
-    'Uncommon Mining Exp Boost': ['mining', 30],
-    'Rare Mining Exp Boost': ['mining', 40],
-    'Common Farming Exp Boost': ['farming', 20],
-    'Uncommon Farming Exp Boost': ['farming', 30],
-    'Rare Farming Exp Boost': ['farming', 40],
-    'Epic Farming Exp Boost': ['farming', 50],
-    'Common Fishing Exp Boost': ['fishing', 20],
-    'Uncommon Fishing Exp Boost': ['fishing', 30],
-    'Rare Fishing Exp Boost': ['fishing', 40],
-    'Epic Fishing Exp Boost': ['fishing', 50],
-    'Common Combat Exp Boost': ['combat', 20],
-    'Uncommon Combat Exp Boost': ['combat', 30],
-    'Rare Combat Exp Boost': ['combat', 40],
-    'Epic Combat Exp Boost': ['combat', 50],
-    'Common Foraging Exp Boost': ['foraging', 20],
-    'Epic Foraging Exp Boost': ['foraging', 50],
-    'All Skills Exp Boost': ['all', 10],
-    'All Skills Exp Super-Boost': ['all', 20],
+pet_exp_boost_options = {
+    "None": "NONE",
+    "Common Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_COMMON",
+    "Uncommon Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_UNCOMMON",
+    "Rare Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_RARE",
+    "Common Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_COMMON",
+    "Uncommon Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_UNCOMMON",
+    "Rare Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_RARE",
+    "Epic Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_EPIC",
+    "Common Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_COMMON",
+    "Uncommon Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_UNCOMMON",
+    "Rare Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_RARE",
+    "Epic Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_EPIC",
+    "Common Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_COMMON",
+    "Uncommon Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_UNCOMMON",
+    "Rare Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_RARE",
+    "Epic Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_EPIC",
+    "Common Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_COMMON",
+    "Epic Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_EPIC",
+    "All Skills Exp Boost": "PET_ITEM_ALL_SKILLS_BOOST_COMMON",
+    "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST",
 }
 
 #%% Floating Crystals
 
-floating_crystals = {
-    "None": { 0: [] },
-    "Farm Crystal": { 10: ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower'] },
-    "Woodcutting Crystal": { 10: ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle', "Flower"] },  # flower minion is correct
-    "Mithril Crystal": { 10: ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Red Sand', 'Mycelium', 'Ice', 'Snow', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril', 'Hard Stone'] },
-    "Winter Crystal": { 5: ["Snow", "Ice"] },
-    "Winter + Mithril Crystal": { 15: ["Snow", "Ice"] }  # correct
+floating_crystal_options = {
+    "None": "NONE",
+    "Farm Crystal": "FARM_CRYSTAL",
+    "Woodcutting Crystal": "WOODCUTTING_CRYSTAL",
+    "Mithril Crystal": "MITHRIL_CRYSTAL",
+    "Winter Crystal": "WINTER_ISLAND_CRYSTAL",
+    "Mithril + Winter Crystal": "MITHRIL_WINTER_CRYSTAL"
 }
 
 #%% Minion Storage
 
-minion_chests = { "None": 0, "Small": 3, "Medium": 9, "Large": 15, "X-Large": 21, "XX-Large": 27 }
+chest_options = {
+    "None": "NONE",
+    "Small Storage": "SMALL_ENCHANTED_CHEST",
+    "Medium Storage": "MEDIUM_ENCHANTED_CHEST",
+    "Large Storage": "LARGE_ENCHANTED_CHEST",
+    "X-Large Storage": "XLARGE_ENCHANTED_CHEST",
+    "XX-Large Storage": "XXLARGE_ENCHANTED_CHEST",
+}
 
 standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10: 15, 11: 15, 12: 15 }
 
 
 #%% Hoppers
 
-hopper_data = {
-    "None": 1,
-    "Budget Hopper": 0.5,
-    "Enchanted Hopper": 0.7,
+hopper_options = {
+    "None": "NONE",
+    "Budget Hopper": "BUDGET_HOPPER",
+    "Enchanted Hopper": "ENCHANTED_HOPPER",
+}
+
+beacon_options = {
+    "None": "NONE",
+    "Beacon I": "BEACON_1",
+    "Beacon II": "BEACON_2",
+    "Beacon III": "BEACON_3",
+    "Beacon IV": "BEACON_4",
+    "Beacon V": "BEACON_5",
 }
 
 #%% Mayors
