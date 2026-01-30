@@ -1107,27 +1107,6 @@ class Calculator(tk.Tk):
             self.warning_msg(ID + " not in itemList")
             return 0
 
-    def get_upgrade_types(self, upgrades):
-        """
-        Gets the upgrade types of the given upgrades.
-
-        Parameters
-        ----------
-        upgrades : list
-            List of upgrade IDs.
-
-        Returns
-        -------
-        list
-            List of upgrade types.
-
-        """
-        upgrade_types = []
-        for upgrade in upgrades:
-            for temp_type in md.itemList[upgrade]["upgrade_special"]["type"].split(", "):
-                upgrade_types.append(temp_type)
-        return upgrade_types
-
     def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
         """
         Adds up speed boosts, uses the fact that booleans can be seen as 0 and 1 for false and true resp.
@@ -1156,8 +1135,8 @@ class Calculator(tk.Tk):
         speed_boost = 0
         speed_boost += md.itemList[minion_fuel_id]["speed_boost"]
         speed_boost += md.itemList[upgrade_ids[0]]["speed_boost"] + md.itemList[upgrade_ids[1]]["speed_boost"]
-        speed_boost += md.itemList[setup_data["beacon"]]["speed_boost"] + 10 * setup_data["infusion"]
-        speed_boost += 10 * setup_data["free_will"] + 5 * setup_data["postcard"]
+        speed_boost += md.itemList[setup_data["beacon"]]["speed_boost"] + md.itemList["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
+        speed_boost += md.itemList["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + md.itemList["POSTCARD"]["speed_boost"] * setup_data["postcard"]
         if setup_data["potato_accessory"] != "NONE" and (afk_toggle or clock_override) and (minion in md.itemList[setup_data["potato_accessory"]]["affected_minions"]):
             speed_boost += md.itemList[setup_data["potato_accessory"]]["speed_boost"]
         if setup_data["crystal"] != "NONE":
@@ -1172,6 +1151,8 @@ class Calculator(tk.Tk):
                 speed_boost += 18 * min(10, setup_data["amount"])
         if setup_data["mayor"] == "Cole" and (afk_toggle or clock_override) and minion in md.affected_by_cole:
             speed_boost += 25
+        if minion_fuel_id == "EVERBURNING_FLAME" and minion in md.itemList[minion_fuel_id]["upgrade_special"]["affected_minions"]:
+            speed_boost += md.itemList[minion_fuel_id]["upgrade_special"]["amount"]
         afkpet = setup_data["afkpet"]
         afkpet_rarity = setup_data["afkpet_rarity"]
         afkpet_lvl = setup_data["afkpet_lvl"]
@@ -1445,7 +1426,7 @@ class Calculator(tk.Tk):
                     spreading_info[item] = amount
                     drops_list[item] = 0
             if "replace" in upgrade_type:
-                replace_info.update(md.itemList[upgrade]["upgrade_special"]["list"])
+                replace_info.update(md.itemList[upgrade]["upgrade_special"]["replacement_list"])
         return spreading_info, replace_info
     
     def add_drops(self, item, amount, drops_list, spreading_info=None, replace_info=None):
@@ -1591,7 +1572,7 @@ class Calculator(tk.Tk):
         # the fuel cost is put into the item data to be used later in the general fuel cost calculator
         return
 
-    def apply_compactor(self, drops_list, compactor_list):
+    def apply_compactor(self, drops_list, compacting_list):
         """
         Applies given compacting rules to the drops list and returns a list of all compacted items
         
@@ -1604,40 +1585,36 @@ class Calculator(tk.Tk):
         compactables = list(drops_list.keys())
         while compactables:
             item = compactables.pop(0)
-            if item not in compactor_list:
+            if item not in compacting_list:
                 continue
             amount = drops_list[item]
-            per_compacted = compactor_list[item]["per"]
+            per_compacted = compacting_list[item]["per"]
             if amount < per_compacted:
                 continue
-            compacted_name = compactor_list[item]["makes"]
+            compacted_name = compacting_list[item]["makes"]
             compacted_amount = int(amount / per_compacted)
-            if "amount" in compactor_list[item]:
-                compacted_amount *= compactor_list[item]["amount"]
+            if "amount" in compacting_list[item]:
+                compacted_amount *= compacting_list[item]["amount"]
             left_over = amount % per_compacted
             drops_list[item] = left_over
             drops_list[compacted_name] = compacted_amount
-            compacted_items.append({"from": item, **compactor_list[item]})
-            if compacted_name in compactor_list:
+            compacted_items.append({"from": item, **compacting_list[item]})
+            if compacted_name in compacting_list:
                 compactables.append(compacted_name)
         return compacted_items
 
-    def get_compacted_drops(self, drops_list, upgrade_types):
+    def get_compacted_drops(self, drops_list, upgrades):
         """
         Gets compacted drops, returns a list of all compacted items
         
         :param drops_list: dict, all drops of the setup
-        :param upgrade_types: list, types of upgrades
+        :param upgrades: list, list of upgrades IDs
         :return compacted_items: list, IDs of items that got compacted
         """
         compacted_items = []
-        # Compactors
-        if "compact" in upgrade_types:
-            compacted_items.extend(self.apply_compactor(drops_list, md.compactorList))
-
-        # Super compactor
-        if "enchant" in upgrade_types:
-            compacted_items.extend(self.apply_compactor(drops_list, md.enchanterList))
+        for upgrade in upgrades:
+            if "compact" in md.itemList[upgrade]["upgrade_special"]["type"]:
+                compacted_items.extend(self.apply_compactor(drops_list, md.itemList[upgrade]["upgrade_special"]["compacting_list"]))
         return compacted_items
 
     def get_available_storage(self, minion, minion_tier, setup_data):
@@ -2151,7 +2128,6 @@ class Calculator(tk.Tk):
 
         # list upgrades types
         upgrades = [setup_data["upgrade1"], setup_data["upgrade2"]]
-        upgrade_types = self.get_upgrade_types(upgrades)
 
         # adding up minion speed bonus
         speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_data)
@@ -2187,7 +2163,7 @@ class Calculator(tk.Tk):
         self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data)
 
         # Apply compactors
-        compacted_items = self.get_compacted_drops(drops_list, upgrade_types)
+        compacted_items = self.get_compacted_drops(drops_list, upgrades)
 
         # storage calculations
         available_storage = self.get_available_storage(minion_type, minion_tier, setup_data)

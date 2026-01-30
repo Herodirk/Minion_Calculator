@@ -51,6 +51,177 @@ smelting_data = {
     'LOG:3': 'COAL'
 }
 
+
+#%% Compacting Lists
+
+compactor_list = {
+    'CUSTOM': { 'makes': 'COMPACTED_CUSTOM', 'amount': 2, 'per': 8 },
+    'GLOWSTONE_DUST': { 'makes': 'GLOWSTONE', 'per': 4 },
+    'CLAY_BALL': { 'makes': 'CLAY', 'per': 4 },
+    'CLAY_BRICK': { 'makes': 'BRICK', 'per': 4 },
+    'ICE': { 'makes': 'PACKED_ICE', 'per': 9 },
+    'SNOW_BALL': { 'makes': 'SNOW_BLOCK', 'per': 4 },
+    'COAL': { 'makes': 'COAL_BLOCK', 'per': 9 },
+    'IRON_INGOT': { 'makes': 'IRON_BLOCK', 'per': 9 },
+    'GOLD_INGOT': { 'makes': 'GOLD_BLOCK', 'per': 9 },
+    'DIAMOND': { 'makes': 'DIAMOND_BLOCK', 'per': 9 },
+    'INK_SACK:4': { 'makes': 'LAPIS_BLOCK', 'per': 9 },
+    'REDSTONE': { 'makes': 'REDSTONE_BLOCK', 'per': 9 },
+    'EMERALD': { 'makes': 'EMERALD_BLOCK', 'per': 9 },
+    'QUARTZ': { 'makes': 'QUARTZ_BLOCK', 'per': 4 },
+    # 'WHEAT': {'makes': 'HAY_BLOCK', 'per': 9},  # does not produce it anymore
+    'MELON': { 'makes': 'MELON_BLOCK', 'per': 9 },
+    'RED_MUSHROOM': { 'makes': 'HUGE_MUSHROOM_2', 'per': 9 },
+    'BROWN_MUSHROOM': { 'makes': 'HUGE_MUSHROOM_1', 'per': 9 },
+    'SLIME_BALL': { 'makes': 'SLIME_BLOCK', 'per': 9 }
+}
+
+super_compactor_list = {
+    'CUSTOM': { 'makes': 'ENCHANTED_CUSTOM', 'amount': 1, 'per': 160 },
+    'COMPACTED_CUSTOM': { 'makes': 'ENCHANTED_CUSTOM', 'amount': 4, 'per': 160 },
+    'LUSH_BERBERIS': { 'makes': 'ENCHANTED_LUSH_BERBERIS', 'per': 160 },
+    'RAW_SOULFLOW': { 'makes': 'SOULFLOW', 'per': 160 },
+    'SULPHUR_ORE': { 'makes': 'ENCHANTED_SULPHUR', 'per': 160 },
+    'ENCHANTED_SULPHUR': { 'makes': 'ENCHANTED_SULPHUR_CUBE', 'per': 160 },
+    'COBBLESTONE': { 'makes': 'ENCHANTED_COBBLESTONE', 'per': 160 },
+    'OBSIDIAN': { 'makes': 'ENCHANTED_OBSIDIAN', 'per': 160 },
+    'GLOWSTONE_DUST': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 160 },
+    'GLOWSTONE': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 40 },
+    'ENCHANTED_GLOWSTONE_DUST': { 'makes': 'ENCHANTED_GLOWSTONE', 'per': 160 },
+    'FLINT': { 'makes': 'ENCHANTED_FLINT', 'per': 160 },
+    'SAND': { 'makes': 'ENCHANTED_SAND', 'per': 160 },
+    'SAND:1': { 'makes': 'ENCHANTED_RED_SAND', 'per': 160 },
+    'ENCHANTED_RED_SAND': { 'makes': 'ENCHANTED_RED_SAND_CUBE', 'per': 160 },
+    'MYCEL': { 'makes': 'ENCHANTED_MYCELIUM', 'per': 160 },
+    'ENCHANTED_MYCELIUM': { 'makes': 'ENCHANTED_MYCELIUM_CUBE', 'per': 160 },
+    'CLAY_BALL': { 'makes': 'ENCHANTED_CLAY_BALL', 'per': 160 },
+    'ENCHANTED_CLAY_BALL': { 'makes': 'ENCHANTED_CLAY_BLOCK', 'per': 160 },
+    'CLAY': { 'makes': 'ENCHANTED_CLAY_BALL', 'amount': 4, 'per': 160 },
+    'ICE': { 'makes': 'ENCHANTED_ICE', 'per': 160 },
+    'PACKED_ICE': { 'makes': 'ENCHANTED_ICE', 'amount': 9, 'per': 160 },
+    'ENCHANTED_ICE': { 'makes': 'ENCHANTED_PACKED_ICE', 'per': 160 },
+    'SNOW_BALL': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 640 },
+    'SNOW_BLOCK': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 160 },
+    'COAL': { 'makes': 'ENCHANTED_COAL', 'per': 160 },
+    'COAL_BLOCK': { 'makes': 'ENCHANTED_COAL', 'amount': 9, 'per': 160 },
+    'ENCHANTED_COAL': { 'makes': 'ENCHANTED_COAL_BLOCK', 'per': 160 },
+    'IRON_INGOT': { 'makes': 'ENCHANTED_IRON', 'per': 160 },
+    'IRON_BLOCK': { 'makes': 'ENCHANTED_IRON', 'amount': 9, 'per': 160 },
+    'ENCHANTED_IRON': { 'makes': 'ENCHANTED_IRON_BLOCK', 'per': 160 },
+    'GOLD_INGOT': { 'makes': 'ENCHANTED_GOLD', 'per': 160 },
+    'GOLD_BLOCK': { 'makes': 'ENCHANTED_GOLD', 'amount': 9, 'per': 160 },
+    'ENCHANTED_GOLD': { 'makes': 'ENCHANTED_GOLD_BLOCK', 'per': 160 },
+    'DIAMOND': { 'makes': 'ENCHANTED_DIAMOND', 'per': 160 },
+    'DIAMOND_BLOCK': { 'makes': 'ENCHANTED_DIAMOND', 'amount': 9, 'per': 160 },
+    'ENCHANTED_DIAMOND': { 'makes': 'ENCHANTED_DIAMOND_BLOCK', 'per': 160 },
+    'INK_SACK:4': { 'makes': 'ENCHANTED_LAPIS_LAZULI', 'per': 160 },
+    'LAPIS_BLOCK': { 'makes': 'ENCHANTED_LAPIS_LAZULI', 'amount': 9, 'per': 160 },
+    'ENCHANTED_LAPIS_LAZULI': { 'makes': 'ENCHANTED_LAPIS_LAZULI_BLOCK', 'per': 160 },
+    'REDSTONE': { 'makes': 'ENCHANTED_REDSTONE', 'per': 160 },
+    'REDSTONE_BLOCK': { 'makes': 'ENCHANTED_REDSTONE', 'amount': 9, 'per': 160 },
+    'ENCHANTED_REDSTONE': { 'makes': 'ENCHANTED_REDSTONE_BLOCK', 'per': 160 },
+    'EMERALD': { 'makes': 'ENCHANTED_EMERALD', 'per': 160 },
+    'EMERALD_BLOCK': { 'makes': 'ENCHANTED_EMERALD', 'amount': 9, 'per': 160 },
+    'ENCHANTED_EMERALD': { 'makes': 'ENCHANTED_EMERALD_BLOCK', 'per': 160 },
+    'QUARTZ': { 'makes': 'ENCHANTED_QUARTZ', 'per': 160 },
+    'QUARTZ_BLOCK': { 'makes': 'ENCHANTED_QUARTZ', 'amount': 4, 'per': 160 },
+    'ENCHANTED_QUARTZ': { 'makes': 'ENCHANTED_QUARTZ_BLOCK', 'per': 160 },
+    'ENDER_STONE': { 'makes': 'ENCHANTED_ENDSTONE', 'per': 160 },
+    'MITHRIL_ORE': { 'makes': 'ENCHANTED_MITHRIL', 'per': 160 },
+    'HARD_STONE': { 'makes': 'ENCHANTED_HARD_STONE', 'per': 576 },
+    'ENCHANTED_HARD_STONE': { 'makes': 'CONCENTRATED_STONE', 'per': 576 },
+    'WHEAT': { 'makes': 'ENCHANTED_WHEAT', 'per': 160 },
+    # 'WHEAT': {'makes': 'ENCHANTED_BREAD', 'per': 60},  # does not produce it anymore
+    'ENCHANTED_WHEAT': { 'makes': 'ENCHANTED_HAY_BALE', 'per': 160 },
+    'SEEDS': { 'makes': 'ENCHANTED_SEEDS', 'per': 160 },
+    'ENCHANTED_SEEDS': { 'makes': 'BOX_OF_SEEDS', 'per': 160 },
+    'MELON': { 'makes': 'ENCHANTED_MELON', 'per': 160 },
+    'MELON_BLOCK': { 'makes': 'ENCHANTED_MELON', 'amount': 9, 'per': 160 },
+    'ENCHANTED_MELON': { 'makes': 'ENCHANTED_MELON_BLOCK', 'per': 160 },
+    'PUMPKIN': { 'makes': 'ENCHANTED_PUMPKIN', 'per': 160 },
+    'ENCHANTED_PUMPKIN': { 'makes': 'POLISHED_PUMPKIN', 'per': 160 },
+    'CARROT_ITEM': { 'makes': 'ENCHANTED_CARROT', 'per': 160 },
+    'ENCHANTED_CARROT': { 'makes': 'ENCHANTED_GOLDEN_CARROT', 'per': 160 },
+    'POTATO_ITEM': { 'makes': 'ENCHANTED_POTATO', 'per': 160 },
+    'ENCHANTED_POTATO': { 'makes': 'ENCHANTED_BAKED_POTATO', 'per': 160 },
+    'RED_MUSHROOM': { 'makes': 'ENCHANTED_RED_MUSHROOM', 'per': 160 },
+    'BROWN_MUSHROOM': { 'makes': 'ENCHANTED_BROWN_MUSHROOM', 'per': 160 },
+    'HUGE_MUSHROOM_2': { 'makes': 'ENCHANTED_RED_MUSHROOM', 'amount': 9, 'per': 160 },
+    'HUGE_MUSHROOM_1': { 'makes': 'ENCHANTED_BROWN_MUSHROOM', 'amount': 9, 'per': 160 },
+    'ENCHANTED_RED_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_2', 'per': 160 },  # correct (2025-12-22)
+    'ENCHANTED_BROWN_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_1', 'per': 160 },  # correct (2025-12-22)
+    'INK_SACK:2': { 'makes': 'ENCHANTED_CACTUS_GREEN', 'per': 160 },
+    'CACTUS': { 'makes': 'ENCHANTED_CACTUS_GREEN', 'per': 160 },  # correct (2025-12-17)
+    'ENCHANTED_CACTUS_GREEN': { 'makes': 'ENCHANTED_CACTUS', 'per': 160 },
+    'INK_SACK:3': { 'makes': 'ENCHANTED_COCOA', 'per': 160 },
+    'ENCHANTED_COCOA': { 'makes': 'ENCHANTED_COOKIE', 'per': 160 },  # correct (2025-12-19)
+    'SUGAR_CANE': { 'makes': 'ENCHANTED_SUGAR', 'per': 160 },
+    'ENCHANTED_SUGAR': { 'makes': 'ENCHANTED_SUGAR_CANE', 'per': 160 },
+    'NETHER_STALK': { 'makes': 'ENCHANTED_NETHER_STALK', 'per': 160 },
+    'ENCHANTED_NETHER_STALK': { 'makes': 'MUTANT_NETHER_STALK', 'per': 160 },
+    'YELLOW_FLOWER': { 'makes': 'ENCHANTED_DANDELION', 'per': 160 },
+    'RED_ROSE': { 'makes': 'ENCHANTED_POPPY', 'per': 576 },
+    'WILD_ROSE': { 'makes': 'ENCHANTED_WILD_ROSE', 'per': 160 },
+    'ENCHANTED_WILD_ROSE': { 'makes': 'COMPACTED_WILD_ROSE', 'per': 160 },
+    'DOUBLE_PLANT': { 'makes': 'ENCHANTED_SUNFLOWER', 'per': 160 },
+    'ENCHANTED_SUNFLOWER': { 'makes': 'COMPACTED_SUNFLOWER', 'per': 160 },
+    'MOONFLOWER': { 'makes': 'ENCHANTED_MOONFLOWER', 'per': 160 },
+    'ENCHANTED_MOONFLOWER': { 'makes': 'COMPACTED_MOONFLOWER', 'per': 160 },
+    'RAW_FISH': { 'makes': 'ENCHANTED_RAW_FISH', 'per': 160 },
+    'RAW_FISH:1': { 'makes': 'ENCHANTED_RAW_SALMON', 'per': 160 },
+    'RAW_FISH:3': { 'makes': 'ENCHANTED_PUFFERFISH', 'per': 160 },
+    'RAW_FISH:2': { 'makes': 'ENCHANTED_CLOWNFISH', 'per': 160 },
+    'PRISMARINE_CRYSTALS': { 'makes': 'ENCHANTED_PRISMARINE_CRYSTALS', 'per': 80 },
+    'PRISMARINE_SHARD': { 'makes': 'ENCHANTED_PRISMARINE_SHARD', 'per': 80 },
+    'SPONGE': { 'makes': 'ENCHANTED_SPONGE', 'per': 40 },
+    'ENCHANTED_RAW_FISH': { 'makes': 'ENCHANTED_COOKED_FISH', 'per': 160 },
+    'ENCHANTED_RAW_SALMON': { 'makes': 'ENCHANTED_COOKED_SALMON', 'per': 160 },
+    'ENCHANTED_SPONGE': { 'makes': 'ENCHANTED_WET_SPONGE', 'per': 40 },
+    'ROTTEN_FLESH': { 'makes': 'ENCHANTED_ROTTEN_FLESH', 'per': 160 },
+    'POISONOUS_POTATO': { 'makes': 'ENCHANTED_POISONOUS_POTATO', 'per': 160 },
+    'ENCHANTED_ENDER_PEARL': { 'makes': 'ABSOLUTE_ENDER_PEARL', 'per': 80 },
+    'CRUDE_GABAGOOL': { 'makes': 'VERY_CRUDE_GABAGOOL', 'per': 192 },  # correct
+    # 'CHILI_PEPPER': {'makes': 'STUFFED_CHILI_PEPPER', 'per': 160},  # does not compact
+    'HEMOVIBE': { 'makes': 'HEMOGLASS', 'per': 160 },
+    # 'HEMOGLASS': {'makes': 'HEMOBOMB', 'per': 15},  # does not compact
+    'BONE': { 'makes': 'ENCHANTED_BONE', 'per': 160 },
+    'SULPHUR': { 'makes': 'ENCHANTED_GUNPOWDER', 'per': 160 },
+    'STRING': { 'makes': 'ENCHANTED_STRING', 'per': 160 },
+    'SPIDER_EYE': { 'makes': 'ENCHANTED_SPIDER_EYE', 'per': 160 },
+    'BLAZE_ROD': { 'makes': 'ENCHANTED_BLAZE_POWDER', 'per': 160 },
+    'ENCHANTED_BLAZE_POWDER': { 'makes': 'ENCHANTED_BLAZE_ROD', 'per': 160 },
+    'MAGMA_CREAM': { 'makes': 'ENCHANTED_MAGMA_CREAM', 'per': 160 },
+    'ENCHANTED_MAGMA_CREAM': { 'makes': 'WHIPPED_MAGMA_CREAM', 'per': 160 },
+    'ENDER_PEARL': { 'makes': 'ENCHANTED_ENDER_PEARL', 'per': 20 },
+    'GHAST_TEAR': { 'makes': 'ENCHANTED_GHAST_TEAR', 'per': 5 },
+    'SLIME_BALL': { 'makes': 'ENCHANTED_SLIME_BALL', 'per': 160 },
+    'SLIME_BLOCK': { 'makes': 'ENCHANTED_SLIME_BALL', 'amount': 9, 'per': 160 },
+    'ENCHANTED_SLIME_BALL': { 'makes': 'ENCHANTED_SLIME_BLOCK', 'per': 160 },
+    'RAW_BEEF': { 'makes': 'ENCHANTED_RAW_BEEF', 'per': 160 },
+    'LEATHER': { 'makes': 'ENCHANTED_LEATHER', 'per': 160 },
+    'PORK': { 'makes': 'ENCHANTED_PORK', 'per': 160 },
+    'ENCHANTED_PORK': { 'makes': 'ENCHANTED_GRILLED_PORK', 'per': 160 },
+    'RAW_CHICKEN': { 'makes': 'ENCHANTED_RAW_CHICKEN', 'per': 160 },
+    'FEATHER': { 'makes': 'ENCHANTED_FEATHER', 'per': 160 },
+    'EGG': { 'makes': 'ENCHANTED_EGG', 'per': 144 },
+    'ENCHANTED_EGG': { 'makes': 'SUPER_EGG', 'per': 144 },
+    'SUPER_EGG': { 'makes': 'OMEGA_EGG', 'per': 9 },  # correct
+    'WOOL': { 'makes': 'ENCHANTED_WOOL', 'per': 160 },
+    'MUTTON': { 'makes': 'ENCHANTED_MUTTON', 'per': 160 },
+    'ENCHANTED_MUTTON': { 'makes': 'ENCHANTED_COOKED_MUTTON', 'per': 160 },
+    'RABBIT': { 'makes': 'ENCHANTED_RABBIT', 'per': 160 },
+    'ENCHANTED_RABBIT': { 'makes': 'ENCHANTED_COOKED_RABBIT', 'per': 160 },
+    'RABBIT_FOOT': { 'makes': 'ENCHANTED_RABBIT_FOOT', 'per': 160 },
+    'RABBIT_HIDE': { 'makes': 'ENCHANTED_RABBIT_HIDE', 'per': 160 },
+    'LOG': { 'makes': 'ENCHANTED_OAK_LOG', 'per': 160 },
+    'LOG:1': { 'makes': 'ENCHANTED_SPRUCE_LOG', 'per': 160 },
+    'LOG:2': { 'makes': 'ENCHANTED_BIRCH_LOG', 'per': 160 },
+    'LOG_2:1': { 'makes': 'ENCHANTED_DARK_OAK_LOG', 'per': 160 },
+    'LOG_2': { 'makes': 'ENCHANTED_ACACIA_LOG', 'per': 160 },
+    'LOG:3': { 'makes': 'ENCHANTED_JUNGLE_LOG', 'per': 160 }
+}
+
+
 #%% item list
 
 itemList = {
@@ -1477,7 +1648,7 @@ itemList = {
         "speed_boost": 35,
         "drop_multiplier": 1,
         "fuel_duration": -1,
-        "upgrade_special": {"type": "speed_bonus", "amount": 5, "affected_minions": []},
+        "upgrade_special": {"type": "speed_bonus", "amount": 5, "affected_minions": ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime"]},  # TODO: need to check affected minions
         "prices": {},
         "recipe": {"PLASMA_BUCKET": 1, "FLAMES": 16, "ENCHANTED_SULPHUR_CUBE": 2, "ENCHANTED_RED_SAND_CUBE": 2},
     },
@@ -1527,28 +1698,28 @@ itemList = {
         'display': 'Auto Smelter',
         "speed_boost": 0,
         "drop_multiplier": 1,
-        "upgrade_special": { "type": "replace", "list": smelting_data },
+        "upgrade_special": { "type": "replace", "replacement_list": smelting_data },
         "prices": {},
     },
     'COMPACTOR': {
         'display': 'Compactor',
         "speed_boost": 0,
         "drop_multiplier": 1,
-        "upgrade_special": { "type": "compact" },
+        "upgrade_special": { "type": "compact", "compacting_list": compactor_list },
         "prices": {},
     },
     'SUPER_COMPACTOR_3000': {
         'display': 'Super Compactor 3000',
         "speed_boost": 0,
         "drop_multiplier": 1,
-        "upgrade_special": { "type": "enchant" },
+        "upgrade_special": { "type": "compact", "compacting_list": super_compactor_list },
         "prices": {},
     },
     'DWARVEN_COMPACTOR': {
         'display': 'Dwarven Super Compactor',
         "speed_boost": 0,
         "drop_multiplier": 1,
-        "upgrade_special": { "type": "replace, enchant", "list": smelting_data },
+        "upgrade_special": { "type": "replace, compact", "replacement_list": smelting_data, "compacting_list": super_compactor_list },
         "prices": {},
     },
     'DIAMOND_SPREADING': {
@@ -1576,7 +1747,7 @@ itemList = {
         'display': 'Flint Shovel',
         "speed_boost": 0,
         "drop_multiplier": 1,
-        "upgrade_special": { "type": "replace", "list": { "GRAVEL": "FLINT" } },
+        "upgrade_special": { "type": "replace", "replacement_list": { "GRAVEL": "FLINT" } },
         "prices": {},
         "recipe": {"FLINT": 10},  # +/- 2 sticks
     },
@@ -1644,7 +1815,7 @@ itemList = {
         'display': "Hunter Knife",
         "speed_boost": 0,
         "drop_multiplier": 1,
-        "upgrade_special": { "type": "replace", "list": { "POTATO_ITEM": "FRENCH_FRIES" } },
+        "upgrade_special": { "type": "replace", "replacement_list": { "POTATO_ITEM": "FRENCH_FRIES" } },
         "prices": { "custom": 500000 },  # 500k from Rusty
     },
 
@@ -1997,21 +2168,8 @@ itemList = {
     },
 }
 
-#%% Inferno minion List
 
-inferno_fuel_grade_options = {
-    'Hypergolic Gabagool': 'HYPERGOLIC_GABAGOOL',
-    'Heavy Gabagool': 'HEAVY_GABAGOOL',
-    'Fuel Gabagool': 'FUEL_GABAGOOL',
-}
-
-inferno_fuel_distillate_options = {
-    'Magma Cream Distillate': 'MAGMA_CREAM_DISTILLATE',
-    'Blaze Rod Distillate': 'BLAZE_ROD_DISTILLATE',
-    'Nether Wart Distillate': 'NETHER_STALK_DISTILLATE',
-    'Glowstone Distillate': 'GLOWSTONE_DUST_DISTILLATE',
-    'Gabagool Distillate': 'CRUDE_GABAGOOL_DISTILLATE',
-}
+#%% Other data
 
 inferno_fuel_data = {
     'grades': { 'HYPERGOLIC_GABAGOOL': 20, 'HEAVY_GABAGOOL': 15, 'FUEL_GABAGOOL': 10 },
@@ -2031,8 +2189,6 @@ inferno_fuel_data = {
     }
 }
 
-#%% Option lists with display to ID translator
-
 getID = {
     'Oak Log': 'LOG',
     'Spruce Log': 'LOG:1',
@@ -2040,6 +2196,35 @@ getID = {
     'Dark Oak Log': 'LOG_2:1',
     'Acacia Log': 'LOG_2',
     'Jungle Log': 'LOG:3',
+}
+
+standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10: 15, 11: 15, 12: 15 }
+
+affected_by_cole = ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Ice', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril']
+
+attribute_shards = {
+    "Common": { 1: 1, 2: 4, 3: 9, 4: 15, 5: 22, 6: 30, 7: 40, 8: 54, 9: 72, 10: 96 },
+    "Uncommon": { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15, 6: 21, 7: 28, 8: 36, 9: 48, 10: 64 },
+    "Rare": { 1: 1, 2: 3, 3: 6, 4: 9, 5: 13, 6: 17, 7: 22, 8: 28, 9: 36, 10: 48 },
+    "Epic": { 1: 1, 2: 2, 3: 4, 4: 6, 5: 9, 6: 12, 7: 16, 8: 20, 9: 25, 10: 32 },
+    "Legendary": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 7, 6: 9, 7: 12, 8: 15, 9: 19, 10: 24 }
+}
+
+
+#%% Option Lists
+
+inferno_fuel_grade_options = {
+    'Hypergolic Gabagool': 'HYPERGOLIC_GABAGOOL',
+    'Heavy Gabagool': 'HEAVY_GABAGOOL',
+    'Fuel Gabagool': 'FUEL_GABAGOOL',
+}
+
+inferno_fuel_distillate_options = {
+    'Magma Cream Distillate': 'MAGMA_CREAM_DISTILLATE',
+    'Blaze Rod Distillate': 'BLAZE_ROD_DISTILLATE',
+    'Nether Wart Distillate': 'NETHER_STALK_DISTILLATE',
+    'Glowstone Distillate': 'GLOWSTONE_DUST_DISTILLATE',
+    'Gabagool Distillate': 'CRUDE_GABAGOOL_DISTILLATE',
 }
 
 fuel_options = {
@@ -2087,182 +2272,6 @@ upgrade_options = {
     "Hunter Knife": "HUNTER_KNIFE"
 }
 
-#%% Compactor List
-
-
-compactorList = {
-    'CUSTOM': { 'makes': 'COMPACTED_CUSTOM', 'amount': 2, 'per': 8 },
-    'GLOWSTONE_DUST': { 'makes': 'GLOWSTONE', 'per': 4 },
-    'CLAY_BALL': { 'makes': 'CLAY', 'per': 4 },
-    'CLAY_BRICK': { 'makes': 'BRICK', 'per': 4 },
-    'ICE': { 'makes': 'PACKED_ICE', 'per': 9 },
-    'SNOW_BALL': { 'makes': 'SNOW_BLOCK', 'per': 4 },
-    'COAL': { 'makes': 'COAL_BLOCK', 'per': 9 },
-    'IRON_INGOT': { 'makes': 'IRON_BLOCK', 'per': 9 },
-    'GOLD_INGOT': { 'makes': 'GOLD_BLOCK', 'per': 9 },
-    'DIAMOND': { 'makes': 'DIAMOND_BLOCK', 'per': 9 },
-    'INK_SACK:4': { 'makes': 'LAPIS_BLOCK', 'per': 9 },
-    'REDSTONE': { 'makes': 'REDSTONE_BLOCK', 'per': 9 },
-    'EMERALD': { 'makes': 'EMERALD_BLOCK', 'per': 9 },
-    'QUARTZ': { 'makes': 'QUARTZ_BLOCK', 'per': 4 },
-    # 'WHEAT': {'makes': 'HAY_BLOCK', 'per': 9},  # does not produce it anymore
-    'MELON': { 'makes': 'MELON_BLOCK', 'per': 9 },
-    'RED_MUSHROOM': { 'makes': 'HUGE_MUSHROOM_2', 'per': 9 },
-    'BROWN_MUSHROOM': { 'makes': 'HUGE_MUSHROOM_1', 'per': 9 },
-    'SLIME_BALL': { 'makes': 'SLIME_BLOCK', 'per': 9 }
-}
-
-#%% Enchanter List (Super Compactor 3000 and Dwarven Super Compactor)
-
-
-enchanterList = {
-    'CUSTOM': { 'makes': 'ENCHANTED_CUSTOM', 'amount': 1, 'per': 160 },
-    'COMPACTED_CUSTOM': { 'makes': 'ENCHANTED_CUSTOM', 'amount': 4, 'per': 160 },
-    'LUSH_BERBERIS': { 'makes': 'ENCHANTED_LUSH_BERBERIS', 'per': 160 },
-    'RAW_SOULFLOW': { 'makes': 'SOULFLOW', 'per': 160 },
-    'SULPHUR_ORE': { 'makes': 'ENCHANTED_SULPHUR', 'per': 160 },
-    'ENCHANTED_SULPHUR': { 'makes': 'ENCHANTED_SULPHUR_CUBE', 'per': 160 },
-    'COBBLESTONE': { 'makes': 'ENCHANTED_COBBLESTONE', 'per': 160 },
-    'OBSIDIAN': { 'makes': 'ENCHANTED_OBSIDIAN', 'per': 160 },
-    'GLOWSTONE_DUST': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 160 },
-    'GLOWSTONE': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 40 },
-    'ENCHANTED_GLOWSTONE_DUST': { 'makes': 'ENCHANTED_GLOWSTONE', 'per': 160 },
-    'FLINT': { 'makes': 'ENCHANTED_FLINT', 'per': 160 },
-    'SAND': { 'makes': 'ENCHANTED_SAND', 'per': 160 },
-    'SAND:1': { 'makes': 'ENCHANTED_RED_SAND', 'per': 160 },
-    'ENCHANTED_RED_SAND': { 'makes': 'ENCHANTED_RED_SAND_CUBE', 'per': 160 },
-    'MYCEL': { 'makes': 'ENCHANTED_MYCELIUM', 'per': 160 },
-    'ENCHANTED_MYCELIUM': { 'makes': 'ENCHANTED_MYCELIUM_CUBE', 'per': 160 },
-    'CLAY_BALL': { 'makes': 'ENCHANTED_CLAY_BALL', 'per': 160 },
-    'ENCHANTED_CLAY_BALL': { 'makes': 'ENCHANTED_CLAY_BLOCK', 'per': 160 },
-    'CLAY': { 'makes': 'ENCHANTED_CLAY_BALL', 'amount': 4, 'per': 160 },
-    'ICE': { 'makes': 'ENCHANTED_ICE', 'per': 160 },
-    'PACKED_ICE': { 'makes': 'ENCHANTED_ICE', 'amount': 9, 'per': 160 },
-    'ENCHANTED_ICE': { 'makes': 'ENCHANTED_PACKED_ICE', 'per': 160 },
-    'SNOW_BALL': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 640 },
-    'SNOW_BLOCK': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 160 },
-    'COAL': { 'makes': 'ENCHANTED_COAL', 'per': 160 },
-    'COAL_BLOCK': { 'makes': 'ENCHANTED_COAL', 'amount': 9, 'per': 160 },
-    'ENCHANTED_COAL': { 'makes': 'ENCHANTED_COAL_BLOCK', 'per': 160 },
-    'IRON_INGOT': { 'makes': 'ENCHANTED_IRON', 'per': 160 },
-    'IRON_BLOCK': { 'makes': 'ENCHANTED_IRON', 'amount': 9, 'per': 160 },
-    'ENCHANTED_IRON': { 'makes': 'ENCHANTED_IRON_BLOCK', 'per': 160 },
-    'GOLD_INGOT': { 'makes': 'ENCHANTED_GOLD', 'per': 160 },
-    'GOLD_BLOCK': { 'makes': 'ENCHANTED_GOLD', 'amount': 9, 'per': 160 },
-    'ENCHANTED_GOLD': { 'makes': 'ENCHANTED_GOLD_BLOCK', 'per': 160 },
-    'DIAMOND': { 'makes': 'ENCHANTED_DIAMOND', 'per': 160 },
-    'DIAMOND_BLOCK': { 'makes': 'ENCHANTED_DIAMOND', 'amount': 9, 'per': 160 },
-    'ENCHANTED_DIAMOND': { 'makes': 'ENCHANTED_DIAMOND_BLOCK', 'per': 160 },
-    'INK_SACK:4': { 'makes': 'ENCHANTED_LAPIS_LAZULI', 'per': 160 },
-    'LAPIS_BLOCK': { 'makes': 'ENCHANTED_LAPIS_LAZULI', 'amount': 9, 'per': 160 },
-    'ENCHANTED_LAPIS_LAZULI': { 'makes': 'ENCHANTED_LAPIS_LAZULI_BLOCK', 'per': 160 },
-    'REDSTONE': { 'makes': 'ENCHANTED_REDSTONE', 'per': 160 },
-    'REDSTONE_BLOCK': { 'makes': 'ENCHANTED_REDSTONE', 'amount': 9, 'per': 160 },
-    'ENCHANTED_REDSTONE': { 'makes': 'ENCHANTED_REDSTONE_BLOCK', 'per': 160 },
-    'EMERALD': { 'makes': 'ENCHANTED_EMERALD', 'per': 160 },
-    'EMERALD_BLOCK': { 'makes': 'ENCHANTED_EMERALD', 'amount': 9, 'per': 160 },
-    'ENCHANTED_EMERALD': { 'makes': 'ENCHANTED_EMERALD_BLOCK', 'per': 160 },
-    'QUARTZ': { 'makes': 'ENCHANTED_QUARTZ', 'per': 160 },
-    'QUARTZ_BLOCK': { 'makes': 'ENCHANTED_QUARTZ', 'amount': 4, 'per': 160 },
-    'ENCHANTED_QUARTZ': { 'makes': 'ENCHANTED_QUARTZ_BLOCK', 'per': 160 },
-    'ENDER_STONE': { 'makes': 'ENCHANTED_ENDSTONE', 'per': 160 },
-    'MITHRIL_ORE': { 'makes': 'ENCHANTED_MITHRIL', 'per': 160 },
-    'HARD_STONE': { 'makes': 'ENCHANTED_HARD_STONE', 'per': 576 },
-    'ENCHANTED_HARD_STONE': { 'makes': 'CONCENTRATED_STONE', 'per': 576 },
-    'WHEAT': { 'makes': 'ENCHANTED_WHEAT', 'per': 160 },
-    # 'WHEAT': {'makes': 'ENCHANTED_BREAD', 'per': 60},  # does not produce it anymore
-    'ENCHANTED_WHEAT': { 'makes': 'ENCHANTED_HAY_BALE', 'per': 160 },
-    'SEEDS': { 'makes': 'ENCHANTED_SEEDS', 'per': 160 },
-    'ENCHANTED_SEEDS': { 'makes': 'BOX_OF_SEEDS', 'per': 160 },
-    'MELON': { 'makes': 'ENCHANTED_MELON', 'per': 160 },
-    'MELON_BLOCK': { 'makes': 'ENCHANTED_MELON', 'amount': 9, 'per': 160 },
-    'ENCHANTED_MELON': { 'makes': 'ENCHANTED_MELON_BLOCK', 'per': 160 },
-    'PUMPKIN': { 'makes': 'ENCHANTED_PUMPKIN', 'per': 160 },
-    'ENCHANTED_PUMPKIN': { 'makes': 'POLISHED_PUMPKIN', 'per': 160 },
-    'CARROT_ITEM': { 'makes': 'ENCHANTED_CARROT', 'per': 160 },
-    'ENCHANTED_CARROT': { 'makes': 'ENCHANTED_GOLDEN_CARROT', 'per': 160 },
-    'POTATO_ITEM': { 'makes': 'ENCHANTED_POTATO', 'per': 160 },
-    'ENCHANTED_POTATO': { 'makes': 'ENCHANTED_BAKED_POTATO', 'per': 160 },
-    'RED_MUSHROOM': { 'makes': 'ENCHANTED_RED_MUSHROOM', 'per': 160 },
-    'BROWN_MUSHROOM': { 'makes': 'ENCHANTED_BROWN_MUSHROOM', 'per': 160 },
-    'HUGE_MUSHROOM_2': { 'makes': 'ENCHANTED_RED_MUSHROOM', 'amount': 9, 'per': 160 },
-    'HUGE_MUSHROOM_1': { 'makes': 'ENCHANTED_BROWN_MUSHROOM', 'amount': 9, 'per': 160 },
-    'ENCHANTED_RED_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_2', 'per': 160 },  # correct (2025-12-22)
-    'ENCHANTED_BROWN_MUSHROOM': { 'makes': 'ENCHANTED_HUGE_MUSHROOM_1', 'per': 160 },  # correct (2025-12-22)
-    'INK_SACK:2': { 'makes': 'ENCHANTED_CACTUS_GREEN', 'per': 160 },
-    'CACTUS': { 'makes': 'ENCHANTED_CACTUS_GREEN', 'per': 160 },  # correct (2025-12-17)
-    'ENCHANTED_CACTUS_GREEN': { 'makes': 'ENCHANTED_CACTUS', 'per': 160 },
-    'INK_SACK:3': { 'makes': 'ENCHANTED_COCOA', 'per': 160 },
-    'ENCHANTED_COCOA': { 'makes': 'ENCHANTED_COOKIE', 'per': 160 },  # correct (2025-12-19)
-    'SUGAR_CANE': { 'makes': 'ENCHANTED_SUGAR', 'per': 160 },
-    'ENCHANTED_SUGAR': { 'makes': 'ENCHANTED_SUGAR_CANE', 'per': 160 },
-    'NETHER_STALK': { 'makes': 'ENCHANTED_NETHER_STALK', 'per': 160 },
-    'ENCHANTED_NETHER_STALK': { 'makes': 'MUTANT_NETHER_STALK', 'per': 160 },
-    'YELLOW_FLOWER': { 'makes': 'ENCHANTED_DANDELION', 'per': 160 },
-    'RED_ROSE': { 'makes': 'ENCHANTED_POPPY', 'per': 576 },
-    'WILD_ROSE': { 'makes': 'ENCHANTED_WILD_ROSE', 'per': 160 },
-    'ENCHANTED_WILD_ROSE': { 'makes': 'COMPACTED_WILD_ROSE', 'per': 160 },
-    'DOUBLE_PLANT': { 'makes': 'ENCHANTED_SUNFLOWER', 'per': 160 },
-    'ENCHANTED_SUNFLOWER': { 'makes': 'COMPACTED_SUNFLOWER', 'per': 160 },
-    'MOONFLOWER': { 'makes': 'ENCHANTED_MOONFLOWER', 'per': 160 },
-    'ENCHANTED_MOONFLOWER': { 'makes': 'COMPACTED_MOONFLOWER', 'per': 160 },
-    'RAW_FISH': { 'makes': 'ENCHANTED_RAW_FISH', 'per': 160 },
-    'RAW_FISH:1': { 'makes': 'ENCHANTED_RAW_SALMON', 'per': 160 },
-    'RAW_FISH:3': { 'makes': 'ENCHANTED_PUFFERFISH', 'per': 160 },
-    'RAW_FISH:2': { 'makes': 'ENCHANTED_CLOWNFISH', 'per': 160 },
-    'PRISMARINE_CRYSTALS': { 'makes': 'ENCHANTED_PRISMARINE_CRYSTALS', 'per': 80 },
-    'PRISMARINE_SHARD': { 'makes': 'ENCHANTED_PRISMARINE_SHARD', 'per': 80 },
-    'SPONGE': { 'makes': 'ENCHANTED_SPONGE', 'per': 40 },
-    'ENCHANTED_RAW_FISH': { 'makes': 'ENCHANTED_COOKED_FISH', 'per': 160 },
-    'ENCHANTED_RAW_SALMON': { 'makes': 'ENCHANTED_COOKED_SALMON', 'per': 160 },
-    'ENCHANTED_SPONGE': { 'makes': 'ENCHANTED_WET_SPONGE', 'per': 40 },
-    'ROTTEN_FLESH': { 'makes': 'ENCHANTED_ROTTEN_FLESH', 'per': 160 },
-    'POISONOUS_POTATO': { 'makes': 'ENCHANTED_POISONOUS_POTATO', 'per': 160 },
-    'ENCHANTED_ENDER_PEARL': { 'makes': 'ABSOLUTE_ENDER_PEARL', 'per': 80 },
-    'CRUDE_GABAGOOL': { 'makes': 'VERY_CRUDE_GABAGOOL', 'per': 192 },  # correct
-    # 'CHILI_PEPPER': {'makes': 'STUFFED_CHILI_PEPPER', 'per': 160},  # does not compact
-    'HEMOVIBE': { 'makes': 'HEMOGLASS', 'per': 160 },
-    # 'HEMOGLASS': {'makes': 'HEMOBOMB', 'per': 15},  # does not compact
-    'BONE': { 'makes': 'ENCHANTED_BONE', 'per': 160 },
-    'SULPHUR': { 'makes': 'ENCHANTED_GUNPOWDER', 'per': 160 },
-    'STRING': { 'makes': 'ENCHANTED_STRING', 'per': 160 },
-    'SPIDER_EYE': { 'makes': 'ENCHANTED_SPIDER_EYE', 'per': 160 },
-    'BLAZE_ROD': { 'makes': 'ENCHANTED_BLAZE_POWDER', 'per': 160 },
-    'ENCHANTED_BLAZE_POWDER': { 'makes': 'ENCHANTED_BLAZE_ROD', 'per': 160 },
-    'MAGMA_CREAM': { 'makes': 'ENCHANTED_MAGMA_CREAM', 'per': 160 },
-    'ENCHANTED_MAGMA_CREAM': { 'makes': 'WHIPPED_MAGMA_CREAM', 'per': 160 },
-    'ENDER_PEARL': { 'makes': 'ENCHANTED_ENDER_PEARL', 'per': 20 },
-    'GHAST_TEAR': { 'makes': 'ENCHANTED_GHAST_TEAR', 'per': 5 },
-    'SLIME_BALL': { 'makes': 'ENCHANTED_SLIME_BALL', 'per': 160 },
-    'SLIME_BLOCK': { 'makes': 'ENCHANTED_SLIME_BALL', 'amount': 9, 'per': 160 },
-    'ENCHANTED_SLIME_BALL': { 'makes': 'ENCHANTED_SLIME_BLOCK', 'per': 160 },
-    'RAW_BEEF': { 'makes': 'ENCHANTED_RAW_BEEF', 'per': 160 },
-    'LEATHER': { 'makes': 'ENCHANTED_LEATHER', 'per': 160 },
-    'PORK': { 'makes': 'ENCHANTED_PORK', 'per': 160 },
-    'ENCHANTED_PORK': { 'makes': 'ENCHANTED_GRILLED_PORK', 'per': 160 },
-    'RAW_CHICKEN': { 'makes': 'ENCHANTED_RAW_CHICKEN', 'per': 160 },
-    'FEATHER': { 'makes': 'ENCHANTED_FEATHER', 'per': 160 },
-    'EGG': { 'makes': 'ENCHANTED_EGG', 'per': 144 },
-    'ENCHANTED_EGG': { 'makes': 'SUPER_EGG', 'per': 144 },
-    'SUPER_EGG': { 'makes': 'OMEGA_EGG', 'per': 9 },  # correct
-    'WOOL': { 'makes': 'ENCHANTED_WOOL', 'per': 160 },
-    'MUTTON': { 'makes': 'ENCHANTED_MUTTON', 'per': 160 },
-    'ENCHANTED_MUTTON': { 'makes': 'ENCHANTED_COOKED_MUTTON', 'per': 160 },
-    'RABBIT': { 'makes': 'ENCHANTED_RABBIT', 'per': 160 },
-    'ENCHANTED_RABBIT': { 'makes': 'ENCHANTED_COOKED_RABBIT', 'per': 160 },
-    'RABBIT_FOOT': { 'makes': 'ENCHANTED_RABBIT_FOOT', 'per': 160 },
-    'RABBIT_HIDE': { 'makes': 'ENCHANTED_RABBIT_HIDE', 'per': 160 },
-    'LOG': { 'makes': 'ENCHANTED_OAK_LOG', 'per': 160 },
-    'LOG:1': { 'makes': 'ENCHANTED_SPRUCE_LOG', 'per': 160 },
-    'LOG:2': { 'makes': 'ENCHANTED_BIRCH_LOG', 'per': 160 },
-    'LOG_2:1': { 'makes': 'ENCHANTED_DARK_OAK_LOG', 'per': 160 },
-    'LOG_2': { 'makes': 'ENCHANTED_ACACIA_LOG', 'per': 160 },
-    'LOG:3': { 'makes': 'ENCHANTED_JUNGLE_LOG', 'per': 160 }
-}
-
-
-#%% pet xp boost items
-
 pet_exp_boost_options = {
     "None": "NONE",
     "Common Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_COMMON",
@@ -2286,8 +2295,6 @@ pet_exp_boost_options = {
     "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST",
 }
 
-#%% Floating Crystals
-
 floating_crystal_options = {
     "None": "NONE",
     "Farm Crystal": "FARM_CRYSTAL",
@@ -2297,8 +2304,6 @@ floating_crystal_options = {
     "Mithril + Winter Crystal": "MITHRIL_WINTER_CRYSTAL"
 }
 
-#%% Minion Storage
-
 chest_options = {
     "None": "NONE",
     "Small Storage": "SMALL_ENCHANTED_CHEST",
@@ -2307,11 +2312,6 @@ chest_options = {
     "X-Large Storage": "XLARGE_ENCHANTED_CHEST",
     "XX-Large Storage": "XXLARGE_ENCHANTED_CHEST",
 }
-
-standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10: 15, 11: 15, 12: 15 }
-
-
-#%% Hoppers
 
 hopper_options = {
     "None": "NONE",
@@ -2334,11 +2334,8 @@ potato_accessory_options = {
     "Potato Ring": "POTATO_RING"
 }
 
-#%% Mayors
 
-affected_by_cole = ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Ice', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril']
-
-#%% Minion boosting pets
+#%% Pets
 
 # name pet: {valid rarities: [boost base, added boost per level], "affects": [affected minions]}
 boost_pets = {
@@ -2377,20 +2374,6 @@ boost_pets = {
         "affects": ["Spider", "Tarantula", "Cave Spider"]
     }
 }
-
-
-#%% Attribute shards
-
-attribute_shards = {
-    "Common": { 1: 1, 2: 4, 3: 9, 4: 15, 5: 22, 6: 30, 7: 40, 8: 54, 9: 72, 10: 96 },
-    "Uncommon": { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15, 6: 21, 7: 28, 8: 36, 9: 48, 10: 64 },
-    "Rare": { 1: 1, 2: 3, 3: 6, 4: 9, 5: 13, 6: 17, 7: 22, 8: 28, 9: 36, 10: 48 },
-    "Epic": { 1: 1, 2: 2, 3: 4, 4: 6, 5: 9, 6: 12, 7: 16, 8: 20, 9: 25, 10: 32 },
-    "Legendary": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 7, 6: 9, 7: 12, 8: 15, 9: 19, 10: 24 }
-}
-
-
-#%% Pets
 
 all_pets = {
     "None": { 'type': 'all', 'rarity': 'Legendary' },
@@ -2476,7 +2459,8 @@ all_pets = {
 
 max_lvl_pet_xp_amounts = { "Common": 5624785, "Uncommon": 8644220, "Rare": 12626665, "Epic": 18608500, "Legendary": 25353230, "Dragon": 210255385 }
 
-#%% Minion List:
+
+#%% Minions
 # average drop amount from hypixel skyblock fandom wiki or self tested
 
 minionList = {
@@ -2788,8 +2772,8 @@ minionList = {
     }
 }
 
-#%% Minion Cost Functions
 
+#%% Minion Cost Functions
 
 def minionCostTypes(materials, upgradetype, twelve=False, edits=None):
     if upgradetype == "single enchanted":  # like Cobblestone
@@ -2839,8 +2823,8 @@ def minionCostSum(minion_type, final_tier):
             final_cost[item] += amount
     return deepcopy(final_cost)
 
-#%% Minion Costs
 
+#%% Minion Costs
 
 minionCosts = {
     "Custom": minionCostTypes(["CUSTOM", "ENCHANTED_CUSTOM"], "single enchanted", True),
