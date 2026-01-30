@@ -62,9 +62,11 @@ itemList = {
         "storage_slots": 0,
         "exp_boost_type": "all",
         "exp_boost_amount": 0,
-        "crystal_boost": 0,
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "affected_minions": [],
-        "upgrade": { 'speed': 0, 'drop': 1, 'duration': 0, 'special': { "type": "None" } }
+        "upgrade_special": { "type": "None" }
     },
     'CUSTOM': {
         'display': 'Custom',
@@ -305,21 +307,27 @@ itemList = {
     },
     'COAL': {
         'display': 'Coal',
+        "speed_boost": 5,
+        "drop_multiplier": 1,
+        "fuel_duration": 1800,
         "prices": {},
         'xp': { 'mining': 0.3 },
-        'upgrade': { 'speed': 5, 'drop': 1, 'duration': 1800 }
     },
     'COAL_BLOCK': {
         'display': 'Block of Coal',  # not in bazaar
+        "speed_boost": 5,
+        "drop_multiplier": 1,
+        "fuel_duration": 18000,
         "prices": {},
         'xp': { 'mining': 2.7 },
-        'upgrade': { 'speed': 5, 'drop': 1, 'duration': 18000 }
     },
     'ENCHANTED_COAL': {
         'display': 'Enchanted Coal',
+        "speed_boost": 10,
+        "drop_multiplier": 1,
+        "fuel_duration": 86400,
         "prices": {},
         'xp': { 'mining': 48 },
-        'upgrade': { 'speed': 10, 'drop': 1, 'duration': 86400 }
     },
     'ENCHANTED_COAL_BLOCK': {
         'display': 'Enchanted Coal Block',
@@ -528,9 +536,11 @@ itemList = {
     },
     'ENCHANTED_BREAD': {
         'display': 'Enchanted Bread',
+        "speed_boost": 5,
+        "drop_multiplier": 1,
+        "fuel_duration": 43200,
         "prices": {},
         'xp': { 'farming': 1.8 },  # not produced anymore by minions
-        "upgrade": { 'speed': 5, 'drop': 1, 'duration': 43200 }
     },
     'ENCHANTED_WHEAT': {
         'display': 'Enchanted Wheat',
@@ -1200,12 +1210,11 @@ itemList = {
     },
     'ENCHANTED_EGG': {
         'display': 'Enchanted Egg',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "add", "items": { "EGG": 1 } },
         "prices": {},
         'xp': { 'farming': 115 },  # correct inaccuracy
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "add", "item": { "EGG": 1 } }
-        }
     },
     'SUPER_EGG': {
         'display': 'Super Enchanted Egg',
@@ -1395,79 +1404,110 @@ itemList = {
     # Fuels
     'ENCHANTED_CHARCOAL': {
         'display': 'Enchanted Charcoal',
+        "speed_boost": 20,
+        "drop_multiplier": 1,
+        "fuel_duration": 129600,
         "prices": {},
-        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 129600 }
     },
     'HAMSTER_WHEEL': {
         'display': 'Hamster Wheel',
+        "speed_boost": 50,
+        "drop_multiplier": 1,
+        "fuel_duration": 86400,
         "prices": {},
-        "upgrade": { 'speed': 50, 'drop': 1, 'duration': 86400 }
     },
     'FOUL_FLESH': {
         'display': 'Foul Flesh',
+        "speed_boost": 90,
+        "drop_multiplier": 1,
+        "fuel_duration": 18000,
         "prices": {},
-        "upgrade": { 'speed': 90, 'drop': 1, 'duration': 18000 }
     },
     'CATALYST': {
         'display': 'Catalyst',
+        "speed_boost": 0,
+        "drop_multiplier": 3,
+        "fuel_duration": 10800,
         "prices": {},
-        "upgrade": { 'speed': 0, 'drop': 3, 'duration': 10800 }
     },
     'HYPER_CATALYST': {
         'display': 'Hyper Catalyst',
+        "speed_boost": 0,
+        "drop_multiplier": 4,
+        "fuel_duration": 21600,
         "prices": {},
-        "upgrade": { 'speed': 0, 'drop': 4, 'duration': 21600 }
     },
     'CHEESE_FUEL': {
         'display': 'Tasty Cheese',
+        "speed_boost": 0,
+        "drop_multiplier": 2,
+        "fuel_duration": 3600,
         "prices": {},
-        "upgrade": { 'speed': 0, 'drop': 2, 'duration': 3600 }
     },
     'SOLAR_PANEL': {
         'display': 'Solar Panel',
+        "speed_boost": 25,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 25, 'drop': 1, 'duration': 0 }
     },
     'ENCHANTED_LAVA_BUCKET': {
         'display': 'Enchanted Lava Bucket',
+        "speed_boost": 25,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 25, 'drop': 1, 'duration': 0 }
     },
     'MAGMA_BUCKET': {
         'display': 'Magma Bucket',
+        "speed_boost": 30,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 30, 'drop': 1, 'duration': 0 }
     },
     'PLASMA_BUCKET': {
         'display': 'Plasma Bucket',
+        "speed_boost": 35,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 35, 'drop': 1, 'duration': 0 }
     },
     'EVERBURNING_FLAME': {
         'display': 'Everburning Flame',
+        "speed_boost": 35,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
+        "upgrade_special": {"type": "speed_bonus", "amount": 5, "affected_minions": []},
         "prices": {},
         "recipe": {"PLASMA_BUCKET": 1, "FLAMES": 16, "ENCHANTED_SULPHUR_CUBE": 2, "ENCHANTED_RED_SAND_CUBE": 2},
-        "upgrade": { 'speed': 40, 'drop': 1, 'duration': 0 }
     },
     'INFERNO_FUEL': {  # exact item ID does not exist
         'display': 'Inferno Minion Fuel',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "fuel_duration": 86400,
         "prices": { "custom": 1 },  # this custom price will be automatically updated by the calculator based on grade and distilate
-        "upgrade": { 'speed': 0, 'drop': 1, 'duration': 86400 }
     },
     'THORNY_VINES': {
         'display': 'Thorny Vines',
+        "speed_boost": 20,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
     },
     'DAYSWITCH': {
         'display': 'Dayswitch',
+        "speed_boost": 20,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
     },
     'NIGHTSWITCH': {
         'display': 'Nightswitch',
+        "speed_boost": 20,
+        "drop_multiplier": 1,
+        "fuel_duration": -1,
         "prices": {},
-        "upgrade": { 'speed': 20, 'drop': 1, 'duration': 0 }
     },
 
     # Hoppers
@@ -1485,213 +1525,204 @@ itemList = {
     # Upgrades
     'AUTO_SMELTER': {
         'display': 'Auto Smelter',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "replace", "list": smelting_data },
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "replace", "list": smelting_data }
-        }
     },
     'COMPACTOR': {
         'display': 'Compactor',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "compact" },
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "compact" }
-        }
     },
     'SUPER_COMPACTOR_3000': {
         'display': 'Super Compactor 3000',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "enchant" },
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "enchant" }
-        }
     },
     'DWARVEN_COMPACTOR': {
         'display': 'Dwarven Super Compactor',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "replace, enchant", "list": smelting_data },
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "replace, enchant", "list": smelting_data }
-        }
     },
     'DIAMOND_SPREADING': {
         'display': 'Diamond Spreading',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "spreading", "items": { "DIAMOND": 0.1 }},
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "generate", "item": { "DIAMOND": 1 }, "chance": 0.1 }
-        }
     },
     'POTATO_SPREADING': {
         'display': 'Potato Spreading',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "spreading", "items": { "POTATO_ITEM": 0.05 }},
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "generate", "item": { "POTATO_ITEM": 1 }, "chance": 0.05 }
-        }
     },
     'MINION_EXPANDER': {
         'display': 'Minion Expander',
+        "speed_boost": 5,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "expand" },
         "prices": {},
-        "upgrade": {
-            'speed': 5, 'drop': 1,
-            'special': { "type": "expand" }
-        }
     },
     'FLINT_SHOVEL': {
         'display': 'Flint Shovel',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "replace", "list": { "GRAVEL": "FLINT" } },
         "prices": {},
         "recipe": {"FLINT": 10},  # +/- 2 sticks
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "replace", "list": { "GRAVEL": "FLINT" } }
-        }
     },
     'FLYCATCHER_UPGRADE': {
         'display': 'Flycatcher',
+        "speed_boost": 20,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "None" },
         "prices": {},
-        "upgrade": {
-            'speed': 20, 'drop': 1,
-            'special': { "type": "None" }
-        }
     },
     'KRAMPUS_HELMET': {
         'display': 'Krampus Helmet',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "spreading", "items": { "RED_GIFT": 0.000045 }},
         "prices": {},
         "AH": True,
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "generate", "item": { "RED_GIFT": 1 }, "chance": 0.000045 }
-        }
     },
     'LESSER_SOULFLOW_ENGINE': {
         'display': 'Lesser Soulflow Engine',
+        "speed_boost": 0,
+        "drop_multiplier": 0.5,
+        "upgrade_special": { "type": "cooldown", "items": { "RAW_SOULFLOW": 1 }, "cooldown": 180, "offline_cooldown": 185 },  # offline cooldown not confirmed
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 0.5,
-            'special': { "type": "timer", "item": { "RAW_SOULFLOW": 1 }, "cooldown": 180 }
-        }
     },
     'SOULFLOW_ENGINE': {
         'display': 'Soulflow Engine',
+        "speed_boost": 0,
+        "drop_multiplier": 0.5,
+        "upgrade_special": { "type": "cooldown", "items": { "RAW_SOULFLOW": 1 }, "cooldown": 90, "offline_cooldown": 105 },  # offline cooldown not confirmed
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 0.5,
-            'special': { "type": "timer", "item": { "RAW_SOULFLOW": 1 }, "cooldown": 90 }
-        }
     },
     'CORRUPT_SOIL': {
         'display': 'Corrupt Soil',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "add", "items": { "SULPHUR_ORE": 1, "CORRUPTED_FRAGMENT": 1 } },
+        "affected_minions": [],
         "prices": {},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "add", "item": { "SULPHUR_ORE": 1, "CORRUPTED_FRAGMENT": 1 } }
-        }
     },
     'BERBERIS_FUEL_INJECTOR': {
         'display': 'Berberis Fuel Injector',
+        "speed_boost": 15,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "cooldown", "items": { "LUSH_BERBERIS": 1 }, "cooldown": 300, "offline_cooldown": 300 },  # offline cooldown not confirmed
+        "affected_minions": [],
         "prices": {},
-        "upgrade": {
-            'speed': 15, 'drop': 1,
-            'special': { "type": "timer", "item": { "LUSH_BERBERIS": 1 }, "cooldown": 300 }
-        }
     },
     'ENCHANTED_SHEARS': {
         'display': 'Enchanted Shears',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "add", "items": { "WOOL": 2 } },  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
         "prices": { "npc": 0 },
         "recipe": {"ENCHANTED_IRON": 2},
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "add", "item": { "WOOL": 2 } }  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
-        }
     },
     'SLEEPY_HOLLOW': {
         'display': 'Sleepy Hollow',
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "spreading", "items": { "PURPLE_CANDY": 0.00015 }},
         "prices": { "npc": 0 },
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "generate", "item": { "PURPLE_CANDY": 1 }, "chance": 0.00015 }
-        }
     },
     "HUNTER_KNIFE": {
         'display': "Hunter Knife",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_special": { "type": "replace", "list": { "POTATO_ITEM": "FRENCH_FRIES" } },
         "prices": { "custom": 500000 },  # 500k from Rusty
-        "upgrade": {
-            'speed': 0, 'drop': 1,
-            'special': { "type": "replace", "list": { "POTATO_ITEM": "FRENCH_FRIES" } }
-        }
     },
 
     # Beacons
     "BEACON_1": {
         'display': "Beacon I",
+        "speed_boost": 2,
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 192, "STARFALL": 64 }
     },
     "BEACON_2": {
         'display': "Beacon II",
+        "speed_boost": 4,
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 192, "STARFALL": 64, "REFINED_MITHRIL": 5 }
     },
     "BEACON_3": {
         'display': "Beacon III",
+        "speed_boost": 6,
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 192, "STARFALL": 64, "REFINED_MITHRIL": 15 }
     },
     "BEACON_4": {
         'display': "Beacon IV",
+        "speed_boost": 8,
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 192, "STARFALL": 64, "REFINED_MITHRIL": 35, "PLASMA": 1 }
     },
     "BEACON_5": {
         'display': "Beacon V",
+        "speed_boost": 10,
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 192, "STARFALL": 64, "REFINED_MITHRIL": 75, "PLASMA": 6 }
     },
     "POWER_CRYSTAL": {
         'display': 'Power Crystal',
         "prices": {},
-        'duration': 172800
+        'fuel_duration': 172800
     },
     "SCORCHED_POWER_CRYSTAL": {
         'display': 'Scorched Power Crystal',
+        "speed_boost": 1,
         "prices": {},
-        'duration': 172800
+        'fuel_duration': 172800
     },
 
     # Floating Crystals
     "FARM_CRYSTAL": {
         'display': "Farm Crystal",
-        "crystal_boost": 10,
+        "speed_boost": 10,
         "affected_minions": ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower'],
         'prices': {},
         "recipe": { "ENCHANTED_PUMPKIN": 96, "ENCHANTED_QUARTZ": 1 }
     },
     "WOODCUTTING_CRYSTAL": {
         'display': "Woodcutting Crystal",
-        "crystal_boost": 10,
+        "speed_boost": 10,
         "affected_minions": ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle', "Flower"],  # Flower minion is correct
         'prices': {},
         "recipe": { "ENCHANTED_SPRUCE_LOG": 96, "ENCHANTED_QUARTZ": 1 }
     },
     "MITHRIL_CRYSTAL": {
         'display': "Mithril Crystal",
-        "crystal_boost": 10,
+        "speed_boost": 10,
         "affected_minions": ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Red Sand', 'Mycelium', 'Ice', 'Snow', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril', 'Hard Stone'],
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 16, "ENCHANTED_QUARTZ": 1 }
     },
     "WINTER_ISLAND_CRYSTAL": {
         'display': "Winter Crystal",
-        "crystal_boost": 5,
+        "speed_boost": 5,
         "affected_minions": ["Snow", "Ice"],
         'prices': {},
         "recipe": { "WINTER_ISLAND": 1 }
     },
     "MITHRIL_WINTER_CRYSTAL": {
         'display': "Mithril + Winter Crystal",  # not a real item
-        "crystal_boost": 15,  # correct
+        "speed_boost": 15,  # correct
         "affected_minions": ["Snow", "Ice"],
         'prices': {},
         "recipe": { "MITHRIL_CRYSTAL": 1, "WINTER_ISLAND_CRYSTAL": 1 }
@@ -1727,6 +1758,7 @@ itemList = {
     # Other Upgrades
     "MITHRIL_INFUSION": {
         'display': "Mithril Infusion",
+        "speed_boost": 10,
         "prices": {}
     },
     'CAPSAICIN_EYEDROPS_NO_CHARGES': {
@@ -1735,20 +1767,26 @@ itemList = {
     },
     "FREE_WILL": {
         'display': "Free Will",
+        "speed_boost": 10,
         'prices': {}
     },
     "POSTCARD": {
         'display': "Postcard",
+        "speed_boost": 5,
         'prices': {},
         "AH": True
     },
     "POTATO_TALISMAN": {
         'display': "Potato Talisman",
+        "speed_boost": 5,
+        "affected_minions": ["Potato"],
         'prices': {},
         "AH": True
     },
     "POTATO_RING": {
         'display': "Potato Ring",
+        "speed_boost": 10,
+        "affected_minions": ["Potato"],
         'prices': {},
         "AH": True
     },
@@ -2288,6 +2326,12 @@ beacon_options = {
     "Beacon III": "BEACON_3",
     "Beacon IV": "BEACON_4",
     "Beacon V": "BEACON_5",
+}
+
+potato_accessory_options = {
+    "None": "NONE",
+    "Potato Talisman": "POTATO_TALISMAN",
+    "Potato Ring": "POTATO_RING"
 }
 
 #%% Mayors

@@ -83,7 +83,7 @@ templateList = {
     "Cheap speed": {
         "fuel": "Enchanted Lava Bucket",
         "upgrade2": "Diamond Spreading",
-        "beacon": 0,
+        "beacon": "Beacon V",
         "infusion": False,
         "free_will": False,
         "postcard": True
@@ -91,7 +91,7 @@ templateList = {
     "No permanent speed": {
         "fuel": "Plasma Bucket",
         "upgrade2": "Flycatcher",
-        "beacon": 5,
+        "beacon": "Beacon V",
         "infusion": False,
         "free_will": False,
         "postcard": True
@@ -99,7 +99,7 @@ templateList = {
     "Max speed": {
         "fuel": "Plasma Bucket",
         "upgrade2": "Flycatcher",
-        "beacon": 5,
+        "beacon": "Beacon V",
         "infusion": True,
         "free_will": True,
         "postcard": True
@@ -107,7 +107,7 @@ templateList = {
     "Hyper speed": {
         "fuel": "Hyper Catalyst",
         "upgrade2": "Flycatcher",
-        "beacon": 5,
+        "beacon": "Beacon V",
         "infusion": True,
         "free_will": True,
         "postcard": True
@@ -148,7 +148,7 @@ templateList = {
         "upgrade1": "Super Compactor 3000",
         "upgrade2": "Flycatcher",
         "chest": "XX-Large Storage",
-        "beacon": 5,
+        "beacon": "Beacon V",
         "scorched": True,
         "infusion": True,
         "free_will": True,
@@ -208,7 +208,7 @@ class Calculator(tk.Tk):
         self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
         self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
         self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="None", options=md.chest_options)
-        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=int, display="Beacon", frame="inputs_minion_grid", initial=0, options=[0, 1, 2, 3, 4, 5], command=self.huim.create_switch_call("beacon", controlvar="self"))
+        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=str, display="Beacon", frame="inputs_minion_grid", initial="None", options=md.beacon_options, command=self.huim.create_switch_call("beacon", controlvar="self"))
         self.scorched = HPM.Hvar(self.huim, key="scorched", vtype="input", dtype=bool, display="Scorched", frame="inputs_minion_grid", initial=False)
         self.B_constant = HPM.Hvar(self.huim, key="B_constant", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
         self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
@@ -224,7 +224,7 @@ class Calculator(tk.Tk):
         self.special_layout = HPM.Hvar(self.huim, key="special_layout", vtype="input", dtype=bool, display="Special Layout", frame="inputs_player_grid", initial=False)
         self.player_harvests = HPM.Hvar(self.huim, key="player_harvests", vtype="input", dtype=bool, display="Player Harvests", frame="inputs_player_grid", initial=False)
         self.player_looting = HPM.Hvar(self.huim, key="player_looting", vtype="input", dtype=int, display="Looting", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5])
-        self.potato_talisman = HPM.Hvar(self.huim, key="potato_talisman", vtype="input", dtype=bool, display="Potato talisman", frame="inputs_player_grid", initial=False)  # change to Potato Accessory with an options list
+        self.potato_accessory = HPM.Hvar(self.huim, key="potato_accessory", vtype="input", dtype=str, display="Potato Accessory", frame="inputs_player_grid", initial="None", options=md.potato_accessory_options)
         self.combat_wisdom = HPM.Hvar(self.huim, key="combat_wisdom", vtype="storage", dtype=float, display="Combat", initial=0.0)
         self.mining_wisdom = HPM.Hvar(self.huim, key="mining_wisdom", vtype="storage", dtype=float, display="Mining", initial=0.0)
         self.farming_wisdom = HPM.Hvar(self.huim, key="farming_wisdom", vtype="storage", dtype=float, display="Farming", initial=0.0)
@@ -367,7 +367,7 @@ class Calculator(tk.Tk):
                 "special_layout": None,
                 "player_harvests": None,
                 "player_looting": None,
-                "potato_talisman": None,
+                "potato_accessory": None,
                 "wisdom": None,
                 "mayor": None,
                 "levelingpet": None,
@@ -460,15 +460,15 @@ class Calculator(tk.Tk):
         self.huim.def_switch("rising_celsius", widget_references="rising_celsius_override",
                             locations="grid", control="Inferno", negate=False, initial=False)
         self.huim.def_switch("beacon", widget_references=["scorched", "B_constant", "B_acquired"],
-                            locations="grid", control=0, negate=True, initial=False)
-        self.huim.def_switch("potato", widget_references="potato_talisman",
+                            locations="grid", control="None", negate=True, initial=False)
+        self.huim.def_switch("potato_accessory_switch", widget_references="potato_accessory",
                             locations="grid", control="PotatoTrue", negate=False, initial=False)
         self.huim.def_switch("bazaar_tax", widget_references="bazaar_flipper",
                             locations="grid", control=1, negate=False, initial=True)
         self.huim.def_switch("afking", widget_references=["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "player_harvests", "player_looting"],
                             locations="grid", control=True, negate=False, initial=False)
         self.huim.def_switch("fuel_amount", widget_references="fuelamount",
-                            locations="grid", control=0, negate=True, initial=False)
+                            locations="grid", control=-1, negate=True, initial=False)
         self.huim.def_switch("scaled_time_switch", widget_references=["scaled_time_amount", "scaled_time"],
                             locations="grid", control=True, negate=False, initial=False)
         self.huim.def_switch("free_will", widget_references="freewillcost",
@@ -515,7 +515,7 @@ class Calculator(tk.Tk):
             },
             "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
-            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_talisman"]},
+            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
             "player_harvests": {"\n> ": ["player_looting"]},
             "wisdom": None,
             "mayor": None,
@@ -548,7 +548,7 @@ class Calculator(tk.Tk):
             "infusion", "crystal", "free_will", "postcard",
             "inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override",
             "afk", "afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout",
-            "player_harvests", "player_looting", "potato_talisman",
+            "player_harvests", "player_looting", "potato_accessory",
             "combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom",
             "mayor",
             "levelingpet", "taming", "falcon_attribute", "toucan_attribute", "petxpboost", "beastmaster",
@@ -618,15 +618,15 @@ class Calculator(tk.Tk):
             if type(control) == str or self.miniontier.get() not in md.minionList[self.minion.get()]["speed"].keys():
                 self.miniontier.set(list(md.minionList[self.minion.get()]["speed"].keys())[-1])
             if type(control) == str:
-                self.huim.toggle_switch("potato", control + str(self.afk.get()))
+                self.huim.toggle_switch("potato_accessory_switch", control + str(self.afk.get()))
                 self.huim.toggle_switch("rising_celsius", control)
         elif multi_ID == "fuel":
             self.huim.toggle_switch("infernofuel", control)
-            self.huim.toggle_switch("fuel_amount", md.itemList[md.fuel_options[control]]["upgrade"]["duration"])
+            self.huim.toggle_switch("fuel_amount", md.itemList[md.fuel_options[control]]["fuel_duration"])
         elif multi_ID == "afk":
             afkState = self.afk.get()
             self.huim.toggle_switch("afking", afkState)
-            self.huim.toggle_switch("potato", self.minion.get() + str(afkState))
+            self.huim.toggle_switch("potato_accessory_switch", self.minion.get() + str(afkState))
         elif multi_ID == "pet_leveling":
             self.huim.toggle_switch("pet_leveling", control)
             mayor = self.mayor.get()
@@ -825,8 +825,6 @@ class Calculator(tk.Tk):
             if len(wisdoms) != 0:
                 return self.wisdom.get_display(True) + ":\n> " + ", ".join(f"{wisdom_type}: `{wisdom_val}`" for wisdom_type, wisdom_val in wisdoms.items())
             return None
-        elif var_key == "beacon":  # special case: add "Beacon" and put the tier in roman numerals
-            val = {0: "", 1: "`Beacon I`", 2: "`Beacon II`", 3: "`Beacon III`", 4: "`Beacon IV`", 5: "`Beacon V`"}[self.var_dict[var_key].get()]
         elif var_key == "used_storage":  # special case: add available storage to output
             val = f"`{self.var_dict[var_key].get()}` (out of `{self.available_storage.get()}`)"
         elif var_key in self.key_replace_bool:  # special case: output key instead of the boolean
@@ -1126,7 +1124,7 @@ class Calculator(tk.Tk):
         """
         upgrade_types = []
         for upgrade in upgrades:
-            for temp_type in md.itemList[upgrade]["upgrade"]["special"]["type"].split(", "):
+            for temp_type in md.itemList[upgrade]["upgrade_special"]["type"].split(", "):
                 upgrade_types.append(temp_type)
         return upgrade_types
 
@@ -1156,16 +1154,17 @@ class Calculator(tk.Tk):
             Total additive speed boost.
         """
         speed_boost = 0
-        speed_boost += md.itemList[minion_fuel_id]["upgrade"]["speed"]
-        speed_boost += md.itemList[upgrade_ids[0]]["upgrade"]["speed"] + md.itemList[upgrade_ids[1]]["upgrade"]["speed"]
-        speed_boost += 2 * setup_data["beacon"] + 10 * setup_data["infusion"]
+        speed_boost += md.itemList[minion_fuel_id]["speed_boost"]
+        speed_boost += md.itemList[upgrade_ids[0]]["speed_boost"] + md.itemList[upgrade_ids[1]]["speed_boost"]
+        speed_boost += md.itemList[setup_data["beacon"]]["speed_boost"] + 10 * setup_data["infusion"]
         speed_boost += 10 * setup_data["free_will"] + 5 * setup_data["postcard"]
-        speed_boost += 5 * setup_data["potato_talisman"] * (afk_toggle or clock_override) * (minion == "Potato")
+        if setup_data["potato_accessory"] != "NONE" and (afk_toggle or clock_override) and (minion in md.itemList[setup_data["potato_accessory"]]["affected_minions"]):
+            speed_boost += md.itemList[setup_data["potato_accessory"]]["speed_boost"]
         if setup_data["crystal"] != "NONE":
             if minion in md.itemList[setup_data["crystal"]]["affected_minions"]:
-                speed_boost += md.itemList[setup_data["crystal"]]["crystal_boost"]
-        if setup_data["beacon"] != 0:
-            speed_boost += 1 * setup_data["scorched"]
+                speed_boost += md.itemList[setup_data["crystal"]]["speed_boost"]
+        if setup_data["beacon"] != "NONE" and setup_data["scorched"]:
+            speed_boost += md.itemList["SCORCHED_POWER_CRYSTAL"]["speed_boost"]
         if minion == "Inferno":
             if setup_data["rising_celsius_override"]:
                 speed_boost += 180
@@ -1207,12 +1206,12 @@ class Calculator(tk.Tk):
             if minion in ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]:
                 drop_multiplier *= 1 + 15 * setup_data["player_looting"] / 100
             return drop_multiplier
-        drop_multiplier *= md.itemList[minion_fuel_id]["upgrade"]["drop"]
-        drop_multiplier *= md.itemList[upgrade_ids[0]]["upgrade"]["drop"]
+        drop_multiplier *= md.itemList[minion_fuel_id]["drop_multiplier"]
+        drop_multiplier *= md.itemList[upgrade_ids[0]]["drop_multiplier"]
         if afk_toggle and drop_multiplier > 1:
             # drop multiplier greater than 1 is rounded down while online
             drop_multiplier = int(drop_multiplier)
-        drop_multiplier *= md.itemList[upgrade_ids[1]]["upgrade"]["drop"]
+        drop_multiplier *= md.itemList[upgrade_ids[1]]["drop_multiplier"]
         if afk_toggle and drop_multiplier > 1:
             drop_multiplier = int(drop_multiplier)
         if setup_data["mayor"] == "Derpy":
@@ -1440,14 +1439,13 @@ class Calculator(tk.Tk):
         spreading_info = {}
         replace_info = {}
         for upgrade in upgrade_ids:
-            upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
-            if "generate" in upgrade_type:
-                spreading_chance = md.itemList[upgrade]["upgrade"]["special"]["chance"]
-                for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
-                    spreading_info[item] = spreading_chance * amount
+            upgrade_type = md.itemList[upgrade]["upgrade_special"]["type"]
+            if "spreading" in upgrade_type:
+                for item, amount in md.itemList[upgrade]["upgrade_special"]["items"].items():
+                    spreading_info[item] = amount
                     drops_list[item] = 0
             if "replace" in upgrade_type:
-                replace_info.update(md.itemList[upgrade]["upgrade"]["special"]["list"])
+                replace_info.update(md.itemList[upgrade]["upgrade_special"]["list"])
         return spreading_info, replace_info
     
     def add_drops(self, item, amount, drops_list, spreading_info=None, replace_info=None):
@@ -1485,7 +1483,7 @@ class Calculator(tk.Tk):
             self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, spreading_info, replace_info)
         return
 
-    def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, empty_time_seconds):
+    def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, empty_time_seconds, seconds_per_action):
         """
         Gets generated drops from upgrades of the setup and adds them to the drops_list
         
@@ -1498,9 +1496,10 @@ class Calculator(tk.Tk):
         :param harvests_per_time: float, amount of harvests between empties
         :param afk_toggle: boolean, True if AFKing, False if offline
         :param empty_time_seconds: float, seconds between empties
+        :param seconds_per_action: float, seconds per minion action
         """
         for upgrade in upgrade_ids:
-            upgrade_type = md.itemList[upgrade]["upgrade"]["special"]["type"]
+            upgrade_type = md.itemList[upgrade]["upgrade_special"]["type"]
             specific_multiplier = 1
             if upgrade_type == "add":
                 # adding upgrades are like Corrupt Soils
@@ -1517,24 +1516,23 @@ class Calculator(tk.Tk):
                         # Enchanted Eggs make one laid egg and one egg on kill while AFKing
                         # the egg on spawn is affected by drop multipliers and spreadings
                         self.add_drops("EGG", harvests_per_time * drop_multiplier, drops_list, spreading_info)
-                    for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                    for item, amount in md.itemList[upgrade]["upgrade_special"]["items"].items():
                         self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list)
                 else:
-                    for item, amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                    for item, amount in md.itemList[upgrade]["upgrade_special"]["items"].items():
                         self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list, spreading_info)
-            elif upgrade_type == "timer":
-                # timer upgrades are like Soulflow Engines
+            elif upgrade_type == "cooldown":
+                # cooldown upgrades are like Soulflow Engines
                 # formula for effective_cooldown still in research
-                # if afk_toggle:
-                #     effective_cooldown = 2 * secondsPaction * (1 + np.floor(np.ceil(md.itemList[upgrade]["upgrade"]["special"]["cooldown"] / secondsPaction) / 2))
-                # else:
-                #     effective_cooldown = ???
                 if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrade_ids:
                     continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
+                if afk_toggle:
+                    effective_cooldown = 2 * seconds_per_action * (1 + np.floor(np.ceil(md.itemList[upgrade]["upgrade_special"]["cooldown"] / seconds_per_action) / 2))
+                else:
+                    effective_cooldown = md.itemList[upgrade]["upgrade_special"]["offline_cooldown"]
                 if "SOULFLOW_ENGINE" == upgrade and minion == "Voidling":
                     specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
-                effective_cooldown = md.itemList[upgrade]["upgrade"]["special"]["cooldown"]
-                for cooldown_item, cooldown_amount in md.itemList[upgrade]["upgrade"]["special"]["item"].items():
+                for cooldown_item, cooldown_amount in md.itemList[upgrade]["upgrade_special"]["items"].items():
                     self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
         return
 
@@ -1577,7 +1575,7 @@ class Calculator(tk.Tk):
                 if item == "INFERNO_APEX" and minion_tier >= 10:  # Apex Minion perk
                     chance *= 2
                 self.add_drops(item, multiplier * chance * harvests_per_time, drops_list)
-            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", empty_time_seconds / md.itemList[minion_fuel]["upgrade"]["duration"], drops_list)
+            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", empty_time_seconds / md.itemList[minion_fuel]["fuel_duration"], drops_list)
 
         # calculate fuel cost
         infernofuel_components = {
@@ -1891,7 +1889,7 @@ class Calculator(tk.Tk):
         :param skill_xp: dict, gained skill xp per type
         :param mayor: str, mayor
         :param setup_notes: dict, setup notes
-        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost, setup data for self.get_price
+        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost, setup data for self.get_price and for self.get_pet_xp_boosts
         :return pet_profit: total profit from pets
         """
         pet_profit = 0.0
@@ -1908,11 +1906,11 @@ class Calculator(tk.Tk):
         if "Dragon" in md.all_pets[main_pet]["rarity"]:
             left_over_pet_xp = 0.0
             for skill, amount in skill_xp.items():
-                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
+                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
                 main_pet_xp[skill], left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
         else:
             for skill, amount in skill_xp.items():
-                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill)
+                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
                 main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
         exp_share_boost = 0.2 * setup_data["taming"] + 10 * (mayor == "Diana") + setup_data["toucan_attribute"]
         exp_share_item = 15 * setup_data["expshareitem"]
@@ -1927,14 +1925,14 @@ class Calculator(tk.Tk):
                     continue
                 left_over_pet_xp = 0.0
                 for skill, amount in main_pet_xp.items():
-                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
+                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
                     equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
                     equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
                     gained_pet_xp, left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
                     pet_info["pet_xp"]["exp_share"] += gained_pet_xp
             else:
                 for skill, amount in main_pet_xp.items():
-                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, True)
+                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
                     pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item) / 100) * non_matching
             if mayor != "Diana":
                 break
@@ -1962,16 +1960,16 @@ class Calculator(tk.Tk):
         """
         fuel_cost = 0.0
         needed_fuel = 0.0
-        if setup_data["beacon"] != 0:
+        if setup_data["beacon"] != "NONE":
             if setup_data["scorched"]:
                 beacon_fuel_ID = "SCORCHED_POWER_CRYSTAL"
             else:
                 beacon_fuel_ID = "POWER_CRYSTAL"
             cost_per_crystal = self.get_price(beacon_fuel_ID, setup_data, "buy", "bazaar")
-            fuel_cost += empty_time_seconds * cost_per_crystal / md.itemList[beacon_fuel_ID]["duration"] * int(not (setup_data["B_constant"]))
-        if md.itemList[minion_fuel]["upgrade"]["duration"] != 0:
+            fuel_cost += empty_time_seconds * cost_per_crystal / md.itemList[beacon_fuel_ID]["fuel_duration"] * int(not (setup_data["B_constant"]))
+        if md.itemList[minion_fuel]["fuel_duration"] != -1:
             cost_per_fuel = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
-            needed_fuel = minion_amount * empty_time_seconds / md.itemList[minion_fuel]["upgrade"]["duration"]
+            needed_fuel = minion_amount * empty_time_seconds / md.itemList[minion_fuel]["fuel_duration"]
             fuel_cost += needed_fuel * cost_per_fuel
         return fuel_cost, needed_fuel
 
@@ -2025,7 +2023,7 @@ class Calculator(tk.Tk):
         cost_per_part["minion"] = tiered_coin_cost[minion_tier]
 
         # Infinite fuel cost
-        if minion_fuel != "NONE" and md.itemList[minion_fuel]["upgrade"]["duration"] == 0:
+        if minion_fuel != "NONE" and md.itemList[minion_fuel]["fuel_duration"] == -1:
             cost_per_part["fuel"] = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
 
         # Hopper cost
@@ -2080,8 +2078,8 @@ class Calculator(tk.Tk):
         self.huim.deepmultiply(cost_per_part, minion_amount)
 
         # Beacon cost
-        if setup_data["beacon"] != 0 and not setup_data["B_acquired"]:
-            cost_per_part["beacon"] = self.get_price(f"BEACON_{setup_data["beacon"]}", setup_data, "buy", "bazaar")
+        if setup_data["beacon"] != "NONE" and not setup_data["B_acquired"]:
+            cost_per_part["beacon"] = self.get_price(setup_data["beacon"], setup_data, "buy", "bazaar")
 
         # Floating Crystal cost
         if setup_data["crystal"] != "NONE":
@@ -2092,8 +2090,8 @@ class Calculator(tk.Tk):
             cost_per_part["postcard"] = final_postcard_cost
 
         # Potato Talisman cost
-        if setup_data["potato_talisman"]:
-            cost_per_part["potato_talisman"] = self.get_price("POTATO_TALISMAN", setup_data, "buy", "custom", True)
+        if setup_data["potato_accessory"] != "NONE":
+            cost_per_part["potato_accessory"] = self.get_price(setup_data["potato_accessory"], setup_data, "buy", "custom", True)
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
@@ -2183,7 +2181,7 @@ class Calculator(tk.Tk):
         self.get_base_drops(drops_list, spreading_info, replace_info, minion_type, harvests_per_time, drop_multiplier)
 
         # upgrade drops
-        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, empty_time_seconds)
+        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, empty_time_seconds, seconds_per_action)
         
         # Inferno minion fuel drops
         self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data)
