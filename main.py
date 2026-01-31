@@ -16,8 +16,6 @@ try:
     import tkinter as tk
     import numpy as np
     import time
-    import json
-    import urllib.request
     from copy import deepcopy
     import webbrowser
     import HSB_minion_data as md
@@ -26,9 +24,9 @@ try:
 except ModuleNotFoundError as import_error:
     missing_package = import_error.name
     if missing_package in ["HSB_minion_data", "Hero_UI_Manager", "official_calculator_add_ons"]:
-        print(f"Could not find calculator file {missing_package}.py,\nplease make sure all the calculator files are in the same folder.")
+        print(f"ERROR - import - Could not find calculator file {missing_package}.py,\nplease make sure all the calculator files are in the same folder.")
     else:
-        print(f"Could not find {missing_package} module,\nplease install this module using PIP")
+        print(f"ERROR - import - Could not find {missing_package} module,\nplease install this module using PIP")
     exit()
 
 #%% Settings
@@ -184,15 +182,14 @@ class Calculator(tk.Tk):
     def __init__(self):
         super().__init__()
         # Use Hero UI Manager to initialize the window and the frames with grids
-        self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette)
-        self.booting_msg("Hero UI Manager loaded")
+        self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette, debug_mode=debug_mode)
         self.huim.create_controls()
         self.huim.create_frames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
         self.huim.create_frames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
-        self.booting_msg("Framework set up")
+        self.huim.logger.debug("Framework set up")
         self.version = self.huim.def_var(dtype=float, initial=1.2)
-        self.booting_msg(f"Calculator version {self.version.get()}")
+        self.huim.logger.info(f"Calculator version {self.version.get()}")
 
         # Define variables
         self.template = HPM.Hvar(self.huim, key="template", vtype="input", display="Templates", initial="Choose Template", dtype=str, frame="inputs_minion_grid", options=list(templateList.keys()), command=self.load_template)
@@ -291,7 +288,7 @@ class Calculator(tk.Tk):
 
         self.notesAnchor = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="")
 
-        self.booting_msg("variables initialized")
+        self.huim.logger.debug("Variables initialized")
 
         # Create widgets for controls menu and placing them
         self.creditLB = self.huim.create_label(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
@@ -446,7 +443,7 @@ class Calculator(tk.Tk):
             widget[-1].place(in_=self.addons_buttons[addon_name], anchor="w", relx=1, rely=0.5, x=10)
             self.addons_buttons[addon_name].grid(row=number % 8, column=(int(number / 8)) * 2)
 
-        self.booting_msg("Widgets placed")
+        self.huim.logger.debug("Widgets placed")
 
         # Create switches with Hero UI Manager for the extended minion options
         self.huim.def_switch("pet_leveling", widget_references=["taming", "petxpboost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "falcon_attribute", "toucan_attribute"],
@@ -480,7 +477,7 @@ class Calculator(tk.Tk):
         self.huim.create_show_hide_toggle("afk", "afking")
         self.huim.create_show_hide_toggle("beacon", "beacon")
         
-        self.booting_msg("Switches activated")
+        self.huim.logger.debug("Switches activated")
 
         self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet"}
         # dependent variables are only active when another specified variable is not equivalent to 0,
@@ -491,7 +488,7 @@ class Calculator(tk.Tk):
         self.outputOrder = ['fuel', "inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override",
                             'hopper', 'upgrade1', 'upgrade2', 'chest',
                             'beacon', 'scorched', 'B_constant', 'B_acquired',
-                            'crystal', 'postcard', 'infusion', 'free_will', 'afk', 'afkpet', 'afkpet_rarity', 'afkpet_lvl', 'enchanted_clock', 'special_layout', 'potato_talisman', 'player_harvests', "player_looting",
+                            'crystal', 'postcard', 'infusion', 'free_will', 'afk', 'afkpet', 'afkpet_rarity', 'afkpet_lvl', 'enchanted_clock', 'special_layout', 'potato_accessory', 'player_harvests', "player_looting",
                             'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
                             'ID', 'setupcost', 'freewillcost', 'extracost', 'actiontime', 'fuelamount', 'sell_loc', 'bazaar_update_txt', 'bazaar_taxes', 'bazaar_flipper', 'notes',
                             'empty_time', 'scaled_time', 'harvests', 'used_storage', 'items', 'item_sell_loc',
@@ -556,7 +553,7 @@ class Calculator(tk.Tk):
             "sell_loc", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper",
             "empty_time_amount", "empty_time_unit", "scale_time", "scaled_time_amount", "scaled_time_unit",
         ]
-        self.booting_msg("Output orders defined")
+        self.huim.logger.debug("Output orders defined")
 
         # Load prices
         self.API_timer = 0
@@ -564,38 +561,9 @@ class Calculator(tk.Tk):
         self.AH_items = []
         self.recipe_items = []
         self.init_prices()
-        self.booting_msg("Updated NPC prices")
+        self.huim.logger.debug("Updated NPC prices")
         self.update_prices(cooldown_warning=False)
-        self.booting_msg("Ready")
-        return
-
-    def system_msg(self, msg_type, message):
-        print(msg_type.upper() + ": " + message)
-        return
-    
-    def booting_msg(self, message):
-        self.system_msg("BOOTING", message)
-        return
-
-    def info_msg(self, message):
-        self.system_msg("INFO", message)
-        return
-    
-    def warning_msg(self, message):
-        self.system_msg("WARNING", message)
-        return
-    
-    def error_msg(self, message):
-        self.system_msg("ERROR", message)
-        return
-
-    def output_msg(self, message):
-        self.system_msg("OUTPUT", "\n" + message + "\n\n")
-        return
-
-    def debug_msg(self, message):
-        if not debug_mode:
-            self.system_msg("DEBUG", message)
+        self.huim.logger.info("Ready")
         return
 
     def multiswitch(self, multi_ID, control):
@@ -679,12 +647,12 @@ class Calculator(tk.Tk):
         """
         Generates a short output string with all relavent inputs and chosen ouputs.
         The order of these inputs and output in the output string is defined in self.outputOrder in __init__().
-        If toTerminal is True it also prints the string to terminal.
+        If toTerminal is True it also logs the string to terminal.
 
         Parameters
         ----------
         toTerminal : bool, optional
-            Toggle for printing to terminal. The default is True.
+            Toggle for logging to terminal. The default is True.
 
         Returns
         -------
@@ -762,7 +730,7 @@ class Calculator(tk.Tk):
             self.clipboard_clear()
             self.clipboard_append(crafted_string)
         if toTerminal is True:
-            self.output_msg(crafted_string)
+            self.huim.logger.info("\n" + crafted_string)
             return
         else:
             return crafted_string
@@ -875,7 +843,7 @@ class Calculator(tk.Tk):
         Parameters
         ----------
         toTerminal : bool, optional
-            Toggle for printing to terminal. The default is True.
+            Toggle for logging to terminal. The default is True.
 
         Returns
         -------
@@ -918,7 +886,7 @@ class Calculator(tk.Tk):
             self.clipboard_clear()
             self.clipboard_append(crafted_string)
         if toTerminal:
-            self.output_msg(crafted_string)
+            self.huim.logger.info("\n" + crafted_string)
             return
         else:
             return crafted_string
@@ -936,7 +904,7 @@ class Calculator(tk.Tk):
         var_values = {}
         for var_key in var_keys:
             if var_key not in self.var_dict:
-                self.warning_msg(f"{var_key} key not in self.var_dict")
+                self.huim.logger.warning(f"{var_key} key not in self.var_dict")
                 continue
             if self.var_dict[var_key].dtype in [dict, list]:
                 var_values[var_key] = deepcopy(self.var_dict[var_key].list)
@@ -960,7 +928,7 @@ class Calculator(tk.Tk):
         """
         for var_key in outputs:
             if var_key not in self.var_dict:
-                self.warning_msg(f"Output {var_key} not found in self.var_dict")
+                self.huim.logger.warning(f"Output {var_key} not found in self.var_dict")
                 continue
             if (var_dtype := self.var_dict[var_key].dtype) in [dict, list]:
                 self.var_dict[var_key].list.clear()
@@ -989,7 +957,7 @@ class Calculator(tk.Tk):
         setup_id = str(self.version.get()) + "!"
         for var_key in self.ID_order:
             if var_key not in setup_data:
-                self.warning_msg(f"(construct_id) {var_key} key not in setup_data, assuming default value")
+                self.huim.logger.warning(f"{var_key} key not in setup_data, assuming default value")
                 val = self.var_dict[var_key].initial
             elif self.var_dict[var_key].translation is not None:
                 val = md.itemList[setup_data[var_key]]["display"]
@@ -1023,36 +991,32 @@ class Calculator(tk.Tk):
         setup_data = {}
         end_ver = ID.find("!")
         if end_ver == -1:
-            self.warning_msg("Invalid ID, could not find version number")
+            self.huim.logger.error("Invalid ID, could not find version number")
             return setup_data
         try:
             version = float(ID[0:end_ver])
         except Exception:
-            self.warning_msg("Invalid ID, could not find version number")
+            self.huim.logger.error("Invalid ID, could not find version number")
             return setup_data
         ID_index = end_ver + 1
         if version != self.version.get():
-            self.warning_msg("Invalid ID, Incompatible version")
+            self.huim.logger.error("Invalid ID, Incompatible version")
             return setup_data
         try:
             for var_key in self.ID_order:
                 if self.var_dict[var_key].options is None:
                     if ID[ID_index] != "!":
-                        self.warning_msg(f"did not find {var_key}")
-                        return
+                        self.huim.logger.error(f"did not find {var_key}")
+                        return {}
                     end_val = ID.find("!", ID_index + 1)
                     setup_data[var_key] = self.var_dict[var_key].dtype(ID[ID_index + 1:end_val])
                     ID_index = end_val + 1
                 else:
                     setup_data[var_key] = self.var_dict[var_key].options[ord(ID[ID_index]) - 48]
                     ID_index += 1
-        except Exception as error:
-            if type(error) == IndexError:
-                self.warning_msg("Invalid ID, ID incomplete")
-                return {}
-            else:
-                self.error_msg("unknown error\ndumping error logs\n" + error)
-                return {}
+        except IndexError as error:
+            self.huim.logger.error("Invalid ID, ID incomplete")
+            return {}
         return setup_data
 
     def get_price(self, ID, setup_data, action="buy", location="bazaar", force=False):
@@ -1094,17 +1058,17 @@ class Calculator(tk.Tk):
             if location in md.itemList[ID]["prices"]:
                 return multiplier * md.itemList[ID]["prices"][location]
             elif force:
-                self.warning_msg("no forced cost found for " + ID)
+                self.huim.logger.warning("no forced cost found for " + ID)
                 return 0
             elif "custom" in md.itemList[ID]["prices"]:
                 return md.itemList[ID]["prices"]["custom"]
             elif "npc" in md.itemList[ID]["prices"]:
                 return multiplier * md.itemList[ID]["prices"]["npc"]
             else:
-                self.warning_msg("no cost found for " + ID)
+                self.huim.logger.warning("no cost found for " + ID)
                 return 0
         else:
-            self.warning_msg(ID + " not in itemList")
+            self.huim.logger.error(ID + " not in itemList")
             return 0
 
     def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
@@ -1125,7 +1089,7 @@ class Calculator(tk.Tk):
             True if using the Enchanted Clock
         setup_data : dict
             Needed setup data: amount, mayor, beacon, scorched, infusion, free_will, postcard, crystal,\n
-            potato_talisman, afkpet, afkpet_rarity, afkpet_lvl, rising_celsius_override
+            potato_accessory, afkpet, afkpet_rarity, afkpet_lvl, rising_celsius_override
 
         Returns
         -------
@@ -1960,7 +1924,7 @@ class Calculator(tk.Tk):
         :param minion_fuel: str, ID of minion fuel
         :param upgrades: list, IDs of upgrades
         :param setup_notes: dict, setup notes
-        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_talisman, toucan_attribute, falcon_attribute, setup data for self.get_price
+        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_accessory, toucan_attribute, falcon_attribute, setup data for self.get_price
         :return total_cost: float, total setup cost
         :return extra_cost: str, total extra cost 
         :return cost_per_part: dict, cost per setup part
@@ -2259,31 +2223,15 @@ class Calculator(tk.Tk):
         None
 
         """
-        self.info_msg("Calling Bazaar")
-        try:
-            f = urllib.request.urlopen(r"https://api.hypixel.net/v2/skyblock/bazaar")
-            bazaar_call_data = f.read().decode('utf-8')
-        except Exception as error:
-            self.error_msg(f"Could not finish Bazaar API call\n{error}")
-            return
-        raw_bazaar_data = json.loads(bazaar_call_data)
+        raw_bazaar_data = self.huim.call_API(r"https://api.hypixel.net/v2/skyblock/bazaar", "Hypixel Bazaar API")
         if "success" not in raw_bazaar_data or raw_bazaar_data["success"] is False:
-            self.error_msg("Bazaar API call was unsuccessful")
+            self.huim.logger.error("Hypixel Bazaar API call was unsuccessful")
             return
-        self.info_msg("Bazaar call successful")
-        
-        self.info_msg("Calling Item API")
-        try:
-            f = urllib.request.urlopen(r"https://api.hypixel.net/resources/skyblock/items")
-            item_call_data = f.read().decode('utf-8')
-        except Exception as error:
-            self.error_msg(f"Could not finish Item API call\n{error}")
-            return
-        raw_item_data = json.loads(item_call_data)
+
+        raw_item_data = self.huim.call_API(r"https://api.hypixel.net/resources/skyblock/items", "Hypixel Item API")
         if "success" not in raw_item_data or raw_item_data["success"] is False:
-            self.error_msg("Item API call was unsuccessful")
+            self.huim.logger.error("Hypixel Item API call was unsuccessful")
             return
-        self.info_msg("Item API call successful")
         dict_item_data = {}
         for item_data in raw_item_data["items"]:
             dict_item_data[item_data["id"]] = item_data
@@ -2313,34 +2261,26 @@ class Calculator(tk.Tk):
         None
 
         """
-        self.info_msg("Calling Bazaar")
-        try:
-            f = urllib.request.urlopen(r"https://api.hypixel.net/v2/skyblock/bazaar")
-            call_data = f.read().decode('utf-8')
-        except Exception as error:
-            self.error_msg(f"Could not finish Bazaar API call\n{error}")
+        raw_bazaar_data = self.huim.call_API(r"https://api.hypixel.net/v2/skyblock/bazaar", "Hypixel Bazaar API")
+        if "success" not in raw_bazaar_data or raw_bazaar_data["success"] is False:
+            self.huim.logger.error("Hypixel Bazaar API call was unsuccessful")
             return
-        raw_data = json.loads(call_data)
-        if "success" not in raw_data or raw_data["success"] is False:
-            self.error_msg("Bazaar API call was unsuccessful")
-            return
-        self.info_msg("Bazaar call successful")
-        self.API_timer = raw_data["lastUpdated"] / 1000
+        self.API_timer = raw_bazaar_data["lastUpdated"] / 1000
         self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(self.API_timer)))
         top_percent = 0.1
         for item_id in self.bazaar_items:
-            if item_id not in raw_data["products"]:
+            if item_id not in raw_bazaar_data["products"]:
                 continue
             for action in ["buy", "sell"]:
-                top_amount = top_percent * sum([order["amount"] for order in raw_data["products"][item_id][f"{action}_summary"]])
+                top_amount = top_percent * sum([order["amount"] for order in raw_bazaar_data["products"][item_id][f"{action}_summary"]])
                 if top_amount == 0:
                     md.itemList[item_id]["prices"][f"{action}Price"] = 0
                     if "npc" not in md.itemList[item_id]["prices"]:
-                        self.warning_msg(f"no {action} supply for {item_id}")
+                        self.huim.logger.warning(f"no {action} supply for {item_id}")
                     continue
                 counter = top_amount
                 top_sum = 0
-                for order in raw_data["products"][item_id][f"{action}_summary"]:
+                for order in raw_bazaar_data["products"][item_id][f"{action}_summary"]:
                     if counter <= 0:
                         break
                     if counter >= order["amount"]:
@@ -2351,10 +2291,10 @@ class Calculator(tk.Tk):
                         counter = 0
                         break
                 top_percent_avg_price = top_sum / top_amount
-                top_price = raw_data["products"][item_id][f"{action}_summary"][0]["pricePerUnit"]
+                top_price = raw_bazaar_data["products"][item_id][f"{action}_summary"][0]["pricePerUnit"]
                 if top_price / top_percent_avg_price >= 2.5:
                     md.itemList[item_id]["prices"][f"{action}Price"] = top_price
-                    self.info_msg(f"bottom heavy {action} supply for {item_id}, taking top order price")
+                    self.huim.logger.info(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
                     md.itemList[item_id]["prices"][f"{action}Price"] = top_percent_avg_price
         return
@@ -2372,16 +2312,8 @@ class Calculator(tk.Tk):
         None.
 
         """
-
-        try:
-            AH_bin_url = r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin"
-            req = urllib.request.Request(AH_bin_url, headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)", })
-            call_data = urllib.request.urlopen(req).read().decode('utf-8')
-        except Exception as error:
-            self.error_msg(f"Could not finish SkyCofl API call for {item_id}\n{error}")
-            return
-        raw_data = json.loads(call_data)
-        return (raw_data["lowest"] + raw_data["secondLowest"]) / 2
+        raw_auction_data = self.huim.call_API(r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin", "SkyCofl AH API", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
+        return (raw_auction_data["lowest"] + raw_auction_data["secondLowest"]) / 2
 
     def update_recipe_price(self, item_id):
         """
@@ -2394,10 +2326,10 @@ class Calculator(tk.Tk):
         None.
         """
         if item_id not in md.itemList:
-            self.error_msg(f"{item_id} not in md.itemList (self.update_recipe_price)")
+            self.huim.logger.error(f"{item_id} not in md.itemList")
             return
         if "recipe" not in md.itemList[item_id]:
-            self.error_msg(f"{item_id} is not a recipe item (self.update_recipe_price)")
+            self.huim.logger.error(f"{item_id} is not a recipe item")
             return
         md.itemList[item_id]["prices"]["buyPrice"] = 0
         md.itemList[item_id]["prices"]["sellPrice"] = 0
@@ -2414,17 +2346,18 @@ class Calculator(tk.Tk):
         """
         If API_cooldown is done, update prices
         
-        :param cooldown_warning: bool, toggle if a terminal message should be printed if the bazaar update cooldown has not passed yet.
+        :param cooldown_warning: bool, toggle if a terminal message should be logged if the bazaar update cooldown has not passed yet.
         """
         if time.time() - self.API_timer < API_cooldown and self.API_timer != 0:
             if cooldown_warning:
-                self.info_msg("API update is on cooldown")
+                self.huim.logger.info("API update is on cooldown")
             return
+        self.huim.logger.info("Updating Bazaar prices")
         self.call_bazaar()
-        self.info_msg("Updating Auction House prices")
+        self.huim.logger.info("Updating Auction House prices")
         for item_id in self.AH_items:
             md.itemList[item_id]["prices"]["custom"] = self.call_auction_house(item_id)
-        self.info_msg("Updating Recipe prices")
+        self.huim.logger.info("Updating Recipe prices")
         for item_id in self.recipe_items:
             self.update_recipe_price(item_id)
         return
@@ -2488,13 +2421,13 @@ def start_app():
     """
     App = Calculator()
     App.mainloop()
-    print("CLOSING: Exited mainloop")
+    print("INFO - start_app - Exited mainloop")
     try:
         App.destroy()
-        print("CLOSING: Detroyed application")
+        print("INFO - start_app - Detroyed application")
     except Exception:
-        print("ERROR: Please use the stop button in the bottom right to close the application")
-    print("CLOSING: Closed")
+        print("ERROR - start_app - Please use the stop button in the bottom right to close the application")
+    print("INFO - start_app - Closed")
     return
 
 if __name__ == "__main__":

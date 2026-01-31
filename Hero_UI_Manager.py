@@ -9,7 +9,9 @@ A module containing functions to assit in the creation and management of Tkinter
 import tkinter as tk
 from tkinter import ttk
 import numpy as np
-
+import urllib.request
+import logging
+import json
 
 color_palettes = {
     "dark": {
@@ -58,11 +60,16 @@ color_palettes = {
     }
 }
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
 
 #%% Hero UI Manager
 
 class H_UI_M():
-    def __init__(self, main, windowTitle, windowWidth, windowHeight, palette="dark"):
+    def __init__(self, main, windowTitle, windowWidth, windowHeight, palette="dark", debug_mode=False):
         """
         H_UI_M: Hero UI Manager, main class for Hero UI Manager functions
         Initializes Hero UI Manager. Sets the chosen color palette. Configures the main window. Creates dict variables for storage of switches and frames.
@@ -86,6 +93,9 @@ class H_UI_M():
 
         """
         self.main = main
+        self.logger = logging.getLogger("HUIM_logger")
+        if debug_mode:
+            self.logger.setLevel(logging.DEBUG)
         self.main.title(windowTitle)
         self.main.colors = color_palettes[palette]
         self.main.configure(width=windowWidth, height=windowHeight, background=self.main.colors["background"])
@@ -98,7 +108,6 @@ class H_UI_M():
                                 selectBackground=self.main.colors["selection"],
                                 selectForeground=self.main.colors["selected_text"],
                                 )
-
         self.main.switches = {}
         self.main.frames = {}
         self.main.var_dict = {}
@@ -134,6 +143,7 @@ class H_UI_M():
             }
         )
         self.style.theme_use('calculator')
+        # self.logger.info("Hero UI Manager version ")  # will use later when HUIM because separate from the minion calculator
         return
 
     ### Frame creation
@@ -157,6 +167,7 @@ class H_UI_M():
 
         self.main.stopB = tk.Button(self.main.frames["controls"], text='Stop', command=self.main.quit)
         self.main.stopB.place(relx=0.99, rely=0.5, anchor="e")
+        self.logger.debug("Created controls")
         return
 
     def create_frames(self, parent, frame_keys=[], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0.07):
@@ -501,7 +512,7 @@ class H_UI_M():
         for widget in widget_references:
             if type(widget) is str:
                 if widget not in self.main.var_dict:
-                    print(f"WARNING: var key {widget} in switch {ID} not in var_dict")
+                    self.logger.warning(f"var key \"{widget}\" in switch \"{ID}\" not in var_dict")
                     continue
                 widget_list.extend(self.main.var_dict[widget].widget)
             else:
@@ -517,11 +528,11 @@ class H_UI_M():
 
         # check amount equality
         if len(widget_list) != len(location_list):
-            print(f"WARNING: {ID} switch did not activate, given widgets does not equal given locations ({len(widget_list)} != {len(location_list)}).")
-        
+            self.logger.warning(f"{ID} switch did not activate, given widgets does not equal given locations ({len(widget_list)} != {len(location_list)})")
+
         # save switch
         self.main.switches[ID] = {"state": initial, "widgets": widget_list, "locations": location_list, "control": control, "negate": negate}
-        
+
         # apply initial state
         for widget, loc in zip(widget_list, location_list):
             if loc != "grid" and initial is True:
@@ -547,7 +558,7 @@ class H_UI_M():
 
         """
         if ID not in self.main.switches:
-            print(f"Error: toggleSwitch, ID {ID} does not exist in switch storage")
+            self.logger.error(f"ID {ID} does not exist in switch storage")
             return
         state = self.main.switches[ID]["state"]
         if control is not None:
@@ -623,6 +634,19 @@ class H_UI_M():
         button_anchor = self.main.var_dict[parent_var_key].widget[-1]
         button.place(in_=button_anchor, **place_args)
         return
+
+    ### Data requests
+
+    def call_API(self, api_url, api_name="API", data=None, headers={}):
+        self.logger.debug(f"Calling {api_name}")
+        try:
+            req = urllib.request.Request(api_url, data=data, headers=headers)
+            call_data = urllib.request.urlopen(req).read().decode('utf-8')
+        except Exception as error:
+            self.logger.error(f"Could not finish {api_name} call\n{error}")
+            return
+        return json.loads(call_data)
+
 
     ### Data management
 
@@ -767,7 +791,7 @@ class H_UI_M():
             try:
                 self.arguments = [input_value.get() for input_value in taken_intputs.values()]
             except tk._tkinter.TclError:
-                print("Inputted wrong data type, please try again")
+                self.logger.error("Inputted wrong data type, please try again")
             else:
                 if execute:
                     func(*self.arguments)
@@ -846,7 +870,7 @@ class H_UI_M():
             try:
                 self.vars_out = [input_value.get() for input_value in taken_inputs.values()]
             except tk._tkinter.TclError:
-                print("Inputted wrong data type, please try again")
+                self.logger.error("Inputted wrong data type, please try again")
             else:
                 inputsW.quit()
 
@@ -881,7 +905,7 @@ class H_UI_M():
 
         """
         if self.edit_vars_active is True:
-            print("WARNING: Already editing variables")
+            self.logger.warning("Already editing variables")
             return
         else:
             self.edit_vars_active = True
@@ -920,7 +944,7 @@ class H_UI_M():
             for var_key in vars:
                 self.main.var_dict[var_key].get()
         except tk._tkinter.TclError:
-            print("WARNING: Inputted wrong data type, please try again")
+            self.logger.error("Inputted wrong data type, please try again")
         else:
             if exit_func is not None:
                 exit_func()
@@ -934,7 +958,7 @@ class H_UI_M():
 class Hvar():
     def __init__(self, huim: H_UI_M, key: str, vtype: str, dtype: type, display: str, initial, frame: str=None, fancy_display: str=None , widget_width:int=None, widget_height: int=None, options: list | dict=None, command=None, switch_initial: None | bool=None, checkbox_text: None | str=None, tags: list| None=None):
         if key in huim.main.var_dict:
-            print(f"warning: {key} already exists in variable dictionary, overwriting it")
+            self.logger.warning(f"{key} already exists in variable dictionary, overwriting it")
         huim.main.var_dict[key] = self  # define in variable dictionary
         # Mandatory data:
         self.key = key  # unique identifier 
