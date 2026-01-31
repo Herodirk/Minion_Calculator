@@ -165,6 +165,8 @@ pet_costs = {
     "Custom Pet": {"min": 0, "max": 20000000},
     "Golden Dragon": {"min": 610000000, "max": 800000000},  # 2025-8-31
     "Jade Dragon": {"min": 580000000, "max": 720000000},  # 2025-8-31
+    "Rose Dragon": {"min": 650000000, "max": 1150000000},  # 2026-1-31
+    "Rose Dragon Egg": {"min": 650000000, "max": 740000000},  # 2026-1-31
     "Black Cat": {"min": 40000000, "max": 62000000},  # 2025-8-31 (both buy and sell as legendary)
     "Elephant": {"min": 23000000, "max": 30000000},  # 2025-8-31
     "Mooshroom Cow": {"min": 8000000, "max": 20000000},  # 2025-8-31
@@ -627,7 +629,7 @@ class Calculator(tk.Tk):
             return
         self.template.set("Choose Template")
         if template_name == "ID":
-            template = self.decode_id(self.loadID.get())
+            template = self.decode_id(self.load_ID.get())
         elif template_name == "Clean":
             template = {var_key: self.var_dict[var_key].initial for var_key in self.ID_order if var_key not in ["minion", "miniontier"]}
         else:
@@ -702,8 +704,6 @@ class Calculator(tk.Tk):
                     formatting_function = lambda x: self.var_dict[x].get()
                 formatted_list = []
                 for list_key, list_val in self.var_dict[var_key].list.items():
-                    if var_key == "pets_levelled" and formatting_function(list_key) == "None":
-                        continue
                     if type(list_val) in [float, int]:
                         formatted_list.append(f"{formatting_function(list_key)}: {self.huim.reduced_number(list_val)}")
                     else:
@@ -812,8 +812,6 @@ class Calculator(tk.Tk):
                 formatting_function = lambda x: self.var_dict[x].get()
             formatted_list = []
             for list_key, list_val in self.var_dict[var_key].list.items():
-                if var_key == "pets_levelled" and formatting_function(list_key) == "None":
-                    continue
                 if type(list_val) in [float, int]:
                     formatted_list.append(f"{formatting_function(list_key)}: `{self.huim.reduced_number(list_val)}`")
                 else:
@@ -968,6 +966,9 @@ class Calculator(tk.Tk):
                 if int(val) == val:
                     val = int(val)
                 setup_id += "!" + str(val) + "!"
+            elif len(var_options) > 79:
+                index = var_options.index(val)
+                setup_id += "!" + str(index) + "!"
             else:
                 index = var_options.index(val)
                 setup_id += chr(48 + index)
@@ -1004,15 +1005,23 @@ class Calculator(tk.Tk):
             return setup_data
         try:
             for var_key in self.ID_order:
-                if self.var_dict[var_key].options is None:
+                var_options = self.var_dict[var_key].options
+                if var_options is None:
                     if ID[ID_index] != "!":
                         self.huim.logger.error(f"did not find {var_key}")
                         return {}
                     end_val = ID.find("!", ID_index + 1)
                     setup_data[var_key] = self.var_dict[var_key].dtype(ID[ID_index + 1:end_val])
                     ID_index = end_val + 1
+                elif len(var_options) > 79:
+                    if ID[ID_index] != "!":
+                        self.huim.logger.error(f"did not find {var_key}")
+                        return {}
+                    end_val = ID.find("!", ID_index + 1)
+                    setup_data[var_key] = var_options[int(ID[ID_index + 1:end_val])]
+                    ID_index = end_val + 1
                 else:
-                    setup_data[var_key] = self.var_dict[var_key].options[ord(ID[ID_index]) - 48]
+                    setup_data[var_key] = var_options[ord(ID[ID_index]) - 48]
                     ID_index += 1
         except IndexError as error:
             self.huim.logger.error("Invalid ID, ID incomplete")
@@ -1837,12 +1846,11 @@ class Calculator(tk.Tk):
         main_pet = setup_data["levelingpet"]
         if main_pet == "None":
             return 0, {}
-        setup_pets = {
-            "levelingpet": {"pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0},
-            "expsharepet": {"pet": setup_data["expsharepet"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
-            "expsharepetslot2": {"pet": setup_data["expsharepetslot2"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0},
-            "expsharepetslot3": {"pet": setup_data["expsharepetslot3"], "pet_xp": {"exp_share": 0.0}, "levelled_pets": 0.0}
-        }
+        setup_pets = { "levelingpet": {"pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0} }
+        for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
+            if setup_data[var_key] == "None" or (mayor != "Diana" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
+                continue
+            setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         if "Dragon" in md.all_pets[main_pet]["rarity"]:
             left_over_pet_xp = 0.0
@@ -1859,8 +1867,6 @@ class Calculator(tk.Tk):
             if pet_slot == "levelingpet":
                 continue
             exp_share_pet = pet_info["pet"]
-            if exp_share_pet == "None":
-                continue
             if "Dragon" in md.all_pets[exp_share_pet]["rarity"]:
                 if exp_share_boost == 0:
                     continue
@@ -1875,8 +1881,7 @@ class Calculator(tk.Tk):
                 for skill, amount in main_pet_xp.items():
                     non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
                     pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item) / 100) * non_matching
-            if mayor != "Diana":
-                break
+        super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
         for pet_slot, pet_info in setup_pets.items():
             pets_levelled = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.all_pets[pet_info["pet"]]["rarity"]]
             setup_pets[pet_slot]["levelled_pets"] = pets_levelled
@@ -1885,9 +1890,9 @@ class Calculator(tk.Tk):
             else:
                 pet_profit += pets_levelled * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "NONE":
-                pet_profit -= pets_levelled * self.get_price(main_pet_item, setup_data, "buy", "custom", True)
+                pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.itemList[main_pet_item]["rarity"]] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pets_levelled * self.get_price("PET_ITEM_EXP_SHARE", setup_data, "buy", "bazaar")
+                pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.itemList["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
         return pet_profit, setup_pets
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
@@ -1914,7 +1919,7 @@ class Calculator(tk.Tk):
             fuel_cost += needed_fuel * cost_per_fuel
         return fuel_cost, needed_fuel
 
-    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_notes, setup_data):
+    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_notes, setup_data):
         """
         Gets cost of all parts of the setup
         
@@ -1924,7 +1929,7 @@ class Calculator(tk.Tk):
         :param minion_fuel: str, ID of minion fuel
         :param upgrades: list, IDs of upgrades
         :param setup_notes: dict, setup notes
-        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_accessory, toucan_attribute, falcon_attribute, setup data for self.get_price
+        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_accessory, petxpboost, expshareitem, toucan_attribute, falcon_attribute, setup data for self.get_price
         :return total_cost: float, total setup cost
         :return extra_cost: str, total extra cost 
         :return cost_per_part: dict, cost per setup part
@@ -2033,6 +2038,15 @@ class Calculator(tk.Tk):
         # Potato Talisman cost
         if setup_data["potato_accessory"] != "NONE":
             cost_per_part["potato_accessory"] = self.get_price(setup_data["potato_accessory"], setup_data, "buy", "custom", True)
+
+        # Pet Item costs
+        for pet_slot in setup_pets.keys():
+            if pet_slot == "levelingpet":
+                cost_per_part["petxpboost"] = self.get_price(setup_data["petxpboost"], setup_data, "buy", "custom", True)
+            elif setup_data["expshareitem"]:
+                if "expshareitem" not in cost_per_part:
+                    cost_per_part["expshareitem"] = 0
+                cost_per_part["expshareitem"] += self.get_price("PET_ITEM_EXP_SHARE", setup_data, "buy", "bazaar")
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
@@ -2157,7 +2171,7 @@ class Calculator(tk.Tk):
         total_profit = item_profit + pet_profit - fuel_cost
 
         # Setup cost
-        total_cost, extra_cost, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_notes, setup_data)
+        total_cost, extra_cost, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_notes, setup_data)
 
         # Construct ID
         setup_ID = self.construct_id(setup_data)
@@ -2377,7 +2391,7 @@ class Calculator(tk.Tk):
                 if var_key == "wisdom":
                     continue
                 if var_key == "pets_levelled":
-                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x].get(), filter=lambda key, val: self.var_dict[key].get() != "None")
+                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x].get())
                     continue
                 format_function = lambda x: x
                 if self.var_dict[var_key].has_tag("item_ID_to_display"):

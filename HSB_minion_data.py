@@ -228,7 +228,7 @@ itemList = {
     # The following items do not exist
     "NONE": {
         'display': "None",
-        "prices": { "npc": 0, "custom": 0 },
+        "rarity": "Common",
         "hopper_selling_rate": 1,
         "storage_slots": 0,
         "exp_boost_type": "all",
@@ -237,7 +237,8 @@ itemList = {
         "drop_multiplier": 1,
         "fuel_duration": -1,
         "affected_minions": [],
-        "upgrade_special": { "type": "None" }
+        "upgrade_special": { "type": "None" },
+        "prices": { "npc": 0, "custom": 0 },
     },
     'CUSTOM': {
         'display': 'Custom',
@@ -2029,18 +2030,21 @@ itemList = {
     # Pet Items
     'PET_ITEM_MINING_SKILL_BOOST_COMMON': {
         'display': 'Common Mining Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Common",
         "exp_boost_type": "mining",
         "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_MINING_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Mining Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Uncommon",
         "exp_boost_type": "mining",
         "exp_boost_amount": 30,
         'prices': { 'custom': 250000 }
     },
     'PET_ITEM_MINING_SKILL_BOOST_RARE': {
         'display': 'Rare Mining Exp Boost',
+        "rarity": "Rare",
         "exp_boost_type": "mining",
         "exp_boost_amount": 40,
         'prices': {},
@@ -2048,12 +2052,14 @@ itemList = {
     },
     'PET_ITEM_FARMING_SKILL_BOOST_COMMON': {
         'display': 'Common Farming Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Common",
         "exp_boost_type": "farming",
         "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_FARMING_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Farming Exp Boost',
+        "rarity": "Uncommon",
         "exp_boost_type": "farming",
         "exp_boost_amount": 30,
         'prices': {},
@@ -2061,24 +2067,28 @@ itemList = {
     },
     'PET_ITEM_FARMING_SKILL_BOOST_RARE': {
         'display': 'Rare Farming Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Rare",
         "exp_boost_type": "farming",
         "exp_boost_amount": 40,
         'prices': { 'custom': 500000 }
     },
     'PET_ITEM_FARMING_SKILL_BOOST_EPIC': {
         'display': 'Epic Farming Exp Boost',  # not in bazaar (Duncan)
+        "rarity": "Epic",
         "exp_boost_type": "farming",
         "exp_boost_amount": 50,
         'prices': { 'custom': 1500000 }
     },
     'PET_ITEM_FISHING_SKILL_BOOST_COMMON': {
         'display': 'Common Fishing Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Common",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_FISHING_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Fishing Exp Boost',
+        "rarity": "Uncommon",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 30,
         'prices': {},
@@ -2086,6 +2096,7 @@ itemList = {
     },
     'PET_ITEM_FISHING_SKILL_BOOST_RARE': {
         'display': 'Rare Fishing Exp Boost',
+        "rarity": "Rare",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 40,
         'prices': {},
@@ -2093,6 +2104,7 @@ itemList = {
     },
     'PET_ITEM_FISHING_SKILL_BOOST_EPIC': {
         'display': 'Epic Fishing Exp Boost',
+        "rarity": "Epic",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 50,
         'prices': {},
@@ -2100,12 +2112,14 @@ itemList = {
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_COMMON': {
         'display': 'Common Combat Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Common",
         "exp_boost_type": "combat",
         "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_UNCOMMON': {
         'display': 'Uncommon Combat Exp Boost',
+        "rarity": "Uncommon",
         "exp_boost_type": "combat",
         "exp_boost_amount": 30,
         'prices': {},
@@ -2113,6 +2127,7 @@ itemList = {
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_RARE': {
         'display': 'Rare Combat Exp Boost',
+        "rarity": "Rare",
         "exp_boost_type": "combat",
         "exp_boost_amount": 40,
         'prices': {},
@@ -2120,6 +2135,7 @@ itemList = {
     },
     'PET_ITEM_COMBAT_SKILL_BOOST_EPIC': {
         'display': 'Epic Combat Exp Boost',
+        "rarity": "Epic",
         "exp_boost_type": "combat",
         "exp_boost_amount": 50,
         'prices': {},
@@ -2127,12 +2143,14 @@ itemList = {
     },
     'PET_ITEM_FORAGING_SKILL_BOOST_COMMON': {
         'display': 'Common Foraging Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Common",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 20,
         'prices': { 'custom': 60000 }
     },
     'PET_ITEM_FORAGING_SKILL_BOOST_EPIC': {
         'display': 'Epic Foraging Exp Boost',
+        "rarity": "Epic",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 50,
         'prices': {},
@@ -2140,12 +2158,14 @@ itemList = {
     },
     'PET_ITEM_ALL_SKILLS_BOOST_COMMON': {
         'display': 'All Skills Exp Boost',  # not in bazaar (Zog)
+        "rarity": "Common",
         "exp_boost_type": "all",
         "exp_boost_amount": 10,
         'prices': { 'custom': 50000 }
     },
     'ALL_SKILLS_SUPER_BOOST': {
         'display': 'All Skills Exp Super-Boost',
+        "rarity": "Uncommon",
         "exp_boost_type": "all",
         "exp_boost_amount": 20,
         'prices': {},
@@ -2153,8 +2173,13 @@ itemList = {
     },
     "PET_ITEM_EXP_SHARE": {
         'display': "Exp Share",
+        "rarity": "Epic",
         'prices': {},
         'recipe': {"PET_ITEM_EXP_SHARE_DROP": 1, "ENCHANTED_GOLD": 72}
+    },
+    "SUPER_SCRUBBER": {
+        "display": "Super Scrubber",
+        "prices": { "custom": 25000 },  # not in bazaar (Plumber Joe)
     },
 
     # Attribute Shards
@@ -2209,6 +2234,8 @@ attribute_shards = {
     "Epic": { 1: 1, 2: 2, 3: 4, 4: 6, 5: 9, 6: 12, 7: 16, 8: 20, 9: 25, 10: 32 },
     "Legendary": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 7, 6: 9, 7: 12, 8: 15, 9: 19, 10: 24 }
 }
+
+pet_item_scrub_cost = { "Common": 25000, "Uncommon": 50000, "Rare": 100000, "Epic": 250000, "Legendary": 500000, "Mythic": 1000000, "Divine": 2500000 }
 
 
 #%% Option Lists
@@ -2390,6 +2417,7 @@ all_pets = {
     'Blaze': { 'type': 'combat', 'rarity': 'Legendary' },
     'Blue Whale': { 'type': 'fishing', 'rarity': 'Legendary' },
     'Chicken': { 'type': 'farming', 'rarity': 'Legendary' },
+    'Crow': { 'type': 'combat', 'rarity': 'Legendary' },
     'Dolphin': { 'type': 'fishing', 'rarity': 'Legendary' },
     'Eerie': { 'type': 'combat', 'rarity': 'Legendary' },
     'Elephant': { 'type': 'farming', 'rarity': 'Legendary' },
@@ -2403,6 +2431,7 @@ all_pets = {
     'Glacite Golem': { 'type': 'mining', 'rarity': 'Legendary' },
     'Goblin': { 'type': 'mining', 'rarity': 'Legendary' },
     'Golden Dragon': { 'type': 'combat', 'rarity': 'Dragon' },
+    'Golden Dragon Egg': { 'type': 'combat', 'rarity': 'Legendary' },
     'Golem': { 'type': 'combat', 'rarity': 'Legendary' },
     'Grandma Wolf': { 'type': 'combat', 'rarity': 'Legendary' },
     'Griffin': { 'type': 'combat', 'rarity': 'Legendary' },
@@ -2413,6 +2442,7 @@ all_pets = {
     'Hound': { 'type': 'combat', 'rarity': 'Legendary' },
     'Jerry': { 'type': 'combat', 'rarity': 'Legendary' },
     'Jade Dragon': { 'type': 'foraging', 'rarity': 'Dragon' },
+    'Jade Dragon Egg': { 'type': 'foraging', 'rarity': 'Legendary' },
     'Jellyfish': { 'type': 'alchemy', 'rarity': 'Legendary' },
     'Kuudra': { 'type': 'combat', 'rarity': 'Legendary' },
     'Lion': { 'type': 'foraging', 'rarity': 'Legendary' },
@@ -2431,11 +2461,14 @@ all_pets = {
     'Phoenix': { 'type': 'combat', 'rarity': 'Legendary' },
     'Pig': { 'type': 'farming', 'rarity': 'Legendary' },
     'Pigman': { 'type': 'combat', 'rarity': 'Legendary' },
+    'Precursor Drone': { 'type': 'combat', 'rarity': 'Common' },
     'Rabbit': { 'type': 'farming', 'rarity': 'Legendary' },
     'Rat': { 'type': 'combat', 'rarity': 'Legendary' },
     'Reindeer': { 'type': 'fishing', 'rarity': 'Legendary' },
     'Rift Ferret': { 'type': 'combat', 'rarity': 'Epic' },
     'Rock': { 'type': 'mining', 'rarity': 'Legendary' },
+    'Rose Dragon': { 'type': 'farming', 'rarity': 'Dragon' },
+    'Rose Dragon Egg': { 'type': 'farming', 'rarity': 'Legendary' },
     'Scatha': { 'type': 'mining', 'rarity': 'Legendary' },
     'Sheep': { 'type': 'alchemy', 'rarity': 'Legendary' },
     'Silverfish': { 'type': 'mining', 'rarity': 'Legendary' },
@@ -2457,7 +2490,7 @@ all_pets = {
     'Zombie': { 'type': 'combat', 'rarity': 'Legendary' }
 }
 
-max_lvl_pet_xp_amounts = { "Common": 5624785, "Uncommon": 8644220, "Rare": 12626665, "Epic": 18608500, "Legendary": 25353230, "Dragon": 210255385 }
+max_lvl_pet_xp_amounts = { "Common": 5624785, "Uncommon": 8644220, "Rare": 12626665, "Epic": 18608500, "Legendary": 25353230, "Mythic": 25353230, "Dragon": 210255385 }
 
 
 #%% Minions
