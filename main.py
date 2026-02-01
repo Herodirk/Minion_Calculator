@@ -231,7 +231,7 @@ class Calculator(tk.Tk):
         self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="storage", dtype=float, display="Foraging", initial=0.0)
         self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="storage", dtype=float, display="Alchemy", initial=0.0)
         self.wisdom = HPM.Hvar(self.huim, key="wisdom", vtype="output", dtype=dict, display="Wisdom", frame="inputs_player_grid", widget_width=None, widget_height=6, initial={'combat': self.combat_wisdom.tkvar, 'mining': self.mining_wisdom.tkvar, 'farming': self.farming_wisdom.tkvar, 'fishing': self.fishing_wisdom.tkvar, 'foraging': self.foraging_wisdom.tkvar, 'alchemy': self.alchemy_wisdom.tkvar})
-        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=['None', 'Aatrox', 'Cole', 'Diana', 'Diaz', 'Finnegan', 'Foxy', 'Marina', 'Paul', 'Jerry', 'Derpy', 'Scorpius'], command=lambda x: self.multiswitch("mayors", x))
+        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=['None', 'Aatrox', 'Cole', 'Diana', 'Diaz', 'Finnegan', 'Foxy', 'Marina', 'Paul', 'Jerry', 'Derpy', 'Scorpius', 'Aura'], command=lambda x: self.multiswitch("mayors", x))
         self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()), command=lambda x: self.multiswitch("pet_leveling", x))
         self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
         self.falcon_attribute = HPM.Hvar(self.huim, key="falcon_attribute", vtype="input", dtype=int, display="Battle Experience", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -1063,6 +1063,8 @@ class Calculator(tk.Tk):
                     bazaar_tax = 0.0125 - 0.00125 * setup_data["bazaar_flipper"]
                     if setup_data["mayor"] == "Derpy":
                         bazaar_tax *= 4
+                    if setup_data["mayor"] == "Aura":
+                        bazaar_tax *= 2
                     multiplier = 1 - bazaar_tax
         elif location == "npc" and action == "buy":
             multiplier = 2
@@ -1708,7 +1710,7 @@ class Calculator(tk.Tk):
             if xptype not in skill_xp:
                 skill_xp[xptype] = 0
             skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
-        if mayor == "Derpy":
+        if mayor in ["Derpy", "Aura"]:
             for xptype in skill_xp.keys():
                 skill_xp[xptype] *= 1.5
         if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
