@@ -25,7 +25,7 @@ Current major limitations:<br>
 | Coop Shenanigans is not an actual option (but can still be applied by using the effective wisdom)<br>
 | Player Harvests interacting with minion upgrades is going wrong in every way<br>
 | Good Storage logic is just not there<br>
-| Cooldown upgrade logic is using the wrong cooldowns<br>
+| Unconfirmed cooldowns for cooldown upgrades<br>
 Lesser limitations are listed on the support discord server,<br>
 the invite to that server is at the bottom of https://herodirk.github.io/
 
