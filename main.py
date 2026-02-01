@@ -280,6 +280,7 @@ class Calculator(tk.Tk):
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
         self.scaled_time_unit = HPM.Hvar(self.huim, key="scaled_time_unit", vtype="input", dtype=str, display="Scaled Time unit", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
+        self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True)
 
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -418,6 +419,7 @@ class Calculator(tk.Tk):
                 "item_sell_loc": None,
                 "itemtype_profit": None,
                 "item_profit": None,
+                "used_pet_prices": None,
                 "pet_profit": None,
                 "fuelcost": None,
                 "total_profit": None
@@ -448,7 +450,7 @@ class Calculator(tk.Tk):
         self.huim.logger.debug("Widgets placed")
 
         # Create switches with Hero UI Manager for the extended minion options
-        self.huim.def_switch("pet_leveling", widget_references=["taming", "petxpboost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "falcon_attribute", "toucan_attribute"],
+        self.huim.def_switch("pet_leveling", widget_references=["taming", "petxpboost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "falcon_attribute", "toucan_attribute", "used_pet_prices"],
                             locations="grid", control="None", negate=True, initial=False)
         self.huim.def_switch("exp_share_diana", widget_references=["expsharepetslot2", "expsharepetslot3"],
                             locations="grid", control="DianaTrue", negate=False, initial=False)
@@ -481,7 +483,7 @@ class Calculator(tk.Tk):
         
         self.huim.logger.debug("Switches activated")
 
-        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet"}
+        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet", "used_pet_prices": "levelingpet", "pet_profit": "levelingpet"}
         # dependent variables are only active when another specified variable is not equivalent to 0,
         # this overrides forced outputs as inactive variables might not be equivalent to 0
         self.key_replace_bool = ["infusion", "free_will", "postcard"]  # variables that are booleans that need their display name outputted instead of the boolean value
@@ -494,7 +496,7 @@ class Calculator(tk.Tk):
                             'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
                             'ID', 'setupcost', 'freewillcost', 'extracost', 'actiontime', 'fuelamount', 'sell_loc', 'bazaar_update_txt', 'bazaar_taxes', 'bazaar_flipper', 'notes',
                             'empty_time', 'scaled_time', 'harvests', 'used_storage', 'items', 'item_sell_loc',
-                            'item_profit', 'itemtype_profit', 'xp', 'pet_profit', 'pets_levelled',
+                            'item_profit', 'itemtype_profit', 'xp', 'pet_profit', 'pets_levelled', 'used_pet_costs',
                             'fuelcost', 'total_profit', 'addons_output_container']
 
         # The Share Output order is stored per line.
@@ -503,7 +505,7 @@ class Calculator(tk.Tk):
         # the values are the second dimension of dict, the keys of which are sub-headers used for formatting, like adding line breaks
         # the values of the second dimension are array-like objects consisting of variable keys,
         # the variables are displayed differently depending on which array type it is:
-        # set {}: only the values of the variables will be outputted
+        # set {}: only the values of the variables will be outputted (without any order)
         # list []: both the displays and the values of the variables will be outputted
         # tuple (): both displays and values are shown, the sub-header will be outputted in front of every variable
         self.fancyOrder = {
@@ -522,6 +524,7 @@ class Calculator(tk.Tk):
                 "\n> ": ["taming", "falcon_attribute", "petxpboost", "beastmaster", "toucan_attribute", "expshareitem"],
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
+            "used_pet_prices": None,
             "**Setup Information**": {"\n> ": ("ID", "setupcost", "freewillcost", "extracost", "actiontime", "fuelamount")},
             "Bazaar Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
             "notes": None,
@@ -1829,7 +1832,7 @@ class Calculator(tk.Tk):
         gained_pet_xp += left_over_pet_xp
         return gained_pet_xp, left_over_pet_xp
 
-    def get_pet_profit(self, skill_xp, mayor, setup_notes, setup_data):
+    def get_pet_profit(self, skill_xp, mayor, setup_data):
         """
         Get total profit from pet levelling\n
         Pet levelling calculations: https://wiki.hypixel.net/Pets#Leveling,\n
@@ -1838,19 +1841,21 @@ class Calculator(tk.Tk):
         
         :param skill_xp: dict, gained skill xp per type
         :param mayor: str, mayor
-        :param setup_notes: dict, setup notes
         :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost, setup data for self.get_price and for self.get_pet_xp_boosts
-        :return pet_profit: total profit from pets
+        :return pet_profit: float, total profit from pets
+        :return setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets
+        :return pet_prices: dict, pet name as key, string as value with lvl 1 price and max lvl price 
         """
         pet_profit = 0.0
         main_pet = setup_data["levelingpet"]
         if main_pet == "None":
-            return 0, {}
-        setup_pets = { "levelingpet": {"pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0} }
+            return 0, {}, {}
+        setup_pets = { "levelingpet": { "pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0 } }
         for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
             if setup_data[var_key] == "None" or (mayor != "Diana" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
                 continue
             setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
+        pet_prices = {}
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         if "Dragon" in md.all_pets[main_pet]["rarity"]:
             left_over_pet_xp = 0.0
@@ -1886,14 +1891,17 @@ class Calculator(tk.Tk):
             pets_levelled = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.all_pets[pet_info["pet"]]["rarity"]]
             setup_pets[pet_slot]["levelled_pets"] = pets_levelled
             if pet_info["pet"] not in pet_costs:
-                setup_notes["Pet Costs"] = f"{pet_info['pet']} is not in pet_costs."
+                if pet_info["pet"] not in pet_prices:
+                    pet_prices[pet_info["pet"]] = f"Price for {pet_info['pet']} not found"
             else:
                 pet_profit += pets_levelled * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
+                if pet_info["pet"] not in pet_prices:
+                    pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(pet_costs[pet_info["pet"]]["min"])} - {self.huim.reduced_number(pet_costs[pet_info["pet"]]["max"])}"
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "NONE":
                 pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.itemList[main_pet_item]["rarity"]] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
                 pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.itemList["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
-        return pet_profit, setup_pets
+        return pet_profit, setup_pets, pet_prices
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
         """
@@ -2162,7 +2170,7 @@ class Calculator(tk.Tk):
         self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes, setup_data)
         
         # Pet leveling
-        pet_profit, setup_pets = self.get_pet_profit(skill_xp, mayor, setup_notes, setup_data)
+        pet_profit, setup_pets, pet_prices = self.get_pet_profit(skill_xp, mayor, setup_data)
 
         # calculating beacon and limited fuel cost
         fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, empty_time_seconds, setup_data)
@@ -2208,7 +2216,8 @@ class Calculator(tk.Tk):
             "empty_time": empty_time_str,
             "scaled_time": scaled_time_str,
             "actiontime": seconds_per_action,
-            "notes": setup_notes
+            "notes": setup_notes,
+            "used_pet_prices": pet_prices,
         }), 
 
         # Update GUI
