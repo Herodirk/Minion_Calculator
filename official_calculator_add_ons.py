@@ -27,7 +27,7 @@ def old_corrupted_frags(calculator):
         return
     corrupted_frag_profit = calculator.itemtype_profit.list["CORRUPTED_FRAGMENT"]
     total_profit = calculator.total_profit.get()
-    calculator.collect_addon_output("Old Corrupted Frag profit", f"{calculator.reduced_number(total_profit + 19 * corrupted_frag_profit, 2)}")
+    calculator.collect_addon_output("Old Corrupted Frag profit", f"{calculator.huim.reduced_number(total_profit + 19 * corrupted_frag_profit, 2)}")
     return
 
 
@@ -38,7 +38,7 @@ def old_enchanted_hopper(calculator):
         calculator.collect_addon_output("Old Enchanted Hopper profit", "Setup does not use Enchanted Hoppers")
         return
     profit = calculator.total_profit.get()
-    calculator.collect_addon_output("Old Enchanted Hopper profit", f"{calculator.reduced_number(profit * (9 / 7), 2)}")
+    calculator.collect_addon_output("Old Enchanted Hopper profit", f"{calculator.huim.reduced_number(profit * (9 / 7), 2)}")
     return
 
 
@@ -50,7 +50,7 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
     if setup_data["fuel"] != "INFERNO_FUEL":
         calculator.collect_addon_output("Bad Luck Inferno", "No Inferno Minion Fuel Found")
         return
-    if setup_data["inferno_grade"] != "Hypergolic Gabagool":
+    if setup_data["inferno_grade"] != "HYPERGOLIC_GABAGOOL":
         calculator.collect_addon_output("Bad Luck Inferno", "No Hypergolic Items Found")
         return
     total_profit = outputs["total_profit"]
@@ -59,7 +59,7 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
     per_vertex = calculator.get_price("INFERNO_VERTEX", setup_data, "sell", "bazaar")
     if return_value:
         return no_rng_profit
-    calculator.collect_addon_output("Bad Luck Inferno Profit", f"{calculator.reduced_number(no_rng_profit, 2)} + {calculator.reduced_number(per_vertex, 2)} per Inferno Vertex")
+    calculator.collect_addon_output("Bad Luck Inferno Profit", f"{calculator.huim.reduced_number(no_rng_profit, 2)} + {calculator.huim.reduced_number(per_vertex, 2)} per Inferno Vertex")
     return
 
 
@@ -94,26 +94,26 @@ def basic_minion_loop(calculator):
     loop_minion_smelting = ["Iron", "Gold", "Cactus"]
     loop_minion_combat = ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]
     super_compactor = False
-    if setup_data["upgrade1"] in ["Super Compactor 3000", "Dwarven Super Compactor"]:
+    if setup_data["upgrade1"] in ["SUPER_COMPACTOR_3000", "DWARVEN_COMPACTOR"]:
         super_compactor = True
-    if setup_data["upgrade2"] in ["Super Compactor 3000", "Dwarven Super Compactor"]:
+    if setup_data["upgrade2"] in ["SUPER_COMPACTOR_3000", "DWARVEN_COMPACTOR"]:
         super_compactor = True
         setup_data["upgrade2"] = setup_data["upgrade1"]
-        setup_data["upgrade1"] = "Super Compactor 3000"
+        setup_data["upgrade1"] = "SUPER_COMPACTOR_3000"
     
     upgrades = [setup_data["upgrade1"], setup_data["upgrade2"]]
     for loop_minion in loop_minion_options:
         if loop_minion in loop_minion_skip:
             continue
-        if loop_minion not in loop_minion_combat and "Corrupt Soil" in upgrades:
+        if loop_minion not in loop_minion_combat and "CORRUPT_SOIL" in upgrades:
             continue
         setup_data["minion"] = loop_minion
         setup_data["miniontier"] = list(md.minionList[setup_data["minion"]]["speed"].keys())[-1]
         if super_compactor:
             if loop_minion in loop_minion_smelting:
-                setup_data["upgrade1"] = "Dwarven Super Compactor"
+                setup_data["upgrade1"] = "DWARVEN_COMPACTOR"
             else:
-                setup_data["upgrade1"] = "Super Compactor 3000"
+                setup_data["upgrade1"] = "SUPER_COMPACTOR_3000"
         outputs = calculator.calculate(setup_data=setup_data, return_outputs=True)
 
         calculated_setup_profits[loop_minion] = outputs["total_profit"]
@@ -123,7 +123,7 @@ def basic_minion_loop(calculator):
     print("Minion : profit , setup cost")
     for _ in range(10):
         top_minion = max(calculated_setup_profits, key=calculated_setup_profits.get)
-        print(top_minion, ":", calculator.reduced_number(calculated_setup_profits[top_minion]), ",", calculator.reduced_number(calculated_setup_costs[top_minion]))
+        print(top_minion, ":", calculator.huim.reduced_number(calculated_setup_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]))
         del calculated_setup_profits[top_minion]
     print("\n")
     calculator.collect_addon_output("Basic Minion Loop", "See terminal")
@@ -143,11 +143,11 @@ def inferno_minion_loop(calculator):
 
     setup_data["minion"] = "Inferno"
     setup_data["fuel"] = "INFERNO_FUEL"
-    setup_data["chest"] = "XX-Large"
+    setup_data["chest"] = "XXLARGE_ENCHANTED_CHEST"
     setup_data["rising_celsius_override"] = True
 
-    loop_tiers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    loop_amounts = list(np.arange(1, 32))
+    loop_tiers = range(1, 12)
+    loop_amounts = range(1, 33)
     for loop_tier in loop_tiers:
         setup_data["miniontier"] = loop_tier
         for loop_amount in loop_amounts:
@@ -164,9 +164,9 @@ def inferno_minion_loop(calculator):
     print("Tier, Amount : bad luck profit , minion cost, true average profit")
     for _ in range(10):
         top_minion = max(calculated_setup_bad_luck_profits, key=calculated_setup_bad_luck_profits.get)
-        print(top_minion, ":", calculator.reduced_number(calculated_setup_bad_luck_profits[top_minion]), ",", calculator.reduced_number(calculated_setup_costs[top_minion]), ",", calculator.reduced_number(calculated_setup_profits[top_minion]))
+        print(top_minion, ":", calculator.huim.reduced_number(calculated_setup_bad_luck_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_profits[top_minion]))
         del calculated_setup_bad_luck_profits[top_minion]
-    print(f"Bad Luck Profit: + {calculator.reduced_number(calculator.get_price('INFERNO_VERTEX', setup_data, 'sell', 'bazaar'), 2)} per Inferno Vertex")
+    print(f"Bad Luck Profit: + {calculator.huim.reduced_number(calculator.get_price('INFERNO_VERTEX', setup_data, 'sell', 'bazaar'), 2)} per Inferno Vertex")
     print("\n")
     calculator.collect_addon_output("Inferno Minion Loop", "See terminal")
     return

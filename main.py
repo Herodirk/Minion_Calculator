@@ -14,7 +14,7 @@ AH data from https://sky.coflnet.com/data
 
 try:
     import tkinter as tk
-    import numpy as np
+    import math
     import time
     from copy import deepcopy
     import webbrowser
@@ -1337,7 +1337,7 @@ class Calculator(tk.Tk):
             scaled_time_str = f"{setup_data["scaled_time_amount"]} {setup_data["scaled_time_unit"]}"
             timeratio = scaled_time_seconds / empty_time_seconds
         return empty_time_seconds, timeratio, empty_time_str, scaled_time_str
-    
+
     def get_harvests_per_time(self, empty_time_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier, setup_data):
         """
         Calculates the amount of harvests in the inputted empty_time.
@@ -1481,7 +1481,7 @@ class Calculator(tk.Tk):
                 if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrade_ids:
                     continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
                 if afk_toggle:
-                    effective_cooldown = 2 * seconds_per_action * (1 + np.floor(np.ceil(md.itemList[upgrade]["upgrade_special"]["cooldown"] / seconds_per_action) / 2))
+                    effective_cooldown = 2 * seconds_per_action * (1 + math.floor(math.ceil(md.itemList[upgrade]["upgrade_special"]["cooldown"] / seconds_per_action) / 2))
                 else:
                     effective_cooldown = md.itemList[upgrade]["upgrade_special"]["offline_cooldown"]
                 if "SOULFLOW_ENGINE" == upgrade and minion == "Voidling":
@@ -1615,7 +1615,7 @@ class Calculator(tk.Tk):
         """
         used_storage_slots = 0
         for amount in drops_list.values():
-            used_storage_slots += np.ceil(amount / 64)  # hypixel does not care about smaller max stack sizes
+            used_storage_slots += math.ceil(amount / 64)  # hypixel does not care about smaller max stack sizes
         return used_storage_slots
     
     def get_fill_time(self, minion, available_storage):
@@ -1941,7 +1941,7 @@ class Calculator(tk.Tk):
         cost_cache = {}
         tiered_coin_cost = {}
         tiered_extra_cost = {}
-        tier_loop = np.arange(minion_tier) + 1
+        tier_loop = range(1, minion_tier + 1)
         for tier in tier_loop:
             tiered_coin_cost[tier] = 0.0
             if minion_type in md.extraMinionCosts:
@@ -2195,7 +2195,7 @@ class Calculator(tk.Tk):
         }
 
         self.huim.deepmultiply(outputs, timeratio)
-        outputs["fuelamount"] = np.ceil(outputs["fuelamount"] / minion_amount) * minion_amount
+        outputs["fuelamount"] = math.ceil(outputs["fuelamount"] / minion_amount) * minion_amount
         outputs.update({
             "available_storage": available_storage,
             "item_sell_loc": per_item_sell_location,

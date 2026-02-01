@@ -26,7 +26,6 @@ If that date is missing, it was confirmed by an old test and might need to be ch
 """
 
 from copy import deepcopy
-import numpy as np
 
 #%% Bazaar Buy and Sell types:
 
@@ -2848,7 +2847,7 @@ def minionCostTypes(materials, upgradetype, twelve=False, edits=None):
 
 def minionCostSum(minion_type, final_tier):
     final_cost = {}
-    tier_loop = np.arange(final_tier) + 1
+    tier_loop = range(1, final_tier + 1)
     for tier in tier_loop:
         for item, amount in minionCosts[minion_type][tier].items():
             if item not in final_cost:
@@ -2928,7 +2927,7 @@ minionCosts["Revenant"] = {
     2: { "REVENANT_FLESH": 140, **minionCostSum("Zombie", 1) },
     3: { "REVENANT_FLESH": 280, **minionCostSum("Zombie", 2) },
     4: { "REVENANT_FLESH": 448, **minionCostSum("Zombie", 3) },
-    **{ i: { "REVENANT_VISCERA": 7 * 2**(i - 5), **minionCostSum("Zombie", i - 1) } for i in np.arange(5, 12) },
+    **{ i: { "REVENANT_VISCERA": 7 * 2**(i - 5), **minionCostSum("Zombie", i - 1) } for i in range(5, 12) },
     12: { "REVENANT_VISCERA": 64 }
 }
 minionCosts["Voidling"] = {
@@ -2936,12 +2935,12 @@ minionCosts["Voidling"] = {
     2: { "NULL_SPHERE": 140, **minionCostSum("Obsidian", 1) },
     3: { "NULL_SPHERE": 280, **minionCostSum("Enderman", 2) },
     4: { "NULL_SPHERE": 448, **minionCostSum("Obsidian", 3) },
-    **{ i: { "NULL_OVOID": 7 * 2**(i - 5), **minionCostSum(f"{'Obsidian' if i % 2 == 0 else 'Enderman'}", i - 1) } for i in np.arange(5, 12) }
+    **{ i: { "NULL_OVOID": 7 * 2**(i - 5), **minionCostSum(f"{'Obsidian' if i % 2 == 0 else 'Enderman'}", i - 1) } for i in range(5, 12) }
 }
 minionCosts["Inferno"] = {
     1: { "DERELICT_ASHE": 80, **minionCostSum("Blaze", 1)},
     2: {"DERELICT_ASHE": 320 },
-    **{ i: {"MOLTEN_POWDER": 8 * 2**(i - 3)} for i in np.arange(3, 9) },
+    **{ i: {"MOLTEN_POWDER": 8 * 2**(i - 3)} for i in range(3, 9) },
     9: { 'MOLTEN_POWDER': 256, "INFERNO_VERTEX": 16 },
     10: { 'MOLTEN_POWDER': 256, "INFERNO_VERTEX": 48 }
 }
@@ -2952,7 +2951,7 @@ minionCosts["Tarantula"] = {
     2: { "TARANTULA_WEB": 140, **minionCostSum("Spider", 1) },
     3: { "TARANTULA_WEB": 280, **minionCostSum("Spider", 2) },
     4: { "TARANTULA_WEB": 448, **minionCostSum("Spider", 3) },
-    **{ i: {"TARANTULA_SILK": 7 * 2**(i - 5), **minionCostSum("Spider", i - 1)} for i in np.arange(5, 12) },
+    **{ i: {"TARANTULA_SILK": 7 * 2**(i - 5), **minionCostSum("Spider", i - 1)} for i in range(5, 12) },
     12: { "TARANTULA_SILK": 64 }
 }
 
