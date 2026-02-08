@@ -16,7 +16,6 @@ try:
     import tkinter as tk
     import math
     import time
-    from copy import deepcopy
     import webbrowser
     import HSB_minion_data as md
     import Hero_UI_Manager as HPM
@@ -891,55 +890,6 @@ class Calculator(tk.Tk):
             return
         else:
             return crafted_string
-
-    def get_from_GUI(self, var_keys, translate=True):
-        """
-        Gets the requested variables of the GUI and returns them as a dict.
-
-        Returns
-        -------
-        dict
-            values of the requested variables.
-
-        """
-        var_values = {}
-        for var_key in var_keys:
-            if var_key not in self.var_dict:
-                self.huim.logger.warning(f"{var_key} key not in self.var_dict")
-                continue
-            if self.var_dict[var_key].dtype in [dict, list]:
-                var_values[var_key] = deepcopy(self.var_dict[var_key].list)
-            else:
-                var_values[var_key] = self.var_dict[var_key].get(translate)
-        return var_values
-
-    def send_to_GUI(self, outputs):
-        """
-        sends outputs to the GUI.
-
-        Parameters
-        ----------
-        outputs : dict
-            dict containing variable keys as keys with the wanted value.
-
-        Returns
-        -------
-        None.
-
-        """
-        for var_key in outputs:
-            if var_key not in self.var_dict:
-                self.huim.logger.warning(f"Output {var_key} not found in self.var_dict")
-                continue
-            if (var_dtype := self.var_dict[var_key].dtype) in [dict, list]:
-                self.var_dict[var_key].list.clear()
-                if var_dtype is dict:
-                    self.var_dict[var_key].list.update(outputs[var_key])
-                else:
-                    self.var_dict[var_key].list.extend(outputs[var_key])
-            else:
-                self.var_dict[var_key].set(outputs[var_key])
-        return
 
     def construct_id(self, setup_data):
         """
@@ -2094,7 +2044,7 @@ class Calculator(tk.Tk):
 
         # Get inputs if none are given
         if setup_data is None:
-            setup_data = self.get_from_GUI(self.ID_order)
+            setup_data = self.huim.get_from_GUI(self.ID_order)
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -2225,7 +2175,7 @@ class Calculator(tk.Tk):
 
         # Update GUI
         if inGUI:
-            self.send_to_GUI(outputs)
+            self.huim.send_to_GUI(outputs)
             self.addons_output_container.list.clear()
             for addon_name, auto_run_bool in self.addons_auto_run.items():
                 if auto_run_bool.get():

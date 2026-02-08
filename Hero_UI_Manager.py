@@ -12,6 +12,7 @@ import numpy as np
 import urllib.request
 import logging
 import json
+from copy import deepcopy
 
 color_palettes = {
     "dark": {
@@ -635,7 +636,7 @@ class H_UI_M():
         button.place(in_=button_anchor, **place_args)
         return
 
-    ### Data requests
+    ### Data logistics
 
     def call_API(self, api_url, api_name="API", data=None, headers={}):
         self.logger.debug(f"Calling {api_name}")
@@ -647,8 +648,56 @@ class H_UI_M():
             return
         return json.loads(call_data)
 
+    def get_from_GUI(self, var_keys, translate=True):
+        """
+        Gets the requested variables of the GUI and returns them as a dict.
 
-    ### Data management
+        Returns
+        -------
+        dict
+            values of the requested variables.
+
+        """
+        var_values = {}
+        for var_key in var_keys:
+            if var_key not in self.main.var_dict:
+                self.logger.warning(f"{var_key} key not in self.var_dict")
+                continue
+            if self.main.var_dict[var_key].dtype in [dict, list]:
+                var_values[var_key] = deepcopy(self.main.var_dict[var_key].list)
+            else:
+                var_values[var_key] = self.main.var_dict[var_key].get(translate)
+        return var_values
+
+    def send_to_GUI(self, outputs):
+        """
+        sends outputs to the GUI.
+
+        Parameters
+        ----------
+        outputs : dict
+            dict containing variable keys as keys with the wanted value.
+
+        Returns
+        -------
+        None.
+
+        """
+        for var_key in outputs:
+            if var_key not in self.main.var_dict:
+                self.logger.warning(f"Output {var_key} not found in self.var_dict")
+                continue
+            if (var_dtype := self.main.var_dict[var_key].dtype) in [dict, list]:
+                self.main.var_dict[var_key].list.clear()
+                if var_dtype is dict:
+                    self.main.var_dict[var_key].list.update(outputs[var_key])
+                else:
+                    self.main.var_dict[var_key].list.extend(outputs[var_key])
+            else:
+                self.main.var_dict[var_key].set(outputs[var_key])
+        return
+
+    ### Data editing
 
     def reduced_number(self, number, decimal=2):
         """

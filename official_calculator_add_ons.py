@@ -45,8 +45,8 @@ def old_enchanted_hopper(calculator):
 def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=False):
     """Outputs the profit of the common Hypergolic drops and the price per Inferno Vertex"""
     if setup_data is None:
-        setup_data = calculator.get_from_GUI(["fuel", "inferno_grade", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper", "mayor"])
-        outputs = calculator.get_from_GUI(["total_profit", "itemtype_profit"])
+        setup_data = calculator.huim.get_from_GUI(["fuel", "inferno_grade", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper", "mayor"])
+        outputs = calculator.huim.get_from_GUI(["total_profit", "itemtype_profit"])
     if setup_data["fuel"] != "INFERNO_FUEL":
         calculator.collect_addon_output("Bad Luck Inferno", "No Inferno Minion Fuel Found")
         return
@@ -65,7 +65,7 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
 
 def setup_repay_time(calculator):
     """Outputs the time (in days) it take for a setup to repay itself"""
-    setup_data = calculator.get_from_GUI(["time_seconds", "setupcost", "free_will", "freewillcost", "total_profit"])
+    setup_data = calculator.huim.get_from_GUI(["time_seconds", "setupcost", "free_will", "freewillcost", "total_profit"])
     setupcost = setup_data["setupcost"]
     # if setup_data["free_will"]:
     #     setupcost += setup_data["freewillcost"]
@@ -85,7 +85,7 @@ def setup_repay_time(calculator):
 
 
 def basic_minion_loop(calculator):
-    setup_data = calculator.get_from_GUI(calculator.ID_order)
+    setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
     calculated_setup_profits = {}
     calculated_setup_costs = {}
     loop_minion_options = list(md.minionList.keys())
@@ -130,7 +130,7 @@ def basic_minion_loop(calculator):
 
 
 def inferno_minion_loop(calculator):
-    setup_data = calculator.get_from_GUI(calculator.ID_order)
+    setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
     calculated_setup_profits = {}
     calculated_setup_bad_luck_profits = {}
     calculated_setup_costs = {}
@@ -172,7 +172,7 @@ def inferno_minion_loop(calculator):
 
 
 def craft_material_amount(calculator):
-    setup_data = calculator.get_from_GUI(["minion", "miniontier", "amount", "extracost"])
+    setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])
     materials = md.minionCostSum(setup_data["minion"], setup_data["miniontier"])
     extra_costs_string = setup_data["extracost"]
     materials_string = ", ".join([f"{amount * setup_data["amount"]} {md.itemList[material]["display"]}" for material, amount in materials.items()])
