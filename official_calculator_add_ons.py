@@ -65,17 +65,16 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
 
 def setup_repay_time(calculator):
     """Outputs the time (in days) it take for a setup to repay itself"""
-    setup_data = calculator.get_from_GUI(["time_seconds", "setupcost", "free_will", "freewillcost", "total_profit", "bazaar_taxes", "bazaar_flipper", "mayor"])
-    totaltime = setup_data["time_seconds"]
+    setup_data = calculator.get_from_GUI(["time_seconds", "setupcost", "free_will", "freewillcost", "total_profit"])
     setupcost = setup_data["setupcost"]
-    if setup_data["free_will"]:
-        setupcost += setup_data["freewillcost"]
+    # if setup_data["free_will"]:
+    #     setupcost += setup_data["freewillcost"]
     profit = setup_data["total_profit"]
     if profit < 0:
         calculator.collect_addon_output("Setup Repay Time", "Negative profit, cannot repay")
         return
     try:
-        profitpersecond = profit / totaltime
+        profitpersecond = profit / setup_data["time_seconds"]
         repay_time_s = setupcost / profitpersecond
     except ZeroDivisionError:
         calculator.collect_addon_output("Setup Repay Time", "Division by zero")

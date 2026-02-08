@@ -14,11 +14,6 @@ Data includes:
 Bazaar and NPC price data from https://api.hypixel.net
 AH data from https://sky.coflnet.com/data
 
-Items that are not on bazaar will have "# not in bazaar" behind the display name,
-some of these are on the auction house and have "(AH)" behind "# not in bazaar",
-these AH only items must have their custom prices updated manually,
-each of these items has a date behind them showing when they were last updated.
-
 If information has been checked, there is "# correct" behind it with the date of the test.
 If information has been checked but still isn't a logical value, then there is "# correct inaccuracy" behind it with the date of the test.
 These are inaccuracies from Hypixel and they can correct them at any point in time, so they should be checked regularly
@@ -1527,7 +1522,7 @@ itemList = {
         'display': 'Enchanted Eye of Ender',
         "prices": {},
     },
-    'SILVER_FANG': {  # correcet: cannot be made in ghast minion
+    'SILVER_FANG': {  # correct: cannot be made in ghast minion
         'display': 'Silver Fang',
         "prices": {},
     },

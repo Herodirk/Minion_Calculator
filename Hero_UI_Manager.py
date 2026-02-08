@@ -965,11 +965,11 @@ class Hvar():
         self.vtype = vtype  # str, variable type ("input", "output", "storage")
         self.dtype = dtype  # type, data type
         self.name_display = display  # str, human-readable display name of variable
-        self.fancy_name_display = fancy_display  # str, fancy display name of variable, if None, self.name_display is used
-        self.frame = frame  # str, ID of Tk Frame in huim.main.frames where the widgets get made
         self.initial = initial  # {self.dtype}, initial value of the variable
 
         # Optional data:
+        self.frame = frame  # str, ID of Tk Frame in huim.main.frames where the widgets get made
+        self.fancy_name_display = fancy_display  # str, fancy display name of variable, if None, self.name_display is used
         if self.dtype == bool:
             self.options = [False, True]
         else:

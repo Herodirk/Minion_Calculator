@@ -81,7 +81,7 @@ templateList = {
     "Cheap speed": {
         "fuel": "Enchanted Lava Bucket",
         "upgrade2": "Diamond Spreading",
-        "beacon": "Beacon V",
+        "beacon": "None",
         "infusion": False,
         "free_will": False,
         "postcard": True
@@ -141,7 +141,7 @@ templateList = {
         "fuel": "Inferno Minion Fuel",
         "inferno_grade": "Hypergolic Gabagool",
         "inferno_distillate": "Gabagool Distillate",
-        "inferno_eyedrops": True,
+        "inferno_eyedrops": False,
         "sell_loc": "Best (NPC/Bazaar)",
         "upgrade1": "Super Compactor 3000",
         "upgrade2": "Flycatcher",
@@ -199,7 +199,7 @@ class Calculator(tk.Tk):
         self.minion = HPM.Hvar(self.huim, key="minion", vtype="input", dtype=str, display="Minion", frame="inputs_minion_grid", initial="Custom", options=list(md.minionList.keys()), command=lambda x: self.multiswitch('minion', x))
         self.miniontier = HPM.Hvar(self.huim, key="miniontier", vtype="input", dtype=int, display="Tier", frame="inputs_minion_grid", initial=12, options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], command=lambda x: self.multiswitch('minion', x))
         self.amount = HPM.Hvar(self.huim, key="amount", vtype="input", dtype=int, display="Amount", frame="inputs_minion_grid", initial=1, options=None)
-        self.fuel = HPM.Hvar(self.huim, key="fuel", vtype="input", dtype=str, display="Fuel", frame="inputs_minion_grid", initial="None", options=md.fuel_options, command=lambda x: self.multiswitch('fuel', x))     
+        self.fuel = HPM.Hvar(self.huim, key="fuel", vtype="input", dtype=str, display="Fuel", frame="inputs_minion_grid", initial="None", options=md.fuel_options, command=lambda x: self.multiswitch('fuel', x))
         self.inferno_grade = HPM.Hvar(self.huim, key="inferno_grade", vtype="input", dtype=str, display="Grade", frame="inputs_minion_grid", initial="Hypergolic Gabagool", options=md.inferno_fuel_grade_options)
         self.inferno_distillate = HPM.Hvar(self.huim, key="inferno_distillate", vtype="input", dtype=str, display="Distillate", frame="inputs_minion_grid", initial="Gabagool Distillate", options=md.inferno_fuel_distillate_options)
         self.inferno_eyedrops = HPM.Hvar(self.huim, key="inferno_eyedrops", vtype="input", dtype=bool, display="Eyedrops", frame="inputs_minion_grid", initial=True)
@@ -213,7 +213,7 @@ class Calculator(tk.Tk):
         self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
         self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
         self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=md.floating_crystal_options)
-        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("free_will", controlvar="free_will"))  
+        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("free_will", controlvar="free_will"))
         self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
         self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
         self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=list(md.boost_pets.keys()))
@@ -230,7 +230,7 @@ class Calculator(tk.Tk):
         self.fishing_wisdom = HPM.Hvar(self.huim, key="fishing_wisdom", vtype="storage", dtype=float, display="Fishing", initial=0.0)
         self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="storage", dtype=float, display="Foraging", initial=0.0)
         self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="storage", dtype=float, display="Alchemy", initial=0.0)
-        self.wisdom = HPM.Hvar(self.huim, key="wisdom", vtype="output", dtype=dict, display="Wisdom", frame="inputs_player_grid", widget_width=None, widget_height=6, initial={'combat': self.combat_wisdom.tkvar, 'mining': self.mining_wisdom.tkvar, 'farming': self.farming_wisdom.tkvar, 'fishing': self.fishing_wisdom.tkvar, 'foraging': self.foraging_wisdom.tkvar, 'alchemy': self.alchemy_wisdom.tkvar})
+        self.wisdom = HPM.Hvar(self.huim, key="wisdom", vtype="output", dtype=dict, display="Wisdom", frame="inputs_player_grid", widget_width=None, widget_height=6, initial={'combat': self.combat_wisdom, 'mining': self.mining_wisdom, 'farming': self.farming_wisdom, 'fishing': self.fishing_wisdom, 'foraging': self.foraging_wisdom, 'alchemy': self.alchemy_wisdom})
         self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=['None', 'Aatrox', 'Cole', 'Diana', 'Diaz', 'Finnegan', 'Foxy', 'Marina', 'Paul', 'Jerry', 'Derpy', 'Scorpius', 'Aura'], command=lambda x: self.multiswitch("mayors", x))
         self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()), command=lambda x: self.multiswitch("pet_leveling", x))
         self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
@@ -308,10 +308,10 @@ class Calculator(tk.Tk):
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
-        self.bazaarB = tk.Button(self.frames["controls"], text="Update Bazaar", command=self.update_prices)
+        self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
-        controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.bazaarB, self.addonsB]
+        controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.pricesB, self.addonsB]
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
@@ -496,7 +496,7 @@ class Calculator(tk.Tk):
                             'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
                             'ID', 'setupcost', 'freewillcost', 'extracost', 'actiontime', 'fuelamount', 'sell_loc', 'bazaar_update_txt', 'bazaar_taxes', 'bazaar_flipper', 'notes',
                             'empty_time', 'scaled_time', 'harvests', 'used_storage', 'items', 'item_sell_loc',
-                            'item_profit', 'itemtype_profit', 'xp', 'pet_profit', 'pets_levelled', 'used_pet_costs',
+                            'item_profit', 'itemtype_profit', 'xp', 'pet_profit', 'pets_levelled', 'used_pet_prices',
                             'fuelcost', 'total_profit', 'addons_output_container']
 
         # The Share Output order is stored per line.
@@ -716,7 +716,7 @@ class Calculator(tk.Tk):
 
             val = self.var_dict[var_key].get(False)
             if vtype == "input":
-                if val in ["None", 0, 0.0]:
+                if val in ["None", 0, 0.0, False, ""]:
                     continue
                 if dtype in [int, float, bool]:
                     string_parts[var_key] = f"{display}: {val}"
@@ -1711,8 +1711,7 @@ class Calculator(tk.Tk):
                 skill_xp[xptype] = 0
             skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
         if mayor in ["Derpy", "Aura"]:
-            for xptype in skill_xp.keys():
-                skill_xp[xptype] *= 1.5
+            self.huim.deepmultiply(skill_xp, 1.5)
         if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
             del skill_xp["combat"]
         return skill_xp
@@ -2021,10 +2020,12 @@ class Calculator(tk.Tk):
                 # the last Free Will will not give a post card
                 free_wills_failed = free_wills_needed - 1
                 tiered_free_will[tier] = free_wills_failed * (tiered_coin_cost[tier] - final_postcard_cost) + free_wills_needed * free_will_price
+            self.huim.logger.debug(f"Found Average Free Will cost per tier:\n{tiered_free_will}",)
             optimal = min(tiered_free_will, key=tiered_free_will.get)
             self.optimal_tier_free_will.set(optimal)
             setup_notes["Free Will"] = f"per minion, apply {1 / (0.5 + 0.04 * (optimal - 1)):.2} Free Wills on Tier {optimal}"
             cost_per_part["free_will"] = tiered_free_will[optimal]
+            self.freewillcost.set(cost_per_part["free_will"])
 
         # Storage Chest cost
         if setup_data["chest"] != "NONE":
@@ -2220,7 +2221,7 @@ class Calculator(tk.Tk):
             "actiontime": seconds_per_action,
             "notes": setup_notes,
             "used_pet_prices": pet_prices,
-        }), 
+        })
 
         # Update GUI
         if inGUI:
