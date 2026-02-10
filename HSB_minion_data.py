@@ -4,10 +4,9 @@
 
 File containing data of hypixel skyblock minions.
 Data includes:
-- List of minion related items with skyblock ID, prices and possible gained skill xp
+- List of minion related things with attributes
 - Skyblock IDs of minion upgrades
 - Lists of compactor, super compactor and auto smelter transformations, inferno minion chances
-- List of minions with their drop amounts, speed and notes
 - Functions for calculating minion crafting cost
 - List of minion costs
 
@@ -218,7 +217,7 @@ super_compactor_list = {
 
 #%% item list
 
-itemList = {
+calculator_data = {
     # The following items do not exist
     "NONE": {
         'display': "None",
@@ -1643,7 +1642,7 @@ itemList = {
         "speed_boost": 35,
         "drop_multiplier": 1,
         "fuel_duration": -1,
-        "upgrade_special": {"type": "speed_bonus", "amount": 5, "affected_minions": ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime"]},  # TODO: need to check affected minions
+        "upgrade_special": {"type": "speed_bonus", "amount": 5, "affected_minions": ["combat_minion"]},  # TODO: need to check affected minions
         "prices": {},
         "recipe": {"PLASMA_BUCKET": 1, "FLAMES": 16, "ENCHANTED_SULPHUR_CUBE": 2, "ENCHANTED_RED_SAND_CUBE": 2},
     },
@@ -1861,35 +1860,35 @@ itemList = {
     "FARM_CRYSTAL": {
         'display': "Farm Crystal",
         "speed_boost": 10,
-        "affected_minions": ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower'],
+        "affected_minions": ["farming_crop_minion"],
         'prices': {},
         "recipe": { "ENCHANTED_PUMPKIN": 96, "ENCHANTED_QUARTZ": 1 }
     },
     "WOODCUTTING_CRYSTAL": {
         'display': "Woodcutting Crystal",
         "speed_boost": 10,
-        "affected_minions": ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle', "Flower"],  # Flower minion is correct
+        "affected_minions": ["foraging_minion"],
         'prices': {},
         "recipe": { "ENCHANTED_SPRUCE_LOG": 96, "ENCHANTED_QUARTZ": 1 }
     },
     "MITHRIL_CRYSTAL": {
         'display': "Mithril Crystal",
         "speed_boost": 10,
-        "affected_minions": ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Red Sand', 'Mycelium', 'Ice', 'Snow', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril', 'Hard Stone'],
+        "affected_minions": ["mining_minion"],
         'prices': {},
         "recipe": { "ENCHANTED_MITHRIL": 16, "ENCHANTED_QUARTZ": 1 }
     },
     "WINTER_ISLAND_CRYSTAL": {
         'display': "Winter Crystal",
         "speed_boost": 5,
-        "affected_minions": ["Snow", "Ice"],
+        "affected_minions": ["winter_minion"],
         'prices': {},
         "recipe": { "WINTER_ISLAND": 1 }
     },
     "MITHRIL_WINTER_CRYSTAL": {
         'display': "Mithril + Winter Crystal",  # not a real item
         "speed_boost": 15,  # correct
-        "affected_minions": ["Snow", "Ice"],
+        "affected_minions": ["winter_minion"],
         'prices': {},
         "recipe": { "MITHRIL_CRYSTAL": 1, "WINTER_ISLAND_CRYSTAL": 1 }
     },
@@ -1945,14 +1944,14 @@ itemList = {
     "POTATO_TALISMAN": {
         'display': "Potato Talisman",
         "speed_boost": 5,
-        "affected_minions": ["Potato"],
+        "affected_minions": ["POTATO_MINION"],
         'prices': {},
         "AH": True
     },
     "POTATO_RING": {
         'display': "Potato Ring",
         "speed_boost": 10,
-        "affected_minions": ["Potato"],
+        "affected_minions": ["POTATO_MINION"],
         'prices': {},
         "AH": True
     },
@@ -2185,6 +2184,420 @@ itemList = {
         "display": "Falcon",
         "prices": {}
     },
+
+    # Minions
+    # average drop amount from hypixel skyblock fandom wiki or self tested
+    "CUSTOM_MINION": {
+        'display': 'Custom',
+        "drops": { "CUSTOM": 1 },
+        "speed": { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12 },
+        "afkcorrupt": 2,
+        "notes": { "Custom": "Custom Minion does not exist", "AFK": "multiple corrupt drops" },
+        "tags": ["custom_object"]
+    },
+    "COBBLESTONE_MINION": {
+        'display': 'Cobblestone',
+        "drops": { "COBBLESTONE": 1 },
+        "speed": { 1: 14, 2: 14, 3: 12, 4: 12, 5: 10, 6: 10, 7: 9, 8: 9, 9: 8, 10: 8, 11: 7, 12: 6 },
+        "notes": { "Special Layout": "only harvests (cobble generator)" },
+        "tags": ["mining_minion"]
+    },
+    "OBSIDIAN_MINION": {
+        'display': 'Obsidian',
+        "drops": { "OBSIDIAN": 1 },
+        "speed": { 1: 45, 2: 45, 3: 42, 4: 42, 5: 39, 6: 39, 7: 35, 8: 35, 9: 30, 10: 30, 11: 24, 12: 21 },
+        "tags": ["mining_minion"]
+    },
+    "GLOWSTONE_MINION": {
+        'display': 'Glowstone',
+        "drops": { "GLOWSTONE_DUST": 3 },
+        "speed": { 1: 25, 2: 25, 3: 23, 4: 23, 5: 21, 6: 21, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13, 12: 11 },
+        "tags": ["mining_minion"]
+    },
+    "GRAVEL_MINION": {
+        'display': 'Gravel',
+        "drops": { "GRAVEL": 0.9, "FLINT": 0.1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "notes": { "Special Layout": "only spawn (gravity blocks)" },
+        "tags": ["mining_minion"]
+    },
+    "SAND_MINION": {
+        'display': 'Sand',
+        "drops": { "SAND": 1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 },
+        "notes": { "Special Layout": "only spawn (gravity blocks)" },
+        "tags": ["mining_minion"]
+    },
+    "RED_SAND_MINION": {
+        'display': 'Red Sand',
+        "drops": { "SAND:1": 1 },
+        "speed": { 1: 26, 2: 25, 3: 24, 4: 23, 5: 22, 6: 21, 7: 20, 8: 19, 9: 18, 10: 16, 11: 13, 12: 11 },
+        "storage": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 6, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 },
+        "notes": { "Special Layout": "only spawn (gravity blocks)" },
+        "tags": ["mining_minion"]
+    },
+    "MYCELIUM_MINION": {
+        'display': 'Mycelium',
+        "drops": { "MYCEL": 1 },
+        "speed": { 1: 26, 2: 25, 3: 24, 4: 23, 5: 22, 6: 21, 7: 20, 8: 19, 9: 18, 10: 16, 11: 13, 12: 11 },
+        "storage": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 6, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 },
+        "notes": { "Special Layout": "only harvests (natural spreading)" },
+        "tags": ["mining_minion"]
+    },
+    "CLAY_MINION": {
+        'display': 'Clay',
+        "drops": { "CLAY_BALL": 4 },
+        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 27.5, 6: 27.5, 7: 24, 8: 24, 9: 20, 10: 20, 11: 16, 12: 14 }
+    },
+    "ICE_MINION": {
+        'display': 'Ice',
+        "drops": { "ICE": 1 },
+        "speed": { 1: 14, 2: 14, 3: 12, 4: 12, 5: 10, 6: 10, 7: 9, 8: 9, 9: 8, 10: 8, 11: 7, 12: 6 },
+        "notes": { "Special Layout": "only harvests (frozen biome)" },
+        "tags": ["mining_minion", "winter_minion"]
+    },
+    "SNOW_MINION": {
+        'display': 'Snow',
+        "drops": { "SNOW_BALL": 4 },
+        "speed": { 1: 13, 2: 13, 3: 12, 4: 12, 5: 11, 6: 11, 7: 9.5, 8: 9.5, 9: 8, 10: 8, 11: 6.5, 12: 5.8 },
+        "tags": ["mining_minion", "winter_minion"]
+    },
+    "COAL_MINION": {
+        'display': 'Coal',
+        "drops": { "COAL": 1 },
+        "speed": { 1: 15, 2: 15, 3: 13, 4: 13, 5: 12, 6: 12, 7: 10, 8: 10, 9: 9, 10: 9, 11: 7, 12: 6 },
+        "tags": ["mining_minion"]
+    },
+    "IRON_MINION": {
+        'display': 'Iron',
+        "drops": { "IRON_ORE": 1 },
+        "speed": { 1: 17, 2: 17, 3: 15, 4: 15, 5: 14, 6: 14, 7: 12, 8: 12, 9: 10, 10: 10, 11: 8, 12: 7 },
+        "tags": ["mining_minion"]
+    },
+    "GOLD_MINION": {
+        'display': 'Gold',
+        "drops": { "GOLD_ORE": 1 },
+        "speed": { 1: 22, 2: 22, 3: 20, 4: 20, 5: 18, 6: 18, 7: 16, 8: 16, 9: 14, 10: 14, 11: 11, 12: 9 },
+        "tags": ["mining_minion"]
+    },
+    "DIAMOND_MINION": {
+        'display': 'Diamond',
+        "drops": { "DIAMOND": 1 },
+        "speed": { 1: 29, 2: 29, 3: 27, 4: 27, 5: 25, 6: 25, 7: 22, 8: 22, 9: 19, 10: 19, 11: 15, 12: 12 },
+        "tags": ["mining_minion"]
+    },
+    "LAPIS_MINION": {
+        'display': 'Lapis',
+        "drops": { "INK_SACK:4": 6 },  # correct
+        "speed": { 1: 29, 2: 29, 3: 27, 4: 27, 5: 25, 6: 25, 7: 23, 8: 23, 9: 21, 10: 21, 11: 18, 12: 16 },
+        "tags": ["mining_minion"]
+    },
+    "REDSTONE_MINION": {
+        'display': 'Redstone',
+        "drops": { "REDSTONE": 4.5 },
+        "speed": { 1: 29, 2: 29, 3: 27, 4: 27, 5: 25, 6: 25, 7: 23, 8: 23, 9: 21, 10: 21, 11: 18, 12: 16 },
+        "tags": ["mining_minion"]
+    },
+    "EMERALD_MINION": {
+        'display': 'Emerald',
+        "drops": { "EMERALD": 1 },
+        "speed": { 1: 28, 2: 28, 3: 26, 4: 26, 5: 24, 6: 24, 7: 21, 8: 21, 9: 18, 10: 18, 11: 14, 12: 12 },
+        "tags": ["mining_minion"]
+    },
+    "QUARTZ_MINION": {
+        'display': 'Quartz',
+        "drops": { "QUARTZ": 1 },
+        "speed": { 1: 22.5, 2: 22.5, 3: 21, 4: 21, 5: 19, 6: 19, 7: 17, 8: 17, 9: 14.5, 10: 14.5, 11: 11.5, 12: 10 },
+        "tags": ["mining_minion"]
+    },
+    "END_STONE_MINION": {
+        'display': 'End Stone',
+        "drops": { "ENDER_STONE": 1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 },
+        "tags": ["mining_minion"]
+    },
+    "MITHRIL_MINION": {
+        'display': 'Mithril',
+        "drops": { "MITHRIL_ORE": 2 },
+        "speed": { 1: 80, 2: 80, 3: 75, 4: 75, 5: 70, 6: 70, 7: 65, 8: 65, 9: 60, 10: 60, 11: 55, 12: 50 },
+        "tags": ["mining_minion"]
+    },
+    "HARD_STONE_MINION": {
+        'display': 'Hard Stone',
+        "drops": { "HARD_STONE": 2 },  # correct
+        "speed": { 1: 14, 2: 14, 3: 12, 4: 12, 5: 10, 6: 10, 7: 9, 8: 9, 9: 8, 10: 8, 11: 7, 12: 6 },
+        "tags": ["mining_minion"]
+    },
+    "WHEAT_MINION": {
+        'display': 'Wheat',
+        "drops": { "WHEAT": 1, "SEEDS": 1.5 },  # correct
+        "speed": { 1: 15, 2: 15, 3: 13, 4: 13, 5: 11, 6: 11, 7: 10, 8: 10, 9: 9, 10: 9, 11: 8, 12: 7 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "notes": { "AFK": "can skip planting with Wheat Crystal (not 100% of the time, depends on minion speed)" },
+        "tags": ["farming_crop_minion"]
+    },
+    "MELON_MINION": {
+        'display': 'Melon',
+        "drops": { "MELON": 5 },
+        "speed": { 1: 24, 2: 24, 3: 22.5, 4: 22.5, 5: 21, 6: 21, 7: 18.5, 8: 18.5, 9: 16, 10: 16, 11: 13, 12: 10 },
+        "notes": { "AFK": "only harvests" },
+        "tags": ["farming_crop_minion"]
+    },
+    "PUMPKIN_MINION": {
+        'display': 'Pumpkin',
+        "drops": { "PUMPKIN": 1 },
+        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 27, 6: 27, 7: 24, 8: 24, 9: 20, 10: 20, 11: 16, 12: 12 },
+        "notes": { "AFK": "only harvests" },
+        "tags": ["farming_crop_minion"]
+    },
+    "CARROT_MINION": {
+        'display': 'Carrot',
+        "drops": { "CARROT_ITEM": 3 },
+        "speed": { 1: 20, 2: 20, 3: 18, 4: 18, 5: 16, 6: 16, 7: 14, 8: 14, 9: 12, 10: 12, 11: 10, 12: 8 },
+        "tags": ["farming_crop_minion"]
+    },
+    "POTATO_MINION": {
+        'display': 'Potato',
+        "drops": { "POTATO_ITEM": 3 },
+        "speed": { 1: 20, 2: 20, 3: 18, 4: 18, 5: 16, 6: 16, 7: 14, 8: 14, 9: 12, 10: 12, 11: 10, 12: 8 },
+        "tags": ["farming_crop_minion"]
+    },
+    "MUSHROOM_MINION": {
+        'display': 'Mushroom',
+        "drops": { "RED_MUSHROOM": 0.5, "BROWN_MUSHROOM": 0.5 },
+        "speed": { 1: 30, 2: 30, 3: 28, 4: 28, 5: 26, 6: 26, 7: 23, 8: 23, 9: 20, 10: 20, 11: 16, 12: 12 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "tags": ["farming_crop_minion"]
+    },
+    "CACTUS_MINION": {
+        'display': 'Cactus',
+        "drops": { "CACTUS": 3 },
+        "speed": { 1: 27, 2: 27, 3: 25, 4: 25, 5: 23, 6: 23, 7: 21, 8: 21, 9: 18, 10: 18, 11: 15, 12: 12 },
+        "tags": ["farming_crop_minion"]
+    },
+    "COCOA_BEANS_MINION": {
+        'display': 'Cocoa Beans',
+        "drops": { "INK_SACK:3": 3 },
+        "speed": { 1: 27, 2: 27, 3: 25, 4: 25, 5: 23, 6: 23, 7: 21, 8: 21, 9: 18, 10: 18, 11: 15, 12: 12 },
+        "tags": ["farming_crop_minion"]
+    },
+    "SUGAR_CANE_MINION": {
+        'display': 'Sugar Cane',
+        "drops": { "SUGAR_CANE": 3 },
+        "speed": { 1: 22, 2: 22, 3: 20, 4: 20, 5: 18, 6: 18, 7: 16, 8: 16, 9: 14.5, 10: 14.5, 11: 12, 12: 9 },
+        "tags": ["farming_crop_minion"]
+    },
+    "NETHER_WART_MINION": {
+        'display': 'Nether Wart',
+        "drops": { "NETHER_STALK": 2.5 },  # correct (2025-10-18)
+        "speed": { 1: 50, 2: 50, 3: 47, 4: 47, 5: 44, 6: 44, 7: 41, 8: 41, 9: 38, 10: 38, 11: 32, 12: 27 },
+        "tags": ["farming_crop_minion"]
+    },
+    "FLOWER_MINION": {
+        'display': 'Flower',
+        "drops": { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 11, "RED_ROSE:2": 0.5 / 11, "RED_ROSE:3": 0.5 / 11, "RED_ROSE:4": 0.5 / 11, "RED_ROSE:5": 0.5 / 11, "RED_ROSE:6": 0.5 / 11, "RED_ROSE:7": 0.5 / 11, "RED_ROSE:8": 0.5 / 11, "DOUBLE_PLANT:1": 0.5 / 11, "DOUBLE_PLANT:4": 0.5 / 11, "DOUBLE_PLANT:5": 0.5 / 11 },  # check
+        "speed": { 1: 30, 2: 29, 3: 28, 4: 27, 5: 26, 6: 25, 7: 24, 8: 23, 9: 22, 10: 20, 11: 18, 12: 15 },
+        "storage": { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15, 9: 15, 10: 15, 11: 15, 12: 15 },
+        "notes": { "Special Layout": "only spawn, no large flowers (water flushing, low roof)" },
+        "tags": ["foraging_minion"]  # correct
+    },
+    "SUNFLOWER_MINION": {
+        'display': 'Sunflower',
+        "drops": { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 },
+        "speed": { 1: 24, 2: 23, 3: 22, 4: 21, 5: 20, 6: 19, 7: 18, 8: 17, 9: 16, 10: 15, 11: 14, 12: 13},
+        "storage": { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 },
+        "tags": ["farming_crop_minion"]
+    },
+    "FISHING_MINION": {
+        'display': 'Fishing',
+        "drops": { "RAW_FISH": 0.54, "RAW_FISH:1": 0.225, "RAW_FISH:3": 0.117, "RAW_FISH:2": 0.036, "PRISMARINE_CRYSTALS": (2 + (11 / 15)) / 100, "PRISMARINE_SHARD": (2 + (11 / 15)) / 100, "SPONGE": (2 + (11 / 15)) / 100 },  # good average (2025-10-24)
+        "speed": { 1: 75, 2: 75, 3: 67, 4: 67, 5: 59, 6: 59, 7: 51, 8: 51, 9: 43, 10: 43, 11: 35, 12: 30 },
+        "storage": { 1: 10, 2: 10, 3: 10, 4: 11, 5: 11, 6: 12, 7: 12, 8: 13, 9: 13, 10: 14, 11: 15 },
+        "notes": { "Always": "only harvests" }
+    },
+    "ZOMBIE_MINION": {
+        'display': 'Zombie',
+        "drops": { "ROTTEN_FLESH": 1, "CARROT_ITEM": 0.01, "POTATO_ITEM": 0.01, "POISONOUS_POTATO": 0.02 },  # correct
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "REVENANT_MINION": {
+        'display': 'Revenant',
+        "drops": { "ROTTEN_FLESH": 3.16, "DIAMOND": 0.2 },
+        "speed": { 1: 29, 2: 29, 3: 26, 4: 26, 5: 23, 6: 23, 7: 19, 8: 19, 9: 14.5, 10: 14.5, 11: 10, 12: 8 },
+        "afkcorrupt": 1.83,
+        "notes": { "AFK": "multiple corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "VOIDLING_MINION": {
+        'display': 'Voidling',
+        "drops": { "OBSIDIAN": 2.5, "QUARTZ": 0.4, "ENCHANTED_ENDER_PEARL": 0.000625 },
+        "speed": { 1: 45, 2: 45, 3: 42, 4: 42, 5: 39, 6: 39, 7: 35, 8: 35, 9: 30, 10: 30, 11: 24 },
+        "afkcorrupt": 1.5,
+        "notes": { "AFK": "multiple corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "INFERNO_MINION": {
+        'display': 'Inferno',
+        "drops": { "CRUDE_GABAGOOL": 1 },
+        "speed": { 1: 1013, 2: 982, 3: 950, 4: 919, 5: 886, 6: 855, 7: 823, 8: 792, 9: 760, 10: 728, 11: 697 },
+        "afkcorrupt": 0,
+        "notes": { "Inferno": "can use inferno fuel", "AFK": "no corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "VAMPIRE_MINION": {
+        'display': 'Vampire',
+        "drops": { "HEMOVIBE": 1 },
+        "speed": { 1: 190, 2: 190, 3: 175, 4: 175, 5: 160, 6: 160, 7: 140, 8: 140, 9: 117, 10: 117, 11: 95 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "SKELETON_MINION": {
+        'display': 'Skeleton',
+        "drops": { "BONE": 1.5 },  # correct
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
+        "afkcorrupt": 1.5,
+        "notes": { "AFK": "multiple corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "CREEPER_MINION": {
+        'display': 'Creeper',
+        "drops": { "SULPHUR": 1 },
+        "speed": { 1: 27, 2: 27, 3: 25, 4: 25, 5: 23, 6: 23, 7: 21, 8: 21, 9: 18, 10: 18, 11: 14 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "SPIDER_MINION": {
+        'display': 'Spider',
+        "drops": { "STRING": 1, "SPIDER_EYE": 0.5 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "TARANTULA_MINION": {
+        'display': 'Tarantula',
+        "drops": { "STRING": 3.16, "SPIDER_EYE": 1, "IRON_INGOT": 0.2 },
+        "speed": { 1: 29, 2: 29, 3: 26, 4: 26, 5: 23, 6: 23, 7: 19, 8: 19, 9: 14.5, 10: 14.5, 11: 10, 12: 8 },
+        "afkcorrupt": 1.83,
+        "notes": { "AFK": "multiple corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "CAVE_SPIDER_MINION": {
+        'display': 'Cave Spider',
+        "drops": { "STRING": 0.5, "SPIDER_EYE": 1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "BLAZE_MINION": {
+        'display': 'Blaze',
+        "drops": { "BLAZE_ROD": 1 },
+        "speed": { 1: 33, 2: 33, 3: 31, 4: 31, 5: 28.5, 6: 28.5, 7: 25, 8: 25, 9: 21, 10: 21, 11: 16.5, 12: 15 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "MAGMA_CUBE_MINION": {
+        'display': 'Magma Cube',
+        "drops": { "MAGMA_CREAM": 2 },
+        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 28, 6: 28, 7: 25, 8: 25, 9: 22, 10: 22, 11: 18, 12: 16 },
+        "afkcorrupt": 2,
+        "notes": { "AFK": "multiple corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "ENDERMAN_MINION": {
+        'display': 'Enderman',
+        "drops": { "ENDER_PEARL": 1 },
+        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 28, 6: 28, 7: 25, 8: 25, 9: 22, 10: 22, 11: 18 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "GHAST_MINION": {
+        'display': 'Ghast',
+        "drops": { "GHAST_TEAR": 1 },
+        "speed": { 1: 50, 2: 50, 3: 47, 4: 47, 5: 44, 6: 44, 7: 41, 8: 41, 9: 38, 10: 38, 11: 32, 12: 30 },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "SLIME_MINION": {
+        'display': 'Slime',
+        "drops": { "SLIME_BALL": 2 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 12 },
+        "afkcorrupt": 2,
+        "notes": { "AFK": "multiple corrupt drops" },
+        "tags": ["mob_minion", "combat_minion"]
+    },
+    "COW_MINION": {
+        'display': 'Cow',
+        "drops": { "RAW_BEEF": 1, "LEATHER": 1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13, 12: 10 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "tags": ["mob_minion", "farm_animal_minion"]
+    },
+    "PIG_MINION": {
+        'display': 'Pig',
+        "drops": { "PORK": 1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13, 12: 10 },
+        "tags": ["mob_minion", "farm_animal_minion"]
+    },
+    "CHICKEN_MINION": {
+        'display': 'Chicken',
+        "drops": { "RAW_CHICKEN": 1, "FEATHER": 1 },
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 18, 10: 18, 11: 15, 12: 12 },
+        "storage": { 1: 3, 2: 5, 3: 5, 4: 7, 5: 7 },
+        "tags": ["mob_minion", "farm_animal_minion"]
+    },
+    "SHEEP_MINION": {
+        'display': 'Sheep',
+        "drops": { "MUTTON": 1, "WOOL": 1 },
+        "speed": { 1: 24, 2: 24, 3: 22, 4: 22, 5: 20, 6: 20, 7: 18, 8: 18, 9: 16, 10: 16, 11: 12, 12: 9 },
+        "storage": { 1: 2, 2: 4, 3: 4 },
+        "tags": ["mob_minion", "farm_animal_minion"]
+    },
+    "RABBIT_MINION": {
+        'display': 'Rabbit',
+        "drops": { "RABBIT": 1, "RABBIT_FOOT": 0.7, "RABBIT_HIDE": 0.7 },  # correct
+        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13, 12: 10 },
+        "storage": { 1: 3, 2: 5, 3: 5, 4: 7, 5: 7 },
+        "tags": ["mob_minion", "farm_animal_minion"]
+    },
+    "OAK_MINION": {
+        'display': 'Oak',
+        "drops": { "LOG": 3 },
+        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
+        "notes": { "AFK": "+1 wood drop" },
+        "tags": ["foraging_minion", "wood_minion"]
+    },
+    "SPRUCE_MINION": {
+        'display': 'Spruce',
+        "drops": { "LOG:1": 3 },
+        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
+        "notes": { "AFK": "+1 wood drop" },
+        "tags": ["foraging_minion", "wood_minion"]
+    },
+    "BIRCH_MINION": {
+        'display': 'Birch',
+        "drops": { "LOG:2": 3 },
+        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
+        "notes": { "AFK": "+1 wood drop" },
+        "tags": ["foraging_minion", "wood_minion"]
+    },
+    "DARK_OAK_MINION": {
+        'display': 'Dark Oak',
+        "drops": { "LOG_2:1": 3 },
+        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
+        "notes": { "AFK": "+1 wood drop" },
+        "tags": ["foraging_minion", "wood_minion"]
+    },
+    "ACACIA_MINION": {
+        'display': 'Acacia',
+        "drops": { "LOG_2": 3 },
+        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
+        "notes": { "AFK": "+1 wood drop" },
+        "tags": ["foraging_minion", "wood_minion"]
+    },
+    "JUNGLE_MINION": {
+        'display': 'Jungle',
+        "drops": { "LOG:3": 3 },
+        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
+        "notes": { "AFK": "+1 wood drop" },
+        "tags": ["foraging_minion", "wood_minion"]
+    },
 }
 
 
@@ -2208,18 +2621,7 @@ inferno_fuel_data = {
     }
 }
 
-getID = {
-    'Oak Log': 'LOG',
-    'Spruce Log': 'LOG:1',
-    'Birch Log': 'LOG:2',
-    'Dark Oak Log': 'LOG_2:1',
-    'Acacia Log': 'LOG_2',
-    'Jungle Log': 'LOG:3',
-}
-
 standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10: 15, 11: 15, 12: 15 }
-
-affected_by_cole = ['Cobblestone', 'Obsidian', 'Glowstone', 'Gravel', 'Sand', 'Ice', 'Coal', 'Iron', 'Gold', 'Diamond', 'Lapis', 'Redstone', 'Emerald', 'Quartz', 'End Stone', 'Mithril']
 
 attribute_shards = {
     "Common": { 1: 1, 2: 4, 3: 9, 4: 15, 5: 22, 6: 30, 7: 40, 8: 54, 9: 72, 10: 96 },
@@ -2233,6 +2635,70 @@ pet_item_scrub_cost = { "Common": 25000, "Uncommon": 50000, "Rare": 100000, "Epi
 
 
 #%% Option Lists
+
+minion_options = {
+    'Custom': 'CUSTOM_MINION',
+    'Cobblestone': 'COBBLESTONE_MINION',
+    'Obsidian': 'OBSIDIAN_MINION',
+    'Glowstone': 'GLOWSTONE_MINION',
+    'Gravel': 'GRAVEL_MINION',
+    'Sand': 'SAND_MINION',
+    'Red Sand': 'RED_SAND_MINION',
+    'Mycelium': 'MYCELIUM_MINION',
+    'Clay': 'CLAY_MINION',
+    'Ice': 'ICE_MINION',
+    'Snow': 'SNOW_MINION',
+    'Coal': 'COAL_MINION',
+    'Iron': 'IRON_MINION',
+    'Gold': 'GOLD_MINION',
+    'Diamond': 'DIAMOND_MINION',
+    'Lapis': 'LAPIS_MINION',
+    'Redstone': 'REDSTONE_MINION',
+    'Emerald': 'EMERALD_MINION',
+    'Quartz': 'QUARTZ_MINION',
+    'End Stone': 'END_STONE_MINION',
+    'Mithril': 'MITHRIL_MINION',
+    'Hard Stone': 'HARD_STONE_MINION',
+    'Wheat': 'WHEAT_MINION',
+    'Melon': 'MELON_MINION',
+    'Pumpkin': 'PUMPKIN_MINION',
+    'Carrot': 'CARROT_MINION',
+    'Potato': 'POTATO_MINION',
+    'Mushroom': 'MUSHROOM_MINION',
+    'Cactus': 'CACTUS_MINION',
+    'Cocoa Beans': 'COCOA_BEANS_MINION',
+    'Sugar Cane': 'SUGAR_CANE_MINION',
+    'Nether Wart': 'NETHER_WART_MINION',
+    'Flower': 'FLOWER_MINION',
+    'Sunflower': 'SUNFLOWER_MINION',
+    'Fishing': 'FISHING_MINION',
+    'Zombie': 'ZOMBIE_MINION',
+    'Revenant': 'REVENANT_MINION',
+    'Voidling': 'VOIDLING_MINION',
+    'Inferno': 'INFERNO_MINION',
+    'Vampire': 'VAMPIRE_MINION',
+    'Skeleton': 'SKELETON_MINION',
+    'Creeper': 'CREEPER_MINION',
+    'Spider': 'SPIDER_MINION',
+    'Tarantula': 'TARANTULA_MINION',
+    'Cave Spider': 'CAVE_SPIDER_MINION',
+    'Blaze': 'BLAZE_MINION',
+    'Magma Cube': 'MAGMA_CUBE_MINION',
+    'Enderman': 'ENDERMAN_MINION',
+    'Ghast': 'GHAST_MINION',
+    'Slime': 'SLIME_MINION',
+    'Cow': 'COW_MINION',
+    'Pig': 'PIG_MINION',
+    'Chicken': 'CHICKEN_MINION',
+    'Sheep': 'SHEEP_MINION',
+    'Rabbit': 'RABBIT_MINION',
+    'Oak': 'OAK_MINION',
+    'Spruce': 'SPRUCE_MINION',
+    'Birch': 'BIRCH_MINION',
+    'Dark Oak': 'DARK_OAK_MINION',
+    'Acacia': 'ACACIA_MINION',
+    'Jungle': 'JUNGLE_MINION'
+}
 
 inferno_fuel_grade_options = {
     'Hypergolic Gabagool': 'HYPERGOLIC_GABAGOOL',
@@ -2365,34 +2831,34 @@ boost_pets = {
     "Magma Cube": {
         "Common": [0, 0.2], "Uncommon": [0, 0.25],
         "Rare": [0, 0.25], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["Slime", "Magma Cube"]  # affects magma cube minion is correct
+        "Legendary": [0, 0.3], "affects": ["SLIME_MINION", "MAGMA_CUBE_MINION"]  # affects magma cube minion is correct
     },
     "Mooshroom Cow": {
         "Common": [0, 0.2], "Uncommon": [0, 0.2],
         "Rare": [0, 0.3], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["Mushroom", "Mycelium"]
+        "Legendary": [0, 0.3], "affects": ["MUSHROOM_MINION", "MYCELIUM_MINION"]
     },
     "Ocelot": {
         "Rare": [0, 0.3], "Epic": [0, 0.3], "Legendary": [0, 0.3],
-        "affects": ['Oak', 'Spruce', 'Birch', 'Dark Oak', 'Acacia', 'Jungle', "Flower"]  # yes flower minion correct
+        "affects": ["foraging_minion"]
     },
     "Pigman": {
         "Common": [0, 0.1], "Uncommon": [0, 0.2],
         "Rare": [0, 0.2], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["Pig"]
+        "Legendary": [0, 0.3], "affects": ["PIG_MINION"]
     },
     "Rabbit": {
         "Legendary": [0, 0.3], "Mythic": [0, 0.3],
-        "affects": ['Wheat', 'Melon', 'Pumpkin', 'Carrot', 'Potato', 'Cactus', 'Cocoa Beans', 'Sugar Cane', 'Mushroom', 'Nether Wart', 'Sunflower']
+        "affects": ["farming_crop_minion"]
     },
     "Snail": {
         "Common": [0, 0.1], "Uncommon": [0, 0.2],
         "Rare": [0, 0.2], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["Red Sand"]
+        "Legendary": [0, 0.3], "affects": ["RED_SAND_MINION"]
     },
     "Spider": {
         "Legendary": [0, 0.3], "Mythic": [0, 0.3],
-        "affects": ["Spider", "Tarantula", "Cave Spider"]
+        "affects": ["SPIDER_MINION", "TARANTULA_MINION", "CAVE_SPIDER_MINION"]
     }
 }
 
@@ -2487,317 +2953,24 @@ all_pets = {
 max_lvl_pet_xp_amounts = { "Common": 5624785, "Uncommon": 8644220, "Rare": 12626665, "Epic": 18608500, "Legendary": 25353230, "Mythic": 25353230, "Dragon": 210255385 }
 
 
-#%% Minions
-# average drop amount from hypixel skyblock fandom wiki or self tested
+#%% Data check functions
 
-minionList = {
-    "Custom": {
-        "drops": {
-            "CUSTOM": 1
-        },
-        "speed": {
-            1: 1,
-            2: 2,
-            3: 3,
-            4: 4,
-            5: 5,
-            6: 6,
-            7: 7,
-            8: 8,
-            9: 9,
-            10: 10,
-            11: 11,
-            12: 12
-        },
-        "afkcorrupt": 2,
-        "notes": { "Custom": "Custom Minion does not exist", "AFK": "multiple corrupt drops" }
-    },
-    "Cobblestone": {
-        "drops": { "COBBLESTONE": 1 },
-        "speed": { 1: 14, 2: 14, 3: 12, 4: 12, 5: 10, 6: 10, 7: 9, 8: 9, 9: 8, 10: 8, 11: 7, 12: 6 },
-        "notes": { "Special Layout": "only harvests (cobble generator)" }
-    },
-    "Obsidian": {
-        "drops": { "OBSIDIAN": 1 },
-        "speed": { 1: 45, 2: 45, 3: 42, 4: 42, 5: 39, 6: 39, 7: 35, 8: 35, 9: 30, 10: 30, 11: 24, 12: 21 }
-    },
-    "Glowstone": {
-        "drops": { "GLOWSTONE_DUST": 3 },
-        "speed": { 1: 25, 2: 25, 3: 23, 4: 23, 5: 21, 6: 21, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13, 12: 11 }
-    },
-    "Gravel": {
-        "drops": { "GRAVEL": 0.9, "FLINT": 0.1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 },
-        "storage": { 1: 2, 2: 4, 3: 4 },
-        "notes": { "Special Layout": "only spawn (gravity blocks)" }
-    },
-    "Sand": {
-        "drops": { "SAND": 1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 },
-        "notes": { "Special Layout": "only spawn (gravity blocks)" }
-    },
-    "Red Sand": {
-        "drops": { "SAND:1": 1 },
-        "speed": { 1: 26, 2: 25, 3: 24, 4: 23, 5: 22, 6: 21, 7: 20, 8: 19, 9: 18, 10: 16, 11: 13, 12: 11 },
-        "storage": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 6, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 },
-        "notes": { "Special Layout": "only spawn (gravity blocks)" }
-    },
-    "Mycelium": {
-        "drops": { "MYCEL": 1 },
-        "speed": { 1: 26, 2: 25, 3: 24, 4: 23, 5: 22, 6: 21, 7: 20, 8: 19, 9: 18, 10: 16, 11: 13, 12: 11 },
-        "storage": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 6, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 },
-        "notes": { "Special Layout": "only harvests (natural spreading)" }
-    },
-    "Clay": {
-        "drops": { "CLAY_BALL": 4 },
-        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 27.5, 6: 27.5, 7: 24, 8: 24, 9: 20, 10: 20, 11: 16, 12: 14 }
-    },
-    "Ice": {
-        "drops": { "ICE": 1 },
-        "speed": { 1: 14, 2: 14, 3: 12, 4: 12, 5: 10, 6: 10, 7: 9, 8: 9, 9: 8, 10: 8, 11: 7, 12: 6 },
-        "notes": { "Special Layout": "only harvests (frozen biome)" }
-    },
-    "Snow": {
-        "drops": { "SNOW_BALL": 4 },
-        "speed": { 1: 13, 2: 13, 3: 12, 4: 12, 5: 11, 6: 11, 7: 9.5, 8: 9.5, 9: 8, 10: 8, 11: 6.5, 12: 5.8 }
-    },
-    "Coal": {
-        "drops": { "COAL": 1 },
-        "speed": { 1: 15, 2: 15, 3: 13, 4: 13, 5: 12, 6: 12, 7: 10, 8: 10, 9: 9, 10: 9, 11: 7, 12: 6 }
-    },
-    "Iron": {
-        "drops": { "IRON_ORE": 1 },
-        "speed": { 1: 17, 2: 17, 3: 15, 4: 15, 5: 14, 6: 14, 7: 12, 8: 12, 9: 10, 10: 10, 11: 8, 12: 7 }
-    },
-    "Gold": {
-        "drops": { "GOLD_ORE": 1 },
-        "speed": { 1: 22, 2: 22, 3: 20, 4: 20, 5: 18, 6: 18, 7: 16, 8: 16, 9: 14, 10: 14, 11: 11, 12: 9 }
-    },
-    "Diamond": {
-        "drops": { "DIAMOND": 1 },
-        "speed": { 1: 29, 2: 29, 3: 27, 4: 27, 5: 25, 6: 25, 7: 22, 8: 22, 9: 19, 10: 19, 11: 15, 12: 12 }
-    },
-    "Lapis": {
-        "drops": { "INK_SACK:4": 6 },  # correct
-        "speed": { 1: 29, 2: 29, 3: 27, 4: 27, 5: 25, 6: 25, 7: 23, 8: 23, 9: 21, 10: 21, 11: 18, 12: 16 }
-    },
-    "Redstone": {
-        "drops": { "REDSTONE": 4.5 },
-        "speed": { 1: 29, 2: 29, 3: 27, 4: 27, 5: 25, 6: 25, 7: 23, 8: 23, 9: 21, 10: 21, 11: 18, 12: 16 }
-    },
-    "Emerald": {
-        "drops": { "EMERALD": 1 },
-        "speed": { 1: 28, 2: 28, 3: 26, 4: 26, 5: 24, 6: 24, 7: 21, 8: 21, 9: 18, 10: 18, 11: 14, 12: 12 }
-    },
-    "Quartz": {
-        "drops": { "QUARTZ": 1 },
-        "speed": { 1: 22.5, 2: 22.5, 3: 21, 4: 21, 5: 19, 6: 19, 7: 17, 8: 17, 9: 14.5, 10: 14.5, 11: 11.5, 12: 10 }
-    },
-    "End Stone": {
-        "drops": { "ENDER_STONE": 1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 13 }
-    },
-    "Mithril": {
-        "drops": { "MITHRIL_ORE": 2 },
-        "speed": { 1: 80, 2: 80, 3: 75, 4: 75, 5: 70, 6: 70, 7: 65, 8: 65, 9: 60, 10: 60, 11: 55, 12: 50 }
-    },
-    "Hard Stone": {
-        "drops": { "HARD_STONE": 2 },  # correct
-        "speed": { 1: 14, 2: 14, 3: 12, 4: 12, 5: 10, 6: 10, 7: 9, 8: 9, 9: 8, 10: 8, 11: 7, 12: 6 }
-    },
-    "Wheat": {
-        "drops": { "WHEAT": 1, "SEEDS": 1.5 },  # correct
-        "speed": { 1: 15, 2: 15, 3: 13, 4: 13, 5: 11, 6: 11, 7: 10, 8: 10, 9: 9, 10: 9, 11: 8, 12: 7 },
-        "storage": { 1: 2, 2: 4, 3: 4 },
-        "notes": { "AFK": "can skip planting with Wheat Crystal (not 100% of the time, depends on minion speed)" }
-    },
-    "Melon": {
-        "drops": { "MELON": 5 },
-        "speed": { 1: 24, 2: 24, 3: 22.5, 4: 22.5, 5: 21, 6: 21, 7: 18.5, 8: 18.5, 9: 16, 10: 16, 11: 13, 12: 10 },
-        "notes": { "AFK": "only harvests" }
-    },
-    "Pumpkin": {
-        "drops": { "PUMPKIN": 1 },
-        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 27, 6: 27, 7: 24, 8: 24, 9: 20, 10: 20, 11: 16, 12: 12 },
-        "notes": { "AFK": "only harvests" }
-    },
-    "Carrot": {
-        "drops": { "CARROT_ITEM": 3 },
-        "speed": { 1: 20, 2: 20, 3: 18, 4: 18, 5: 16, 6: 16, 7: 14, 8: 14, 9: 12, 10: 12, 11: 10, 12: 8 }
-    },
-    "Potato": {
-        "drops": { "POTATO_ITEM": 3 },
-        "speed": { 1: 20, 2: 20, 3: 18, 4: 18, 5: 16, 6: 16, 7: 14, 8: 14, 9: 12, 10: 12, 11: 10, 12: 8 }
-    },
-    "Mushroom": {
-        "drops": { "RED_MUSHROOM": 0.5, "BROWN_MUSHROOM": 0.5 },
-        "speed": { 1: 30, 2: 30, 3: 28, 4: 28, 5: 26, 6: 26, 7: 23, 8: 23, 9: 20, 10: 20, 11: 16, 12: 12 },
-        "storage": { 1: 2, 2: 4, 3: 4 }
-    },
-    "Cactus": {
-        "drops": { "CACTUS": 3 },
-        "speed": { 1: 27, 2: 27, 3: 25, 4: 25, 5: 23, 6: 23, 7: 21, 8: 21, 9: 18, 10: 18, 11: 15, 12: 12 }
-    },
-    "Cocoa Beans": {
-        "drops": { "INK_SACK:3": 3 },
-        "speed": { 1: 27, 2: 27, 3: 25, 4: 25, 5: 23, 6: 23, 7: 21, 8: 21, 9: 18, 10: 18, 11: 15, 12: 12 }
-    },
-    "Sugar Cane": {
-        "drops": { "SUGAR_CANE": 3 },
-        "speed": { 1: 22, 2: 22, 3: 20, 4: 20, 5: 18, 6: 18, 7: 16, 8: 16, 9: 14.5, 10: 14.5, 11: 12, 12: 9 }
-    },
-    "Nether Wart": {
-        "drops": { "NETHER_STALK": 2.5 },  # correct (2025-10-18)
-        "speed": { 1: 50, 2: 50, 3: 47, 4: 47, 5: 44, 6: 44, 7: 41, 8: 41, 9: 38, 10: 38, 11: 32, 12: 27 }
-    },
-    "Flower": {
-        "drops": { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 11, "RED_ROSE:2": 0.5 / 11, "RED_ROSE:3": 0.5 / 11, "RED_ROSE:4": 0.5 / 11, "RED_ROSE:5": 0.5 / 11, "RED_ROSE:6": 0.5 / 11, "RED_ROSE:7": 0.5 / 11, "RED_ROSE:8": 0.5 / 11, "DOUBLE_PLANT:1": 0.5 / 11, "DOUBLE_PLANT:4": 0.5 / 11, "DOUBLE_PLANT:5": 0.5 / 11 },  # check
-        "speed": { 1: 30, 2: 29, 3: 28, 4: 27, 5: 26, 6: 25, 7: 24, 8: 23, 9: 22, 10: 20, 11: 18, 12: 15 },
-        "storage": { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15, 9: 15, 10: 15, 11: 15, 12: 15 },
-        "notes": { "Special Layout": "only spawn, no large flowers (water flushing, low roof)" }
-    },
-    "Sunflower": {
-        "drops": { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 },
-        "speed": { 1: 24, 2: 23, 3: 22, 4: 21, 5: 20, 6: 19, 7: 18, 8: 17, 9: 16, 10: 15, 11: 14, 12: 13},
-        "storage": { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14, 11: 15, 12: 15 }
-    },
-    "Fishing": {
-        "drops": { "RAW_FISH": 0.54, "RAW_FISH:1": 0.225, "RAW_FISH:3": 0.117, "RAW_FISH:2": 0.036, "PRISMARINE_CRYSTALS": (2 + (11 / 15)) / 100, "PRISMARINE_SHARD": (2 + (11 / 15)) / 100, "SPONGE": (2 + (11 / 15)) / 100 },  # good average (2025-10-24)
-        "speed": { 1: 75, 2: 75, 3: 67, 4: 67, 5: 59, 6: 59, 7: 51, 8: 51, 9: 43, 10: 43, 11: 35, 12: 30 },
-        "storage": { 1: 10, 2: 10, 3: 10, 4: 11, 5: 11, 6: 12, 7: 12, 8: 13, 9: 13, 10: 14, 11: 15 },
-        "notes": { "Always": "only harvests" }
-    },
-    "Zombie": {
-        "drops": { "ROTTEN_FLESH": 1, "CARROT_ITEM": 0.01, "POTATO_ITEM": 0.01, "POISONOUS_POTATO": 0.02 },  # correct
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 }
-    },
-    "Revenant": {
-        "drops": { "ROTTEN_FLESH": 3.16, "DIAMOND": 0.2 },
-        "speed": { 1: 29, 2: 29, 3: 26, 4: 26, 5: 23, 6: 23, 7: 19, 8: 19, 9: 14.5, 10: 14.5, 11: 10, 12: 8 },
-        "afkcorrupt": 1.83,
-        "notes": { "AFK": "multiple corrupt drops" }
-    },
-    "Voidling": {
-        "drops": { "OBSIDIAN": 2.5, "QUARTZ": 0.4, "ENCHANTED_ENDER_PEARL": 0.000625 },
-        "speed": { 1: 45, 2: 45, 3: 42, 4: 42, 5: 39, 6: 39, 7: 35, 8: 35, 9: 30, 10: 30, 11: 24 },
-        "afkcorrupt": 1.5,
-        "notes": { "AFK": "multiple corrupt drops" }
-    },
-    "Inferno": {
-        "drops": { "CRUDE_GABAGOOL": 1 },
-        "speed": { 1: 1013, 2: 982, 3: 950, 4: 919, 5: 886, 6: 855, 7: 823, 8: 792, 9: 760, 10: 728, 11: 697 },
-        "afkcorrupt": 0,
-        "notes": { "Inferno": "can use inferno fuel", "AFK": "no corrupt drops" }
-    },
-    "Vampire": {
-        "drops": { "HEMOVIBE": 1 },
-        "speed": { 1: 190, 2: 190, 3: 175, 4: 175, 5: 160, 6: 160, 7: 140, 8: 140, 9: 117, 10: 117, 11: 95 }
-    },
-    "Skeleton": {
-        "drops": { "BONE": 1.5 },  # correct
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
-        "afkcorrupt": 1.5,
-        "notes": { "AFK": "multiple corrupt drops" }
-    },
-    "Creeper": {
-        "drops": { "SULPHUR": 1 },
-        "speed": { 1: 27, 2: 27, 3: 25, 4: 25, 5: 23, 6: 23, 7: 21, 8: 21, 9: 18, 10: 18, 11: 14 }
-    },
-    "Spider": {
-        "drops": { "STRING": 1, "SPIDER_EYE": 0.5 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
-        "storage": { 1: 2, 2: 4, 3: 4 }
-    },
-    "Tarantula": {
-        "drops": { "STRING": 3.16, "SPIDER_EYE": 1, "IRON_INGOT": 0.2 },
-        "speed": { 1: 29, 2: 29, 3: 26, 4: 26, 5: 23, 6: 23, 7: 19, 8: 19, 9: 14.5, 10: 14.5, 11: 10, 12: 8 },
-        "afkcorrupt": 1.83,
-        "notes": { "AFK": "multiple corrupt drops" }
-    },
-    "Cave Spider": {
-        "drops": { "STRING": 0.5, "SPIDER_EYE": 1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13 },
-        "storage": { 1: 2, 2: 4, 3: 4 }
-    },
-    "Blaze": {
-        "drops": { "BLAZE_ROD": 1 },
-        "speed": { 1: 33, 2: 33, 3: 31, 4: 31, 5: 28.5, 6: 28.5, 7: 25, 8: 25, 9: 21, 10: 21, 11: 16.5, 12: 15 }
-    },
-    "Magma Cube": {
-        "drops": { "MAGMA_CREAM": 2 },
-        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 28, 6: 28, 7: 25, 8: 25, 9: 22, 10: 22, 11: 18, 12: 16 },
-        "afkcorrupt": 2,
-        "notes": { "AFK": "multiple corrupt drops" }
-    },
-    "Enderman": {
-        "drops": { "ENDER_PEARL": 1 },
-        "speed": { 1: 32, 2: 32, 3: 30, 4: 30, 5: 28, 6: 28, 7: 25, 8: 25, 9: 22, 10: 22, 11: 18 }
-    },
-    "Ghast": {
-        "drops": { "GHAST_TEAR": 1 },
-        "speed": { 1: 50, 2: 50, 3: 47, 4: 47, 5: 44, 6: 44, 7: 41, 8: 41, 9: 38, 10: 38, 11: 32, 12: 30 }
-    },
-    "Slime": {
-        "drops": { "SLIME_BALL": 2 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 19, 8: 19, 9: 16, 10: 16, 11: 12 },
-        "afkcorrupt": 2,
-        "notes": { "AFK": "multiple corrupt drops" }
-    },
-    "Cow": {
-        "drops": { "RAW_BEEF": 1, "LEATHER": 1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13, 12: 10 },
-        "storage": { 1: 2, 2: 4, 3: 4 }
-    },
-    "Pig": {
-        "drops": { "PORK": 1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13, 12: 10 }
-    },
-    "Chicken": {
-        "drops": { "RAW_CHICKEN": 1, "FEATHER": 1 },
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 18, 10: 18, 11: 15, 12: 12 },
-        "storage": { 1: 3, 2: 5, 3: 5, 4: 7, 5: 7 }
-    },
-    "Sheep": {
-        "drops": { "MUTTON": 1, "WOOL": 1 },
-        "speed": { 1: 24, 2: 24, 3: 22, 4: 22, 5: 20, 6: 20, 7: 18, 8: 18, 9: 16, 10: 16, 11: 12, 12: 9 },
-        "storage": { 1: 2, 2: 4, 3: 4 }
-    },
-    "Rabbit": {
-        "drops": { "RABBIT": 1, "RABBIT_FOOT": 0.7, "RABBIT_HIDE": 0.7 },  # correct
-        "speed": { 1: 26, 2: 26, 3: 24, 4: 24, 5: 22, 6: 22, 7: 20, 8: 20, 9: 17, 10: 17, 11: 13, 12: 10 },
-        "storage": { 1: 3, 2: 5, 3: 5, 4: 7, 5: 7 }
-    },
-    "Oak": {
-        "drops": { "LOG": 3 },
-        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
-        "notes": { "AFK": "+1 wood drop" }
-    },
-    "Spruce": {
-        "drops": { "LOG:1": 3 },
-        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
-        "notes": { "AFK": "+1 wood drop" }
-    },
-    "Birch": {
-        "drops": { "LOG:2": 3 },
-        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
-        "notes": { "AFK": "+1 wood drop" }
-    },
-    "Dark Oak": {
-        "drops": { "LOG_2:1": 3 },
-        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
-        "notes": { "AFK": "+1 wood drop" }
-    },
-    "Acacia": {
-        "drops": { "LOG_2": 3 },
-        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
-        "notes": { "AFK": "+1 wood drop" }
-    },
-    "Jungle": {
-        "drops": { "LOG:3": 3 },
-        "speed": { 1: 48, 2: 48, 3: 45, 4: 45, 5: 42, 6: 42, 7: 38, 8: 38, 9: 33, 10: 33, 11: 27 },
-        "notes": { "AFK": "+1 wood drop" }
-    }
-}
+def has_data_tag(data_ID, tag):
+    if data_ID not in calculator_data:
+        print(f"ERROR - has_data_tag - data ID {data_ID} not in calculator data")
+        return False
+    if data_ID == tag or data_ID in tag:
+        return True
+    if "tags" not in calculator_data[data_ID]:
+        return False
+    if type(tag) == str and tag in calculator_data[data_ID]["tags"]:
+        return True
+    if type(tag) != list:
+        return False
+    for search_tag in tag:
+        if search_tag in calculator_data[data_ID]["tags"]:
+            return True
+    return False
 
 
 #%% Minion Cost Functions
@@ -2854,143 +3027,143 @@ def minionCostSum(minion_type, final_tier):
 #%% Minion Costs
 
 minionCosts = {
-    "Custom": minionCostTypes(["CUSTOM", "ENCHANTED_CUSTOM"], "single enchanted", True),
-    "Cobblestone": minionCostTypes(["COBBLESTONE", "ENCHANTED_COBBLESTONE"], "single enchanted", True),
-    "Obsidian": minionCostTypes(["OBSIDIAN", "ENCHANTED_OBSIDIAN"], "single enchanted", True),
-    "Glowstone": minionCostTypes(["GLOWSTONE_DUST", "ENCHANTED_GLOWSTONE_DUST", "ENCHANTED_GLOWSTONE"], "expensive enchanted", True),
-    "Gravel": minionCostTypes(["GRAVEL", "ENCHANTED_FLINT"], "single enchanted", False),
-    "Sand": minionCostTypes(["SAND", "ENCHANTED_SAND"], "single enchanted", False),
-    "Red Sand": minionCostTypes(["SAND:1", "ENCHANTED_RED_SAND", "ENCHANTED_RED_SAND_CUBE"], "expensive enchanted", True, {1: {'SAND:1': 80}, 4: {'ENCHANTED_RED_SAND': 16}, 5: {'ENCHANTED_RED_SAND': 32}}),
-    "Mycelium": minionCostTypes(["MYCEL", "ENCHANTED_MYCELIUM", "ENCHANTED_MYCELIUM_CUBE"], "expensive enchanted", True, {1: {'MYCEL': 80}, 4: {'ENCHANTED_MYCELIUM': 16}, 5: {'ENCHANTED_MYCELIUM': 32}}),
-    "Clay": minionCostTypes(["CLAY_BALL", "ENCHANTED_CLAY_BALL"], "single enchanted", True, {12: {"ENCHANTED_CLAY_BLOCK": 8}}),
-    "Ice": {1: {"ICE": 80}, 2: {"ICE": 160}, 3: {"ICE": 320}, 4: {"ICE": 512}, 5: {"PACKED_ICE": 128}, 6: {"PACKED_ICE": 256}, 7: {"PACKED_ICE": 512}, 8: {"ENCHANTED_ICE": 64}, 9: {"ENCHANTED_ICE": 128}, 10: {"ENCHANTED_ICE": 256}, 11: {"ENCHANTED_ICE": 512}, 12: {"ENCHANTED_ICE": 1024}},
-    "Snow": {1: {}, 2: {"SNOW_BLOCK": 32}, 3: {"SNOW_BLOCK": 64}, 4: {"SNOW_BLOCK": 128}, 5: {"SNOW_BLOCK": 256}, 6: {"SNOW_BLOCK": 512}, 7: {"ENCHANTED_SNOW_BLOCK": 8}, 8: {"ENCHANTED_SNOW_BLOCK": 16}, 9: {"ENCHANTED_SNOW_BLOCK": 32}, 10: {"ENCHANTED_SNOW_BLOCK": 64}, 11: {"ENCHANTED_SNOW_BLOCK": 128}, 12: {"ENCHANTED_SNOW_BLOCK": 1024}},
-    "Coal": minionCostTypes(["COAL", "ENCHANTED_COAL", "ENCHANTED_COAL_BLOCK"], "double enchanted", True),
-    "Iron": minionCostTypes(["IRON_INGOT", "ENCHANTED_IRON", "ENCHANTED_IRON_BLOCK"], "double enchanted", True),
-    "Gold": minionCostTypes(["GOLD_INGOT", "ENCHANTED_GOLD", "ENCHANTED_GOLD_BLOCK"], "double enchanted", True),
-    "Diamond": minionCostTypes(["DIAMOND", "ENCHANTED_DIAMOND", "ENCHANTED_DIAMOND_BLOCK"], "double enchanted", True),
-    "Lapis": minionCostTypes(["INK_SACK:4", "ENCHANTED_LAPIS_LAZULI", "ENCHANTED_LAPIS_LAZULI_BLOCK"], "very expensive enchanted", True),
-    "Redstone": minionCostTypes(["REDSTONE", "ENCHANTED_REDSTONE", "ENCHANTED_REDSTONE_BLOCK"], "expensive enchanted", True),
-    "Emerald": minionCostTypes(["EMERALD", "ENCHANTED_EMERALD", "ENCHANTED_EMERALD_BLOCK"], "double enchanted", True),
-    "Quartz": minionCostTypes(["QUARTZ", "ENCHANTED_QUARTZ", "ENCHANTED_QUARTZ_BLOCK"], "double enchanted", True),
-    "End Stone": minionCostTypes(["ENDER_STONE", "ENCHANTED_ENDSTONE"], "single enchanted", False),
-    "Mithril": minionCostTypes(["MITHRIL_ORE", "ENCHANTED_MITHRIL", "REFINED_MITHRIL"], "double enchanted", True),
-    "Hard Stone": minionCostTypes(["HARD_STONE", "ENCHANTED_HARD_STONE", "CONCENTRATED_STONE"], "expensive enchanted", True, {1: {'HARD_STONE': 256}, 2: {'HARD_STONE': 512}, 3: {'ENCHANTED_HARD_STONE': 8}, 4: {'ENCHANTED_HARD_STONE': 16}, 5: {'ENCHANTED_HARD_STONE': 32}, 10: {"CONCENTRATED_STONE": 4}, 11: {"CONCENTRATED_STONE": 8}, 12: {"CONCENTRATED_STONE": 16}}),
-    "Wheat": minionCostTypes(["WHEAT", "ENCHANTED_WHEAT"], "single enchanted", True),
-    "Melon": {1: {"MELON": 256}, 2: {"MELON": 512}, 3: {"MELON_BLOCK": 128}, 4: {"MELON_BLOCK": 256}, 5: {"MELON_BLOCK": 512}, 6: {"ENCHANTED_MELON": 64}, 7: {"ENCHANTED_MELON": 128}, 8: {"ENCHANTED_MELON": 256}, 9: {"ENCHANTED_MELON": 512}, 10: {"ENCHANTED_MELON_BLOCK": 8}, 11: {"ENCHANTED_MELON_BLOCK": 16}, 12: {"ENCHANTED_MELON_BLOCK": 32}},
-    "Pumpkin": minionCostTypes(["PUMPKIN", "ENCHANTED_PUMPKIN"], "single enchanted", True),
-    "Carrot": minionCostTypes(["CARROT_ITEM", "ENCHANTED_CARROT", "ENCHANTED_GOLDEN_CARROT"], "expensive enchanted", True),
-    "Potato": minionCostTypes(["POTATO_ITEM", "ENCHANTED_POTATO", "ENCHANTED_BAKED_POTATO"], "expensive enchanted", True),
-    "Mushroom": minionCostTypes(["RED_MUSHROOM", "ENCHANTED_RED_MUSHROOM"], "single enchanted", True, {12: {"ENCHANTED_RED_MUSHROOM": 512, "ENCHANTED_BROWN_MUSHROOM": 512}}),
-    "Cactus": minionCostTypes(["CACTUS", "ENCHANTED_CACTUS_GREEN", "ENCHANTED_CACTUS"], "expensive enchanted", True),
-    "Cocoa Beans": minionCostTypes(["INK_SACK:3", "ENCHANTED_COCOA", "ENCHANTED_COOKIE"], "double enchanted", True),
-    "Sugar Cane": minionCostTypes(["SUGAR_CANE", "ENCHANTED_SUGAR", "ENCHANTED_SUGAR_CANE"], "expensive enchanted", True),
-    "Nether Wart": minionCostTypes(["NETHER_STALK", "ENCHANTED_NETHER_STALK"], "single enchanted", True),
-    "Flower": minionCostTypes(["YELLOW_FLOWER", "ENCHANTED_DANDELION", "ENCHANTED_POPPY"], "double enchanted", True, {1: {}}),
-    "Sunflower": {1: {"DOUBLE_PLANT": 128}, 2: {"DOUBLE_PLANT": 160}, 3: {"DOUBLE_PLANT": 320}, 4: {"DOUBLE_PLANT": 512}, 5: {"ENCHANTED_SUNFLOWER": 8}, 6: {"ENCHANTED_SUNFLOWER": 24}, 7: {"ENCHANTED_SUNFLOWER": 64}, 8: {"ENCHANTED_SUNFLOWER": 128}, 9: {"ENCHANTED_SUNFLOWER": 512}, 10: {"COMPACTED_SUNFLOWER": 8}, 11: {"COMPACTED_SUNFLOWER": 16}, 12: {"COMPACTED_SUNFLOWER": 32}},
-    "Fishing": {1: {'RAW_FISH': 64}, 2: {'RAW_FISH': 128}, 3: {'RAW_FISH': 256}, 4: {'RAW_FISH': 512}, 5: {'ENCHANTED_RAW_FISH': 8}, 6: {'ENCHANTED_RAW_FISH': 24}, 7: {'ENCHANTED_RAW_FISH': 64}, 8: {'ENCHANTED_RAW_FISH': 128}, 9: {'ENCHANTED_RAW_FISH': 256}, 10: {'ENCHANTED_RAW_FISH': 512}, 11: {'ENCHANTED_COOKED_FISH': 8}, 12: {'ENCHANTED_COOKED_FISH': 16}},
-    "Zombie": minionCostTypes(["ROTTEN_FLESH", "ENCHANTED_ROTTEN_FLESH"], "single enchanted", False),
-    "Revenant": {},
-    "Voidling": {},
-    "Inferno": {},
-    "Vampire": minionCostTypes(["HEMOVIBE", "HEMOGLASS"], "single enchanted", False),
-    "Skeleton": minionCostTypes(["BONE", "ENCHANTED_BONE"], "single enchanted", False),
-    "Creeper": minionCostTypes(["SULPHUR", "ENCHANTED_GUNPOWDER", "ENCHANTED_FIREWORK_ROCKET"], "double enchanted", False, {11: {"ENCHANTED_FIREWORK_ROCKET": 16}}),
-    "Spider": minionCostTypes(["STRING", "ENCHANTED_STRING"], "single enchanted", False),
-    "Tarantula": {},
-    "Cave Spider": minionCostTypes(["SPIDER_EYE", "ENCHANTED_SPIDER_EYE", "ENCHANTED_FERMENTED_SPIDER_EYE"], "double enchanted", False, {11: {"ENCHANTED_FERMENTED_SPIDER_EYE": 16}}),
-    "Blaze": minionCostTypes(["BLAZE_ROD", "ENCHANTED_BLAZE_POWDER", "ENCHANTED_BLAZE_ROD"], "double enchanted", True),
-    "Magma Cube": minionCostTypes(["MAGMA_CREAM", "ENCHANTED_MAGMA_CREAM"], "single enchanted", True),
-    "Enderman": {1: {"ENDER_PEARL": 64}, 2: {"ENDER_PEARL": 128}, 3: {"ENCHANTED_ENDER_PEARL": 8}, 4: {"ENCHANTED_ENDER_PEARL": 24}, 5: {"ENCHANTED_ENDER_PEARL": 48}, 6: {"ENCHANTED_ENDER_PEARL": 96}, 7: {"ENCHANTED_EYE_OF_ENDER": 8}, 8: {"ENCHANTED_EYE_OF_ENDER": 24}, 9: {"ENCHANTED_EYE_OF_ENDER": 48}, 10: {"ENCHANTED_EYE_OF_ENDER": 96}, 11: {"ENCHANTED_EYE_OF_ENDER": 192}},
-    "Ghast": {1: {"GHAST_TEAR": 64}, 2: {"GHAST_TEAR": 128}, 3: {"GHAST_TEAR": 256}, 4: {"GHAST_TEAR": 512}, 5: {"ENCHANTED_GHAST_TEAR": 256}, 6: {"ENCHANTED_GHAST_TEAR": 512}, 7: {"SILVER_FANG": 32}, 8: {"SILVER_FANG": 64}, 9: {"SILVER_FANG": 128}, 10: {"SILVER_FANG": 256}, 11: {"SILVER_FANG": 512}, 12: {"SILVER_FANG": 1024}},
-    "Slime": minionCostTypes(["SLIME_BALL", "ENCHANTED_SLIME_BALL", "ENCHANTED_SLIME_BLOCK"], "double enchanted", False),
-    "Cow": {1: {"RAW_BEEF": 64}, 2: {"RAW_BEEF": 128}, 3: {"RAW_BEEF": 256}, 4: {"RAW_BEEF": 512}, 5: {"ENCHANTED_RAW_BEEF": 8}, 6: {"ENCHANTED_RAW_BEEF": 24}, 7: {"ENCHANTED_RAW_BEEF": 64}, 8: {"ENCHANTED_RAW_BEEF": 128}, 9: {"ENCHANTED_RAW_BEEF": 256}, 10: {"ENCHANTED_RAW_BEEF": 512}, 11: {"ENCHANTED_LEATHER": 512}, 12: {"ENCHANTED_LEATHER": 1024}},  # correct
-    "Pig": minionCostTypes(["PORK", "ENCHANTED_PORK", "ENCHANTED_GRILLED_PORK"], "double enchanted", True, {1: {"PORK": 64}, 2: {"PORK": 128}, 3: {"PORK": 256}}),
-    "Chicken": minionCostTypes(["RAW_CHICKEN", "ENCHANTED_RAW_CHICKEN"], "single enchanted", True, {1: {"RAW_CHICKEN": 64}, 2: {"RAW_CHICKEN": 128}, 3: {"RAW_CHICKEN": 256}}),
-    "Sheep": minionCostTypes(["MUTTON", "ENCHANTED_MUTTON", "ENCHANTED_COOKED_MUTTON"], "double enchanted", True, {1: {"MUTTON": 64}, 2: {"MUTTON": 128}, 3: {"MUTTON": 256}}),
-    "Rabbit": minionCostTypes(["RABBIT", "ENCHANTED_RABBIT", "ENCHANTED_COOKED_RABBIT"], "double enchanted", True, {1: {"RABBIT": 64}, 2: {"RABBIT": 128}, 3: {"RABBIT": 256}}),
-    "Oak": minionCostTypes(["LOG", "ENCHANTED_OAK_LOG"], "single enchanted", False),
-    "Spruce": minionCostTypes(["LOG:1", "ENCHANTED_SPRUCE_LOG"], "single enchanted", False),
-    "Birch": minionCostTypes(["LOG:2", "ENCHANTED_BIRCH_LOG"], "single enchanted", False),
-    "Dark Oak": minionCostTypes(["LOG_2:1", "ENCHANTED_DARK_OAK_LOG"], "single enchanted", False),
-    "Acacia": minionCostTypes(["LOG_2", "ENCHANTED_ACACIA_LOG"], "single enchanted", False),
-    "Jungle": minionCostTypes(["LOG:3", "ENCHANTED_JUNGLE_LOG"], "single enchanted", False)
+    "CUSTOM_MINION": minionCostTypes(["CUSTOM", "ENCHANTED_CUSTOM"], "single enchanted", True),
+    "COBBLESTONE_MINION": minionCostTypes(["COBBLESTONE", "ENCHANTED_COBBLESTONE"], "single enchanted", True),
+    "OBSIDIAN_MINION": minionCostTypes(["OBSIDIAN", "ENCHANTED_OBSIDIAN"], "single enchanted", True),
+    "GLOWSTONE_MINION": minionCostTypes(["GLOWSTONE_DUST", "ENCHANTED_GLOWSTONE_DUST", "ENCHANTED_GLOWSTONE"], "expensive enchanted", True),
+    "GRAVEL_MINION": minionCostTypes(["GRAVEL", "ENCHANTED_FLINT"], "single enchanted", False),
+    "SAND_MINION": minionCostTypes(["SAND", "ENCHANTED_SAND"], "single enchanted", False),
+    "RED_SAND_MINION": minionCostTypes(["SAND:1", "ENCHANTED_RED_SAND", "ENCHANTED_RED_SAND_CUBE"], "expensive enchanted", True, {1: {'SAND:1': 80}, 4: {'ENCHANTED_RED_SAND': 16}, 5: {'ENCHANTED_RED_SAND': 32}}),
+    "MYCELIUM_MINION": minionCostTypes(["MYCEL", "ENCHANTED_MYCELIUM", "ENCHANTED_MYCELIUM_CUBE"], "expensive enchanted", True, {1: {'MYCEL': 80}, 4: {'ENCHANTED_MYCELIUM': 16}, 5: {'ENCHANTED_MYCELIUM': 32}}),
+    "CLAY_MINION": minionCostTypes(["CLAY_BALL", "ENCHANTED_CLAY_BALL"], "single enchanted", True, {12: {"ENCHANTED_CLAY_BLOCK": 8}}),
+    "ICE_MINION": {1: {"ICE": 80}, 2: {"ICE": 160}, 3: {"ICE": 320}, 4: {"ICE": 512}, 5: {"PACKED_ICE": 128}, 6: {"PACKED_ICE": 256}, 7: {"PACKED_ICE": 512}, 8: {"ENCHANTED_ICE": 64}, 9: {"ENCHANTED_ICE": 128}, 10: {"ENCHANTED_ICE": 256}, 11: {"ENCHANTED_ICE": 512}, 12: {"ENCHANTED_ICE": 1024}},
+    "SNOW_MINION": {1: {}, 2: {"SNOW_BLOCK": 32}, 3: {"SNOW_BLOCK": 64}, 4: {"SNOW_BLOCK": 128}, 5: {"SNOW_BLOCK": 256}, 6: {"SNOW_BLOCK": 512}, 7: {"ENCHANTED_SNOW_BLOCK": 8}, 8: {"ENCHANTED_SNOW_BLOCK": 16}, 9: {"ENCHANTED_SNOW_BLOCK": 32}, 10: {"ENCHANTED_SNOW_BLOCK": 64}, 11: {"ENCHANTED_SNOW_BLOCK": 128}, 12: {"ENCHANTED_SNOW_BLOCK": 1024}},
+    "COAL_MINION": minionCostTypes(["COAL", "ENCHANTED_COAL", "ENCHANTED_COAL_BLOCK"], "double enchanted", True),
+    "IRON_MINION": minionCostTypes(["IRON_INGOT", "ENCHANTED_IRON", "ENCHANTED_IRON_BLOCK"], "double enchanted", True),
+    "GOLD_MINION": minionCostTypes(["GOLD_INGOT", "ENCHANTED_GOLD", "ENCHANTED_GOLD_BLOCK"], "double enchanted", True),
+    "DIAMOND_MINION": minionCostTypes(["DIAMOND", "ENCHANTED_DIAMOND", "ENCHANTED_DIAMOND_BLOCK"], "double enchanted", True),
+    "LAPIS_MINION": minionCostTypes(["INK_SACK:4", "ENCHANTED_LAPIS_LAZULI", "ENCHANTED_LAPIS_LAZULI_BLOCK"], "very expensive enchanted", True),
+    "REDSTONE_MINION": minionCostTypes(["REDSTONE", "ENCHANTED_REDSTONE", "ENCHANTED_REDSTONE_BLOCK"], "expensive enchanted", True),
+    "EMERALD_MINION": minionCostTypes(["EMERALD", "ENCHANTED_EMERALD", "ENCHANTED_EMERALD_BLOCK"], "double enchanted", True),
+    "QUARTZ_MINION": minionCostTypes(["QUARTZ", "ENCHANTED_QUARTZ", "ENCHANTED_QUARTZ_BLOCK"], "double enchanted", True),
+    "END_STONE_MINION": minionCostTypes(["ENDER_STONE", "ENCHANTED_ENDSTONE"], "single enchanted", False),
+    "MITHRIL_MINION": minionCostTypes(["MITHRIL_ORE", "ENCHANTED_MITHRIL", "REFINED_MITHRIL"], "double enchanted", True),
+    "HARD_STONE_MINION": minionCostTypes(["HARD_STONE", "ENCHANTED_HARD_STONE", "CONCENTRATED_STONE"], "expensive enchanted", True, {1: {'HARD_STONE': 256}, 2: {'HARD_STONE': 512}, 3: {'ENCHANTED_HARD_STONE': 8}, 4: {'ENCHANTED_HARD_STONE': 16}, 5: {'ENCHANTED_HARD_STONE': 32}, 10: {"CONCENTRATED_STONE": 4}, 11: {"CONCENTRATED_STONE": 8}, 12: {"CONCENTRATED_STONE": 16}}),
+    "WHEAT_MINION": minionCostTypes(["WHEAT", "ENCHANTED_WHEAT"], "single enchanted", True),
+    "MELON_MINION": {1: {"MELON": 256}, 2: {"MELON": 512}, 3: {"MELON_BLOCK": 128}, 4: {"MELON_BLOCK": 256}, 5: {"MELON_BLOCK": 512}, 6: {"ENCHANTED_MELON": 64}, 7: {"ENCHANTED_MELON": 128}, 8: {"ENCHANTED_MELON": 256}, 9: {"ENCHANTED_MELON": 512}, 10: {"ENCHANTED_MELON_BLOCK": 8}, 11: {"ENCHANTED_MELON_BLOCK": 16}, 12: {"ENCHANTED_MELON_BLOCK": 32}},
+    "PUMPKIN_MINION": minionCostTypes(["PUMPKIN", "ENCHANTED_PUMPKIN"], "single enchanted", True),
+    "CARROT_MINION": minionCostTypes(["CARROT_ITEM", "ENCHANTED_CARROT", "ENCHANTED_GOLDEN_CARROT"], "expensive enchanted", True),
+    "POTATO_MINION": minionCostTypes(["POTATO_ITEM", "ENCHANTED_POTATO", "ENCHANTED_BAKED_POTATO"], "expensive enchanted", True),
+    "MUSHROOM_MINION": minionCostTypes(["RED_MUSHROOM", "ENCHANTED_RED_MUSHROOM"], "single enchanted", True, {12: {"ENCHANTED_RED_MUSHROOM": 512, "ENCHANTED_BROWN_MUSHROOM": 512}}),
+    "CACTUS_MINION": minionCostTypes(["CACTUS", "ENCHANTED_CACTUS_GREEN", "ENCHANTED_CACTUS"], "expensive enchanted", True),
+    "COCOA_BEANS_MINION": minionCostTypes(["INK_SACK:3", "ENCHANTED_COCOA", "ENCHANTED_COOKIE"], "double enchanted", True),
+    "SUGAR_CANE_MINION": minionCostTypes(["SUGAR_CANE", "ENCHANTED_SUGAR", "ENCHANTED_SUGAR_CANE"], "expensive enchanted", True),
+    "NETHER_WART_MINION": minionCostTypes(["NETHER_STALK", "ENCHANTED_NETHER_STALK"], "single enchanted", True),
+    "FLOWER_MINION": minionCostTypes(["YELLOW_FLOWER", "ENCHANTED_DANDELION", "ENCHANTED_POPPY"], "double enchanted", True, {1: {}}),
+    "SUNFLOWER_MINION": {1: {"DOUBLE_PLANT": 128}, 2: {"DOUBLE_PLANT": 160}, 3: {"DOUBLE_PLANT": 320}, 4: {"DOUBLE_PLANT": 512}, 5: {"ENCHANTED_SUNFLOWER": 8}, 6: {"ENCHANTED_SUNFLOWER": 24}, 7: {"ENCHANTED_SUNFLOWER": 64}, 8: {"ENCHANTED_SUNFLOWER": 128}, 9: {"ENCHANTED_SUNFLOWER": 512}, 10: {"COMPACTED_SUNFLOWER": 8}, 11: {"COMPACTED_SUNFLOWER": 16}, 12: {"COMPACTED_SUNFLOWER": 32}},
+    "FISHING_MINION": {1: {'RAW_FISH': 64}, 2: {'RAW_FISH': 128}, 3: {'RAW_FISH': 256}, 4: {'RAW_FISH': 512}, 5: {'ENCHANTED_RAW_FISH': 8}, 6: {'ENCHANTED_RAW_FISH': 24}, 7: {'ENCHANTED_RAW_FISH': 64}, 8: {'ENCHANTED_RAW_FISH': 128}, 9: {'ENCHANTED_RAW_FISH': 256}, 10: {'ENCHANTED_RAW_FISH': 512}, 11: {'ENCHANTED_COOKED_FISH': 8}, 12: {'ENCHANTED_COOKED_FISH': 16}},
+    "ZOMBIE_MINION": minionCostTypes(["ROTTEN_FLESH", "ENCHANTED_ROTTEN_FLESH"], "single enchanted", False),
+    "REVENANT_MINION": {},
+    "VOIDLING_MINION": {},
+    "INFERNO_MINION": {},
+    "VAMPIRE_MINION": minionCostTypes(["HEMOVIBE", "HEMOGLASS"], "single enchanted", False),
+    "SKELETON_MINION": minionCostTypes(["BONE", "ENCHANTED_BONE"], "single enchanted", False),
+    "CREEPER_MINION": minionCostTypes(["SULPHUR", "ENCHANTED_GUNPOWDER", "ENCHANTED_FIREWORK_ROCKET"], "double enchanted", False, {11: {"ENCHANTED_FIREWORK_ROCKET": 16}}),
+    "SPIDER_MINION": minionCostTypes(["STRING", "ENCHANTED_STRING"], "single enchanted", False),
+    "TARANTULA_MINION": {},
+    "CAVE_SPIDER_MINION": minionCostTypes(["SPIDER_EYE", "ENCHANTED_SPIDER_EYE", "ENCHANTED_FERMENTED_SPIDER_EYE"], "double enchanted", False, {11: {"ENCHANTED_FERMENTED_SPIDER_EYE": 16}}),
+    "BLAZE_MINION": minionCostTypes(["BLAZE_ROD", "ENCHANTED_BLAZE_POWDER", "ENCHANTED_BLAZE_ROD"], "double enchanted", True),
+    "MAGMA_CUBE_MINION": minionCostTypes(["MAGMA_CREAM", "ENCHANTED_MAGMA_CREAM"], "single enchanted", True),
+    "ENDERMAN_MINION": {1: {"ENDER_PEARL": 64}, 2: {"ENDER_PEARL": 128}, 3: {"ENCHANTED_ENDER_PEARL": 8}, 4: {"ENCHANTED_ENDER_PEARL": 24}, 5: {"ENCHANTED_ENDER_PEARL": 48}, 6: {"ENCHANTED_ENDER_PEARL": 96}, 7: {"ENCHANTED_EYE_OF_ENDER": 8}, 8: {"ENCHANTED_EYE_OF_ENDER": 24}, 9: {"ENCHANTED_EYE_OF_ENDER": 48}, 10: {"ENCHANTED_EYE_OF_ENDER": 96}, 11: {"ENCHANTED_EYE_OF_ENDER": 192}},
+    "GHAST_MINION": {1: {"GHAST_TEAR": 64}, 2: {"GHAST_TEAR": 128}, 3: {"GHAST_TEAR": 256}, 4: {"GHAST_TEAR": 512}, 5: {"ENCHANTED_GHAST_TEAR": 256}, 6: {"ENCHANTED_GHAST_TEAR": 512}, 7: {"SILVER_FANG": 32}, 8: {"SILVER_FANG": 64}, 9: {"SILVER_FANG": 128}, 10: {"SILVER_FANG": 256}, 11: {"SILVER_FANG": 512}, 12: {"SILVER_FANG": 1024}},
+    "SLIME_MINION": minionCostTypes(["SLIME_BALL", "ENCHANTED_SLIME_BALL", "ENCHANTED_SLIME_BLOCK"], "double enchanted", False),
+    "COW_MINION": {1: {"RAW_BEEF": 64}, 2: {"RAW_BEEF": 128}, 3: {"RAW_BEEF": 256}, 4: {"RAW_BEEF": 512}, 5: {"ENCHANTED_RAW_BEEF": 8}, 6: {"ENCHANTED_RAW_BEEF": 24}, 7: {"ENCHANTED_RAW_BEEF": 64}, 8: {"ENCHANTED_RAW_BEEF": 128}, 9: {"ENCHANTED_RAW_BEEF": 256}, 10: {"ENCHANTED_RAW_BEEF": 512}, 11: {"ENCHANTED_LEATHER": 512}, 12: {"ENCHANTED_LEATHER": 1024}},  # correct
+    "PIG_MINION": minionCostTypes(["PORK", "ENCHANTED_PORK", "ENCHANTED_GRILLED_PORK"], "double enchanted", True, {1: {"PORK": 64}, 2: {"PORK": 128}, 3: {"PORK": 256}}),
+    "CHICKEN_MINION": minionCostTypes(["RAW_CHICKEN", "ENCHANTED_RAW_CHICKEN"], "single enchanted", True, {1: {"RAW_CHICKEN": 64}, 2: {"RAW_CHICKEN": 128}, 3: {"RAW_CHICKEN": 256}}),
+    "SHEEP_MINION": minionCostTypes(["MUTTON", "ENCHANTED_MUTTON", "ENCHANTED_COOKED_MUTTON"], "double enchanted", True, {1: {"MUTTON": 64}, 2: {"MUTTON": 128}, 3: {"MUTTON": 256}}),
+    "RABBIT_MINION": minionCostTypes(["RABBIT", "ENCHANTED_RABBIT", "ENCHANTED_COOKED_RABBIT"], "double enchanted", True, {1: {"RABBIT": 64}, 2: {"RABBIT": 128}, 3: {"RABBIT": 256}}),
+    "OAK_MINION": minionCostTypes(["LOG", "ENCHANTED_OAK_LOG"], "single enchanted", False),
+    "SPRUCE_MINION": minionCostTypes(["LOG:1", "ENCHANTED_SPRUCE_LOG"], "single enchanted", False),
+    "BIRCH_MINION": minionCostTypes(["LOG:2", "ENCHANTED_BIRCH_LOG"], "single enchanted", False),
+    "DARK_OAK_MINION": minionCostTypes(["LOG_2:1", "ENCHANTED_DARK_OAK_LOG"], "single enchanted", False),
+    "ACACIA_MINION": minionCostTypes(["LOG_2", "ENCHANTED_ACACIA_LOG"], "single enchanted", False),
+    "JUNGLE_MINION": minionCostTypes(["LOG:3", "ENCHANTED_JUNGLE_LOG"], "single enchanted", False)
 }
 
-minionCosts["Revenant"] = {
+minionCosts["REVENANT_MINION"] = {
     1: { "REVENANT_FLESH": 80, "ENCHANTED_ROTTEN_FLESH": 256, "ENCHANTED_DIAMOND": 256 },
-    2: { "REVENANT_FLESH": 140, **minionCostSum("Zombie", 1) },
-    3: { "REVENANT_FLESH": 280, **minionCostSum("Zombie", 2) },
-    4: { "REVENANT_FLESH": 448, **minionCostSum("Zombie", 3) },
-    **{ i: { "REVENANT_VISCERA": 7 * 2**(i - 5), **minionCostSum("Zombie", i - 1) } for i in range(5, 12) },
+    2: { "REVENANT_FLESH": 140, **minionCostSum("ZOMBIE_MINION", 1) },
+    3: { "REVENANT_FLESH": 280, **minionCostSum("ZOMBIE_MINION", 2) },
+    4: { "REVENANT_FLESH": 448, **minionCostSum("ZOMBIE_MINION", 3) },
+    **{ i: { "REVENANT_VISCERA": 7 * 2**(i - 5), **minionCostSum("ZOMBIE_MINION", i - 1) } for i in range(5, 12) },
     12: { "REVENANT_VISCERA": 64 }
 }
-minionCosts["Voidling"] = {
-    1: { "NULL_SPHERE": 80, **minionCostSum("Enderman", 1) },
-    2: { "NULL_SPHERE": 140, **minionCostSum("Obsidian", 1) },
-    3: { "NULL_SPHERE": 280, **minionCostSum("Enderman", 2) },
-    4: { "NULL_SPHERE": 448, **minionCostSum("Obsidian", 3) },
-    **{ i: { "NULL_OVOID": 7 * 2**(i - 5), **minionCostSum(f"{'Obsidian' if i % 2 == 0 else 'Enderman'}", i - 1) } for i in range(5, 12) }
+minionCosts["VOIDLING_MINION"] = {
+    1: { "NULL_SPHERE": 80, **minionCostSum("ENDERMAN_MINION", 1) },
+    2: { "NULL_SPHERE": 140, **minionCostSum("OBSIDIAN_MINION", 1) },
+    3: { "NULL_SPHERE": 280, **minionCostSum("ENDERMAN_MINION", 2) },
+    4: { "NULL_SPHERE": 448, **minionCostSum("OBSIDIAN_MINION", 3) },
+    **{ i: { "NULL_OVOID": 7 * 2**(i - 5), **minionCostSum(f"{'OBSIDIAN_MINION' if i % 2 == 0 else 'ENDERMAN_MINION'}", i - 1) } for i in range(5, 12) }
 }
-minionCosts["Inferno"] = {
-    1: { "DERELICT_ASHE": 80, **minionCostSum("Blaze", 1)},
+minionCosts["INFERNO_MINION"] = {
+    1: { "DERELICT_ASHE": 80, **minionCostSum("BLAZE_MINION", 1)},
     2: {"DERELICT_ASHE": 320 },
     **{ i: {"MOLTEN_POWDER": 8 * 2**(i - 3)} for i in range(3, 9) },
     9: { 'MOLTEN_POWDER': 256, "INFERNO_VERTEX": 16 },
     10: { 'MOLTEN_POWDER': 256, "INFERNO_VERTEX": 48 }
 }
-minionCosts["Inferno"][11] = { "INFERNO_VERTEX": 48, "INFERNO_APEX": 1, **minionCostSum("Inferno", 8) }
-minionCosts["Inferno"][11]["MOLTEN_POWDER"] += 256
-minionCosts["Tarantula"] = {
+minionCosts["INFERNO_MINION"][11] = { "INFERNO_VERTEX": 48, "INFERNO_APEX": 1, **minionCostSum("INFERNO_MINION", 8) }
+minionCosts["INFERNO_MINION"][11]["MOLTEN_POWDER"] += 256
+minionCosts["TARANTULA_MINION"] = {
     1: { "TARANTULA_WEB": 80, "ENCHANTED_FERMENTED_SPIDER_EYE": 1 },
-    2: { "TARANTULA_WEB": 140, **minionCostSum("Spider", 1) },
-    3: { "TARANTULA_WEB": 280, **minionCostSum("Spider", 2) },
-    4: { "TARANTULA_WEB": 448, **minionCostSum("Spider", 3) },
-    **{ i: {"TARANTULA_SILK": 7 * 2**(i - 5), **minionCostSum("Spider", i - 1)} for i in range(5, 12) },
+    2: { "TARANTULA_WEB": 140, **minionCostSum("SPIDER_MINION", 1) },
+    3: { "TARANTULA_WEB": 280, **minionCostSum("SPIDER_MINION", 2) },
+    4: { "TARANTULA_WEB": 448, **minionCostSum("SPIDER_MINION", 3) },
+    **{ i: {"TARANTULA_SILK": 7 * 2**(i - 5), **minionCostSum("SPIDER_MINION", i - 1)} for i in range(5, 12) },
     12: { "TARANTULA_SILK": 64 }
 }
 
 extraMinionCosts = {
-    "Custom": { 6: { "TESTING": 2 }, 12: { "COINS": 1, "NON_EXISTENT": 1, "TEST": 2 } },
-    "Cobblestone": { 12: { "COINS": 2000000 } },
-    "Obsidian": { 12: { "COINS": 2000000 } },
-    "Glowstone": { 12: { "COINS": 2000000 } },
-    "Red Sand": { 12: { "COINS": 2000000 } },
-    "Mycelium": { 12: { "COINS": 2000000 } },
-    "Clay": { 12: { "COINS": 2000000, "FISHY_TREAT": 256 } },
-    "Ice": { 12: { "COINS": 1000000, "NORTH_STARS": 300 } },
-    "Snow": { 12: { "COINS": 2000000, "NORTH_STARS": 500 } },
-    "Coal": { 12: { "COINS": 2000000 } },
-    "Iron": { 12: { "COINS": 2000000 } },
-    "Gold": { 12: { "COINS": 2000000 } },
-    "Diamond": { 12: { "COINS": 2000000 } },
-    "Lapis": { 12: { "COINS": 2000000 } },
-    "Redstone": { 12: { "COINS": 2000000 } },
-    "Emerald": { 12: { "COINS": 2000000 } },
-    "Quartz": { 12: { "COINS": 2000000 } },
-    "Mithril": { 12: { "COINS": 2000000 } },
-    "Hard Stone": { 12: { "COINS": 2000000 } },
-    "Wheat": { 12: { "PELTS": 75 } },
-    "Melon": { 12: { "PELTS": 75 } },
-    "Pumpkin": { 12: { "PELTS": 75 } },
-    "Carrot": { 12: { "PELTS": 75 } },
-    "Potato": { 12: { "PELTS": 75 } },
-    "Mushroom": { 12: { "PELTS": 75 } },
-    "Cactus": { 12: { "PELTS": 75 } },
-    "Cocoa Beans": { 12: { "PELTS": 75 } },
-    "Sugar Cane": { 12: { "PELTS": 75 } },
-    "Nether Wart": { 12: { "PELTS": 75 } },
-    "Flower": { 1: { "T1_FROM_DARK_AUCTION": 1 } },
-    "Fishing": { 12: { "COINS": 2000000, "FISHY_TREAT": 256 } },
-    "Revenant": { 12: { "COINS": 2000000 } },
-    "Vampire": { 1: { "BAT_PERSON_HELMET": 1 } },
-    "Tarantula": { 12: { "COINS": 2000000 } },
-    "Blaze": { 12: { "COINS": 2000000 } },
-    "Magma Cube": { 12: { "COINS": 2000000 } },
-    "Ghast": { 12: { "COINS": 2000000 } },
-    "Cow": { 12: { "PELTS": 75 } },
-    "Pig": { 12: { "PELTS": 75 } },
-    "Chicken": { 12: { "PELTS": 75 } },
-    "Sheep": { 12: { "PELTS": 75 } },
-    "Rabbit": { 12: { "PELTS": 75 } },
+    "CUSTOM_MINION": { 6: { "TESTING": 2 }, 12: { "COINS": 1, "NON_EXISTENT": 1, "TEST": 2 } },
+    "COBBLESTONE_MINION": { 12: { "COINS": 2000000 } },
+    "OBSIDIAN_MINION": { 12: { "COINS": 2000000 } },
+    "GLOWSTONE_MINION": { 12: { "COINS": 2000000 } },
+    "RED_SAND_MINION": { 12: { "COINS": 2000000 } },
+    "MYCELIUM_MINION": { 12: { "COINS": 2000000 } },
+    "CLAY_MINION": { 12: { "COINS": 2000000, "FISHY_TREAT": 256 } },
+    "ICE_MINION": { 12: { "COINS": 1000000, "NORTH_STARS": 300 } },
+    "SNOW_MINION": { 12: { "COINS": 2000000, "NORTH_STARS": 500 } },
+    "COAL_MINION": { 12: { "COINS": 2000000 } },
+    "IRON_MINION": { 12: { "COINS": 2000000 } },
+    "GOLD_MINION": { 12: { "COINS": 2000000 } },
+    "DIAMOND_MINION": { 12: { "COINS": 2000000 } },
+    "LAPIS_MINION": { 12: { "COINS": 2000000 } },
+    "REDSTONE_MINION": { 12: { "COINS": 2000000 } },
+    "EMERALD_MINION": { 12: { "COINS": 2000000 } },
+    "QUARTZ_MINION": { 12: { "COINS": 2000000 } },
+    "MITHRIL_MINION": { 12: { "COINS": 2000000 } },
+    "HARD_STONE_MINION": { 12: { "COINS": 2000000 } },
+    "WHEAT_MINION": { 12: { "PELTS": 75 } },
+    "MELON_MINION": { 12: { "PELTS": 75 } },
+    "PUMPKIN_MINION": { 12: { "PELTS": 75 } },
+    "CARROT_MINION": { 12: { "PELTS": 75 } },
+    "POTATO_MINION": { 12: { "PELTS": 75 } },
+    "MUSHROOM_MINION": { 12: { "PELTS": 75 } },
+    "CACTUS_MINION": { 12: { "PELTS": 75 } },
+    "COCOA_BEANS_MINION": { 12: { "PELTS": 75 } },
+    "SUGAR_CANE_MINION": { 12: { "PELTS": 75 } },
+    "NETHER_WART_MINION": { 12: { "PELTS": 75 } },
+    "FLOWER_MINION": { 1: { "T1_FROM_DARK_AUCTION": 1 } },
+    "FISHING_MINION": { 12: { "COINS": 2000000, "FISHY_TREAT": 256 } },
+    "REVENANT_MINION": { 12: { "COINS": 2000000 } },
+    "VAMPIRE_MINION": { 1: { "BAT_PERSON_HELMET": 1 } },
+    "TARANTULA_MINION": { 12: { "COINS": 2000000 } },
+    "BLAZE_MINION": { 12: { "COINS": 2000000 } },
+    "MAGMA_CUBE_MINION": { 12: { "COINS": 2000000 } },
+    "GHAST_MINION": { 12: { "COINS": 2000000 } },
+    "COW_MINION": { 12: { "PELTS": 75 } },
+    "PIG_MINION": { 12: { "PELTS": 75 } },
+    "CHICKEN_MINION": { 12: { "PELTS": 75 } },
+    "SHEEP_MINION": { 12: { "PELTS": 75 } },
+    "RABBIT_MINION": { 12: { "PELTS": 75 } },
 }

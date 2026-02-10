@@ -88,10 +88,9 @@ def basic_minion_loop(calculator):
     setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
     calculated_setup_profits = {}
     calculated_setup_costs = {}
-    loop_minion_options = list(md.minionList.keys())
-    loop_minion_skip = ["Custom"]
-    loop_minion_smelting = ["Iron", "Gold", "Cactus"]
-    loop_minion_combat = ["Zombie", "Revenant", "Voidling", "Inferno", "Vampire", "Skeleton", "Creeper", "Spider", "Tarantula", "Cave Spider", "Blaze", "Magma Cube", "Enderman", "Ghast", "Slime", "Cow", "Pig", "Chicken", "Sheep", "Rabbit"]
+    loop_minion_options = list(md.minion_options.values())
+    loop_minion_skip = ["CUSTOM_MINION"]
+    loop_minion_smelting = ["IRON_MINION", "GOLD_MINION", "CACTUS_MINION"]
     super_compactor = False
     if setup_data["upgrade1"] in ["SUPER_COMPACTOR_3000", "DWARVEN_COMPACTOR"]:
         super_compactor = True
@@ -104,10 +103,10 @@ def basic_minion_loop(calculator):
     for loop_minion in loop_minion_options:
         if loop_minion in loop_minion_skip:
             continue
-        if loop_minion not in loop_minion_combat and "CORRUPT_SOIL" in upgrades:
+        if "CORRUPT_SOIL" in upgrades and not md.has_data_tag(loop_minion, "mob_minion"):
             continue
         setup_data["minion"] = loop_minion
-        setup_data["miniontier"] = list(md.minionList[setup_data["minion"]]["speed"].keys())[-1]
+        setup_data["miniontier"] = list(md.calculator_data[setup_data["minion"]]["speed"].keys())[-1]
         if super_compactor:
             if loop_minion in loop_minion_smelting:
                 setup_data["upgrade1"] = "DWARVEN_COMPACTOR"
@@ -122,7 +121,7 @@ def basic_minion_loop(calculator):
     print("Minion : profit , setup cost")
     for _ in range(10):
         top_minion = max(calculated_setup_profits, key=calculated_setup_profits.get)
-        print(top_minion, ":", calculator.huim.reduced_number(calculated_setup_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]))
+        print(md.calculator_data[top_minion]["display"], ":", calculator.huim.reduced_number(calculated_setup_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]))
         del calculated_setup_profits[top_minion]
     print("\n")
     calculator.collect_addon_output("Basic Minion Loop", "See terminal")
@@ -140,7 +139,7 @@ def inferno_minion_loop(calculator):
     # saving this file and restarting the calculator is needed to apply changes.
     # will make this into a good working input in the GUI later.
 
-    setup_data["minion"] = "Inferno"
+    setup_data["minion"] = "INFERNO_MINION"
     setup_data["fuel"] = "INFERNO_FUEL"
     setup_data["chest"] = "XXLARGE_ENCHANTED_CHEST"
     setup_data["rising_celsius_override"] = True
@@ -175,7 +174,7 @@ def craft_material_amount(calculator):
     setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])
     materials = md.minionCostSum(setup_data["minion"], setup_data["miniontier"])
     extra_costs_string = setup_data["extracost"]
-    materials_string = ", ".join([f"{amount * setup_data["amount"]} {md.itemList[material]["display"]}" for material, amount in materials.items()])
+    materials_string = ", ".join([f"{amount * setup_data["amount"]} {md.calculator_data[material]["display"]}" for material, amount in materials.items()])
     if len(extra_costs_string) != 0:
         materials_string += ", " + extra_costs_string
     calculator.collect_addon_output("Minion Crafting Materials", materials_string)
