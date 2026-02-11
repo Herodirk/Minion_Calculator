@@ -664,7 +664,7 @@ class Calculator(tk.Tk):
             Output string. If toTerminal is True, this function returns None.
 
         """
-        crafted_string = f'{self.amount.get()}x {self.minion.get()} t{self.miniontier.get()}; '
+        crafted_string = f'{self.amount.get()}x {self.minion.get(False)} t{self.miniontier.get()}; '
         string_parts = {}
         for var_key in self.outputOrder:
             if var_key in self.dependent_variables:
@@ -851,7 +851,7 @@ class Calculator(tk.Tk):
             Output string. If toTerminal is True, this function returns None.
 
         """
-        crafted_string = f'{self.amount.get()}x **{self.minion.get()} t{self.miniontier.get()}**'
+        crafted_string = f'{self.amount.get()}x **{self.minion.get(False)} t{self.miniontier.get()}**'
         for key in self.fancyOrder:
             line_str = ""
             header = ""
