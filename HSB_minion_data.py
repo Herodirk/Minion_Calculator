@@ -228,8 +228,10 @@ calculator_data = {
         "exp_boost_amount": 0,
         "speed_boost": 0,
         "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
         "fuel_duration": -1,
-        "affected_minions": [],
+        "affected_minions": None,
         "upgrade_special": { "type": "None" },
         "prices": { "npc": 0, "custom": 0 },
     },
@@ -2598,6 +2600,105 @@ calculator_data = {
         "notes": { "AFK": "+1 wood drop" },
         "tags": ["foraging_minion", "wood_minion"]
     },
+
+    # Mayors
+
+    "MAYOR_AATROX": {
+        'display': "Aatrox",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_COLE": {
+        'display': "Cole",
+        "speed_boost": 25,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": ["mining_minion"]
+    },
+    "MAYOR_DIANA": {
+        'display': "Diana",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": []
+    },
+    "MAYOR_DIAZ": {
+        'display': "Diaz",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_FINNEGAN": {
+        'display': "Finnegan",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_FOXY": {
+        'display': "Foxy",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_MARINA": {
+        'display': "Marina",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_PAUL": {
+        'display': "Paul",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_JERRY": {
+        'display': "Jerry",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_DERPY": {
+        'display': "Derpy",
+        "speed_boost": 0,
+        "drop_multiplier": 2,
+        "xp_multiplier": 1.5,
+        "tax_multiplier": 4,
+        "affected_minions": []
+    },
+    "MAYOR_SCORPIUS": {
+        'display': "Scorpius",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1,
+        "tax_multiplier": 1,
+        "affected_minions": None
+    },
+    "MAYOR_AURA": {
+        'display': "Aura",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "xp_multiplier": 1.5,
+        "tax_multiplier": 2,
+        "affected_minions": []
+    }
 }
 
 
@@ -2821,44 +2922,60 @@ potato_accessory_options = {
     "Potato Ring": "POTATO_RING"
 }
 
+mayor_options = {
+    'None': "NONE",
+    'Aatrox': "MAYOR_AATROX",
+    'Cole': "MAYOR_COLE",
+    'Diana': "MAYOR_DIANA",
+    'Diaz': "MAYOR_DIAZ",
+    'Finnegan': "MAYOR_FINNEGAN",
+    'Foxy': "MAYOR_FOXY",
+    'Marina': "MAYOR_MARINA",
+    'Paul': "MAYOR_PAUL",
+    'Jerry': "MAYOR_JERRY",
+    'Derpy': "MAYOR_DERPY",
+    'Scorpius': "MAYOR_SCORPIUS",
+    'Aura': "MAYOR_AURA"
+}
+
 
 #%% Pets
 
-# name pet: {valid rarities: [boost base, added boost per level], "affects": [affected minions]}
+# name pet: {valid rarities: [boost base, added boost per level], "affected_minions": [affected minions]}
 boost_pets = {
-    "None": { "affects": [] },
-    # "Chicken": {"Legendary": [0, 0.3], "affects": ["Chicken"]},  # reworked in skyblock 0.23.1
+    "None": { "affected_minions": [] },
+    # "Chicken": {"Legendary": [0, 0.3], "affected_minions": ["Chicken"]},  # reworked in skyblock 0.23.1
     "Magma Cube": {
         "Common": [0, 0.2], "Uncommon": [0, 0.25],
         "Rare": [0, 0.25], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["SLIME_MINION", "MAGMA_CUBE_MINION"]  # affects magma cube minion is correct
+        "Legendary": [0, 0.3], "affected_minions": ["SLIME_MINION", "MAGMA_CUBE_MINION"]  # affects magma cube minion is correct
     },
     "Mooshroom Cow": {
         "Common": [0, 0.2], "Uncommon": [0, 0.2],
         "Rare": [0, 0.3], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["MUSHROOM_MINION", "MYCELIUM_MINION"]
+        "Legendary": [0, 0.3], "affected_minions": ["MUSHROOM_MINION", "MYCELIUM_MINION"]
     },
     "Ocelot": {
         "Rare": [0, 0.3], "Epic": [0, 0.3], "Legendary": [0, 0.3],
-        "affects": ["foraging_minion"]
+        "affected_minions": ["foraging_minion"]
     },
     "Pigman": {
         "Common": [0, 0.1], "Uncommon": [0, 0.2],
         "Rare": [0, 0.2], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["PIG_MINION"]
+        "Legendary": [0, 0.3], "affected_minions": ["PIG_MINION"]
     },
     "Rabbit": {
         "Legendary": [0, 0.3], "Mythic": [0, 0.3],
-        "affects": ["farming_crop_minion"]
+        "affected_minions": ["farming_crop_minion"]
     },
     "Snail": {
         "Common": [0, 0.1], "Uncommon": [0, 0.2],
         "Rare": [0, 0.2], "Epic": [0, 0.3],
-        "Legendary": [0, 0.3], "affects": ["RED_SAND_MINION"]
+        "Legendary": [0, 0.3], "affected_minions": ["RED_SAND_MINION"]
     },
     "Spider": {
         "Legendary": [0, 0.3], "Mythic": [0, 0.3],
-        "affects": ["SPIDER_MINION", "TARANTULA_MINION", "CAVE_SPIDER_MINION"]
+        "affected_minions": ["SPIDER_MINION", "TARANTULA_MINION", "CAVE_SPIDER_MINION"]
     }
 }
 
@@ -2959,6 +3076,10 @@ def has_data_tag(data_ID, tag):
     if data_ID not in calculator_data:
         print(f"ERROR - has_data_tag - data ID {data_ID} not in calculator data")
         return False
+    if tag is None:
+        return False
+    if len(tag) == 0:
+        return True
     if data_ID == tag or data_ID in tag:
         return True
     if "tags" not in calculator_data[data_ID]:

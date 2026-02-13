@@ -230,7 +230,7 @@ class Calculator(tk.Tk):
         self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="storage", dtype=float, display="Foraging", initial=0.0)
         self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="storage", dtype=float, display="Alchemy", initial=0.0)
         self.wisdom = HPM.Hvar(self.huim, key="wisdom", vtype="output", dtype=dict, display="Wisdom", frame="inputs_player_grid", widget_width=None, widget_height=6, initial={'combat': self.combat_wisdom, 'mining': self.mining_wisdom, 'farming': self.farming_wisdom, 'fishing': self.fishing_wisdom, 'foraging': self.foraging_wisdom, 'alchemy': self.alchemy_wisdom})
-        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=['None', 'Aatrox', 'Cole', 'Diana', 'Diaz', 'Finnegan', 'Foxy', 'Marina', 'Paul', 'Jerry', 'Derpy', 'Scorpius', 'Aura'], command=lambda x: self.multiswitch("mayors", x))
+        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=md.mayor_options, command=lambda x: self.multiswitch("mayors", x))
         self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=list(md.all_pets.keys()), command=lambda x: self.multiswitch("pet_leveling", x))
         self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
         self.falcon_attribute = HPM.Hvar(self.huim, key="falcon_attribute", vtype="input", dtype=int, display="Battle Experience", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -601,7 +601,7 @@ class Calculator(tk.Tk):
             self.huim.toggle_switch("potato_accessory_switch", self.minion.get(False) + str(afkState))
         elif multi_ID == "pet_leveling":
             self.huim.toggle_switch("pet_leveling", control)
-            mayor = self.mayor.get()
+            mayor = self.mayor.get(False)
             pet_leveling_state = self.switches["pet_leveling"]["state"]
             self.huim.toggle_switch("exp_share_diana", mayor + str(pet_leveling_state))
         elif multi_ID == "mayors":
@@ -671,10 +671,13 @@ class Calculator(tk.Tk):
                 if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
                     continue
             elif var_key in ["expsharepetslot2", "expsharepetslot3"]:
-                if self.mayor.get() != "Diana":
+                if self.mayor.get(False) != "Diana":
                     continue
             elif var_key in ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]:
                 if self.fuel.get(False) != "Inferno Minion Fuel":
+                    continue
+            elif var_key in ["rising_celsius_override"]:
+                if self.minion.get(False) != "Inferno":
                     continue
             if self.var_dict[var_key].get_output_switch() is False:
                 if (var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list):
@@ -765,7 +768,7 @@ class Calculator(tk.Tk):
             if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
                 return None
         elif var_key in ["expsharepetslot2", "expsharepetslot3"]:  # special case: slots only active during Diana
-            if self.mayor.get() != "Diana":
+            if self.mayor.get(False) != "Diana":
                 return None
         elif var_key in ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]:  # special case: fuel attributes only relevant for Inferno Minion Fuel
             if self.fuel.get(False) != "Inferno Minion Fuel":
@@ -1011,10 +1014,7 @@ class Calculator(tk.Tk):
                 location = md.bazaar_sell_types[setup_data["bazaar_sell_type"]]
                 if setup_data["bazaar_taxes"]:
                     bazaar_tax = 0.0125 - 0.00125 * setup_data["bazaar_flipper"]
-                    if setup_data["mayor"] == "Derpy":
-                        bazaar_tax *= 4
-                    if setup_data["mayor"] == "Aura":
-                        bazaar_tax *= 2
+                    bazaar_tax *= md.calculator_data[setup_data["mayor"]]["tax_multiplier"]
                     multiplier = 1 - bazaar_tax
         elif location == "npc" and action == "buy":
             multiplier = 2
@@ -1065,8 +1065,6 @@ class Calculator(tk.Tk):
         speed_boost += md.calculator_data[upgrade_ids[0]]["speed_boost"] + md.calculator_data[upgrade_ids[1]]["speed_boost"]
         speed_boost += md.calculator_data[setup_data["beacon"]]["speed_boost"] + md.calculator_data["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
         speed_boost += md.calculator_data["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + md.calculator_data["POSTCARD"]["speed_boost"] * setup_data["postcard"]
-        if setup_data["potato_accessory"] != "NONE" and (afk_toggle or clock_override) and md.has_data_tag(minion, md.calculator_data[setup_data["potato_accessory"]]["affected_minions"]):
-            speed_boost += md.calculator_data[setup_data["potato_accessory"]]["speed_boost"]
         if setup_data["crystal"] != "NONE":
             if md.has_data_tag(minion, md.calculator_data[setup_data["crystal"]]["affected_minions"]):
                 speed_boost += md.calculator_data[setup_data["crystal"]]["speed_boost"]
@@ -1077,14 +1075,18 @@ class Calculator(tk.Tk):
                 speed_boost += 180
             else:
                 speed_boost += 18 * min(10, setup_data["amount"])
-        if setup_data["mayor"] == "Cole" and (afk_toggle or clock_override) and md.has_data_tag(minion, "mining_minion"):
-            speed_boost += 25
         if minion_fuel_id == "EVERBURNING_FLAME" and md.has_data_tag(minion, md.calculator_data[minion_fuel_id]["upgrade_special"]["affected_minions"]):
             speed_boost += md.calculator_data[minion_fuel_id]["upgrade_special"]["amount"]
+        if not (afk_toggle or clock_override):
+            return speed_boost
+        if md.has_data_tag(minion, md.calculator_data[setup_data["mayor"]]["affected_minions"]):
+            speed_boost += md.calculator_data[setup_data["mayor"]]["speed_boost"]
+        if md.has_data_tag(minion, md.calculator_data[setup_data["potato_accessory"]]["affected_minions"]):
+            speed_boost += md.calculator_data[setup_data["potato_accessory"]]["speed_boost"]
         afkpet = setup_data["afkpet"]
         afkpet_rarity = setup_data["afkpet_rarity"]
         afkpet_lvl = setup_data["afkpet_lvl"]
-        if (afk_toggle or clock_override) and md.has_data_tag(minion, md.boost_pets[afkpet]["affects"]) and afkpet_rarity in md.boost_pets[afkpet]:
+        if md.has_data_tag(minion, md.boost_pets[afkpet]["affected_minions"]) and afkpet_rarity in md.boost_pets[afkpet]:
             speed_boost += md.boost_pets[afkpet][afkpet_rarity][0] + afkpet_lvl * md.boost_pets[afkpet][afkpet_rarity][1]
         return speed_boost
 
@@ -1123,8 +1125,8 @@ class Calculator(tk.Tk):
         drop_multiplier *= md.calculator_data[upgrade_ids[1]]["drop_multiplier"]
         if afk_toggle and drop_multiplier > 1:
             drop_multiplier = int(drop_multiplier)
-        if setup_data["mayor"] == "Derpy":
-            drop_multiplier *= 2
+        if md.has_data_tag(minion, md.calculator_data[setup_data["mayor"]]["affected_minions"]):
+            drop_multiplier *= md.calculator_data[setup_data["mayor"]]["drop_multiplier"]
         return drop_multiplier
     
     def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data, setup_notes):
@@ -1660,8 +1662,7 @@ class Calculator(tk.Tk):
             if xptype not in skill_xp:
                 skill_xp[xptype] = 0
             skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
-        if mayor in ["Derpy", "Aura"]:
-            self.huim.deepmultiply(skill_xp, 1.5)
+        self.huim.deepmultiply(skill_xp, md.calculator_data[mayor]["xp_multiplier"])
         if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
             del skill_xp["combat"]
         return skill_xp
@@ -1732,7 +1733,7 @@ class Calculator(tk.Tk):
             pet_item = 1 + md.calculator_data[setup_data["petxpboost"]]["exp_boost_amount"] / 100
         else:
             pet_item = 1
-        if setup_data["mayor"] == "Diana":
+        if setup_data["mayor"] == "MAYOR_DIANA":
             petxpbonus *= 1.35
         if xp_type in ["mining", "fishing"]:
             petxpbonus *= 1.5
@@ -1803,7 +1804,7 @@ class Calculator(tk.Tk):
             return 0, {}, {}
         setup_pets = { "levelingpet": { "pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0 } }
         for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
-            if setup_data[var_key] == "None" or (mayor != "Diana" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
+            if setup_data[var_key] == "None" or (mayor != "MAYOR_DIANA" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
                 continue
             setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
         pet_prices = {}
@@ -1817,7 +1818,7 @@ class Calculator(tk.Tk):
             for skill, amount in skill_xp.items():
                 pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
                 main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
-        exp_share_boost = 0.2 * setup_data["taming"] + 10 * (mayor == "Diana") + setup_data["toucan_attribute"]
+        exp_share_boost = 0.2 * setup_data["taming"] + 10 * (mayor == "MAYOR_DIANA") + setup_data["toucan_attribute"]
         exp_share_item = 15 * setup_data["expshareitem"]
         for pet_slot, pet_info in setup_pets.items():
             if pet_slot == "levelingpet":
