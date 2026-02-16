@@ -201,7 +201,7 @@ class Calculator(tk.Tk):
         self.fuel = HPM.Hvar(self.huim, key="fuel", vtype="input", dtype=str, display="Fuel", frame="inputs_minion_grid", initial="None", options=md.fuel_options, command=lambda x: self.multiswitch('fuel', x))
         self.inferno_grade = HPM.Hvar(self.huim, key="inferno_grade", vtype="input", dtype=str, display="Grade", frame="inputs_minion_grid", initial="Hypergolic Gabagool", options=md.inferno_fuel_grade_options)
         self.inferno_distillate = HPM.Hvar(self.huim, key="inferno_distillate", vtype="input", dtype=str, display="Distillate", frame="inputs_minion_grid", initial="Gabagool Distillate", options=md.inferno_fuel_distillate_options)
-        self.inferno_eyedrops = HPM.Hvar(self.huim, key="inferno_eyedrops", vtype="input", dtype=bool, display="Eyedrops", frame="inputs_minion_grid", initial=True)
+        self.inferno_eyedrops = HPM.Hvar(self.huim, key="inferno_eyedrops", vtype="input", dtype=bool, display="Eyedrops", frame="inputs_minion_grid", initial=False)
         self.hopper = HPM.Hvar(self.huim, key="hopper", vtype="input", dtype=str, display="Hopper", frame="inputs_minion_grid", initial="None", options=md.hopper_options)
         self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
         self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=md.upgrade_options)
@@ -679,7 +679,9 @@ class Calculator(tk.Tk):
             elif var_key in ["rising_celsius_override"]:
                 if self.minion.get(False) != "Inferno":
                     continue
-            if self.var_dict[var_key].get_output_switch() is False:
+            if var_key == "scaled_time" and self.scale_time.get() is False and self.empty_time.get_output_switch() is False:
+                continue
+            elif self.var_dict[var_key].get_output_switch() is False:
                 if (var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list):
                     string_parts["notes"] = "Notes: Special Layout: " + self.notes.list['Special Layout']
                 else:
@@ -779,6 +781,8 @@ class Calculator(tk.Tk):
         elif var_key == "extracost":  # special case: setup cost is turned off
             if self.setupcost.get_output_switch() is False:
                 return None
+        elif var_key == "scaled_time" and self.scale_time.get() is False and self.empty_time.get_output_switch() is False:  # special case: scale time is off and empty time is off
+            return None
 
         # Output switch
         force = False  # force is a toggle for output variables that can be equivalent to 0 but still have to be outputted due to output switch

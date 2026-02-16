@@ -50,10 +50,12 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
     if setup_data["fuel"] != "INFERNO_FUEL":
         calculator.collect_addon_output("Bad Luck Inferno", "No Inferno Minion Fuel Found")
         return
+    total_profit = outputs["total_profit"]
     if setup_data["inferno_grade"] != "HYPERGOLIC_GABAGOOL":
+        if return_value:
+            return total_profit
         calculator.collect_addon_output("Bad Luck Inferno", "No Hypergolic Items Found")
         return
-    total_profit = outputs["total_profit"]
     item_type_profit = outputs["itemtype_profit"]
     no_rng_profit = total_profit - item_type_profit["INFERNO_APEX"] - item_type_profit["REAPER_PEPPER"] - item_type_profit["INFERNO_VERTEX"] - item_type_profit["GABAGOOL_THE_FISH"]
     per_vertex = calculator.get_price("INFERNO_VERTEX", setup_data, "sell", "bazaar")
