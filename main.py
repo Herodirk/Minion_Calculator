@@ -223,13 +223,12 @@ class Calculator(tk.Tk):
         self.player_harvests = HPM.Hvar(self.huim, key="player_harvests", vtype="input", dtype=bool, display="Player Harvests", frame="inputs_player_grid", initial=False)
         self.player_looting = HPM.Hvar(self.huim, key="player_looting", vtype="input", dtype=int, display="Looting", frame="inputs_player_grid", initial=0, options=[0, 1, 2, 3, 4, 5])
         self.potato_accessory = HPM.Hvar(self.huim, key="potato_accessory", vtype="input", dtype=str, display="Potato Accessory", frame="inputs_player_grid", initial="None", options=md.potato_accessory_options)
-        self.combat_wisdom = HPM.Hvar(self.huim, key="combat_wisdom", vtype="storage", dtype=float, display="Combat", initial=0.0)
-        self.mining_wisdom = HPM.Hvar(self.huim, key="mining_wisdom", vtype="storage", dtype=float, display="Mining", initial=0.0)
-        self.farming_wisdom = HPM.Hvar(self.huim, key="farming_wisdom", vtype="storage", dtype=float, display="Farming", initial=0.0)
-        self.fishing_wisdom = HPM.Hvar(self.huim, key="fishing_wisdom", vtype="storage", dtype=float, display="Fishing", initial=0.0)
-        self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="storage", dtype=float, display="Foraging", initial=0.0)
-        self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="storage", dtype=float, display="Alchemy", initial=0.0)
-        self.wisdom = HPM.Hvar(self.huim, key="wisdom", vtype="output", dtype=dict, display="Wisdom", frame="inputs_player_grid", widget_width=None, widget_height=6, initial={'combat': self.combat_wisdom, 'mining': self.mining_wisdom, 'farming': self.farming_wisdom, 'fishing': self.fishing_wisdom, 'foraging': self.foraging_wisdom, 'alchemy': self.alchemy_wisdom})
+        self.combat_wisdom = HPM.Hvar(self.huim, key="combat_wisdom", vtype="input", dtype=float, display="Combat wisdom", fancy_display="Combat", frame="inputs_player_grid", initial=0.0)
+        self.mining_wisdom = HPM.Hvar(self.huim, key="mining_wisdom", vtype="input", dtype=float, display="Mining wisdom", fancy_display="Mining", frame="inputs_player_grid", initial=0.0)
+        self.farming_wisdom = HPM.Hvar(self.huim, key="farming_wisdom", vtype="input", dtype=float, display="Farming wisdom", fancy_display="Farming", frame="inputs_player_grid", initial=0.0)
+        self.fishing_wisdom = HPM.Hvar(self.huim, key="fishing_wisdom", vtype="input", dtype=float, display="Fishing wisdom", fancy_display="Fishing", frame="inputs_player_grid", initial=0.0)
+        self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="input", dtype=float, display="Foraging wisdom", fancy_display="Foraging", frame="inputs_player_grid", initial=0.0)
+        self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="input", dtype=float, display="Alchemy wisdom", fancy_display="Alchemy", frame="inputs_player_grid", initial=0.0)
         self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=md.mayor_options, command=lambda x: self.multiswitch("mayors", x))
         self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=md.pet_options, command=lambda x: self.multiswitch("pet_leveling", x))
         self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
@@ -284,10 +283,6 @@ class Calculator(tk.Tk):
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
-        self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0)
-        self.wisdomB = tk.Button(self.frames["inputs_player_grid"], text='Edit', command=lambda: self.huim.edit_vars(lambda: self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0), ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]))
-        self.wisdomB.place(in_=self.wisdom.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
-
         self.notesAnchor = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="")
 
         self.huim.logger.debug("Variables initialized")
@@ -302,21 +297,22 @@ class Calculator(tk.Tk):
         self.API_creditLB.place(in_=self.manualLB, x=-10, rely=0.5, anchor="e")
         self.API_creditLB.bind("<Button-1>", lambda click_event: webbrowser.open(r"https://api.hypixel.net/") if click_event.y < 18 else webbrowser.open(r"https://sky.coflnet.com/data"))
 
-        self.outputB = tk.Button(self.frames["controls"], text='Short Output', command=self.output_data)
-        self.fancyoutputB = tk.Button(self.frames["controls"], text='Share Output', command=self.fancy_output)
+        self.text_outputB = tk.Button(self.frames["controls"], text='Text Output', command=lambda: self.text_output(markdown=False))
+        self.markdown_outputB = tk.Button(self.frames["controls"], text='Markdown Output', command=lambda: self.text_output(markdown=True))
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
         self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
-        controlsGrid = [self.calcB, self.statusC, self.outputB, self.fancyoutputB, self.pricesB, self.addonsB]
+        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB]
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
         miniontitleLB = self.huim.create_label(frm=self.frames["inputs_minion_grid"], txt="\nMinion options")
         islandtitleLB = self.huim.create_label(frm=self.frames["inputs_minion_grid"], txt="\nIsland options")
         playertitleLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="Player options")
+        wisdomLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="Wisdoms:")
         timingtitleLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="\nTime options")
         markettitleLB = self.huim.create_label(frm=self.frames["inputs_player_grid"], txt="\nMarket options")
         setupoutputsLB = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="Setup Information")
@@ -367,7 +363,13 @@ class Calculator(tk.Tk):
                 "player_harvests": None,
                 "player_looting": None,
                 "potato_accessory": None,
-                "wisdom": None,
+                "wisdom_label": [wisdomLB, self.huim.create_show_hide_toggle("combat_wisdom", "wisdom_inputs", None)],
+                "combat_wisdom": None,
+                "mining_wisdom": None,
+                "farming_wisdom": None,
+                "fishing_wisdom": None,
+                "foraging_wisdom": None,
+                "alchemy_wisdom": None,
                 "mayor": None,
                 "levelingpet": None,
                 "toggle_levelingpet_options": [None, self.huim.create_show_hide_toggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
@@ -449,6 +451,8 @@ class Calculator(tk.Tk):
         self.huim.logger.debug("Widgets placed")
 
         # Create switches with Hero UI Manager for the extended minion options
+        self.huim.def_switch("wisdom_inputs", widget_references=["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"],
+                            locations="grid", control=None, negate=False, initial=False)
         self.huim.def_switch("pet_leveling", widget_references=["taming", "petxpboost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "falcon_attribute", "toucan_attribute", "used_pet_prices"],
                             locations="grid", control="None", negate=True, initial=False)
         self.huim.def_switch("exp_share_diana", widget_references=["expsharepetslot2", "expsharepetslot3"],
@@ -482,23 +486,13 @@ class Calculator(tk.Tk):
         
         self.huim.logger.debug("Switches activated")
 
-        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet", "used_pet_prices": "levelingpet", "pet_profit": "levelingpet"}
+        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet", "pets_levelled": "levelingpet", "used_pet_prices": "levelingpet", "pet_profit": "levelingpet"}
         # dependent variables are only active when another specified variable is not equivalent to 0,
         # this overrides forced outputs as inactive variables might not be equivalent to 0
         self.key_replace_bool = ["infusion", "free_will", "postcard"]  # variables that are booleans that need their display name outputted instead of the boolean value
 
-        # Define output orders for Short Output (self.outputOrder) and Share Output (self.fancyOrder)
-        self.outputOrder = ['fuel', "inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override",
-                            'hopper', 'upgrade1', 'upgrade2', 'chest',
-                            'beacon', 'scorched', 'B_constant', 'B_acquired',
-                            'crystal', 'postcard', 'infusion', 'free_will', 'afk', 'afkpet', 'afkpet_rarity', 'afkpet_lvl', 'enchanted_clock', 'special_layout', 'potato_accessory', 'player_harvests', "player_looting",
-                            'wisdom', 'mayor', 'levelingpet', 'taming', 'falcon_attribute', 'petxpboost', 'beastmaster', 'toucan_attribute', 'expshareitem', 'expsharepet', 'expsharepetslot2', 'expsharepetslot3',
-                            'ID', 'setupcost', 'freewillcost', 'extracost', 'actiontime', 'fuelamount', 'sell_loc', 'bazaar_update_txt', 'bazaar_taxes', 'bazaar_flipper', 'notes',
-                            'empty_time', 'scaled_time', 'harvests', 'used_storage', 'items', 'item_sell_loc',
-                            'item_profit', 'itemtype_profit', 'xp', 'pet_profit', 'pets_levelled', 'used_pet_prices',
-                            'fuelcost', 'total_profit', 'addons_output_container']
-
-        # The Share Output order is stored per line.
+        # Define text output order
+        # The text output order is stored per line.
         # First dimension of dict exists of keys which are placed first on a line
         # These keys can serve as headers, or if the key is a variable key, the variable is outputted as {"display"}: {"value"}
         # the values are the second dimension of dict, the keys of which are sub-headers used for formatting, like adding line breaks
@@ -507,7 +501,7 @@ class Calculator(tk.Tk):
         # set {}: only the values of the variables will be outputted (without any order)
         # list []: both the displays and the values of the variables will be outputted
         # tuple (): both displays and values are shown, the sub-header will be outputted in front of every variable
-        self.fancyOrder = {
+        self.output_order = {
             "**Minion Upgrades**": {
                 "\n> Internal: ": {"fuel", "hopper", "upgrade1", "upgrade2"},
                 "\n> External: ": {"chest", "beacon", "crystal", "postcard"},
@@ -517,7 +511,7 @@ class Calculator(tk.Tk):
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
             "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
             "player_harvests": {"\n> ": ["player_looting"]},
-            "wisdom": None,
+            "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
             "levelingpet": {
                 "\n> ": ["taming", "falcon_attribute", "petxpboost", "beastmaster", "toucan_attribute", "expshareitem"],
@@ -613,9 +607,9 @@ class Calculator(tk.Tk):
         """
         Handles the input from the template input.
         If "ID" is selected it sends the inputted ID to the decoder.
-        If "Clean" is selected it sets every self.variable with "vtype" equal to "input" to its "initial".
-        Otherwise it is a key from templateList which has as value a dict with self.variable keys and values.
-        If the self.variable has a load function with switches, it runs that too.
+        If "Clean" is selected it sets every variable with "vtype" equal to "input" to its "initial".
+        Otherwise it is a key from templateList which has as value a dict with variable keys and values.
+        If the variable has a load function with switches, it runs that too.
 
         Parameters
         ----------
@@ -643,256 +637,141 @@ class Calculator(tk.Tk):
                     self.var_dict[setting].command()
                 else:
                     self.var_dict[setting].command(variable)
-            if "_wisdom" in setting:
-                self.wisdom.update_listbox(value_format_function=lambda var: var.get(), filter=lambda key, val: val.get() != 0.0)
         return
 
-    def output_data(self, toTerminal=True):
-        """
-        Generates a short output string with all relavent inputs and chosen ouputs.
-        The order of these inputs and output in the output string is defined in self.outputOrder in __init__().
-        If toTerminal is True it also logs the string to terminal.
-
-        Parameters
-        ----------
-        toTerminal : bool, optional
-            Toggle for logging to terminal. The default is True.
-
-        Returns
-        -------
-        crafted_string : str
-            Output string. If toTerminal is True, this function returns None.
-
-        """
-        crafted_string = f'{self.amount.get()}x {self.minion.get(False)} t{self.miniontier.get()}; '
-        string_parts = {}
-        for var_key in self.outputOrder:
-            if var_key in self.dependent_variables:
-                if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
-                    continue
-            elif var_key in ["expsharepetslot2", "expsharepetslot3"]:
-                if self.mayor.get(False) != "Diana":
-                    continue
-            elif var_key in ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]:
-                if self.fuel.get(False) != "Inferno Minion Fuel":
-                    continue
-            elif var_key in ["rising_celsius_override"]:
-                if self.minion.get(False) != "Inferno":
-                    continue
-            if var_key == "scaled_time" and self.scale_time.get() is False and self.empty_time.get_output_switch() is False:
-                continue
-            elif self.var_dict[var_key].get_output_switch() is False:
-                if (var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list):
-                    string_parts["notes"] = "Notes: Special Layout: " + self.notes.list['Special Layout']
-                else:
-                    continue
-            if var_key == "wisdom":
-                wisdoms = {list_key: var.get() for list_key, var in self.wisdom.list.items() if (var.get() not in ["None", 0, 0.0] and list_key in self.xp.list)}
-                if len(wisdoms) != 0:
-                    string_parts["widsom"] = self.wisdom.get_display() + ": " + ", ".join(f"{wisdom_type}: {wisdom_val}" for wisdom_type, wisdom_val in wisdoms.items())
-                continue
-            if var_key == "bazaar_update_txt":
-                string_parts["bazaar_update_txt"] = f'Bazaar info: {self.bazaar_sell_type.get()}, {self.bazaar_buy_type.get()}, Last updated at {self.bazaar_update_txt.get()}'
-                continue
-            if var_key == "extracost":
-                if self.setupcost.get_output_switch() is False:
-                    continue
-
-            vtype = self.var_dict[var_key].vtype
-            display = self.var_dict[var_key].get_display()
-            dtype = self.var_dict[var_key].dtype
-            if dtype in [list, dict]:
-                if len(self.var_dict[var_key].list) == 0:
-                    continue
-                formatting_function = lambda x: x
-                if self.var_dict[var_key].has_tag("item_ID_to_display"):
-                    formatting_function = lambda x: md.calculator_data[x]['display']
-                elif var_key == "pets_levelled":
-                    formatting_function = lambda x: self.var_dict[x].get(False)
-                formatted_list = []
-                for list_key, list_val in self.var_dict[var_key].list.items():
-                    if type(list_val) in [float, int]:
-                        formatted_list.append(f"{formatting_function(list_key)}: {self.huim.reduced_number(list_val)}")
-                    else:
-                        formatted_list.append(f"{formatting_function(list_key)}: {list_val}")
-                string_parts[var_key] = display + ": " + ", ".join(formatted_list)
-                continue
-
-            val = self.var_dict[var_key].get(False)
-            if vtype == "input":
-                if val in ["None", 0, 0.0, False, ""]:
-                    continue
-                if dtype in [int, float, bool]:
-                    string_parts[var_key] = f"{display}: {val}"
-                else:
-                    string_parts[var_key] = f"{val}"
-            else:
-                if dtype in [int, float]:
-                    string_parts[var_key] = f"{display}: {self.huim.reduced_number(val)}"
-                else:
-                    string_parts[var_key] = f"{display}: {val}"
-
-        crafted_string += "; ".join(string_parts.values())
-        if output_to_clipboard:
-            self.clipboard_clear()
-            self.clipboard_append(crafted_string)
-        if toTerminal is True:
-            self.huim.logger.info("\n" + crafted_string)
-            return
-        else:
-            return crafted_string
-
-    def prep_fancy_data(self, var_key, display=True, newline=False):
-        """
-        Subfunction for fancyOutput().
-        This function generate the part of the Share Output for the inputted variable key
-        with toggles if the self.variable "display" should be shown and if a new line should be put at the end.
-        Returns None if the self.variable has "output_switch" set to False.
-        Returns None if the value of the self.variable is equivalent to 0, except if "output_switch" is True.
-
-        Parameters
-        ----------
-        var_key : str
-            A variable key.
-        display : bool, optional
-            Toggle for if the self.variable "display" should be shown. The default is True.
-        newline : bool, optional
-            Toggle for if a new line should be put at the end. The default is False.
-
-        Returns
-        -------
-        str
-            The part of the Share Output for the inputted variable key.
-
-        """
+    def data_to_text(self, var_key, calculation_data, output_switches, display=True, newline=False, markdown=True):
         # Special cases that can stop variables from outputting
         if var_key in self.dependent_variables:  # special case: dependent variables
-            if self.var_dict[self.dependent_variables[var_key]].get(False) in ["None", "0", "0.0", "", False]:
+            if calculation_data[self.dependent_variables[var_key]] in ["None", "0", "0.0", "", False]:
                 return None
         elif var_key in ["expsharepetslot2", "expsharepetslot3"]:  # special case: slots only active during Diana
-            if self.mayor.get(False) != "Diana":
+            if calculation_data["mayor"] != "Diana":
                 return None
         elif var_key in ["inferno_grade", "inferno_distillate", "inferno_eyedrops"]:  # special case: fuel attributes only relevant for Inferno Minion Fuel
-            if self.fuel.get(False) != "Inferno Minion Fuel":
+            if calculation_data["fuel"] != "Inferno Minion Fuel":
                 return None
         elif var_key in ["rising_celsius_override"]:  # special case: Rising Celsius only applies to Inferno minions
-            if self.minion.get(False) != "Inferno":
+            if calculation_data["minion"] != "Inferno":
                 return None
-        elif var_key == "extracost":  # special case: setup cost is turned off
-            if self.setupcost.get_output_switch() is False:
-                return None
-        elif var_key == "scaled_time" and self.scale_time.get() is False and self.empty_time.get_output_switch() is False:  # special case: scale time is off and empty time is off
+        elif var_key == "extracost" and output_switches["setupcost"] is False:  # special case: setup cost is turned off
+            return None
+        elif var_key == "scaled_time" and calculation_data["scale_time"] is False and output_switches["empty_time"] is False:  # special case: scale time is off and empty time is off
             return None
 
         # Output switch
         force = False  # force is a toggle for output variables that can be equivalent to 0 but still have to be outputted due to output switch
-        output_switch_val = self.var_dict[var_key].get_output_switch()
+        output_switch_val = output_switches[var_key]
         if output_switch_val is False:
-            # special cases: output switch set to false, but forced output anyway
-            if var_key == "notes" and self.special_layout.get() is True and "Special Layout" in self.notes.list:
-                return f"Notes:\n> Special Layout: `{self.notes.list['Special Layout']}`"
-            else:
-                return None
+            return None
         elif output_switch_val is True:
             force = True
 
-        # Special cases that can override the formatting
-        if var_key == "wisdom":  # special case: wisdom being separate variables
-            wisdoms = {list_key: var.get() for list_key, var in self.wisdom.list.items() if (var.get() not in ["None", 0, 0.0] and list_key in self.xp.list)}
-            if len(wisdoms) != 0:
-                return self.wisdom.get_display(True) + ":\n> " + ", ".join(f"{wisdom_type}: `{wisdom_val}`" for wisdom_type, wisdom_val in wisdoms.items())
-            return None
-        elif var_key == "used_storage":  # special case: add available storage to output
-            val = f"`{self.var_dict[var_key].get()}` (out of `{self.available_storage.get()}`)"
-        elif var_key in self.key_replace_bool:  # special case: output key instead of the boolean
-            if self.var_dict[var_key].get() is True:
-                val = f"`{self.var_dict[var_key].get_display(True)}`"
+        # Getting data
+        if var_key in self.key_replace_bool:  # special case: output key instead of the boolean
+            if calculation_data[var_key] is True:
+                data = f"{self.var_dict[var_key].get_display(True)}"
             else:
-                return None
-        elif var_key == "ID":  # special case: spoiler lines around setup ID
-            val = f"||{self.var_dict[var_key].get()}||".replace("\\", r"\\")
+                return None  # no output if zero-like
+        elif var_key == "special_layout" and "Special Layout" in calculation_data["notes"]:  # special case: special layout description instead of True
+            data = f"{calculation_data["notes"]["Special Layout"]}"
         elif self.var_dict[var_key].dtype in [dict, list]:
-            if len(self.var_dict[var_key].list) == 0:
-                return None
-            formatting_function = lambda x: x
-            if self.var_dict[var_key].has_tag("item_ID_to_display"):
-                formatting_function = lambda x: md.calculator_data[x]['display']
-            elif var_key == "pets_levelled":
-                formatting_function = lambda x: self.var_dict[x].get(False)
-            formatted_list = []
-            for list_key, list_val in self.var_dict[var_key].list.items():
-                if type(list_val) in [float, int]:
-                    formatted_list.append(f"{formatting_function(list_key)}: `{self.huim.reduced_number(list_val)}`")
-                else:
-                    formatted_list.append(f"{formatting_function(list_key)}: `{list_val}`")
-            val = "\n> " + ", ".join(formatted_list)
+            data = calculation_data[var_key]
         elif self.var_dict[var_key].dtype in [int, float]:
-            val = f"`{self.huim.reduced_number(self.var_dict[var_key].get())}`"
+            data = f"{self.huim.reduced_number(calculation_data[var_key])}"
         else:
-            val = f"`{self.var_dict[var_key].get(False)}`"
-        if val in ["`None`", "`0`", "`0.0`", "", "``", "`False`"] and force is False:
+            data = f"{calculation_data[var_key]}"
+
+        # Filter for zero-like
+        if (data in ["None", "0", "0.0", "", "False"] or len(data) == 0) and force is False:
             return None
-        if var_key == "freewillcost":
-            val += f" (optimal: apply on t{self.optimal_tier_free_will.get()})"
+
+        # Text formatting
         return_str = ""
         if display:
             return_str += f"{self.var_dict[var_key].get_display(True)}: "
-        return_str += f"{val}"
+        value_formatting_function = lambda x: f"{x}"
+        if markdown:
+            value_formatting_function = lambda x: f"`{x}`"
+        if type(data) in [list, dict]:
+            return_str += "\n> "
+            key_formatting_function = lambda x: x
+            if self.var_dict[var_key].has_tag("item_ID_to_display"):
+                key_formatting_function = lambda x: md.calculator_data[x]['display']
+            elif var_key == "pets_levelled":
+                key_formatting_function = lambda x: calculation_data[x]
+            formatted_list = []
+            for list_key, list_val in data.items():
+                if type(list_val) in [float, int]:
+                    list_val = self.huim.reduced_number(list_val)
+                formatted_list.append(f"{key_formatting_function(list_key)}: {value_formatting_function(list_val)}")
+            return_str += ", ".join(formatted_list)
+        elif markdown and var_key == "ID":
+            return_str += f"||{data}||".replace("\\", r"\\")
+        else:
+            return_str += value_formatting_function(data)
+        
+        # extra text
+        if var_key == "used_storage":
+            return_str += f" (out of {value_formatting_function(calculation_data["available_storage"])})"
+        elif var_key == "freewillcost":
+            return_str += f" (optimal: apply on t{calculation_data["optimal_tier_free_will"]})"
+
         if newline:
             return_str += "\n"
         return return_str
 
-    def fancy_output(self, toTerminal=True):
-        """
-        Generates the Share Output. The Share Output is meant for sharing through discord as it uses discords markdown features.
-        This function combines the outputs of prep_fancy_data() in the order given by self.fancyOrder as defined in __init__().
+    def text_output(self, calculation_data=None, output_switches=None, markdown=True, to_terminal=True):
+        if calculation_data is None:
+            calculation_data = self.huim.get_from_GUI(self.var_dict.keys())
+            calculation_data.update(self.decode_id(calculation_data["ID"]))
+        if output_switches is None:
+            output_switches = {var_key: self.var_dict[var_key].get_output_switch() for var_key in self.var_dict}
 
-        Parameters
-        ----------
-        toTerminal : bool, optional
-            Toggle for logging to terminal. The default is True.
+        if markdown:
+            crafted_string = f'{calculation_data["amount"]}x **{calculation_data["minion"]} t{calculation_data["miniontier"]}**'
+        else:
+            crafted_string = f'{calculation_data["amount"]}x {calculation_data["minion"]} t{calculation_data["miniontier"]}'
 
-        Returns
-        -------
-        crafted_string : str
-            Output string. If toTerminal is True, this function returns None.
+        for section_key in self.output_order:
+            # Special cases where entire sections can be skipped
+            if section_key == "Beacon Info" and calculation_data["beacon"] == 0:
+                continue
+            if section_key == "Inferno Info" and calculation_data["minion"] != "Inferno" and calculation_data["fuel"] != "Inferno Minion Fuel":
+                continue
+            if section_key == "Bazaar Info" and output_switches["bazaar_update_txt"] is False:
+                continue
 
-        """
-        crafted_string = f'{self.amount.get()}x **{self.minion.get(False)} t{self.miniontier.get()}**'
-        for key in self.fancyOrder:
             line_str = ""
             header = ""
             force_line = False
-            if key in self.var_dict:
-                header = self.prep_fancy_data(key)
+            if section_key in self.var_dict:
+                header = self.data_to_text(section_key, calculation_data, output_switches, markdown=markdown)
                 force_line = True
             else:
-                header = key
+                header = section_key
+                if not markdown:
+                    header = header.replace("*", "")
             if header is None:
                 continue
-            if header == "Beacon Info" and self.beacon.get() == 0:
-                continue
-            if header == "Inferno Info" and self.minion.get(False) != "Inferno" and self.fuel.get(False) != "Inferno Minion Fuel":
-                continue
-            if header == "Bazaar Info" and self.bazaar_update_txt.get_output_switch() is False:
-                continue
-            if type(self.fancyOrder[key]) is dict:
-                for sub_key, key_arr in self.fancyOrder[key].items():
+
+            if type(self.output_order[section_key]) is dict:
+                for sub_key, key_arr in self.output_order[section_key].items():
+                    line_data = ""
                     if type(key_arr) == list:
-                        if (joined_keys := ", ".join(s for var_key in self.fancyOrder[key][sub_key] if (s := self.prep_fancy_data(var_key)) is not None)) != "":
-                            line_str += sub_key + joined_keys
+                        line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, markdown=markdown)) is not None)
                     elif type(key_arr) == tuple:
-                        if (joined_keys := sub_key.join(s for var_key in self.fancyOrder[key][sub_key] if (s := self.prep_fancy_data(var_key)) is not None)) != "":
-                            line_str += sub_key + joined_keys
+                        line_data += sub_key.join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, markdown=markdown)) is not None)
                     elif type(key_arr) == set:
-                        if (joined_keys := ", ".join(s for var_key in self.fancyOrder[key][sub_key] if (s := self.prep_fancy_data(var_key, display=False)) is not None)) != "":
-                            line_str += sub_key + joined_keys
+                        line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, display=False, markdown=markdown)) is not None)
+                    if line_data == "":
+                        continue
+                    line_str += sub_key + line_data
             if line_str != "" or force_line is True:
                 crafted_string += "\n" + header + line_str
         if output_to_clipboard:
             self.clipboard_clear()
             self.clipboard_append(crafted_string)
-        if toTerminal:
+        if to_terminal:
             self.huim.logger.info("\n" + crafted_string)
             return
         else:
@@ -903,8 +782,8 @@ class Calculator(tk.Tk):
         Generates the setup ID of the provided setup data.
         A setup ID consists of:\n
         - the version number of the minion calculator it was generated in\n
-        - the index of the set value in "options" of each self.variable with "vtype" equal to "input" encoded in ASCII with an offset of 48\n
-        - the set value surrounded by exclamation marks if a self.variable has an empty "options" list
+        - the index of the set value in "options" of each variable with "vtype" equal to "input" encoded in ASCII with an offset of 48\n
+        - the set value surrounded by exclamation marks if a variable has an empty "options" list
 
         Returns
         -------
@@ -2355,7 +2234,6 @@ class Calculator(tk.Tk):
     def update_listboxes(self):
         """
         Calls .update_listbox() for all variables that are of dtype list or dict.
-        Except wisdom
 
         Returns
         -------
@@ -2364,8 +2242,6 @@ class Calculator(tk.Tk):
         """
         for var_key in self.var_dict:
             if self.var_dict[var_key].dtype in [list, dict]:
-                if var_key == "wisdom":
-                    continue
                 if var_key == "pets_levelled":
                     self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x].get(False))
                     continue
