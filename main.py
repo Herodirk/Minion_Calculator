@@ -1081,10 +1081,10 @@ class Calculator(tk.Tk):
                 speed_boost += 18 * min(10, setup_data["amount"])
         if minion_fuel_id == "EVERBURNING_FLAME" and md.has_data_tag(minion, md.calculator_data[minion_fuel_id]["upgrade_special"]["affected_minions"]):
             speed_boost += md.calculator_data[minion_fuel_id]["upgrade_special"]["amount"]
-        if not (afk_toggle or clock_override):
-            return speed_boost
         if md.has_data_tag(minion, md.calculator_data[setup_data["mayor"]]["affected_minions"]):
             speed_boost += md.calculator_data[setup_data["mayor"]]["speed_boost"]
+        if not (afk_toggle or clock_override):
+            return speed_boost
         if md.has_data_tag(minion, md.calculator_data[setup_data["potato_accessory"]]["affected_minions"]):
             speed_boost += md.calculator_data[setup_data["potato_accessory"]]["speed_boost"]
         afkpet = setup_data["afkpet"]

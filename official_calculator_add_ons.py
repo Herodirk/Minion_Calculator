@@ -16,6 +16,7 @@ The Official Add-ons include:
 """
 
 import numpy as np
+import math
 import HSB_minion_data as md
 
 
@@ -46,7 +47,7 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
     """Outputs the profit of the common Hypergolic drops and the price per Inferno Vertex"""
     if setup_data is None:
         setup_data = calculator.huim.get_from_GUI(["fuel", "inferno_grade", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper", "mayor"])
-        outputs = calculator.huim.get_from_GUI(["total_profit", "itemtype_profit"])
+        outputs = calculator.huim.get_from_GUI(["total_profit", "itemtype_profit", "harvests"])
     if setup_data["fuel"] != "INFERNO_FUEL":
         calculator.collect_addon_output("Bad Luck Inferno", "No Inferno Minion Fuel Found")
         return
@@ -57,11 +58,15 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
         calculator.collect_addon_output("Bad Luck Inferno", "No Hypergolic Items Found")
         return
     item_type_profit = outputs["itemtype_profit"]
-    no_rng_profit = total_profit - item_type_profit["INFERNO_APEX"] - item_type_profit["REAPER_PEPPER"] - item_type_profit["INFERNO_VERTEX"] - item_type_profit["GABAGOOL_THE_FISH"]
-    per_vertex = calculator.get_price("INFERNO_VERTEX", setup_data, "sell", "bazaar")
+    no_rng_profit_average = total_profit - item_type_profit["INFERNO_APEX"] - item_type_profit["REAPER_PEPPER"] - item_type_profit["GABAGOOL_THE_FISH"]
     if return_value:
-        return no_rng_profit
-    calculator.collect_addon_output("Bad Luck Inferno Profit", f"{calculator.huim.reduced_number(no_rng_profit, 2)} + {calculator.huim.reduced_number(per_vertex, 2)} per Inferno Vertex")
+        return no_rng_profit_average
+    prediction_interval_size = 1.96  # for 95% of cases within the interval, https://en.wikipedia.org/wiki/Prediction_interval#Known_mean,_known_variance
+    interval_radius_vertex_amount = prediction_interval_size * math.sqrt(outputs["harvests"] * md.inferno_fuel_data["drops"]["INFERNO_VERTEX"] * (1 - md.inferno_fuel_data["drops"]["INFERNO_VERTEX"]))
+    per_vertex = calculator.get_price("INFERNO_VERTEX", setup_data, "sell", "bazaar")
+    interval_min = no_rng_profit_average - per_vertex * interval_radius_vertex_amount
+    interval_max = no_rng_profit_average + per_vertex * interval_radius_vertex_amount
+    calculator.collect_addon_output("Bad Luck Inferno Profit", f"average: {calculator.huim.reduced_number(no_rng_profit_average, 2)}, 95% of cases: {calculator.huim.reduced_number(interval_min, 2)} -- {calculator.huim.reduced_number(interval_max, 2)}, average (no Vertexes): {calculator.huim.reduced_number(no_rng_profit_average - item_type_profit["INFERNO_VERTEX"], 2)}")
     return
 
 
@@ -166,7 +171,6 @@ def inferno_minion_loop(calculator):
         top_minion = max(calculated_setup_bad_luck_profits, key=calculated_setup_bad_luck_profits.get)
         print(top_minion, ":", calculator.huim.reduced_number(calculated_setup_bad_luck_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_profits[top_minion]))
         del calculated_setup_bad_luck_profits[top_minion]
-    print(f"Bad Luck Profit: + {calculator.huim.reduced_number(calculator.get_price('INFERNO_VERTEX', setup_data, 'sell', 'bazaar'), 2)} per Inferno Vertex")
     print("\n")
     calculator.collect_addon_output("Inferno Minion Loop", "See terminal")
     return
