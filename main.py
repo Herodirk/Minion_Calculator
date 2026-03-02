@@ -189,7 +189,7 @@ class Calculator(tk.Tk):
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
         self.huim.create_frames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
         self.huim.logger.debug("Framework set up")
-        self.version = self.huim.def_var(dtype=float, initial=1.2)
+        self.version = self.huim.def_var(dtype=str, initial="1.2.0")
         self.huim.logger.info(f"Calculator version {self.version.get()}")
 
         # Define variables
@@ -791,7 +791,7 @@ class Calculator(tk.Tk):
             Setup ID.
 
         """
-        setup_id = str(self.version.get()) + "!"
+        setup_id = self.version.get() + "!"
         for var_key in self.ID_order:
             if var_key not in setup_data:
                 self.huim.logger.warning(f"{var_key} key not in setup_data, assuming default value")
@@ -834,7 +834,7 @@ class Calculator(tk.Tk):
             self.huim.logger.error("Invalid ID, could not find version number")
             return setup_data
         try:
-            version = float(ID[0:end_ver])
+            version = ID[0:end_ver]
         except Exception:
             self.huim.logger.error("Invalid ID, could not find version number")
             return setup_data

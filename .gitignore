@@ -1,4 +1,5 @@
 __pycache__
+.vscode
 to_do_list.txt
 minion_visualiser_add_on.py
 testing_environment.py
