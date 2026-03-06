@@ -212,7 +212,7 @@ class Calculator(tk.Tk):
         self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
         self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
         self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=md.floating_crystal_options)
-        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("free_will", controlvar="free_will"))
+        self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("optimal_free_will", controlvar="free_will"))
         self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
         self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
         self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=md.boosting_pet_options)
@@ -268,9 +268,9 @@ class Calculator(tk.Tk):
         self.notes = HPM.Hvar(self.huim, key="notes", vtype="output", dtype=dict, display="Notes", frame="outputs_setup_grid", widget_width=50, widget_height=4, initial={}, switch_initial=False)
         self.bazaar_update_txt = HPM.Hvar(self.huim, key="bazaar_update_txt", vtype="output", dtype=str, display="Bazaar data", frame="outputs_profit_grid", initial="Not Loaded", switch_initial=True)
         self.setupcost = HPM.Hvar(self.huim, key="setupcost", vtype="output", dtype=float, display="Setup cost", frame="outputs_profit_grid", initial=0.0, switch_initial=True)
-        self.freewillcost = HPM.Hvar(self.huim, key="freewillcost", vtype="output", dtype=float, display="Free Will cost", fancy_display="+ Average Free Will cost", frame="outputs_profit_grid", initial=0.0, switch_initial=True)
-        self.extracost = HPM.Hvar(self.huim, key="extracost", vtype="storage", dtype=str, display="Extra cost", fancy_display="+ Extra cost", initial="")
-        self.optimal_tier_free_will = HPM.Hvar(self.huim, key="optimal_tier_free_will", vtype="storage", dtype=int, display="Optimal Tier Free Will", initial=1)
+        self.setupcost_breakdown = HPM.Hvar(self.huim, key="setupcost_breakdown", vtype="output", dtype=dict, display="Setup part costs", frame="outputs_profit_grid", widget_width=35, widget_height=8, initial={}, switch_initial=False)
+        self.extracost = HPM.Hvar(self.huim, key="extracost", vtype="output", dtype=str, display="Extra cost", frame="outputs_profit_grid", initial="None", switch_initial=True)
+        self.optimal_tier_free_will = HPM.Hvar(self.huim, key="optimal_tier_free_will", vtype="output", dtype=int, display="Free Will Tier", fancy_display="Optimal tier Free Will", frame="outputs_profit_grid", initial=0, switch_initial=True)
         self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="storage", dtype=int, display="Available Storage", initial=0)
         self.addons_output_container = HPM.Hvar(self.huim, key="addons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="addons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
         self.empty_time_amount = HPM.Hvar(self.huim, key="empty_time_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
@@ -363,7 +363,7 @@ class Calculator(tk.Tk):
                 "player_harvests": None,
                 "player_looting": None,
                 "potato_accessory": None,
-                "wisdom_label": [wisdomLB, self.huim.create_show_hide_toggle("combat_wisdom", "wisdom_inputs", None)],
+                "wisdom_label": [wisdomLB, self.huim.create_show_hide_toggle(wisdomLB, "wisdom_inputs", None)],
                 "combat_wisdom": None,
                 "mining_wisdom": None,
                 "farming_wisdom": None,
@@ -372,7 +372,7 @@ class Calculator(tk.Tk):
                 "alchemy_wisdom": None,
                 "mayor": None,
                 "levelingpet": None,
-                "toggle_levelingpet_options": [None, self.huim.create_show_hide_toggle("levelingpet", lambda: self.multiswitch("pet_leveling", None), None)],
+                "toggle_levelingpet_options": [None, self.huim.create_show_hide_toggle(self.levelingpet.widget[0], lambda: self.multiswitch("pet_leveling", None), None)],
                 "taming": None,
                 "falcon_attribute": None,
                 "petxpboost": None,
@@ -416,7 +416,10 @@ class Calculator(tk.Tk):
                 "labels": [None, profitoutputsLB, profitprintLB],
                 "bazaar_update_txt": None,
                 "setupcost": None,
-                "freewillcost": None,
+                "setupcost_breakdown_toggle": [None, self.huim.create_show_hide_toggle(self.setupcost.widget[0], "setup_cost_breakdown", None, "Toggle breakdown")],
+                "setupcost_breakdown": None,
+                "extracost": None,
+                "optimal_tier_free_will": None,
                 "item_sell_loc": None,
                 "itemtype_profit": None,
                 "item_profit": None,
@@ -475,18 +478,20 @@ class Calculator(tk.Tk):
                             locations="grid", control=-1, negate=True, initial=False)
         self.huim.def_switch("scaled_time_switch", widget_references=["scaled_time_amount", "scaled_time"],
                             locations="grid", control=True, negate=False, initial=False)
-        self.huim.def_switch("free_will", widget_references="freewillcost",
+        self.huim.def_switch("optimal_free_will", widget_references="optimal_tier_free_will",
                             locations="grid", control=True, negate=False, initial=False)
+        self.huim.def_switch("setup_cost_breakdown", widget_references="setupcost_breakdown",
+                            locations="grid", control=None, negate=False, initial=False)
         self.huim.def_switch(ID="addons", widget_references=self.frames["addons_main"],
                             locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
         
         # Show/Hide toggle buttons for large amount of extended options
-        self.huim.create_show_hide_toggle("afk", "afking")
-        self.huim.create_show_hide_toggle("beacon", "beacon")
+        self.huim.create_show_hide_toggle(self.afk.widget[-1], "afking")
+        self.huim.create_show_hide_toggle(self.beacon.widget[-1], "beacon")
         
         self.huim.logger.debug("Switches activated")
 
-        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "freewillcost": "free_will", "expshareitem": "expsharepet", "pets_levelled": "levelingpet", "used_pet_prices": "levelingpet", "pet_profit": "levelingpet"}
+        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "optimal_tier_free_will": "free_will", "expshareitem": "expsharepet", "pets_levelled": "levelingpet", "used_pet_prices": "levelingpet", "pet_profit": "levelingpet"}
         # dependent variables are only active when another specified variable is not equivalent to 0,
         # this overrides forced outputs as inactive variables might not be equivalent to 0
         self.key_replace_bool = ["infusion", "free_will", "postcard"]  # variables that are booleans that need their display name outputted instead of the boolean value
@@ -518,7 +523,8 @@ class Calculator(tk.Tk):
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
-            "**Setup Information**": {"\n> ": ("ID", "setupcost", "freewillcost", "extracost", "actiontime", "fuelamount")},
+            "**Setup Information**": {"\n> ": ("ID", "actiontime", "fuelamount", "optimal_tier_free_will", "setupcost", "extracost")},
+            "setupcost_breakdown": None,
             "Bazaar Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
             "notes": None,
             "empty_time": None,
@@ -653,8 +659,6 @@ class Calculator(tk.Tk):
         elif var_key in ["rising_celsius_override"]:  # special case: Rising Celsius only applies to Inferno minions
             if calculation_data["minion"] != "Inferno":
                 return None
-        elif var_key == "extracost" and output_switches["setupcost"] is False:  # special case: setup cost is turned off
-            return None
         elif var_key == "scaled_time" and calculation_data["scale_time"] is False and output_switches["empty_time"] is False:  # special case: scale time is off and empty time is off
             return None
 
@@ -699,6 +703,8 @@ class Calculator(tk.Tk):
                 key_formatting_function = lambda x: md.calculator_data[x]['display']
             elif var_key == "pets_levelled":
                 key_formatting_function = lambda x: calculation_data[x]
+            elif var_key == "setupcost_breakdown":
+                key_formatting_function = lambda x: self.var_dict[x].get_display(True)
             formatted_list = []
             for list_key, list_val in data.items():
                 if type(list_val) in [float, int]:
@@ -713,8 +719,6 @@ class Calculator(tk.Tk):
         # extra text
         if var_key == "used_storage":
             return_str += f" (out of {value_formatting_function(calculation_data["available_storage"])})"
-        elif var_key == "freewillcost":
-            return_str += f" (optimal: apply on t{calculation_data["optimal_tier_free_will"]})"
 
         if newline:
             return_str += "\n"
@@ -1761,7 +1765,7 @@ class Calculator(tk.Tk):
             fuel_cost += needed_fuel * cost_per_fuel
         return fuel_cost, needed_fuel
 
-    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_notes, setup_data):
+    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_data):
         """
         Gets cost of all parts of the setup
         
@@ -1770,14 +1774,13 @@ class Calculator(tk.Tk):
         :param minion_amount: int, minion amount
         :param minion_fuel: str, ID of minion fuel
         :param upgrades: list, IDs of upgrades
-        :param setup_notes: dict, setup notes
         :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_accessory, petxpboost, expshareitem, toucan_attribute, falcon_attribute, setup data for self.get_price
         :return total_cost: float, total setup cost
         :return extra_cost: str, total extra cost 
         :return cost_per_part: dict, cost per setup part
         """
         cost_per_part = {}
-        extra_cost = ""
+        extra_cost = "None"
 
         # Single minion cost
         cost_cache = {}
@@ -1806,7 +1809,6 @@ class Calculator(tk.Tk):
                         tiered_extra_cost[tier][material] = 0
                     tiered_extra_cost[tier][material] += amount
         if len(tiered_extra_cost) != 0:
-            setup_notes["Extra cost"] = ", ".join([f"{amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()]) + " per minion"
             extra_cost = ", ".join([f"{amount * minion_amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()])
         cost_per_part["minion"] = tiered_coin_cost[minion_tier]
 
@@ -1840,6 +1842,7 @@ class Calculator(tk.Tk):
         """
         free_will_price = self.get_price("FREE_WILL", setup_data, "buy", "bazaar")
         postcard_price = self.get_price("POSTCARD", setup_data, "buy", "custom", True)
+        free_will_optimal_tier = 0
         if postcard_price == 0:
             # If no price found, use the free will price
             final_postcard_cost = free_will_price
@@ -1854,11 +1857,8 @@ class Calculator(tk.Tk):
                 free_wills_failed = free_wills_needed - 1
                 tiered_free_will[tier] = free_wills_failed * (tiered_coin_cost[tier] - final_postcard_cost) + free_wills_needed * free_will_price
             self.huim.logger.debug(f"Found Average Free Will cost per tier:\n{tiered_free_will}",)
-            optimal = min(tiered_free_will, key=tiered_free_will.get)
-            self.optimal_tier_free_will.set(optimal)
-            setup_notes["Free Will"] = f"per minion, apply {1 / (0.5 + 0.04 * (optimal - 1)):.2} Free Wills on Tier {optimal}"
-            cost_per_part["free_will"] = tiered_free_will[optimal]
-            self.freewillcost.set(cost_per_part["free_will"])
+            free_will_optimal_tier = min(tiered_free_will, key=tiered_free_will.get)
+            cost_per_part["free_will"] = tiered_free_will[free_will_optimal_tier]
 
         # Storage Chest cost
         if setup_data["chest"] != "NONE":
@@ -1900,7 +1900,7 @@ class Calculator(tk.Tk):
 
 
         total_cost = sum(cost_per_part.values())
-        return total_cost, extra_cost, cost_per_part
+        return total_cost, extra_cost, free_will_optimal_tier, cost_per_part
 
     def calculate(self, inGUI=False, setup_data=None, return_outputs=False):
         """
@@ -2015,7 +2015,7 @@ class Calculator(tk.Tk):
         total_profit = item_profit + pet_profit - fuel_cost
 
         # Setup cost
-        total_cost, extra_cost, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_notes, setup_data)
+        total_cost, extra_cost, free_will_optimal_tier, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_data)
 
         # Construct ID
         setup_ID = self.construct_id(setup_data)
@@ -2047,6 +2047,7 @@ class Calculator(tk.Tk):
             "ID": setup_ID,
             "extracost": extra_cost,
             "setupcost": total_cost,
+            "setupcost_breakdown": cost_per_part,
             "filltime": fill_time,
             "used_storage": used_storage,
             "empty_time": empty_time_str,
@@ -2054,6 +2055,7 @@ class Calculator(tk.Tk):
             "actiontime": seconds_per_action,
             "notes": setup_notes,
             "used_pet_prices": pet_prices,
+            "optimal_tier_free_will": free_will_optimal_tier,
         })
 
         # Update GUI
@@ -2244,6 +2246,9 @@ class Calculator(tk.Tk):
             if self.var_dict[var_key].dtype in [list, dict]:
                 if var_key == "pets_levelled":
                     self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x].get(False))
+                    continue
+                elif var_key == "setupcost_breakdown":
+                    self.setupcost_breakdown.update_listbox(key_format_function=lambda x: self.var_dict[x].get_display(False))
                     continue
                 format_function = lambda x: x
                 if self.var_dict[var_key].has_tag("item_ID_to_display"):

@@ -607,7 +607,7 @@ class H_UI_M():
         else:
             return lambda: self.toggle_switch(ID, self.main.var_dict[controlvar].get())
 
-    def create_show_hide_toggle(self, parent_var_key, ID, place_args={"relx": 1, "x": 3, "rely": 0.5, "anchor": 'w'}):
+    def create_show_hide_toggle(self, anchor_widget, ID, place_args={"relx": 1, "x": 3, "rely": 0.5, "anchor": 'w'}, button_text="Toggle extra options"):
         """
         Creates and places a button that forces a switch, or runs any inputted function.
 
@@ -625,15 +625,14 @@ class H_UI_M():
         -------
         None.
         """
-        button_frame = self.main.var_dict[parent_var_key].frame
+        button_frame = anchor_widget.master
         if type(ID) is str:
-            button = tk.Button(self.main.frames[button_frame], text="Toggle extra options", border=0, borderwidth=0, command=self.create_switch_call(ID))
+            button = tk.Button(button_frame, text=button_text, border=0, borderwidth=0, command=self.create_switch_call(ID))
         elif str(type(ID)) == "<class 'function'>":
-            button = tk.Button(self.main.frames[button_frame], text="Toggle extra options", border=0, borderwidth=0, command=ID)
+            button = tk.Button(button_frame, text=button_text, border=0, borderwidth=0, command=ID)
         if place_args is None:
             return button
-        button_anchor = self.main.var_dict[parent_var_key].widget[-1]
-        button.place(in_=button_anchor, **place_args)
+        button.place(in_=anchor_widget, **place_args)
         return
 
     ### Data logistics
