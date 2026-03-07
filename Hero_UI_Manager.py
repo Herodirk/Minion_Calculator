@@ -721,6 +721,8 @@ class H_UI_M():
             return str(np.round(number, decimal - 1 + int(np.abs(np.floor(np.log10(np.abs(number)))))))
         highest_reduction = min(int(np.floor(np.log10(np.abs(number))) / 3), len(self.reduced_amounts) - 1)
         reduced = np.round((number / (10 ** (3 * highest_reduction))), decimal)
+        if int(reduced) == reduced:
+            reduced = int(reduced)
         output_string = f'{reduced}{self.reduced_amounts[highest_reduction]}'
         return output_string
 

@@ -74,8 +74,6 @@ def setup_repay_time(calculator):
     """Outputs the time (in days) it take for a setup to repay itself"""
     setup_data = calculator.huim.get_from_GUI(["time_seconds", "setupcost", "free_will", "freewillcost", "total_profit"])
     setupcost = setup_data["setupcost"]
-    # if setup_data["free_will"]:
-    #     setupcost += setup_data["freewillcost"]
     profit = setup_data["total_profit"]
     if profit < 0:
         calculator.collect_addon_output("Setup Repay Time", "Negative profit, cannot repay")
@@ -123,14 +121,32 @@ def basic_minion_loop(calculator):
 
         calculated_setup_profits[loop_minion] = outputs["total_profit"]
         calculated_setup_costs[loop_minion] = outputs["setupcost"]
-        # if setup_data["free_will"]:
-        #     calculated_setup_costs[loop_minion] += outputs["freewillcost"]
-    print("Minion : profit , setup cost")
+    setup_data.update(calculator.decode_id(outputs["ID"]))
+    setup_data["used_pet_prices"] = outputs["used_pet_prices"]
+    setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
+    output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
+            "amount": None,
+            "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
+            "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
+            "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
+            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
+            "player_harvests": {"\n> ": ["player_looting"]},
+            "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
+            "mayor": None,
+            "levelingpet": {
+                "\n> ": ["taming", "falcon_attribute", "petxpboost", "beastmaster", "toucan_attribute", "expshareitem"],
+                "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
+            },
+            "used_pet_prices": None,
+            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
+            }, markdown=False, to_terminal=False)
+    output_str += "\nMinion: profit, setup cost"
     for _ in range(10):
         top_minion = max(calculated_setup_profits, key=calculated_setup_profits.get)
-        print(md.calculator_data[top_minion]["display"], ":", calculator.huim.reduced_number(calculated_setup_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]))
+        output_str += "\n" + md.calculator_data[top_minion]["display"] + ": " + calculator.huim.reduced_number(calculated_setup_profits[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion])
         del calculated_setup_profits[top_minion]
-    print("\n")
+    output_str += "\n"
+    print(output_str)
     calculator.collect_addon_output("Basic Minion Loop", "See terminal")
     return
 
@@ -160,18 +176,35 @@ def inferno_minion_loop(calculator):
             outputs = calculator.calculate(setup_data=setup_data, return_outputs=True)
             bad_luck_profit = bad_luck_inferno(calculator, setup_data=setup_data, outputs=outputs, return_value=True)
             cost = outputs["setupcost"]
-            # if setup_data["free_will"]:
-            #     cost += outputs["freewillcost"]
             if cost < cost_filter:
                 calculated_setup_costs[f"{loop_tier}, {loop_amount}"] = cost
                 calculated_setup_profits[f"{loop_tier}, {loop_amount}"] = outputs["total_profit"]
                 calculated_setup_bad_luck_profits[f"{loop_tier}, {loop_amount}"] = bad_luck_profit
-    print("Tier, Amount : bad luck profit , minion cost, true average profit")
+    setup_data.update(calculator.decode_id(outputs["ID"]))
+    setup_data["used_pet_prices"] = outputs["used_pet_prices"]
+    setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
+    output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
+            "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
+            "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
+            "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
+            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
+            "player_harvests": {"\n> ": ["player_looting"]},
+            "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
+            "mayor": None,
+            "levelingpet": {
+                "\n> ": ["taming", "falcon_attribute", "petxpboost", "beastmaster", "toucan_attribute", "expshareitem"],
+                "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
+            },
+            "used_pet_prices": None,
+            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
+            }, markdown=False, to_terminal=False)
+    output_str += "\nTier, Amount: bad luck profit, minion cost, true average profit"
     for _ in range(10):
         top_minion = max(calculated_setup_bad_luck_profits, key=calculated_setup_bad_luck_profits.get)
-        print(top_minion, ":", calculator.huim.reduced_number(calculated_setup_bad_luck_profits[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_costs[top_minion]), ",", calculator.huim.reduced_number(calculated_setup_profits[top_minion]))
+        output_str += "\n" + top_minion + ": " + calculator.huim.reduced_number(calculated_setup_bad_luck_profits[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_profits[top_minion])
         del calculated_setup_bad_luck_profits[top_minion]
-    print("\n")
+    output_str += "\n"
+    print(output_str)
     calculator.collect_addon_output("Inferno Minion Loop", "See terminal")
     return
 

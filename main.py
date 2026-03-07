@@ -271,7 +271,7 @@ class Calculator(tk.Tk):
         self.setupcost_breakdown = HPM.Hvar(self.huim, key="setupcost_breakdown", vtype="output", dtype=dict, display="Setup part costs", frame="outputs_profit_grid", widget_width=35, widget_height=8, initial={}, switch_initial=False)
         self.extracost = HPM.Hvar(self.huim, key="extracost", vtype="output", dtype=str, display="Extra cost", frame="outputs_profit_grid", initial="None", switch_initial=True)
         self.optimal_tier_free_will = HPM.Hvar(self.huim, key="optimal_tier_free_will", vtype="output", dtype=int, display="Free Will Tier", fancy_display="Optimal tier Free Will", frame="outputs_profit_grid", initial=0, switch_initial=True)
-        self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="storage", dtype=int, display="Available Storage", initial=0)
+        self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="output", dtype=int, display="Available Storage", frame="outputs_setup_grid", initial=0, switch_initial=False)
         self.addons_output_container = HPM.Hvar(self.huim, key="addons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="addons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
         self.empty_time_amount = HPM.Hvar(self.huim, key="empty_time_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
         self.empty_time_unit = HPM.Hvar(self.huim, key="empty_time_unit", vtype="input", dtype=str, display="Empty Time unit", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
@@ -400,6 +400,7 @@ class Calculator(tk.Tk):
                 "scaled_time": None,
                 "actiontime": None,
                 "fuelamount": None,
+                "available_storage": None,
                 "notes": [self.notes.widget[0], None, self.notes.widget[2]],
                 "notes_anchor": [self.notesAnchor],
                 "notes_space_1": [None],
@@ -506,7 +507,8 @@ class Calculator(tk.Tk):
         # set {}: only the values of the variables will be outputted (without any order)
         # list []: both the displays and the values of the variables will be outputted
         # tuple (): both displays and values are shown, the sub-header will be outputted in front of every variable
-        self.output_order = {
+        self.standard_output_order = {
+            "### ": {"$": {"amount"}, "$x ": {"minion"}, "$ t": {"miniontier"}},
             "**Minion Upgrades**": {
                 "\n> Internal: ": {"fuel", "hopper", "upgrade1", "upgrade2"},
                 "\n> External: ": {"chest", "beacon", "crystal", "postcard"},
@@ -523,7 +525,7 @@ class Calculator(tk.Tk):
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
-            "**Setup Information**": {"\n> ": ("ID", "actiontime", "fuelamount", "optimal_tier_free_will", "setupcost", "extracost")},
+            "**Setup Information**": {"\n> ": ("ID", "actiontime", "fuelamount", "available_storage", "optimal_tier_free_will", "setupcost", "extracost")},
             "setupcost_breakdown": None,
             "Bazaar Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
             "notes": None,
@@ -646,6 +648,8 @@ class Calculator(tk.Tk):
         return
 
     def data_to_text(self, var_key, calculation_data, output_switches, display=True, newline=False, markdown=True):
+        if var_key not in calculation_data:
+            return None
         # Special cases that can stop variables from outputting
         if var_key in self.dependent_variables:  # special case: dependent variables
             if calculation_data[self.dependent_variables[var_key]] in ["None", "0", "0.0", "", False]:
@@ -664,7 +668,9 @@ class Calculator(tk.Tk):
 
         # Output switch
         force = False  # force is a toggle for output variables that can be equivalent to 0 but still have to be outputted due to output switch
-        output_switch_val = output_switches[var_key]
+        output_switch_val = None
+        if var_key in output_switches:
+            output_switch_val = output_switches[var_key]
         if output_switch_val is False:
             return None
         elif output_switch_val is True:
@@ -681,7 +687,7 @@ class Calculator(tk.Tk):
         elif self.var_dict[var_key].dtype in [dict, list]:
             data = calculation_data[var_key]
         elif self.var_dict[var_key].dtype in [int, float]:
-            data = f"{self.huim.reduced_number(calculation_data[var_key])}"
+            data = self.huim.reduced_number(calculation_data[var_key])
         else:
             data = f"{calculation_data[var_key]}"
 
@@ -715,34 +721,26 @@ class Calculator(tk.Tk):
             return_str += f"||{data}||".replace("\\", r"\\")
         else:
             return_str += value_formatting_function(data)
-        
-        # extra text
-        if var_key == "used_storage":
-            return_str += f" (out of {value_formatting_function(calculation_data["available_storage"])})"
-
         if newline:
             return_str += "\n"
         return return_str
 
-    def text_output(self, calculation_data=None, output_switches=None, markdown=True, to_terminal=True):
+    def text_output(self, calculation_data=None, output_switches=None, output_order=None, markdown=True, to_terminal=True):
         if calculation_data is None:
             calculation_data = self.huim.get_from_GUI(self.var_dict.keys())
             calculation_data.update(self.decode_id(calculation_data["ID"]))
         if output_switches is None:
             output_switches = {var_key: self.var_dict[var_key].get_output_switch() for var_key in self.var_dict}
-
-        if markdown:
-            crafted_string = f'{calculation_data["amount"]}x **{calculation_data["minion"]} t{calculation_data["miniontier"]}**'
-        else:
-            crafted_string = f'{calculation_data["amount"]}x {calculation_data["minion"]} t{calculation_data["miniontier"]}'
-
-        for section_key in self.output_order:
+        if output_order is None:
+            output_order = self.standard_output_order
+        crafted_string = ""
+        for section_key in output_order:
             # Special cases where entire sections can be skipped
             if section_key == "Beacon Info" and calculation_data["beacon"] == 0:
                 continue
             if section_key == "Inferno Info" and calculation_data["minion"] != "Inferno" and calculation_data["fuel"] != "Inferno Minion Fuel":
                 continue
-            if section_key == "Bazaar Info" and output_switches["bazaar_update_txt"] is False:
+            if section_key == "Bazaar Info" and ("bazaar_update_txt" in output_switches and output_switches["bazaar_update_txt"] is False):
                 continue
 
             line_str = ""
@@ -755,17 +753,21 @@ class Calculator(tk.Tk):
                 header = section_key
                 if not markdown:
                     header = header.replace("*", "")
+                    header = header.replace("### ", "")
             if header is None:
                 continue
 
-            if type(self.output_order[section_key]) is dict:
-                for sub_key, key_arr in self.output_order[section_key].items():
+            if type(output_order[section_key]) is dict:
+                for sub_key, key_arr in output_order[section_key].items():
                     line_data = ""
-                    if type(key_arr) == list:
+                    if "$" in sub_key:  # value only: no display, no markdown
+                        sub_key = sub_key[1:]
+                        line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, display=False, markdown=False)) is not None)
+                    elif type(key_arr) == list:  # standard
                         line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, markdown=markdown)) is not None)
-                    elif type(key_arr) == tuple:
+                    elif type(key_arr) == tuple:  # repeated sub_key
                         line_data += sub_key.join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, markdown=markdown)) is not None)
-                    elif type(key_arr) == set:
+                    elif type(key_arr) == set:  # no display
                         line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, display=False, markdown=markdown)) is not None)
                     if line_data == "":
                         continue
@@ -1173,7 +1175,7 @@ class Calculator(tk.Tk):
             Time between empties in seconds, ratio between empty_time and scaled time.
         """
         empty_time_seconds = self.huim.time_number(setup_data["empty_time_unit"], setup_data["empty_time_amount"], seconds_per_action * actions_per_harvest)
-        empty_time_str = scaled_time_str = f"{setup_data["empty_time_amount"]} {setup_data["empty_time_unit"]}"
+        empty_time_str = scaled_time_str = f"{self.huim.reduced_number(setup_data["empty_time_amount"])} {setup_data["empty_time_unit"]}"
         timeratio = 1
         if setup_data["scale_time"]:
             scaled_time_seconds = self.huim.time_number(setup_data["scaled_time_unit"], setup_data["scaled_time_amount"], seconds_per_action * actions_per_harvest)
