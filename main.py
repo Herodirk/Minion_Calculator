@@ -17,6 +17,8 @@ try:
     import math
     import time
     import webbrowser
+    import pathlib
+    import json
     import HSB_minion_data as md
     import Hero_UI_Manager as HPM
     import official_calculator_add_ons as Hero_addons
@@ -27,6 +29,10 @@ except ModuleNotFoundError as import_error:
     else:
         print(f"ERROR - import - Could not find {missing_package} module,\nplease install this module using PIP")
     exit()
+try:
+    pathlib.Path("calculator_instance_data").mkdir()
+except FileExistsError:
+    pass
 
 #%% Settings
 
@@ -37,29 +43,10 @@ external_add_ons = {**Hero_addons.add_ons_package}
 # the name will show up on the button, the funtion will only get the argument calculator=self sent to it.
 # the support for this is limited and will be improved later
 
-# API settings
-API_auto_update = True
-# If true, bazaar automatically updates before performing calculation
-API_cooldown = 120  # seconds
-# Time limit in seconds between each automatic update
-
-# Output settings
-compact_tolerance = 10000  # coins
-# Minimum coin loss per compacting action for the calculator to make a note of coin loss
-output_to_clipboard = True
-# If true, Short Output and Share Output also get saved in your clipboard
-debug_mode = False
-# Toggle for debug mode
-
-# Visual settings
-color_palette = "dark_red"
-# Color palette of the calculator, current options: "dark", "dark_red", "light", "gray_text"
-# For Apple IOS users, use "gray_text"
-
 # Setup Templates
 templateList = {
     "Choose Template": {},  # would suggest to keep this one
-    "ID": {},  # would suggest to keep this one too
+    "Load ID": {},  # would suggest to keep this one too
     "Clean": {},  # would suggest to also keep this one
     "Corrupt": {
         "hopper": "Enchanted Hopper",
@@ -182,8 +169,35 @@ pet_costs = {
 class Calculator(tk.Tk):
     def __init__(self):
         super().__init__()
+        # Get settings
+        self.settings_file = pathlib.Path("calculator_instance_data/calculator_settings.json")
+        self.default_settings = {
+            "API_auto_update": True,
+            "API_cooldown": 120,
+            "compact_tolerance": 10000,
+            "output_to_clipboard": True,
+            "debug_mode": False,
+            "color_palette": "dark_red",
+            "window_width": 1450,
+            "window_height": 750,
+            "calculated_ID": "",
+        }
+        if not self.settings_file.is_file():
+            self.settings_file.write_text(json.dumps(self.default_settings, indent=4, sort_keys=True), encoding="utf-8")
+        try:
+            found_settings = json.loads(self.settings_file.read_text())
+        except Exception:
+            found_settings = {}
+        setting_load_errors = []
+        for setting in self.default_settings.keys():
+            if setting not in found_settings:
+                setting_load_errors.append(setting)
+                found_settings[setting] = self.default_settings[setting]
+
         # Use Hero UI Manager to initialize the window and the frames with grids
-        self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=1450, windowHeight=750, palette=color_palette, debug_mode=debug_mode)
+        self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=found_settings["window_width"], windowHeight=found_settings["window_height"], palette=found_settings["color_palette"], debug_mode=found_settings["debug_mode"])
+        if len(setting_load_errors) != 0:
+            self.huim.logger.error(f"Could not find the following settings: {", ".join(setting_load_errors)}")
         self.huim.create_controls()
         self.huim.create_frames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
@@ -193,8 +207,14 @@ class Calculator(tk.Tk):
         self.huim.logger.info(f"Calculator version {self.version.get()}")
 
         # Define variables
+        self.API_auto_update = HPM.Hvar(self.huim, key="API_auto_update", vtype="storage", dtype=bool, display="API Auto Update", initial=found_settings["API_auto_update"])
+        self.API_cooldown = HPM.Hvar(self.huim, key="API_cooldown", vtype="storage", dtype=int, display="API Cooldown (s)", initial=found_settings["API_cooldown"])
+        self.compact_tolerance = HPM.Hvar(self.huim, key="compact_tolerance", vtype="storage", dtype=int, display="Over-Compacting Tolerance (coins)", initial=found_settings["compact_tolerance"])
+        self.output_to_clipboard = HPM.Hvar(self.huim, key="output_to_clipboard", vtype="storage", dtype=bool, display="Output to Clipboard", initial=found_settings["output_to_clipboard"])
+        self.debug_mode = HPM.Hvar(self.huim, key="debug_mode", vtype="storage", dtype=bool, display="Debug Mode", initial=found_settings["debug_mode"])
+        self.color_palette = HPM.Hvar(self.huim, key="color_palette", vtype="storage", dtype=str, display="Color Palette", initial=found_settings["color_palette"], options=list(HPM.color_palettes.keys()))
         self.template = HPM.Hvar(self.huim, key="template", vtype="input", display="Templates", initial="Choose Template", dtype=str, frame="inputs_minion_grid", options=list(templateList.keys()), command=self.load_template)
-        self.load_ID = HPM.Hvar(self.huim, key="load_id", vtype="input", dtype=str, frame="inputs_minion_grid", display="Load ID", initial="")
+        self.load_ID = HPM.Hvar(self.huim, key="load_id", vtype="input", dtype=str, frame="inputs_minion_grid", display="Load ID", initial=found_settings["calculated_ID"])
         self.minion = HPM.Hvar(self.huim, key="minion", vtype="input", dtype=str, display="Minion", frame="inputs_minion_grid", initial="Custom", options=md.minion_options, command=lambda x: self.multiswitch('minion', x))
         self.miniontier = HPM.Hvar(self.huim, key="miniontier", vtype="input", dtype=int, display="Tier", frame="inputs_minion_grid", initial=12, options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], command=lambda x: self.multiswitch('minion', x))
         self.amount = HPM.Hvar(self.huim, key="amount", vtype="input", dtype=int, display="Amount", frame="inputs_minion_grid", initial=1, options=None)
@@ -246,7 +266,7 @@ class Calculator(tk.Tk):
         self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="Buy Order", options=list(md.bazaar_buy_types.keys()))
         self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Bazaar taxes", frame="inputs_player_grid", initial=True, command=self.huim.create_switch_call("bazaar_tax", controlvar="bazaar_taxes"))
         self.bazaar_flipper = HPM.Hvar(self.huim, key="bazaar_flipper", vtype="input", dtype=int, display="Bazaar Flipper", frame="inputs_player_grid", initial=1, options=[0, 1, 2])
-        self.ID = HPM.Hvar(self.huim, key="ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
+        self.calculated_ID = HPM.Hvar(self.huim, key="calculated_ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
         self.ID_container = HPM.Hvar(self.huim, key="ID_container", vtype="output", dtype=list, display="ID", frame="outputs_setup_grid", widget_width=35, widget_height=1, initial=[], switch_initial=False)
         self.scaled_time = HPM.Hvar(self.huim, key="scaled_time", vtype="output", dtype=str, display="Scaled Time", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
         self.time_seconds = HPM.Hvar(self.huim, key="time_seconds", vtype="storage", dtype=float, display="Time (s)", initial=86400.0)
@@ -395,7 +415,7 @@ class Calculator(tk.Tk):
             },
             "outputs_setup_grid": {
                 "labels": [None, setupoutputsLB, setupprintLB],
-                "ID": [self.ID.widget[0], self.ID_container.widget[1], self.ID.widget[2]],
+                "setup_ID": [self.calculated_ID.widget[0], self.ID_container.widget[1], self.calculated_ID.widget[2]],
                 "empty_time": None,
                 "scaled_time": None,
                 "actiontime": None,
@@ -483,7 +503,7 @@ class Calculator(tk.Tk):
                             locations="grid", control=True, negate=False, initial=False)
         self.huim.def_switch("setup_cost_breakdown", widget_references="setupcost_breakdown",
                             locations="grid", control=None, negate=False, initial=False)
-        self.huim.def_switch(ID="addons", widget_references=self.frames["addons_main"],
+        self.huim.def_switch("addons", widget_references=self.frames["addons_main"],
                             locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
         
         # Show/Hide toggle buttons for large amount of extended options
@@ -525,7 +545,7 @@ class Calculator(tk.Tk):
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
-            "**Setup Information**": {"\n> ": ("ID", "actiontime", "fuelamount", "available_storage", "optimal_tier_free_will", "setupcost", "extracost")},
+            "**Setup Information**": {"\n> ": ("calculated_ID", "actiontime", "fuelamount", "available_storage", "optimal_tier_free_will", "setupcost", "extracost")},
             "setupcost_breakdown": None,
             "Bazaar Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
             "notes": None,
@@ -614,7 +634,7 @@ class Calculator(tk.Tk):
     def load_template(self, template_name):
         """
         Handles the input from the template input.
-        If "ID" is selected it sends the inputted ID to the decoder.
+        If "Load ID" is selected it sends the inputted ID to the decoder.
         If "Clean" is selected it sets every variable with "vtype" equal to "input" to its "initial".
         Otherwise it is a key from templateList which has as value a dict with variable keys and values.
         If the variable has a load function with switches, it runs that too.
@@ -632,7 +652,7 @@ class Calculator(tk.Tk):
         if template_name == "Choose Template":
             return
         self.template.set("Choose Template")
-        if template_name == "ID":
+        if template_name == "Load ID":
             template = self.decode_id(self.load_ID.get())
         elif template_name == "Clean":
             template = {var_key: self.var_dict[var_key].initial for var_key in self.ID_order if var_key not in ["minion", "miniontier"]}
@@ -717,7 +737,7 @@ class Calculator(tk.Tk):
                     list_val = self.huim.reduced_number(list_val)
                 formatted_list.append(f"{key_formatting_function(list_key)}: {value_formatting_function(list_val)}")
             return_str += ", ".join(formatted_list)
-        elif markdown and var_key == "ID":
+        elif markdown and var_key == "calculated_ID":
             return_str += f"||{data}||".replace("\\", r"\\")
         else:
             return_str += value_formatting_function(data)
@@ -728,7 +748,7 @@ class Calculator(tk.Tk):
     def text_output(self, calculation_data=None, output_switches=None, output_order=None, markdown=True, to_terminal=True):
         if calculation_data is None:
             calculation_data = self.huim.get_from_GUI(self.var_dict.keys())
-            calculation_data.update(self.decode_id(calculation_data["ID"]))
+            calculation_data.update(self.decode_id(calculation_data["calculated_ID"]))
         if output_switches is None:
             output_switches = {var_key: self.var_dict[var_key].get_output_switch() for var_key in self.var_dict}
         if output_order is None:
@@ -774,7 +794,7 @@ class Calculator(tk.Tk):
                     line_str += sub_key + line_data
             if line_str != "" or force_line is True:
                 crafted_string += "\n" + header + line_str
-        if output_to_clipboard:
+        if self.output_to_clipboard.get():
             self.clipboard_clear()
             self.clipboard_append(crafted_string)
         if to_terminal:
@@ -793,7 +813,7 @@ class Calculator(tk.Tk):
 
         Returns
         -------
-        ID : str
+        setup_id : str
             Setup ID.
 
         """
@@ -819,13 +839,13 @@ class Calculator(tk.Tk):
                 setup_id += chr(48 + index)
         return setup_id
 
-    def decode_id(self, ID):
+    def decode_id(self, setup_id):
         """
         Generates a template structure for load_template() from a given setup ID.
 
         Parameters
         ----------
-        ID : str
+        setup_id : str
             Setup ID.
 
         Returns
@@ -835,51 +855,51 @@ class Calculator(tk.Tk):
 
         """
         setup_data = {}
-        end_ver = ID.find("!")
+        end_ver = setup_id.find("!")
         if end_ver == -1:
-            self.huim.logger.error("Invalid ID, could not find version number")
+            self.huim.logger.error("Invalid setup ID, could not find version number")
             return setup_data
         try:
-            version = ID[0:end_ver]
+            version = setup_id[0:end_ver]
         except Exception:
-            self.huim.logger.error("Invalid ID, could not find version number")
+            self.huim.logger.error("Invalid setup ID, could not find version number")
             return setup_data
         ID_index = end_ver + 1
         if version != self.version.get():
-            self.huim.logger.error("Invalid ID, Incompatible version")
+            self.huim.logger.error("Invalid setup ID, Incompatible version")
             return setup_data
         try:
             for var_key in self.ID_order:
                 var_options = self.var_dict[var_key].options
                 if var_options is None:
-                    if ID[ID_index] != "!":
+                    if setup_id[ID_index] != "!":
                         self.huim.logger.error(f"did not find {var_key}")
                         return {}
-                    end_val = ID.find("!", ID_index + 1)
-                    setup_data[var_key] = self.var_dict[var_key].dtype(ID[ID_index + 1:end_val])
+                    end_val = setup_id.find("!", ID_index + 1)
+                    setup_data[var_key] = self.var_dict[var_key].dtype(setup_id[ID_index + 1:end_val])
                     ID_index = end_val + 1
                 elif len(var_options) > 79:
-                    if ID[ID_index] != "!":
+                    if setup_id[ID_index] != "!":
                         self.huim.logger.error(f"did not find {var_key}")
                         return {}
-                    end_val = ID.find("!", ID_index + 1)
-                    setup_data[var_key] = var_options[int(ID[ID_index + 1:end_val])]
+                    end_val = setup_id.find("!", ID_index + 1)
+                    setup_data[var_key] = var_options[int(setup_id[ID_index + 1:end_val])]
                     ID_index = end_val + 1
                 else:
-                    setup_data[var_key] = var_options[ord(ID[ID_index]) - 48]
+                    setup_data[var_key] = var_options[ord(setup_id[ID_index]) - 48]
                     ID_index += 1
         except IndexError as error:
-            self.huim.logger.error("Invalid ID, ID incomplete")
+            self.huim.logger.error("Invalid setup ID, ID incomplete")
             return {}
         return setup_data
 
-    def get_price(self, ID, setup_data, action="buy", location="bazaar", force=False):
+    def get_price(self, item_ID, setup_data, action="buy", location="bazaar", force=False):
         """
         Returns the price of an item from ID, transaction type and location of transaction.
 
         Parameters
         ----------
-        ID : str
+        item_ID : str
             Skyblock Item ID of which the price is needed.
         setup_data : dict
             needed setup data: bazaar_buy_type, bazaar_sell_type, bazaar_taxes, bazaar_flipper, mayor.
@@ -907,21 +927,21 @@ class Calculator(tk.Tk):
                     multiplier = 1 - bazaar_tax
         elif location == "npc" and action == "buy":
             multiplier = 2
-        if ID in md.calculator_data:
-            if location in md.calculator_data[ID]["prices"]:
-                return multiplier * md.calculator_data[ID]["prices"][location]
+        if item_ID in md.calculator_data:
+            if location in md.calculator_data[item_ID]["prices"]:
+                return multiplier * md.calculator_data[item_ID]["prices"][location]
             elif force:
-                self.huim.logger.warning("no forced cost found for " + ID)
+                self.huim.logger.warning("no forced cost found for " + item_ID)
                 return 0
-            elif "custom" in md.calculator_data[ID]["prices"]:
-                return md.calculator_data[ID]["prices"]["custom"]
-            elif "npc" in md.calculator_data[ID]["prices"]:
-                return multiplier * md.calculator_data[ID]["prices"]["npc"]
+            elif "custom" in md.calculator_data[item_ID]["prices"]:
+                return md.calculator_data[item_ID]["prices"]["custom"]
+            elif "npc" in md.calculator_data[item_ID]["prices"]:
+                return multiplier * md.calculator_data[item_ID]["prices"]["npc"]
             else:
-                self.huim.logger.warning("no cost found for " + ID)
+                self.huim.logger.warning("no cost found for " + item_ID)
                 return 0
         else:
-            self.huim.logger.error(ID + " not in calculator data")
+            self.huim.logger.error(item_ID + " not in calculator data")
             return 0
 
     def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
@@ -1577,7 +1597,7 @@ class Calculator(tk.Tk):
                 compact_amount = item_data["amount"]
             cost = self.get_price(item, setup_data, "sell", per_item_sell_location[item]) * per_compact
             compact_cost = self.get_price(compact_item, setup_data, "sell", per_item_sell_location[compact_item]) * compact_amount
-            if cost - compact_cost > compact_tolerance:
+            if cost - compact_cost > self.compact_tolerance.get():
                 over_compacting.append(md.calculator_data[item]['display'])
         if len(over_compacting) != 0:
             setup_notes["Over-compacting"] = ', '.join(over_compacting)
@@ -1924,7 +1944,7 @@ class Calculator(tk.Tk):
             self.statusC.update()
 
         # auto update bazaar
-        if API_auto_update:
+        if self.API_auto_update.get():
             self.update_prices(cooldown_warning=False, in_gui=inGUI)
 
         # Get inputs if none are given
@@ -2046,7 +2066,7 @@ class Calculator(tk.Tk):
             "available_storage": available_storage,
             "item_sell_loc": per_item_sell_location,
             "ID_container": [setup_ID],
-            "ID": setup_ID,
+            "calculated_ID": setup_ID,
             "extracost": extra_cost,
             "setupcost": total_cost,
             "setupcost_breakdown": cost_per_part,
@@ -2214,7 +2234,7 @@ class Calculator(tk.Tk):
         
         :param cooldown_warning: bool, toggle if a terminal message should be logged if the bazaar update cooldown has not passed yet.
         """
-        if time.time() - self.API_timer < API_cooldown and self.API_timer != 0:
+        if time.time() - self.API_timer < self.API_cooldown.get() and self.API_timer != 0:
             if cooldown_warning:
                 self.huim.logger.info("API update is on cooldown")
             return
@@ -2278,6 +2298,18 @@ class Calculator(tk.Tk):
         self.addons_output_container.list[output_name] = output_str
         self.addons_output_container.update_listbox()
         return
+    
+    def save_calculator_data(self):
+        saving_settings = {}
+        for setting in self.default_settings.keys():
+            if setting in self.var_dict:
+                saving_settings[setting] = self.var_dict[setting].get()
+            elif setting == "window_height":
+                saving_settings[setting] = self.winfo_height()
+            elif setting == "window_width":
+                saving_settings[setting] = self.winfo_width()
+        self.settings_file.write_text(json.dumps(saving_settings, indent=4, sort_keys=True), encoding="utf-8")
+        return
 
 #%% main loop
 
@@ -2296,9 +2328,10 @@ def start_app():
     App.mainloop()
     print("INFO - start_app - Exited mainloop")
     try:
+        App.save_calculator_data()
         App.destroy()
         print("INFO - start_app - Detroyed application")
-    except Exception:
+    except tk.TclError:
         print("ERROR - start_app - Please use the stop button in the bottom right to close the application")
     print("INFO - start_app - Closed")
     return

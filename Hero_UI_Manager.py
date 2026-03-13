@@ -467,7 +467,7 @@ class H_UI_M():
 
     ### Switch management
 
-    def def_switch(self, ID, widget_references, locations, control=None, negate=False, initial=True):
+    def def_switch(self, switch_id, widget_references, locations, control=None, negate=False, initial=True):
         """
         def_switch: define switch
         Creates an entry in the switches dict used for turning widgets on and off.
@@ -480,7 +480,7 @@ class H_UI_M():
 
         Parameters
         ----------
-        ID : str
+        switch_id : str
             ID for the switch to call it with toggleSwitch.
         widget_references : any Tkinter widget or list of widgets and/or variable keys
             The objects that will be part of the switch, can be one singular widget or a list of widgets and/or variables keys.
@@ -513,7 +513,7 @@ class H_UI_M():
         for widget in widget_references:
             if type(widget) is str:
                 if widget not in self.main.var_dict:
-                    self.logger.warning(f"var key \"{widget}\" in switch \"{ID}\" not in var_dict")
+                    self.logger.warning(f"var key \"{widget}\" in switch \"{switch_id}\" not in var_dict")
                     continue
                 widget_list.extend(self.main.var_dict[widget].widget)
             else:
@@ -529,10 +529,10 @@ class H_UI_M():
 
         # check amount equality
         if len(widget_list) != len(location_list):
-            self.logger.warning(f"{ID} switch did not activate, given widgets does not equal given locations ({len(widget_list)} != {len(location_list)})")
+            self.logger.warning(f"{switch_id} switch did not activate, given widgets does not equal given locations ({len(widget_list)} != {len(location_list)})")
 
         # save switch
-        self.main.switches[ID] = {"state": initial, "widgets": widget_list, "locations": location_list, "control": control, "negate": negate}
+        self.main.switches[switch_id] = {"state": initial, "widgets": widget_list, "locations": location_list, "control": control, "negate": negate}
 
         # apply initial state
         for widget, loc in zip(widget_list, location_list):
@@ -542,13 +542,13 @@ class H_UI_M():
                 widget.grid_remove()
         return
 
-    def toggle_switch(self, ID, control=None):
+    def toggle_switch(self, switch_id, control=None):
         """
         Toggles a switch by ID and check if control conditions are met
 
         Parameters
         ----------
-        ID : str
+        switch_id : str
             Identifier of the switch.
         control : str, int, float, optional
             Control variable to determine if the widget should be visible or not. None to force a switch. The default is None.
@@ -558,16 +558,16 @@ class H_UI_M():
         None.
 
         """
-        if ID not in self.main.switches:
-            self.logger.error(f"ID {ID} does not exist in switch storage")
+        if switch_id not in self.main.switches:
+            self.logger.error(f"ID {switch_id} does not exist in switch storage")
             return
-        state = self.main.switches[ID]["state"]
+        state = self.main.switches[switch_id]["state"]
         if control is not None:
-            if self.main.switches[ID]["negate"]:
-                if state is not (control == self.main.switches[ID]["control"]):
+            if self.main.switches[switch_id]["negate"]:
+                if state is not (control == self.main.switches[switch_id]["control"]):
                     return
             else:
-                if state is (control == self.main.switches[ID]["control"]):
+                if state is (control == self.main.switches[switch_id]["control"]):
                     return
         if state is True:
             next_grid_state = lambda obj: obj.grid_remove()
@@ -575,21 +575,21 @@ class H_UI_M():
         else:
             next_grid_state = lambda obj: obj.grid()
             next_place_state = lambda obj, args: obj.place(**args)
-        for widget, loc in zip(self.main.switches[ID]["widgets"], self.main.switches[ID]["locations"]):
+        for widget, loc in zip(self.main.switches[switch_id]["widgets"], self.main.switches[switch_id]["locations"]):
             if loc == "grid":
                 next_grid_state(widget)
             else:
                 next_place_state(widget, loc)
-        self.main.switches[ID]["state"] = bool(1 - int(state))
+        self.main.switches[switch_id]["state"] = bool(1 - int(state))
         return
 
-    def create_switch_call(self, ID, controlvar=None):
+    def create_switch_call(self, switch_id, controlvar=None):
         """
         Creates a command for a GUI widget that calls a switch.
 
         Parameters
         ----------
-        ID : str
+        switch_id : str
             Identifier of the switch.
         controlvar : str or None
             Variable key for the switch control. "self" to make the command send the value in the widget as control. None to force a switch. The default is None.
@@ -601,13 +601,13 @@ class H_UI_M():
 
         """
         if controlvar == "self":
-            return lambda x: self.toggle_switch(ID, x)
+            return lambda x: self.toggle_switch(switch_id, x)
         elif controlvar is None:
-            return lambda: self.toggle_switch(ID, None)
+            return lambda: self.toggle_switch(switch_id, None)
         else:
-            return lambda: self.toggle_switch(ID, self.main.var_dict[controlvar].get())
+            return lambda: self.toggle_switch(switch_id, self.main.var_dict[controlvar].get())
 
-    def create_show_hide_toggle(self, anchor_widget, ID, place_args={"relx": 1, "x": 3, "rely": 0.5, "anchor": 'w'}, button_text="Toggle extra options"):
+    def create_show_hide_toggle(self, anchor_widget, switch_id, place_args={"relx": 1, "x": 3, "rely": 0.5, "anchor": 'w'}, button_text="Toggle extra options"):
         """
         Creates and places a button that forces a switch, or runs any inputted function.
 
@@ -615,7 +615,7 @@ class H_UI_M():
         ----------
         parent_var_key : str
             Variable key of the widget where the button should anchor to.
-        ID : str or function
+        switch_id : str or function
             As string it's the identifier of the switch. As function it is any function.
         place_args : dict
             Dictionary containing the arguments for the .place function of Tkinter.
@@ -626,10 +626,10 @@ class H_UI_M():
         None.
         """
         button_frame = anchor_widget.master
-        if type(ID) is str:
-            button = tk.Button(button_frame, text=button_text, border=0, borderwidth=0, command=self.create_switch_call(ID))
-        elif str(type(ID)) == "<class 'function'>":
-            button = tk.Button(button_frame, text=button_text, border=0, borderwidth=0, command=ID)
+        if type(switch_id) is str:
+            button = tk.Button(button_frame, text=button_text, border=0, borderwidth=0, command=self.create_switch_call(switch_id))
+        elif str(type(switch_id)) == "<class 'function'>":
+            button = tk.Button(button_frame, text=button_text, border=0, borderwidth=0, command=switch_id)
         if place_args is None:
             return button
         button.place(in_=anchor_widget, **place_args)

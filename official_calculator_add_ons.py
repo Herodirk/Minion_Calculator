@@ -121,7 +121,7 @@ def basic_minion_loop(calculator):
 
         calculated_setup_profits[loop_minion] = outputs["total_profit"]
         calculated_setup_costs[loop_minion] = outputs["setupcost"]
-    setup_data.update(calculator.decode_id(outputs["ID"]))
+    setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
     setup_data["used_pet_prices"] = outputs["used_pet_prices"]
     setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
     output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
@@ -180,7 +180,7 @@ def inferno_minion_loop(calculator):
                 calculated_setup_costs[f"{loop_tier}, {loop_amount}"] = cost
                 calculated_setup_profits[f"{loop_tier}, {loop_amount}"] = outputs["total_profit"]
                 calculated_setup_bad_luck_profits[f"{loop_tier}, {loop_amount}"] = bad_luck_profit
-    setup_data.update(calculator.decode_id(outputs["ID"]))
+    setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
     setup_data["used_pet_prices"] = outputs["used_pet_prices"]
     setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
     output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
