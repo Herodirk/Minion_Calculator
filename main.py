@@ -209,7 +209,7 @@ class Calculator(tk.Tk):
         # Define variables
         self.API_auto_update = HPM.Hvar(self.huim, key="API_auto_update", vtype="storage", dtype=bool, display="API Auto Update", initial=found_settings["API_auto_update"])
         self.API_cooldown = HPM.Hvar(self.huim, key="API_cooldown", vtype="storage", dtype=int, display="API Cooldown (s)", initial=found_settings["API_cooldown"])
-        self.compact_tolerance = HPM.Hvar(self.huim, key="compact_tolerance", vtype="storage", dtype=int, display="Over-Compacting Tolerance (coins)", initial=found_settings["compact_tolerance"])
+        self.compact_tolerance = HPM.Hvar(self.huim, key="compact_tolerance", vtype="storage", dtype=int, display="Over-compacting (coin)", initial=found_settings["compact_tolerance"])
         self.output_to_clipboard = HPM.Hvar(self.huim, key="output_to_clipboard", vtype="storage", dtype=bool, display="Output to Clipboard", initial=found_settings["output_to_clipboard"])
         self.debug_mode = HPM.Hvar(self.huim, key="debug_mode", vtype="storage", dtype=bool, display="Debug Mode", initial=found_settings["debug_mode"])
         self.color_palette = HPM.Hvar(self.huim, key="color_palette", vtype="storage", dtype=str, display="Color Palette", initial=found_settings["color_palette"], options=list(HPM.color_palettes.keys()))
@@ -323,9 +323,10 @@ class Calculator(tk.Tk):
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
         self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
+        self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars(self.edit_settings, ["API_auto_update", "API_cooldown", "compact_tolerance", "output_to_clipboard", "debug_mode", "color_palette"], True))
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
-        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB]
+        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB, self.settingsB]
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
@@ -2299,6 +2300,13 @@ class Calculator(tk.Tk):
         self.addons_output_container.update_listbox()
         return
     
+    def edit_settings(self):
+        if self.debug_mode.get():
+            self.huim.logger.setLevel(10)
+        else:
+            self.huim.logger.setLevel(20)
+        return
+
     def save_calculator_data(self):
         saving_settings = {}
         for setting in self.default_settings.keys():
@@ -2314,7 +2322,7 @@ class Calculator(tk.Tk):
 #%% main loop
 
 
-def start_app():
+def run_calculator():
     """
     Starts the minion calculator and destroys it when exited
     Warns user if the stop button was not used to close the calculator
@@ -2326,17 +2334,18 @@ def start_app():
     """
     App = Calculator()
     App.mainloop()
-    print("INFO - start_app - Exited mainloop")
+    print("INFO - run_calculator - Exited mainloop")
     try:
         App.save_calculator_data()
+        print("INFO - run_calculator - Saved calculator data")
         App.destroy()
-        print("INFO - start_app - Detroyed application")
+        print("INFO - run_calculator - Detroyed application")
     except tk.TclError:
-        print("ERROR - start_app - Please use the stop button in the bottom right to close the application")
-    print("INFO - start_app - Closed")
+        print("ERROR - run_calculator - Please use the stop button in the bottom right to close the application")
+    print("INFO - run_calculator - Closed")
     return
 
 if __name__ == "__main__":
-    start_app()
+    run_calculator()
 else:
     print("Run `main.py` directly to start the calculator")

@@ -13,6 +13,7 @@ import urllib.request
 import logging
 import json
 from copy import deepcopy
+import math
 
 color_palettes = {
     "dark": {
@@ -114,6 +115,7 @@ class H_UI_M():
         self.main.var_dict = {}
         self.reduced_amounts = {0: "", 1: "k", 2: "M", 3: "B", 4: "T", 5: "Qd"}
         self.edit_vars_active = False
+        self.edit_vars_output = {}
 
         self.style = ttk.Style()
         self.style.theme_create(
@@ -279,7 +281,7 @@ class H_UI_M():
             var.set(initial)
         return var
 
-    def def_input_var(self, dtype, frame, L_text, initial=None, options=None, cmd=None, checkbox_text=None, w=None, h=None):
+    def def_input_var(self, dtype, frame, L_text, initial=None, options=None, cmd=None, checkbox_text=None, w=None, h=None, existing_var=None):
         """
         defVarI: define variable input
         Generates a Tkinter variable, a label and an input widget.
@@ -316,7 +318,10 @@ class H_UI_M():
             List containing the label and the input widget.
 
         """
-        var = self.def_var(dtype, initial=initial)
+        if existing_var is None:
+            var = self.def_var(dtype, initial=initial)
+        else:
+            var = existing_var
         if dtype != bool:
             if options is not None:
                 input_widget = ttk.Combobox(frame, textvariable=var, values=options, state="readonly", width=1 + len(str(max(options, key=lambda x: len(str(x))))), height=20)
@@ -715,6 +720,8 @@ class H_UI_M():
             Rounded number with a size indicator letter if needed.
 
         """
+        if number == math.inf:
+            return "Infinite"
         if number == 0.0:
             return str(0)
         elif np.abs(number) < 1:
@@ -936,7 +943,7 @@ class H_UI_M():
         inputsW.destroy()
         return self.vars_out
 
-    def edit_vars(self, exit_function, variables=[]):
+    def edit_vars(self, exit_function, variables=[], existing_variables=True):
         """
         Creates a pop-up that asks for values for the inputted variable keys.
 
@@ -944,8 +951,8 @@ class H_UI_M():
         ----------
         exit_function : function
             Function run after clicking close.
-        variables : list
-            List containing variable keys as strings.
+        variables : list or dict
+            List containing variable keys as strings. Dict containing variable keys as keys with variable data as value
 
         Returns
         -------
@@ -972,16 +979,15 @@ class H_UI_M():
         del self.main.frames["edit_vars"]
 
         widgets_dict = {}
-        for var_key in variables:
-            options = self.main.var_dict[var_key].options
-            L_text = self.main.var_dict[var_key].get_display()
-            var = self.main.var_dict[var_key].tkvar
-
-            if options is None:
-                input_widget = tk.Entry(self.edit_vars_inputs, textvariable=var)
-            else:
-                input_widget = tk.OptionMenu(self.edit_vars_inputs, var, *options)
-            widgets_dict[var_key] = [self.create_label(frm=self.edit_vars_inputs, txt=L_text + ":"), input_widget]
+        if existing_variables:
+            for var_key in variables:
+                self.edit_vars_output[var_key], widgets_dict[var_key] = self.def_input_var(self.main.var_dict[var_key].dtype, self.edit_vars_inputs, f"{self.main.var_dict[var_key].get_display()}:", None, self.main.var_dict[var_key].options, None, existing_var=self.main.var_dict[var_key].tkvar)
+        else:
+            for var_key, var_data in variables.items():
+                if var_key in self.edit_vars_output:
+                    self.edit_vars_output[var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], self.edit_vars_inputs, f"{var_data['display']}:", None, var_data["options"], None, existing_var=self.edit_vars_output[var_key])
+                else:
+                    self.edit_vars_output[var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], self.edit_vars_inputs, f"{var_data['display']}:", var_data["initial"], var_data["options"], None)
 
         self.fill_grid(widgets_dict.values(), self.edit_vars_inputs)
 
@@ -992,7 +998,7 @@ class H_UI_M():
     def edit_confirm(self, exit_func, vars=[]):
         try:
             for var_key in vars:
-                self.main.var_dict[var_key].get()
+                self.edit_vars_output[var_key].get()
         except tk._tkinter.TclError:
             self.logger.error("Inputted wrong data type, please try again")
         else:

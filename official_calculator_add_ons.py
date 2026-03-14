@@ -91,6 +91,10 @@ def setup_repay_time(calculator):
 
 def basic_minion_loop(calculator):
     setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
+    cost_filter = calculator.huim.edit_vars_output["setup_cost_limit"].get()
+    if cost_filter == 0:
+        cost_filter = math.inf
+    markdown_output = calculator.huim.edit_vars_output["markdown_output"].get()
     calculated_setup_profits = {}
     calculated_setup_costs = {}
     loop_minion_options = list(md.minion_options.values())
@@ -119,8 +123,12 @@ def basic_minion_loop(calculator):
                 setup_data["upgrade1"] = "SUPER_COMPACTOR_3000"
         outputs = calculator.calculate(setup_data=setup_data, return_outputs=True)
 
-        calculated_setup_profits[loop_minion] = outputs["total_profit"]
-        calculated_setup_costs[loop_minion] = outputs["setupcost"]
+        if outputs["setupcost"] < cost_filter:
+            calculated_setup_profits[loop_minion] = outputs["total_profit"]
+            calculated_setup_costs[loop_minion] = outputs["setupcost"]
+    if len(calculated_setup_profits) == 0:
+        calculator.collect_addon_output("Basic Minion Loop", "No setups pass the cost filter")
+        return
     setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
     setup_data["used_pet_prices"] = outputs["used_pet_prices"]
     setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
@@ -139,14 +147,25 @@ def basic_minion_loop(calculator):
             },
             "used_pet_prices": None,
             "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
-            }, markdown=False, to_terminal=False)
-    output_str += "\nMinion: profit, setup cost"
+            }, markdown=markdown_output, to_terminal=False)
+    if markdown_output:
+        output_str += "\n```"
+    else:
+        output_str += "\n"
+    output_str += f"\nMinion: profit, setup cost (limit: {calculator.huim.reduced_number(cost_filter)})"
     for _ in range(10):
+        if len(calculated_setup_profits) == 0:
+            break
         top_minion = max(calculated_setup_profits, key=calculated_setup_profits.get)
         output_str += "\n" + md.calculator_data[top_minion]["display"] + ": " + calculator.huim.reduced_number(calculated_setup_profits[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion])
         del calculated_setup_profits[top_minion]
+    if markdown_output:
+        output_str += "\n```"
     output_str += "\n"
-    print(output_str)
+    if calculator.output_to_clipboard.get():
+        calculator.clipboard_clear()
+        calculator.clipboard_append(output_str)
+    calculator.huim.logger.info("\n" + output_str)
     calculator.collect_addon_output("Basic Minion Loop", "See terminal")
     return
 
@@ -157,18 +176,21 @@ def inferno_minion_loop(calculator):
     calculated_setup_bad_luck_profits = {}
     calculated_setup_costs = {}
 
-    cost_filter = 6000000000
-    # input the full number as filter, so no abbreviations like "6B"
-    # saving this file and restarting the calculator is needed to apply changes.
-    # will make this into a good working input in the GUI later.
-
+    cost_filter = calculator.huim.edit_vars_output["setup_cost_limit"].get()
+    if cost_filter == 0:
+        cost_filter = math.inf
+    minion_amount_limit = calculator.huim.edit_vars_output["amount_limit"].get()
+    if minion_amount_limit < 1:
+        calculator.collect_addon_output("Inferno Minion Loop", "Positive minion amount limit is required")
+        return
+    markdown_output = calculator.huim.edit_vars_output["markdown_output"].get()
     setup_data["minion"] = "INFERNO_MINION"
     setup_data["fuel"] = "INFERNO_FUEL"
     setup_data["chest"] = "XXLARGE_ENCHANTED_CHEST"
     setup_data["rising_celsius_override"] = True
 
     loop_tiers = range(1, 12)
-    loop_amounts = range(1, 33)
+    loop_amounts = range(1, minion_amount_limit + 1)
     for loop_tier in loop_tiers:
         setup_data["miniontier"] = loop_tier
         for loop_amount in loop_amounts:
@@ -180,6 +202,9 @@ def inferno_minion_loop(calculator):
                 calculated_setup_costs[f"{loop_tier}, {loop_amount}"] = cost
                 calculated_setup_profits[f"{loop_tier}, {loop_amount}"] = outputs["total_profit"]
                 calculated_setup_bad_luck_profits[f"{loop_tier}, {loop_amount}"] = bad_luck_profit
+    if len(calculated_setup_bad_luck_profits) == 0:
+        calculator.collect_addon_output("Inferno Minion Loop", "No setups pass the cost filter")
+        return
     setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
     setup_data["used_pet_prices"] = outputs["used_pet_prices"]
     setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
@@ -197,17 +222,35 @@ def inferno_minion_loop(calculator):
             },
             "used_pet_prices": None,
             "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
-            }, markdown=False, to_terminal=False)
-    output_str += "\nTier, Amount: bad luck profit, minion cost, true average profit"
+            }, markdown=markdown_output, to_terminal=False)
+    if markdown_output:
+        output_str += "\n```"
+    else:
+        output_str += "\n"
+    output_str += f"\nTier, Amount (limit: {calculator.huim.reduced_number(minion_amount_limit)}): bad luck profit, setup cost (limit: {calculator.huim.reduced_number(cost_filter)}), true average profit"
     for _ in range(10):
+        if len(calculated_setup_bad_luck_profits) == 0:
+            break
         top_minion = max(calculated_setup_bad_luck_profits, key=calculated_setup_bad_luck_profits.get)
         output_str += "\n" + top_minion + ": " + calculator.huim.reduced_number(calculated_setup_bad_luck_profits[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_profits[top_minion])
         del calculated_setup_bad_luck_profits[top_minion]
+    if markdown_output:
+        output_str += "\n```"
     output_str += "\n"
-    print(output_str)
+    if calculator.output_to_clipboard.get():
+        calculator.clipboard_clear()
+        calculator.clipboard_append(output_str)
+    calculator.huim.logger.info("\n" + output_str)
     calculator.collect_addon_output("Inferno Minion Loop", "See terminal")
     return
 
+def basic_minion_loop_inputs(calculator):
+    calculator.huim.edit_vars(lambda: basic_minion_loop(calculator), {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, False)
+    return
+
+def inferno_minion_loop_inputs(calculator):
+    calculator.huim.edit_vars(lambda: inferno_minion_loop(calculator), {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, False)
+    return
 
 def craft_material_amount(calculator):
     setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])
@@ -220,6 +263,6 @@ def craft_material_amount(calculator):
     return
 
 
-add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop}
+add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop_inputs, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop_inputs}
 # "Old Corrupted Frags": old_corrupted_frags
 # "Old Enchanted Hopper": old_enchanted_hopper
