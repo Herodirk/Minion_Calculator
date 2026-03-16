@@ -701,6 +701,25 @@ class H_UI_M():
                 self.main.var_dict[var_key].set(outputs[var_key])
         return
 
+    def check_json(self, file, default):
+        if not file.is_file():
+            self.write_json(file, default)
+        return
+
+    def write_json(self, file, json_object):
+        try:
+            file.write_text(json.dumps(json_object, indent=4, sort_keys=True), encoding="utf-8")
+        except Exception:
+            self.logger.error(f"Failed to write to {file.name}")
+        return
+
+    def read_json(self, file):
+        try:
+            data = json.loads(file.read_text())
+        except Exception:
+            data = {}
+        return data
+
     ### Data editing
 
     def reduced_number(self, number, decimal=2):

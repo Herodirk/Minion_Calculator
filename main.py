@@ -142,24 +142,6 @@ templateList = {
     }
 }
 
-# All pets are assumed to be Legendary or Mythic, except Rift Ferret, which is stuck at Epic.
-# min is for the price of a level 1, max is for the price of a max lvl (either 100 or 200).
-# make sure that any pets you add have the ID spelt the same as in md.calculator_data
-# The date of the price and possible notes is behind each pet.
-pet_costs = {
-    "NONE": {"min": 1, "max": 1},
-    "PET_CUSTOM_PET": {"min": 0, "max": 20000000},
-    "PET_GOLDEN_DRAGON": {"min": 610000000, "max": 800000000},  # 2025-8-31
-    "PET_JADE_DRAGON": {"min": 580000000, "max": 720000000},  # 2025-8-31
-    "PET_ROSE_DRAGON": {"min": 650000000, "max": 1150000000},  # 2026-1-31
-    "PET_ROSE_DRAGON_EGG": {"min": 650000000, "max": 740000000},  # 2026-1-31
-    "PET_BLACK_CAT": {"min": 40000000, "max": 62000000},  # 2025-8-31 (both buy and sell as legendary)
-    "PET_ELEPHANT": {"min": 23000000, "max": 30000000},  # 2025-8-31
-    "PET_MOOSHROOM_COW": {"min": 8000000, "max": 20000000},  # 2025-8-31
-    "PET_SLUG": {"min": 5000000, "max": 32000000},  # 2025-8-31
-    "PET_HEDGEHOG": {"min": 8000000, "max": 30000000},  # 2025-8-31
-    "PET_ENDERMAN": {"min": 44000000, "max": 69000000},  # 2025-8-31 (buy as legendary lvl 1, sell as mythic lvl 100)
-}
 
 # and the custom prices in calculator data (see HSB_minion_data.py)
 
@@ -188,7 +170,7 @@ class Calculator(tk.Tk):
             found_settings = json.loads(self.settings_file.read_text())
         except Exception:
             found_settings = {}
-        setting_load_errors = []
+        setting_load_errors = []  # queue errors as HUIM is not defined yet
         for setting in self.default_settings.keys():
             if setting not in found_settings:
                 setting_load_errors.append(setting)
@@ -298,6 +280,7 @@ class Calculator(tk.Tk):
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
         self.scaled_time_unit = HPM.Hvar(self.huim, key="scaled_time_unit", vtype="input", dtype=str, display="Scaled Time unit", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
+        self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"min": 1, "max": 1, "last_updated": 0}}, )
         self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True, tags=["item_ID_to_display"])
 
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -590,6 +573,17 @@ class Calculator(tk.Tk):
         self.init_prices()
         self.huim.logger.debug("Updated NPC prices")
         self.update_prices(cooldown_warning=False, in_gui=True)
+
+        # Calculator Data locations
+        self.calculator_data_files = {
+            "pet_costs": pathlib.Path("calculator_instance_data/pet_costs.json"),
+            # "custom_inputs": pathlib.Path("calculator_instance_data/custom_inputs.json")
+            # "custom_prices": pathlib.Path("calculator_instance_data/custom_prices.json")
+        }
+        for var_key, data_file in self.calculator_data_files.items():
+            self.huim.check_json(data_file, self.var_dict[var_key].initial)
+            self.var_dict[var_key].list.update(self.huim.read_json(data_file))
+        self.huim.logger.debug("Calculator Data loaded")
         self.huim.logger.info("Ready")
         return
 
@@ -1175,6 +1169,7 @@ class Calculator(tk.Tk):
         secondsPaction = base_speed / (1 + speed_boost / 100)
         if minion_fuel_id == "INFERNO_FUEL":
             secondsPaction /= 1 + md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
+        secondsPaction = round(secondsPaction * 20) / 20
         return secondsPaction
 
     def get_time_constants(self, seconds_per_action, actions_per_harvest, setup_data):
@@ -1751,13 +1746,13 @@ class Calculator(tk.Tk):
         for pet_slot, pet_info in setup_pets.items():
             pets_levelled = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
             setup_pets[pet_slot]["levelled_pets"] = pets_levelled
-            if pet_info["pet"] not in pet_costs:
+            if pet_info["pet"] not in self.pet_costs.list:
                 if pet_info["pet"] not in pet_prices:
                     pet_prices[pet_info["pet"]] = f"Price for {md.calculator_data[pet_info['pet']]["display"]} not found"
             else:
-                pet_profit += pets_levelled * (pet_costs[pet_info["pet"]]["max"] - pet_costs[pet_info["pet"]]["min"])
+                pet_profit += pets_levelled * (self.pet_costs.list[pet_info["pet"]]["max"] - self.pet_costs.list[pet_info["pet"]]["min"])
                 if pet_info["pet"] not in pet_prices:
-                    pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(pet_costs[pet_info["pet"]]["min"])} - {self.huim.reduced_number(pet_costs[pet_info["pet"]]["max"])}"
+                    pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["max"])}"
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "NONE":
                 pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
@@ -1944,13 +1939,15 @@ class Calculator(tk.Tk):
             self.statusC.configure(bg="yellow")
             self.statusC.update()
 
-        # auto update bazaar
-        if self.API_auto_update.get():
-            self.update_prices(cooldown_warning=False, in_gui=inGUI)
-
         # Get inputs if none are given
         if setup_data is None:
             setup_data = self.huim.get_from_GUI(self.ID_order)
+
+        # auto update bazaar
+        if self.API_auto_update.get():
+            self.update_prices(cooldown_warning=False, in_gui=inGUI)
+            for pet_ID in [setup_data["levelingpet"], setup_data["expsharepet"], setup_data["expsharepetslot2"], setup_data["expsharepetslot3"]]:
+                self.update_pet_price(pet_ID)
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -2199,7 +2196,7 @@ class Calculator(tk.Tk):
         None.
 
         """
-        raw_auction_data = self.huim.call_API(r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin", "SkyCofl AH API", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
+        raw_auction_data = self.huim.call_API(r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin", f"SkyCofl AH BIN API: {item_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
         return (raw_auction_data["lowest"] + raw_auction_data["secondLowest"]) / 2
 
     def update_recipe_price(self, item_id):
@@ -2254,6 +2251,62 @@ class Calculator(tk.Tk):
         if in_gui is True:
             self.statusC.configure(bg=background_color_storage)
             self.statusC.update()
+        return
+
+    def update_pet_price(self, pet_ID):
+        """
+        API call to SkyCofl to update Auction House price of the given pet.
+        First calls to BIN, and takes the average of the two lowest.
+        If there are less than 2 BIN auctions active it falls back to the average of the last 2 days.
+        If no price is found, it will keep the old price.
+        Repeated for both minimum and maximum pet level.
+        Both minimum and maximum have to be found for a new pet to be added to memory.
+
+        AH data from https://sky.coflnet.com/data
+        
+        :param pet_ID: str, pet ID as seen in calculator data
+        """
+        if pet_ID == "NONE":
+            return
+        if pet_ID in self.pet_costs.list and time.time() - self.pet_costs.list[pet_ID]["last_updated"] < 1800:  # possibly make cooldown into setting
+            self.huim.logger.debug(f"{pet_ID} price update is on cooldown")
+            return
+        # make rarity options into md.rarity_options for the rarity intput, also remove Dragon rarity and make it a tag
+        rarity_options = { "Common": "COMMON", "Uncommon": "UNCOMMON", "Rare": "RARE", "Epic": "EPIC", "Legendary": "LEGENDARY", "Mythic": "MYTHIC", "Dragon": "LEGENDARY" }
+        level_ranges = { "min": "1", "max": "100" }
+        api_end_point = r"https://sky.coflnet.com/api/item/price/"
+        if pet_ID in ["PET_ROSE_DRAGON_EGG", "PET_JADE_DRAGON_EGG", "PET_GOLDEN_DRAGON_EGG"]:
+            # change the dragon pets to "dragon egg" tag so the rarity can be normal, and to automatically remove _EGG from the ID
+            api_pet_id = { "PET_ROSE_DRAGON_EGG": "PET_ROSE_DRAGON", "PET_JADE_DRAGON_EGG": "PET_JADE_DRAGON", "PET_GOLDEN_DRAGON_EGG": "PET_GOLDEN_DRAGON" }[pet_ID]
+            level_ranges["max"] = "100-103"
+        else:
+            api_pet_id = pet_ID
+        if pet_ID in ["PET_ROSE_DRAGON", "PET_JADE_DRAGON", "PET_GOLDEN_DRAGON"]:
+            # change the dragon pets to "dragon" tag so the rarity can be normal
+            level_ranges["max"] = "200"
+        api_bin = r"/bin"
+        api_static_filters = r"?filters[Rarity]=" + rarity_options[md.calculator_data[pet_ID]["rarity"]] + r"&filters[Candy]=0&filters[PetLevel]="
+        results = {"min": 0, "max": 0}
+        for level_type, level_range in level_ranges.items():
+            raw_auction_data = self.huim.call_API(api_end_point + api_pet_id + api_bin + api_static_filters + level_range, f"SkyCofl pet AH BIN API: {api_pet_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
+            lowest_price = raw_auction_data["lowest"]
+            second_lowest_price = raw_auction_data["secondLowest"]
+            if lowest_price == 0 or second_lowest_price == 0:
+                # fall back to average of last 2 days if not enough BINs are found
+                results[level_type] = self.huim.call_API(api_end_point + api_pet_id + api_static_filters + level_range, f"SkyCofl pet AH API: {api_pet_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})["mean"]
+            else:
+                results[level_type] = (lowest_price + second_lowest_price) / 2
+        if pet_ID not in self.pet_costs.list:
+            # non-zero min and max is required for new entry
+            if results["min"] != 0 and results["max"] != 0:
+                self.pet_costs.list[pet_ID] = { "min": 0, "max": 0, "last_updated": 0 }
+            else:
+                return
+        if results["min"] != 0:
+            self.pet_costs.list[pet_ID]["min"] = results["min"]
+        if results["max"] != 0:
+            self.pet_costs.list[pet_ID]["max"] = results["max"]
+        self.pet_costs.list[pet_ID]["last_updated"] = time.time()
         return
 
     def update_listboxes(self):
@@ -2316,7 +2369,10 @@ class Calculator(tk.Tk):
                 saving_settings[setting] = self.winfo_height()
             elif setting == "window_width":
                 saving_settings[setting] = self.winfo_width()
-        self.settings_file.write_text(json.dumps(saving_settings, indent=4, sort_keys=True), encoding="utf-8")
+        self.huim.write_json(self.settings_file, saving_settings)
+
+        for var_key, data_file in self.calculator_data_files.items():
+            self.huim.write_json(data_file, self.var_dict[var_key].list)
         return
 
 #%% main loop
