@@ -156,6 +156,7 @@ class Calculator(tk.Tk):
         self.default_settings = {
             "API_auto_update": True,
             "API_cooldown": 120,
+            "pet_API_cooldown": 1800,
             "compact_tolerance": 10000,
             "output_to_clipboard": True,
             "debug_mode": False,
@@ -191,6 +192,7 @@ class Calculator(tk.Tk):
         # Define variables
         self.API_auto_update = HPM.Hvar(self.huim, key="API_auto_update", vtype="storage", dtype=bool, display="API Auto Update", initial=found_settings["API_auto_update"])
         self.API_cooldown = HPM.Hvar(self.huim, key="API_cooldown", vtype="storage", dtype=int, display="API Cooldown (s)", initial=found_settings["API_cooldown"])
+        self.pet_API_cooldown = HPM.Hvar(self.huim, key="pet_API_cooldown", vtype="storage", dtype=int, display="Pet API Cooldown (s)", initial=found_settings["pet_API_cooldown"])
         self.compact_tolerance = HPM.Hvar(self.huim, key="compact_tolerance", vtype="storage", dtype=int, display="Over-compacting (coin)", initial=found_settings["compact_tolerance"])
         self.output_to_clipboard = HPM.Hvar(self.huim, key="output_to_clipboard", vtype="storage", dtype=bool, display="Output to Clipboard", initial=found_settings["output_to_clipboard"])
         self.debug_mode = HPM.Hvar(self.huim, key="debug_mode", vtype="storage", dtype=bool, display="Debug Mode", initial=found_settings["debug_mode"])
@@ -306,7 +308,7 @@ class Calculator(tk.Tk):
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
         self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
-        self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars(self.edit_settings, ["API_auto_update", "API_cooldown", "compact_tolerance", "output_to_clipboard", "debug_mode", "color_palette"], True))
+        self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars(self.edit_settings, ["API_auto_update", "API_cooldown", "pet_API_cooldown", "compact_tolerance", "output_to_clipboard", "debug_mode", "color_palette"], True))
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
         controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB, self.settingsB]
@@ -1608,7 +1610,7 @@ class Calculator(tk.Tk):
         Parameters
         ----------
         pet : str
-            Pet for the calculation, must be a pet from pet_data.
+            Pet for the calculation, must be a pet from calculator data.
         xp_type : str
             Type of skill XP.
         setup_data : dict
@@ -1633,7 +1635,7 @@ class Calculator(tk.Tk):
         if exp_share:
             return non_matching
         petxpbonus = (1 + setup_data["taming"] / 100) * (1 + setup_data["beastmaster"] / 100) * non_matching
-        if md.calculator_data[setup_data["petxpboost"]]["exp_boost_type"] in [xp_type, "all"]:
+        if md.calculator_data[setup_data["petxpboost"]]["exp_boost_type"] in [xp_type, "all"] and not md.has_data_tag(pet, "dragon_egg_pet"):
             pet_item = 1 + md.calculator_data[setup_data["petxpboost"]]["exp_boost_amount"] / 100
         else:
             pet_item = 1
@@ -1692,7 +1694,7 @@ class Calculator(tk.Tk):
         """
         Get total profit from pet levelling\n
         Pet levelling calculations: https://wiki.hypixel.net/Pets#Leveling,\n
-        for Golden Dragon: special algorithm taking into account that pet items cannot be applied to Golden Dragon Eggs,\n
+        for Dragon pets: special algorithm taking into account that pet items cannot be applied to Dragon Eggs,\n
         the pet costs are manually added in pet_data
         
         :param skill_xp: dict, gained skill xp per type
@@ -1713,7 +1715,7 @@ class Calculator(tk.Tk):
             setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
         pet_prices = {}
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
-        if "Dragon" in md.calculator_data[main_pet]["rarity"]:
+        if md.has_data_tag(main_pet, "dragon_pet"):
             left_over_pet_xp = 0.0
             for skill, amount in skill_xp.items():
                 pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
@@ -1728,7 +1730,7 @@ class Calculator(tk.Tk):
             if pet_slot == "levelingpet":
                 continue
             exp_share_pet = pet_info["pet"]
-            if "Dragon" in md.calculator_data[exp_share_pet]["rarity"]:
+            if md.has_data_tag(exp_share_pet, "dragon_pet"):
                 if exp_share_boost == 0:
                     continue
                 left_over_pet_xp = 0.0
@@ -1741,11 +1743,15 @@ class Calculator(tk.Tk):
             else:
                 for skill, amount in main_pet_xp.items():
                     non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
-                    pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item) / 100) * non_matching
+                    pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching
         super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
         for pet_slot, pet_info in setup_pets.items():
-            pets_levelled = sum(pet_info["pet_xp"].values()) / md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
-            setup_pets[pet_slot]["levelled_pets"] = pets_levelled
+            if md.has_data_tag(pet_info["pet"], "dragon_pet"):
+                max_lvl_pet_xp = md.max_lvl_pet_xp_amounts["Dragon"]
+            else:
+                max_lvl_pet_xp = md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
+            pets_levelled = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
+            pet_info["levelled_pets"] = pets_levelled
             if pet_info["pet"] not in self.pet_costs.list:
                 if pet_info["pet"] not in pet_prices:
                     pet_prices[pet_info["pet"]] = f"Price for {md.calculator_data[pet_info['pet']]["display"]} not found"
@@ -1753,6 +1759,8 @@ class Calculator(tk.Tk):
                 pet_profit += pets_levelled * (self.pet_costs.list[pet_info["pet"]]["max"] - self.pet_costs.list[pet_info["pet"]]["min"])
                 if pet_info["pet"] not in pet_prices:
                     pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["max"])}"
+            if md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
+                continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "NONE":
                 pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
@@ -1903,6 +1911,8 @@ class Calculator(tk.Tk):
 
         # Pet Item costs
         for pet_slot in setup_pets.keys():
+            if md.has_data_tag(setup_pets[pet_slot]["pet"], "dragon_egg_pet"):
+                continue
             if pet_slot == "levelingpet":
                 cost_per_part["petxpboost"] = self.get_price(setup_data["petxpboost"], setup_data, "buy", "custom", True)
             elif setup_data["expshareitem"]:
@@ -1943,11 +1953,14 @@ class Calculator(tk.Tk):
         if setup_data is None:
             setup_data = self.huim.get_from_GUI(self.ID_order)
 
-        # auto update bazaar
+        # auto update API
         if self.API_auto_update.get():
             self.update_prices(cooldown_warning=False, in_gui=inGUI)
             for pet_ID in [setup_data["levelingpet"], setup_data["expsharepet"], setup_data["expsharepetslot2"], setup_data["expsharepetslot3"]]:
                 self.update_pet_price(pet_ID)
+            if md.has_data_tag(setup_data["petxpboost"], "auction_price_upon_request") and (time.time() - md.calculator_data[setup_data["petxpboost"]]["price_last_updated"] > self.API_cooldown.get()):
+                md.calculator_data[setup_data["petxpboost"]]["prices"]["custom"] = self.call_auction_house(setup_data["petxpboost"])
+                md.calculator_data[setup_data["petxpboost"]]["price_last_updated"] = time.time()
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -2128,8 +2141,10 @@ class Calculator(tk.Tk):
                 self.bazaar_items.append(item_id)
             elif "recipe" in md.calculator_data[item_id]:
                 self.recipe_items.append(item_id)
-            elif "AH" in md.calculator_data[item_id] and md.calculator_data[item_id]["AH"]:
+            elif md.has_data_tag(item_id, "auction_price"):
                 self.AH_items.append(item_id)
+            elif md.has_data_tag(item_id, "auction_price_upon_request"):
+                md.calculator_data[item_id]["price_last_updated"] = 0
         return  
 
 
@@ -2218,7 +2233,7 @@ class Calculator(tk.Tk):
         md.calculator_data[item_id]["prices"]["buyPrice"] = 0
         md.calculator_data[item_id]["prices"]["sellPrice"] = 0
         for material_id, amount in md.calculator_data[item_id]["recipe"].items():
-            if "AH" in md.calculator_data[material_id]:
+            if md.has_data_tag(material_id, "auction_price"):
                 md.calculator_data[item_id]["prices"]["buyPrice"] += amount * md.calculator_data[material_id]["prices"]["custom"]
                 md.calculator_data[item_id]["prices"]["sellPrice"] += amount * md.calculator_data[material_id]["prices"]["custom"]
                 continue
@@ -2268,21 +2283,18 @@ class Calculator(tk.Tk):
         """
         if pet_ID == "NONE":
             return
-        if pet_ID in self.pet_costs.list and time.time() - self.pet_costs.list[pet_ID]["last_updated"] < 1800:  # possibly make cooldown into setting
+        if pet_ID in self.pet_costs.list and time.time() - self.pet_costs.list[pet_ID]["last_updated"] < self.pet_API_cooldown.get():
             self.huim.logger.debug(f"{pet_ID} price update is on cooldown")
             return
-        # make rarity options into md.rarity_options for the rarity intput, also remove Dragon rarity and make it a tag
-        rarity_options = { "Common": "COMMON", "Uncommon": "UNCOMMON", "Rare": "RARE", "Epic": "EPIC", "Legendary": "LEGENDARY", "Mythic": "MYTHIC", "Dragon": "LEGENDARY" }
+        rarity_options = { "Common": "COMMON", "Uncommon": "UNCOMMON", "Rare": "RARE", "Epic": "EPIC", "Legendary": "LEGENDARY", "Mythic": "MYTHIC"}
         level_ranges = { "min": "1", "max": "100" }
         api_end_point = r"https://sky.coflnet.com/api/item/price/"
-        if pet_ID in ["PET_ROSE_DRAGON_EGG", "PET_JADE_DRAGON_EGG", "PET_GOLDEN_DRAGON_EGG"]:
-            # change the dragon pets to "dragon egg" tag so the rarity can be normal, and to automatically remove _EGG from the ID
-            api_pet_id = { "PET_ROSE_DRAGON_EGG": "PET_ROSE_DRAGON", "PET_JADE_DRAGON_EGG": "PET_JADE_DRAGON", "PET_GOLDEN_DRAGON_EGG": "PET_GOLDEN_DRAGON" }[pet_ID]
+        if md.has_data_tag(pet_ID, "dragon_egg_pet"):
+            api_pet_id = pet_ID.removesuffix("_EGG")
             level_ranges["max"] = "100-103"
         else:
             api_pet_id = pet_ID
-        if pet_ID in ["PET_ROSE_DRAGON", "PET_JADE_DRAGON", "PET_GOLDEN_DRAGON"]:
-            # change the dragon pets to "dragon" tag so the rarity can be normal
+        if md.has_data_tag(pet_ID, "dragon_pet"):
             level_ranges["max"] = "200"
         api_bin = r"/bin"
         api_static_filters = r"?filters[Rarity]=" + rarity_options[md.calculator_data[pet_ID]["rarity"]] + r"&filters[Candy]=0&filters[PetLevel]="
