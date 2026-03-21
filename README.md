@@ -7,18 +7,18 @@ Notable features:<br>
 | Near infinite customizable setup<br>
 | Corrupt soil calculations<br>
 | Inferno minions calculations<br>
+| Live prices thought Hypixel's and SkyCofl's API<br>
 | Pet leveling with exp share calculations<br>
 | Setup cost calculations<br>
 Visit https://herodirk.github.io/ for an online manual.<br>
 To start the calculator: run the file `main.py` with a local python interpreter
 
 Bazaar and NPC price data from https://api.hypixel.net<br>
-AH data from https://sky.coflnet.com/data (currently only Postcard)
+AH data from https://sky.coflnet.com/data
 
 Current major limitations:<br>
 | inaccurate averages for Cactus and Sugar Cane minion while AFKing<br>
 | Inferno drop chances might be inaccurate<br>
-| Pet prices have to be updated manually<br>
 | Unconfirmed average wool amount from Enchanted Shears<br>
 | +/- spawn actions: Hypixel takes harvests from offline calculation to fill empty spawning spaces when loading the island, this calculator does not account for that<br>
 | Not entirely bazaar manipulation proof<br>

@@ -262,7 +262,108 @@ def craft_material_amount(calculator):
     calculator.collect_addon_output("Minion Crafting Materials", materials_string)
     return
 
+def dragon_pet_xp(gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
+        """
+        Calculates the pet xp gain on the dragon pets.
 
-add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop_inputs, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop_inputs}
+        Parameters
+        ----------
+        gained_xp : float
+            Gained skill xp of a specific type.
+        left_over_pet_xp : float
+            Left over pet xp on the pet before applying the gained skill xp.
+        pet_xp_boost : float
+            Combined pet xp boost multiplier without pet item.
+        xp_boost_pet_item : float
+            Pet xp boost multiplier from pet item.
+
+        Returns
+        -------
+        gained_pet_xp : float
+            Amount of pet xp gained after applying the gained skill xp.
+        left_over_pet_xp : float
+            Left over pet xp on the pet after applying the gained skill xp.
+
+        """
+        drag_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
+        drag_lvl_200 = md.max_lvl_pet_xp_amounts["Dragon"]
+        gained_pet_xp = 0.0
+        skill_xp_per_pet = (drag_lvl_200 + drag_lvl_100 * (xp_boost_pet_item - 1)) / (xp_boost_pet_item * pet_xp_boost)
+        gained_pet_xp = - left_over_pet_xp
+        if left_over_pet_xp <= drag_lvl_100:
+            gained_xp += left_over_pet_xp / pet_xp_boost
+        else:
+            gained_xp += (left_over_pet_xp + drag_lvl_100 * (xp_boost_pet_item - 1)) / (pet_xp_boost * xp_boost_pet_item)
+        gained_pet_xp += (gained_xp // skill_xp_per_pet) * drag_lvl_200
+        left_over_xp = gained_xp % skill_xp_per_pet
+        if left_over_xp <= drag_lvl_100 / pet_xp_boost:
+            left_over_pet_xp = left_over_xp * pet_xp_boost
+        else:
+            left_over_pet_xp = left_over_xp * pet_xp_boost * xp_boost_pet_item + drag_lvl_100 * (1 - xp_boost_pet_item)
+        gained_pet_xp += left_over_pet_xp
+        return gained_pet_xp, left_over_pet_xp
+
+def exact_pet_levelling_inputs(calculator):
+    setup_data = calculator.huim.get_from_GUI(["mayor", "levelingpet", "expsharepet", "expsharepetslot2", "expsharepetslot3"])
+    if setup_data["levelingpet"] == "NONE":
+        calculator.collect_addon_output("Exact Pet Levelling", "No pet levelling active")
+        return
+    setup_pets = { "levelingpet": { "pet": setup_data["levelingpet"], "pet_xp": {}, "levelled_pets": 0.0 } }
+    for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
+        if setup_data[var_key] == "NONE" or (setup_data["mayor"] != "MAYOR_DIANA" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
+            continue
+        setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
+    input_variables = {}
+    for pet_slot, pet_info in setup_pets.items():
+        input_variables[pet_slot + "_starting_pet_xp"] = {"dtype": float, "display": md.calculator_data[pet_info["pet"]]["display"] + " pet xp", "initial": 0, "options": None}
+    calculator.huim.edit_vars(lambda pet_data=setup_pets: exact_pet_levelling(calculator, pet_data), input_variables, False)
+    return
+
+def exact_pet_levelling(calculator, setup_pets):
+    setup_data = calculator.huim.get_from_GUI(["mayor", "xp", "taming", "toucan_attribute", "expshareitem", "petxpboost", "beastmaster", "falcon_attribute", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper"])
+    skill_xp = setup_data["xp"]
+    main_pet = setup_pets["levelingpet"]["pet"]
+    main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
+    if md.has_data_tag(main_pet, "dragon_pet"):
+        left_over_pet_xp = calculator.huim.edit_vars_output["levelingpet_starting_pet_xp"].get()
+        for skill, amount in skill_xp.items():
+            pet_xp_boost, xp_boost_pet_item = calculator.get_pet_xp_boosts(main_pet, skill, setup_data)
+            main_pet_xp[skill], left_over_pet_xp = dragon_pet_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
+    else:
+        for skill, amount in skill_xp.items():
+            pet_xp_boost, xp_boost_pet_item = calculator.get_pet_xp_boosts(main_pet, skill, setup_data)
+            main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
+    exp_share_boost = 0.2 * setup_data["taming"] + 10 * (setup_data["mayor"] == "MAYOR_DIANA") + setup_data["toucan_attribute"]
+    exp_share_item = 15 * setup_data["expshareitem"]
+    for pet_slot, pet_info in setup_pets.items():
+        if pet_slot == "levelingpet":
+            continue
+        exp_share_pet = pet_info["pet"]
+        if md.has_data_tag(exp_share_pet, "dragon_pet"):
+            if exp_share_boost == 0:
+                continue
+            left_over_pet_xp = calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get()
+            for skill, amount in main_pet_xp.items():
+                non_matching = calculator.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
+                equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
+                equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
+                gained_pet_xp, left_over_pet_xp = dragon_pet_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
+                pet_info["pet_xp"]["exp_share"] += gained_pet_xp
+        else:
+            for skill, amount in main_pet_xp.items():
+                non_matching = calculator.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
+                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching
+    for pet_slot, pet_info in setup_pets.items():
+        if md.has_data_tag(pet_info["pet"], "dragon_pet"):
+            max_lvl_pet_xp = md.max_lvl_pet_xp_amounts["Dragon"]
+        else:
+            max_lvl_pet_xp = md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
+        pets_levelled = (calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get() + sum(pet_info["pet_xp"].values())) / max_lvl_pet_xp
+        pet_info["levelled_pets"] = pets_levelled
+    output_string = ", ".join([f"{calculator.huim.reduced_number(pet_info['levelled_pets'], 4)} {md.calculator_data[pet_info["pet"]]["display"]}" for pet_info in setup_pets.values()])
+    calculator.collect_addon_output("Exact Pet Levelling", output_string)
+    return
+
+add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop_inputs, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop_inputs, "Exact Pet Levelling": exact_pet_levelling_inputs}
 # "Old Corrupted Frags": old_corrupted_frags
 # "Old Enchanted Hopper": old_enchanted_hopper

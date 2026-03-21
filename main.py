@@ -1649,123 +1649,93 @@ class Calculator(tk.Tk):
             petxpbonus *= (1 + setup_data["falcon_attribute"] / 100)
         return petxpbonus, pet_item
 
-    def dragon_xp(self, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
+    def get_pets_levelled(self, skill_xp, mayor, setup_data):
         """
-        Calculates the pet xp gain on the dragon pets.
-
-        Parameters
-        ----------
-        gained_xp : float
-            Gained skill xp of a specific type.
-        left_over_pet_xp : float
-            Left over pet xp on the pet before applying the gained skill xp.
-        pet_xp_boost : float
-            Combined pet xp boost multiplier without pet item.
-        xp_boost_pet_item : float
-            Pet xp boost multiplier from pet item.
-
-        Returns
-        -------
-        gained_pet_xp : float
-            Amount of pet xp gained after applying the gained skill xp.
-        left_over_pet_xp : float
-            Left over pet xp on the pet after applying the gained skill xp.
-
-        """
-        drag_lvl_100 = 25353230
-        drag_lvl_200 = 210255385
-        gained_pet_xp = 0.0
-        skill_xp_per_pet = (drag_lvl_200 + drag_lvl_100 * (xp_boost_pet_item - 1)) / (xp_boost_pet_item * pet_xp_boost)
-        gained_pet_xp = - left_over_pet_xp
-        if left_over_pet_xp <= drag_lvl_100:
-            gained_xp += left_over_pet_xp / pet_xp_boost
-        else:
-            gained_xp += (left_over_pet_xp + drag_lvl_100 * (xp_boost_pet_item - 1)) / (pet_xp_boost * xp_boost_pet_item)
-        gained_pet_xp += (gained_xp // skill_xp_per_pet) * drag_lvl_200
-        left_over_xp = gained_xp % skill_xp_per_pet
-        if left_over_xp <= drag_lvl_100 / pet_xp_boost:
-            left_over_pet_xp = left_over_xp * pet_xp_boost
-        else:
-            left_over_pet_xp = left_over_xp * pet_xp_boost * xp_boost_pet_item + drag_lvl_100 * (1 - xp_boost_pet_item)
-        gained_pet_xp += left_over_pet_xp
-        return gained_pet_xp, left_over_pet_xp
-
-    def get_pet_profit(self, skill_xp, mayor, setup_data):
-        """
-        Get total profit from pet levelling\n
         Pet levelling calculations: https://wiki.hypixel.net/Pets#Leveling,\n
-        for Dragon pets: special algorithm taking into account that pet items cannot be applied to Dragon Eggs,\n
-        the pet costs are manually added in pet_data
-        
+        for Dragon pets: an extra multiplier to take that pet items cannot be applied to Dragon Eggs into account,\n
+        this gives an average amount of pets levelled, for exact amounts, use the add-on Exact Pet Levelling.\n
+        Decimal amounts of levelled pets is the fraction of total pet xp for max level, not pet level.
+
         :param skill_xp: dict, gained skill xp per type
         :param mayor: str, mayor
-        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost, setup data for self.get_price and for self.get_pet_xp_boosts
-        :return pet_profit: float, total profit from pets
-        :return setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets
-        :return pet_prices: dict, pet name as key, string as value with lvl 1 price and max lvl price 
+        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, petxpboost, beastmaster, setup data for self.get_price
+        :return setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets        
         """
-        pet_profit = 0.0
         main_pet = setup_data["levelingpet"]
         if main_pet == "NONE":
-            return 0, {}, {}
+            return {}
+
+        # Creating setup_pets
         setup_pets = { "levelingpet": { "pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0 } }
         for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
             if setup_data[var_key] == "NONE" or (mayor != "MAYOR_DIANA" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
                 continue
             setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
-        pet_prices = {}
+
+        # Main pet
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
+        dragon_pet_multiplier = lambda pet_item: 1
+        dragon_pet_xp_lvl_200 = md.max_lvl_pet_xp_amounts["Dragon"]
         if md.has_data_tag(main_pet, "dragon_pet"):
-            left_over_pet_xp = 0.0
-            for skill, amount in skill_xp.items():
-                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
-                main_pet_xp[skill], left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
-        else:
-            for skill, amount in skill_xp.items():
-                pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
-                main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item
+            dragon_pet_xp_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
+            dragon_pet_multiplier = lambda pet_item: dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (pet_item - 1))
+        for skill, amount in skill_xp.items():
+            pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
+            main_pet_xp[skill] = amount * pet_xp_boost * xp_boost_pet_item * dragon_pet_multiplier(xp_boost_pet_item)
+
+        # Exp Share
         exp_share_boost = 0.2 * setup_data["taming"] + 10 * (mayor == "MAYOR_DIANA") + setup_data["toucan_attribute"]
         exp_share_item = 15 * setup_data["expshareitem"]
         for pet_slot, pet_info in setup_pets.items():
             if pet_slot == "levelingpet":
                 continue
             exp_share_pet = pet_info["pet"]
+            dragon_pet_multiplier = 1
             if md.has_data_tag(exp_share_pet, "dragon_pet"):
                 if exp_share_boost == 0:
                     continue
-                left_over_pet_xp = 0.0
-                for skill, amount in main_pet_xp.items():
-                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
-                    equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
-                    equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
-                    gained_pet_xp, left_over_pet_xp = self.dragon_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
-                    pet_info["pet_xp"]["exp_share"] += gained_pet_xp
-            else:
-                for skill, amount in main_pet_xp.items():
-                    non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
-                    pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching
-        super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
+                dragon_pet_xp_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
+                dragon_pet_multiplier = dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (exp_share_item / exp_share_boost))
+            for skill, amount in main_pet_xp.items():
+                non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
+                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching * dragon_pet_multiplier
+
+        # Calculate levelled pets
         for pet_slot, pet_info in setup_pets.items():
             if md.has_data_tag(pet_info["pet"], "dragon_pet"):
-                max_lvl_pet_xp = md.max_lvl_pet_xp_amounts["Dragon"]
+                max_lvl_pet_xp = dragon_pet_xp_lvl_200
             else:
                 max_lvl_pet_xp = md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
-            pets_levelled = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
-            pet_info["levelled_pets"] = pets_levelled
+            pet_info["levelled_pets"] = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
+        return setup_pets
+
+    def get_pet_profit(self, setup_pets, setup_data):
+        """
+        Get total profit from the levelled pets
+        
+        :param setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets
+        :param setup_data: needed setup data: expshareitem, petxpboost, setup data for self.get_price
+        :return pet_profit: float, total profit from pets
+        :return pet_prices: dict, pet name as key, string as value with lvl 1 price and max lvl price 
+        """
+        pet_profit = 0.0
+        pet_prices = {}
+        super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
+        for pet_slot, pet_info in setup_pets.items():
             if pet_info["pet"] not in self.pet_costs.list:
                 if pet_info["pet"] not in pet_prices:
                     pet_prices[pet_info["pet"]] = f"Price for {md.calculator_data[pet_info['pet']]["display"]} not found"
             else:
-                pet_profit += pets_levelled * (self.pet_costs.list[pet_info["pet"]]["max"] - self.pet_costs.list[pet_info["pet"]]["min"])
+                pet_profit += pet_info["levelled_pets"] * (self.pet_costs.list[pet_info["pet"]]["max"] - self.pet_costs.list[pet_info["pet"]]["min"])
                 if pet_info["pet"] not in pet_prices:
                     pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["max"])}"
             if md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["petxpboost"]) != "NONE":
-                pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
+                pet_profit -= pet_info["levelled_pets"] * (md.pet_item_scrub_cost[md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pets_levelled * (md.pet_item_scrub_cost[md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
-        return pet_profit, setup_pets, pet_prices
+                pet_profit -= pet_info["levelled_pets"] * (md.pet_item_scrub_cost[md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
+        return pet_profit, pet_prices
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
         """
@@ -2039,7 +2009,8 @@ class Calculator(tk.Tk):
         self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes, setup_data)
         
         # Pet leveling
-        pet_profit, setup_pets, pet_prices = self.get_pet_profit(skill_xp, mayor, setup_data)
+        setup_pets = self.get_pets_levelled(skill_xp, mayor, setup_data)
+        pet_profit, pet_prices = self.get_pet_profit(setup_pets, setup_data)
 
         # calculating beacon and limited fuel cost
         fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, empty_time_seconds, setup_data)
