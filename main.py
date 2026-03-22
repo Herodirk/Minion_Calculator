@@ -282,7 +282,7 @@ class Calculator(tk.Tk):
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
         self.scaled_time_unit = HPM.Hvar(self.huim, key="scaled_time_unit", vtype="input", dtype=str, display="Scaled Time unit", initial="Days", frame="inputs_player_grid", options=["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"])
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
-        self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"min": 1, "max": 1, "last_updated": 0}}, )
+        self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"min": 1, "max": 1, "last_updated": 0}})
         self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True, tags=["item_ID_to_display"])
 
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -514,7 +514,7 @@ class Calculator(tk.Tk):
         # list []: both the displays and the values of the variables will be outputted
         # tuple (): both displays and values are shown, the sub-header will be outputted in front of every variable
         self.standard_output_order = {
-            "### ": {"$": {"amount"}, "$x ": {"minion"}, "$ t": {"miniontier"}},
+            "### ": {"$": ["amount"], "$x ": ["minion"], "$ t": ["miniontier"]},
             "**Minion Upgrades**": {
                 "\n> Internal: ": {"fuel", "hopper", "upgrade1", "upgrade2"},
                 "\n> External: ": {"chest", "beacon", "crystal", "postcard"},
@@ -1197,7 +1197,7 @@ class Calculator(tk.Tk):
         timeratio = 1
         if setup_data["scale_time"]:
             scaled_time_seconds = self.huim.time_number(setup_data["scaled_time_unit"], setup_data["scaled_time_amount"], seconds_per_action * actions_per_harvest)
-            scaled_time_str = f"{setup_data["scaled_time_amount"]} {setup_data["scaled_time_unit"]}"
+            scaled_time_str = f"{self.huim.reduced_number(setup_data["scaled_time_amount"])} {setup_data["scaled_time_unit"]}"
             timeratio = scaled_time_seconds / empty_time_seconds
         return empty_time_seconds, timeratio, empty_time_str, scaled_time_str
 
