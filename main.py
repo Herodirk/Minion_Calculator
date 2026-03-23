@@ -1626,28 +1626,28 @@ class Calculator(tk.Tk):
             pet xp boost of pet item
 
         """
-        non_matching = 1
+        pet_xp_boost = 1
         if md.calculator_data[pet]["pet_type"] != "all" and md.calculator_data[pet]["pet_type"] != xp_type:
             if xp_type in ["alchemy", "enchanting"]:
-                non_matching = 1 / 12
+                pet_xp_boost = 1 / 12
             else:
-                non_matching = 1 / 3
+                pet_xp_boost = 1 / 3
+        if xp_type in ["mining", "fishing"]:
+            pet_xp_boost *= 1.5
         if exp_share:
-            return non_matching
-        petxpbonus = (1 + setup_data["taming"] / 100) * (1 + setup_data["beastmaster"] / 100) * non_matching
+            return pet_xp_boost
+        pet_xp_boost *= (1 + setup_data["taming"] / 100) * (1 + setup_data["beastmaster"] / 100)
         if md.calculator_data[setup_data["petxpboost"]]["exp_boost_type"] in [xp_type, "all"] and not md.has_data_tag(pet, "dragon_egg_pet"):
             pet_item = 1 + md.calculator_data[setup_data["petxpboost"]]["exp_boost_amount"] / 100
         else:
             pet_item = 1
         if setup_data["mayor"] == "MAYOR_DIANA":
-            petxpbonus *= 1.35
-        if xp_type in ["mining", "fishing"]:
-            petxpbonus *= 1.5
+            pet_xp_boost *= 1.35
         if pet == "PET_REINDEER":
-            petxpbonus *= 2
+            pet_xp_boost *= 2
         if xp_type in ["combat"] and setup_data["falcon_attribute"] != 0:
-            petxpbonus *= (1 + setup_data["falcon_attribute"] / 100)
-        return petxpbonus, pet_item
+            pet_xp_boost *= (1 + setup_data["falcon_attribute"] / 100)
+        return pet_xp_boost, pet_item
 
     def get_pets_levelled(self, skill_xp, mayor, setup_data):
         """
@@ -1697,8 +1697,8 @@ class Calculator(tk.Tk):
                 dragon_pet_xp_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
                 dragon_pet_multiplier = dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (exp_share_item / exp_share_boost))
             for skill, amount in main_pet_xp.items():
-                non_matching = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
-                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching * dragon_pet_multiplier
+                pet_xp_boost = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
+                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * pet_xp_boost * dragon_pet_multiplier
 
         # Calculate levelled pets
         for pet_slot, pet_info in setup_pets.items():
