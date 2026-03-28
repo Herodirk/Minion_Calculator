@@ -21,11 +21,6 @@ If that date is missing, it was confirmed by an old test and might need to be ch
 
 from copy import deepcopy
 
-#%% Bazaar Buy and Sell types:
-
-bazaar_buy_types = {"Buy Order": "sellPrice", "Insta Buy": "buyPrice", "Custom": "custom"}
-bazaar_sell_types = {"Sell Offer": "buyPrice", "Insta Sell": "sellPrice", "Custom": "custom"}
-
 #%% Smelter List:
 
 smelting_data = {
@@ -79,7 +74,7 @@ super_compactor_list = {
     'COBBLESTONE': { 'makes': 'ENCHANTED_COBBLESTONE', 'per': 160 },
     'OBSIDIAN': { 'makes': 'ENCHANTED_OBSIDIAN', 'per': 160 },
     'GLOWSTONE_DUST': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 160 },
-    'GLOWSTONE': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 40 },
+    'GLOWSTONE': { 'makes': 'ENCHANTED_GLOWSTONE_DUST', 'per': 40 },  # TODO: check if its not per 160 with amount 4
     'ENCHANTED_GLOWSTONE_DUST': { 'makes': 'ENCHANTED_GLOWSTONE', 'per': 160 },
     'FLINT': { 'makes': 'ENCHANTED_FLINT', 'per': 160 },
     'SAND': { 'makes': 'ENCHANTED_SAND', 'per': 160 },
@@ -93,8 +88,8 @@ super_compactor_list = {
     'ICE': { 'makes': 'ENCHANTED_ICE', 'per': 160 },
     'PACKED_ICE': { 'makes': 'ENCHANTED_ICE', 'amount': 9, 'per': 160 },
     'ENCHANTED_ICE': { 'makes': 'ENCHANTED_PACKED_ICE', 'per': 160 },
-    'SNOW_BALL': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 640 },
-    'SNOW_BLOCK': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 160 },
+    'SNOW_BALL': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 640 },  # TODO: check per and amount
+    'SNOW_BLOCK': { 'makes': 'ENCHANTED_SNOW_BLOCK', 'per': 160 },  # TODO: check per and amount
     'COAL': { 'makes': 'ENCHANTED_COAL', 'per': 160 },
     'COAL_BLOCK': { 'makes': 'ENCHANTED_COAL', 'amount': 9, 'per': 160 },
     'ENCHANTED_COAL': { 'makes': 'ENCHANTED_COAL_BLOCK', 'per': 160 },
@@ -178,6 +173,7 @@ super_compactor_list = {
     'HEMOVIBE': { 'makes': 'HEMOGLASS', 'per': 160 },
     # 'HEMOGLASS': {'makes': 'HEMOBOMB', 'per': 15},  # does not compact
     'BONE': { 'makes': 'ENCHANTED_BONE', 'per': 160 },
+    # 'ENCHANTED_BONE': { 'makes': 'ENCHANTED_BONE_BLOCK', 'per': 160 },  # research on going
     'SULPHUR': { 'makes': 'ENCHANTED_GUNPOWDER', 'per': 160 },
     'STRING': { 'makes': 'ENCHANTED_STRING', 'per': 160 },
     'SPIDER_EYE': { 'makes': 'ENCHANTED_SPIDER_EYE', 'per': 160 },
@@ -3191,311 +3187,6 @@ attribute_shards = {
 pet_item_scrub_cost = { "Common": 25000, "Uncommon": 50000, "Rare": 100000, "Epic": 250000, "Legendary": 500000, "Mythic": 1000000, "Divine": 2500000 }
 
 max_lvl_pet_xp_amounts = { "Common": 5624785, "Uncommon": 8644220, "Rare": 12626665, "Epic": 18608500, "Legendary": 25353230, "Mythic": 25353230, "Dragon": 210255385 }
-
-
-#%% Option Lists
-
-minion_options = {
-    'Custom': 'CUSTOM_MINION',
-    'Cobblestone': 'COBBLESTONE_MINION',
-    'Obsidian': 'OBSIDIAN_MINION',
-    'Glowstone': 'GLOWSTONE_MINION',
-    'Gravel': 'GRAVEL_MINION',
-    'Sand': 'SAND_MINION',
-    'Red Sand': 'RED_SAND_MINION',
-    'Mycelium': 'MYCELIUM_MINION',
-    'Clay': 'CLAY_MINION',
-    'Ice': 'ICE_MINION',
-    'Snow': 'SNOW_MINION',
-    'Coal': 'COAL_MINION',
-    'Iron': 'IRON_MINION',
-    'Gold': 'GOLD_MINION',
-    'Diamond': 'DIAMOND_MINION',
-    'Lapis': 'LAPIS_MINION',
-    'Redstone': 'REDSTONE_MINION',
-    'Emerald': 'EMERALD_MINION',
-    'Quartz': 'QUARTZ_MINION',
-    'End Stone': 'END_STONE_MINION',
-    'Mithril': 'MITHRIL_MINION',
-    'Hard Stone': 'HARD_STONE_MINION',
-    'Wheat': 'WHEAT_MINION',
-    'Melon': 'MELON_MINION',
-    'Pumpkin': 'PUMPKIN_MINION',
-    'Carrot': 'CARROT_MINION',
-    'Potato': 'POTATO_MINION',
-    'Mushroom': 'MUSHROOM_MINION',
-    'Cactus': 'CACTUS_MINION',
-    'Cocoa Beans': 'COCOA_BEANS_MINION',
-    'Sugar Cane': 'SUGAR_CANE_MINION',
-    'Nether Wart': 'NETHER_WART_MINION',
-    'Flower': 'FLOWER_MINION',
-    'Sunflower': 'SUNFLOWER_MINION',
-    'Fishing': 'FISHING_MINION',
-    'Zombie': 'ZOMBIE_MINION',
-    'Revenant': 'REVENANT_MINION',
-    'Voidling': 'VOIDLING_MINION',
-    'Inferno': 'INFERNO_MINION',
-    'Vampire': 'VAMPIRE_MINION',
-    'Skeleton': 'SKELETON_MINION',
-    'Creeper': 'CREEPER_MINION',
-    'Spider': 'SPIDER_MINION',
-    'Tarantula': 'TARANTULA_MINION',
-    'Cave Spider': 'CAVE_SPIDER_MINION',
-    'Blaze': 'BLAZE_MINION',
-    'Magma Cube': 'MAGMA_CUBE_MINION',
-    'Enderman': 'ENDERMAN_MINION',
-    'Ghast': 'GHAST_MINION',
-    'Slime': 'SLIME_MINION',
-    'Cow': 'COW_MINION',
-    'Pig': 'PIG_MINION',
-    'Chicken': 'CHICKEN_MINION',
-    'Sheep': 'SHEEP_MINION',
-    'Rabbit': 'RABBIT_MINION',
-    'Oak': 'OAK_MINION',
-    'Spruce': 'SPRUCE_MINION',
-    'Birch': 'BIRCH_MINION',
-    'Dark Oak': 'DARK_OAK_MINION',
-    'Acacia': 'ACACIA_MINION',
-    'Jungle': 'JUNGLE_MINION'
-}
-
-inferno_fuel_grade_options = {
-    'Hypergolic Gabagool': 'HYPERGOLIC_GABAGOOL',
-    'Heavy Gabagool': 'HEAVY_GABAGOOL',
-    'Fuel Gabagool': 'FUEL_GABAGOOL',
-}
-
-inferno_fuel_distillate_options = {
-    'Magma Cream Distillate': 'MAGMA_CREAM_DISTILLATE',
-    'Blaze Rod Distillate': 'BLAZE_ROD_DISTILLATE',
-    'Nether Wart Distillate': 'NETHER_STALK_DISTILLATE',
-    'Glowstone Distillate': 'GLOWSTONE_DUST_DISTILLATE',
-    'Gabagool Distillate': 'CRUDE_GABAGOOL_DISTILLATE',
-}
-
-fuel_options = {
-    "None": "NONE",
-    "Coal": "COAL",
-    "Block Of Coal": "COAL_BLOCK",
-    "Enchanted Coal": "ENCHANTED_COAL",
-    "Enchanted Charcoal": "ENCHANTED_CHARCOAL",
-    "Hamster Wheel": "HAMSTER_WHEEL",
-    "Foul Flesh": "FOUL_FLESH",
-    "Enchanted Bread": "ENCHANTED_BREAD",
-    "Catalyst": "CATALYST",
-    "Hyper Catalyst": "HYPER_CATALYST",
-    "Tasty Cheese": "CHEESE_FUEL",
-    "Solar Panel": "SOLAR_PANEL",
-    "Enchanted Lava Bucket": "ENCHANTED_LAVA_BUCKET",
-    "Magma Bucket": "MAGMA_BUCKET",
-    "Plasma Bucket": "PLASMA_BUCKET",
-    "Everburning Flame": "EVERBURNING_FLAME",
-    "Inferno Minion Fuel": "INFERNO_FUEL",
-    "Dayswitch": "DAYSWITCH",
-    "Nightswitch": "NIGHTSWITCH",
-    "Thorny Vines": "THORNY_VINES"
-}
-
-upgrade_options = {
-    "None": "NONE",
-    "Auto Smelter": "AUTO_SMELTER",
-    "Compactor": "COMPACTOR",
-    "Super Compactor 3000": "SUPER_COMPACTOR_3000",
-    "Dwarven Super Compactor": "DWARVEN_COMPACTOR",
-    "Diamond Spreading": "DIAMOND_SPREADING",
-    "Potato Spreading": "POTATO_SPREADING",
-    "Minion Expander": "MINION_EXPANDER",
-    "Enchanted Egg": "ENCHANTED_EGG",
-    "Flint Shovel": "FLINT_SHOVEL",
-    "Flycatcher": "FLYCATCHER_UPGRADE",
-    "Krampus Helmet": "KRAMPUS_HELMET",
-    "Lesser Soulflow Engine": "LESSER_SOULFLOW_ENGINE",
-    "Soulflow Engine": "SOULFLOW_ENGINE",
-    "Corrupt Soil": "CORRUPT_SOIL",
-    "Berberis Fuel Injector": "BERBERIS_FUEL_INJECTOR",
-    "Enchanted Shears": "ENCHANTED_SHEARS",
-    "Sleepy Hollow": "SLEEPY_HOLLOW",
-    "Hunter Knife": "HUNTER_KNIFE"
-}
-
-pet_exp_boost_options = {
-    "None": "NONE",
-    "Common Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_COMMON",
-    "Uncommon Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_UNCOMMON",
-    "Rare Mining Exp Boost": "PET_ITEM_MINING_SKILL_BOOST_RARE",
-    "Common Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_COMMON",
-    "Uncommon Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_UNCOMMON",
-    "Rare Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_RARE",
-    "Epic Farming Exp Boost": "PET_ITEM_FARMING_SKILL_BOOST_EPIC",
-    "Common Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_COMMON",
-    "Uncommon Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_UNCOMMON",
-    "Rare Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_RARE",
-    "Epic Fishing Exp Boost": "PET_ITEM_FISHING_SKILL_BOOST_EPIC",
-    "Common Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_COMMON",
-    "Uncommon Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_UNCOMMON",
-    "Rare Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_RARE",
-    "Epic Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_EPIC",
-    "Common Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_COMMON",
-    "Epic Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_EPIC",
-    "All Skills Exp Boost": "PET_ITEM_ALL_SKILLS_BOOST_COMMON",
-    "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST",
-}
-
-floating_crystal_options = {
-    "None": "NONE",
-    "Farm Crystal": "FARM_CRYSTAL",
-    "Woodcutting Crystal": "WOODCUTTING_CRYSTAL",
-    "Mithril Crystal": "MITHRIL_CRYSTAL",
-    "Winter Crystal": "WINTER_ISLAND_CRYSTAL",
-    "Mithril + Winter Crystal": "MITHRIL_WINTER_CRYSTAL"
-}
-
-chest_options = {
-    "None": "NONE",
-    "Small Storage": "SMALL_ENCHANTED_CHEST",
-    "Medium Storage": "MEDIUM_ENCHANTED_CHEST",
-    "Large Storage": "LARGE_ENCHANTED_CHEST",
-    "X-Large Storage": "XLARGE_ENCHANTED_CHEST",
-    "XX-Large Storage": "XXLARGE_ENCHANTED_CHEST",
-}
-
-hopper_options = {
-    "None": "NONE",
-    "Budget Hopper": "BUDGET_HOPPER",
-    "Enchanted Hopper": "ENCHANTED_HOPPER",
-}
-
-beacon_options = {
-    "None": "NONE",
-    "Beacon I": "BEACON_1",
-    "Beacon II": "BEACON_2",
-    "Beacon III": "BEACON_3",
-    "Beacon IV": "BEACON_4",
-    "Beacon V": "BEACON_5",
-}
-
-potato_accessory_options = {
-    "None": "NONE",
-    "Potato Talisman": "POTATO_TALISMAN",
-    "Potato Ring": "POTATO_RING"
-}
-
-mayor_options = {
-    'None': "NONE",
-    'Aatrox': "MAYOR_AATROX",
-    'Cole': "MAYOR_COLE",
-    'Diana': "MAYOR_DIANA",
-    'Diaz': "MAYOR_DIAZ",
-    'Finnegan': "MAYOR_FINNEGAN",
-    'Foxy': "MAYOR_FOXY",
-    'Marina': "MAYOR_MARINA",
-    'Paul': "MAYOR_PAUL",
-    'Jerry': "MAYOR_JERRY",
-    'Derpy': "MAYOR_DERPY",
-    'Scorpius': "MAYOR_SCORPIUS",
-    'Aura': "MAYOR_AURA"
-}
-
-boosting_pet_options = {
-    "None": "NONE",
-    "Magma Cube": "PET_MAGMA_CUBE",
-    "Mooshroom Cow": "PET_MOOSHROOM_COW",
-    "Ocelot": "PET_OCELOT",
-    "Pigman": "PET_PIGMAN",
-    "Rabbit": "PET_RABBIT",
-    "Snail": "PET_SNAIL",
-    "Spider": "PET_SPIDER"
-}
-
-pet_options = {
-    'None': 'NONE',
-    'Custom Pet': 'PET_CUSTOM_PET',
-    'Ammonite': 'PET_AMMONITE',
-    'Ankylosaurus': 'PET_ANKYLOSAURUS',
-    'Armadillo': 'PET_ARMADILLO',
-    'Baby Yeti': 'PET_BABY_YETI',
-    'Bal': 'PET_BAL',
-    'Bat': 'PET_BAT',
-    'Bee': 'PET_BEE',
-    'Bingo': 'PET_BINGO',
-    'Black Cat': 'PET_BLACK_CAT',
-    'Blaze': 'PET_BLAZE',
-    'Blue Whale': 'PET_BLUE_WHALE',
-    'Chicken': 'PET_CHICKEN',
-    'Crow': 'PET_CROW',
-    'Dolphin': 'PET_DOLPHIN',
-    'Eerie': 'PET_EERIE',
-    'Elephant': 'PET_ELEPHANT',
-    'Ender Dragon': 'PET_ENDER_DRAGON',
-    'Enderman': 'PET_ENDERMAN',
-    'Endermite': 'PET_ENDERMITE',
-    'Flying Fish': 'PET_FLYING_FISH',
-    'Frog': 'PET_FROG',
-    'Ghoul': 'PET_GHOUL',
-    'Giraffe': 'PET_GIRAFFE',
-    'Glacite Golem': 'PET_GLACITE_GOLEM',
-    'Goblin': 'PET_GOBLIN',
-    'Golden Dragon': 'PET_GOLDEN_DRAGON',
-    'Golden Dragon Egg': 'PET_GOLDEN_DRAGON_EGG',
-    'Golem': 'PET_GOLEM',
-    'Grandma Wolf': 'PET_GRANDMA_WOLF',
-    'Griffin': 'PET_GRIFFIN',
-    'Guardian': 'PET_GUARDIAN',
-    'Hedgehog': 'PET_HEDGEHOG',
-    'Hermit Crab': 'PET_HERMIT_CRAB',
-    'Horse': 'PET_HORSE',
-    'Hound': 'PET_HOUND',
-    'Jerry': 'PET_JERRY',
-    'Jade Dragon': 'PET_JADE_DRAGON',
-    'Jade Dragon Egg': 'PET_JADE_DRAGON_EGG',
-    'Jellyfish': 'PET_JELLYFISH',
-    'Kuudra': 'PET_KUUDRA',
-    'Lion': 'PET_LION',
-    'Magma Cube': 'PET_MAGMA_CUBE',
-    'Mammoth': 'PET_MAMMOTH',
-    'Megalodon': 'PET_MEGALODON',
-    'Mithril Golem': 'PET_MITHRIL_GOLEM',
-    'Mole': 'PET_MOLE',
-    'Monkey': 'PET_MONKEY',
-    'Mooshroom Cow': 'PET_MOOSHROOM_COW',
-    'Mosquito': 'PET_MOSQUITO',
-    'Ocelot': 'PET_OCELOT',
-    'Owl': 'PET_OWL',
-    'Parrot': 'PET_PARROT',
-    'Penguin': 'PET_PENGUIN',
-    'Phoenix': 'PET_PHOENIX',
-    'Pig': 'PET_PIG',
-    'Pigman': 'PET_PIGMAN',
-    'Precursor Drone': 'PET_PRECURSOR_DRONE',
-    'Rabbit': 'PET_RABBIT',
-    'Rat': 'PET_RAT',
-    'Reindeer': 'PET_REINDEER',
-    'Rift Ferret': 'PET_RIFT_FERRET',
-    'Rock': 'PET_ROCK',
-    'Rose Dragon': 'PET_ROSE_DRAGON',
-    'Rose Dragon Egg': 'PET_ROSE_DRAGON_EGG',
-    'Scatha': 'PET_SCATHA',
-    'Seal': 'PET_SEAL',
-    'Sheep': 'PET_SHEEP',
-    'Silverfish': 'PET_SILVERFISH',
-    'Skeleton': 'PET_SKELETON',
-    'Skeleton Horse': 'PET_SKELETON_HORSE',
-    'Slug': 'PET_SLUG',
-    'Snail': 'PET_SNAIL',
-    'Snowman': 'PET_SNOWMAN',
-    'Spider': 'PET_SPIDER',
-    'Spinosaurus': 'PET_SPINOSAURUS',
-    'Spirit': 'PET_SPIRIT',
-    'Squid': 'PET_SQUID',
-    'T-Rex': 'PET_TYRANNOSAURUS',
-    'Tarantula': 'PET_TARANTULA',
-    'Tiger': 'PET_TIGER',
-    'Turtle': 'PET_TURTLE',
-    'Witch': 'PET_WITCH',
-    'Wither Skeleton': 'PET_WITHER_SKELETON',
-    'Wolf': 'PET_WOLF',
-    'Zombie': 'PET_ZOMBIE'
-}
 
 
 #%% Data check functions

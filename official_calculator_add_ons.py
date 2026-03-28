@@ -97,7 +97,7 @@ def basic_minion_loop(calculator):
     markdown_output = calculator.huim.edit_vars_output["markdown_output"].get()
     calculated_setup_profits = {}
     calculated_setup_costs = {}
-    loop_minion_options = list(md.minion_options.values())
+    loop_minion_options = list(calculator.input_options["minion"].values())
     loop_minion_skip = ["CUSTOM_MINION"]
     loop_minion_smelting = ["IRON_MINION", "GOLD_MINION", "CACTUS_MINION"]
     super_compactor = False
@@ -142,7 +142,7 @@ def basic_minion_loop(calculator):
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
             "levelingpet": {
-                "\n> ": ["taming", "falcon_attribute", "petxpboost", "beastmaster", "toucan_attribute", "expshareitem"],
+                "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
@@ -217,7 +217,7 @@ def inferno_minion_loop(calculator):
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
             "levelingpet": {
-                "\n> ": ["taming", "falcon_attribute", "petxpboost", "beastmaster", "toucan_attribute", "expshareitem"],
+                "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
@@ -320,7 +320,7 @@ def exact_pet_levelling_inputs(calculator):
     return
 
 def exact_pet_levelling(calculator, setup_pets):
-    setup_data = calculator.huim.get_from_GUI(["mayor", "xp", "taming", "toucan_attribute", "expshareitem", "petxpboost", "beastmaster", "falcon_attribute", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper"])
+    setup_data = calculator.huim.get_from_GUI(["mayor", "xp", "taming", "toucan_attribute", "expshareitem", "pet_exp_boost", "beastmaster", "falcon_attribute", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper"])
     skill_xp = setup_data["xp"]
     main_pet = setup_pets["levelingpet"]["pet"]
     main_pet_xp = setup_pets["levelingpet"]["pet_xp"]

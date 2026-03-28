@@ -1062,10 +1062,12 @@ class Hvar():
         if self.dtype in [list, dict]:
             self.list = self.initial
         self.widget = None
-        self.translation = None
+        self.translation = None  # Translation: untranslated (display) -> translated (internal)
+        self.reverse_translation = None
         if type(self.options) is dict:
             self.translation = self.options
             self.options = list(self.options.keys())
+            self.reverse_translation = {translated: untranslated for untranslated, translated in self.translation.items()}
         self.tk_output_switch = None
 
         if self.vtype == "input":
@@ -1105,9 +1107,13 @@ class Hvar():
         else:
             return tag in self.tags
 
-    def set(self, value) -> None:
-        self.tkvar.set(value)
-        return
+    def set(self, value, translated=False) -> None:
+        if (self.translation is None) or (translated is False):
+            self.tkvar.set(value)
+            return
+        else:
+            self.tkvar.set(self.reverse_translation[value])
+            return
 
     def update_listbox(self, key_format_function=lambda x: x, value_format_function=lambda x: x, filter=lambda key, val: True) -> None:
         if self.dtype not in [dict, list]:
