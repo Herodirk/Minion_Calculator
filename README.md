@@ -1,6 +1,7 @@
 # Minion Calculator
 Minion Calculator for Hypixel Skyblock Minions<br>
-Made by Herodirk
+Made by Herodirk<br>
+Made in Python version 3.12.4
 
 Notable features:<br>
 | Accuracy supported by research<br>

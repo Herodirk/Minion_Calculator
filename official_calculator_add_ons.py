@@ -17,7 +17,6 @@ The Official Add-ons include:
 
 import numpy as np
 import math
-import HSB_minion_data as md
 
 
 def old_corrupted_frags(calculator):
@@ -62,7 +61,7 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
     if return_value:
         return no_rng_profit_average
     prediction_interval_size = 1.96  # for 95% of cases within the interval, https://en.wikipedia.org/wiki/Prediction_interval#Known_mean,_known_variance
-    interval_radius_vertex_amount = prediction_interval_size * math.sqrt(outputs["harvests"] * md.inferno_fuel_data["drops"]["INFERNO_VERTEX"] * (1 - md.inferno_fuel_data["drops"]["INFERNO_VERTEX"]))
+    interval_radius_vertex_amount = prediction_interval_size * math.sqrt(outputs["harvests"] * calculator.md.inferno_fuel_data["drops"]["INFERNO_VERTEX"] * (1 - calculator.md.inferno_fuel_data["drops"]["INFERNO_VERTEX"]))
     per_vertex = calculator.get_price("INFERNO_VERTEX", setup_data, "sell", "bazaar")
     interval_min = no_rng_profit_average - per_vertex * interval_radius_vertex_amount
     interval_max = no_rng_profit_average + per_vertex * interval_radius_vertex_amount
@@ -72,7 +71,7 @@ def bad_luck_inferno(calculator, setup_data=None, outputs=None, return_value=Fal
 
 def setup_repay_time(calculator):
     """Outputs the time (in days) it take for a setup to repay itself"""
-    setup_data = calculator.huim.get_from_GUI(["time_seconds", "setupcost", "free_will", "freewillcost", "total_profit"])
+    setup_data = calculator.huim.get_from_GUI(["time_seconds", "setupcost", "free_will", "total_profit"])
     setupcost = setup_data["setupcost"]
     profit = setup_data["total_profit"]
     if profit < 0:
@@ -112,10 +111,10 @@ def basic_minion_loop(calculator):
     for loop_minion in loop_minion_options:
         if loop_minion in loop_minion_skip:
             continue
-        if "CORRUPT_SOIL" in upgrades and not md.has_data_tag(loop_minion, "mob_minion"):
+        if "CORRUPT_SOIL" in upgrades and not calculator.md.has_data_tag(loop_minion, "mob_minion"):
             continue
         setup_data["minion"] = loop_minion
-        setup_data["miniontier"] = list(md.calculator_data[setup_data["minion"]]["speed"].keys())[-1]
+        setup_data["miniontier"] = list(calculator.md.calculator_data[setup_data["minion"]]["speed"].keys())[-1]
         if super_compactor:
             if loop_minion in loop_minion_smelting:
                 setup_data["upgrade1"] = "DWARVEN_COMPACTOR"
@@ -157,7 +156,7 @@ def basic_minion_loop(calculator):
         if len(calculated_setup_profits) == 0:
             break
         top_minion = max(calculated_setup_profits, key=calculated_setup_profits.get)
-        output_str += "\n" + md.calculator_data[top_minion]["display"] + ": " + calculator.huim.reduced_number(calculated_setup_profits[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion])
+        output_str += "\n" + calculator.md.calculator_data[top_minion]["display"] + ": " + calculator.huim.reduced_number(calculated_setup_profits[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion])
         del calculated_setup_profits[top_minion]
     if markdown_output:
         output_str += "\n```"
@@ -254,15 +253,15 @@ def inferno_minion_loop_inputs(calculator):
 
 def craft_material_amount(calculator):
     setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])
-    materials = md.minionCostSum(setup_data["minion"], setup_data["miniontier"])
+    materials = calculator.md.minionCostSum(setup_data["minion"], setup_data["miniontier"])
     extra_costs_string = setup_data["extracost"]
-    materials_string = ", ".join([f"{amount * setup_data["amount"]} {md.calculator_data[material]["display"]}" for material, amount in materials.items()])
+    materials_string = ", ".join([f"{amount * setup_data["amount"]} {calculator.md.calculator_data[material]["display"]}" for material, amount in materials.items()])
     if len(extra_costs_string) != 0:
         materials_string += ", " + extra_costs_string
     calculator.collect_addon_output("Minion Crafting Materials", materials_string)
     return
 
-def dragon_pet_xp(gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
+def dragon_pet_xp(calculator, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
         """
         Calculates the pet xp gain on the dragon pets.
 
@@ -285,8 +284,8 @@ def dragon_pet_xp(gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
             Left over pet xp on the pet after applying the gained skill xp.
 
         """
-        drag_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
-        drag_lvl_200 = md.max_lvl_pet_xp_amounts["Dragon"]
+        drag_lvl_100 = calculator.md.max_lvl_pet_xp_amounts["Legendary"]
+        drag_lvl_200 = calculator.md.max_lvl_pet_xp_amounts["Dragon"]
         gained_pet_xp = 0.0
         skill_xp_per_pet = (drag_lvl_200 + drag_lvl_100 * (xp_boost_pet_item - 1)) / (xp_boost_pet_item * pet_xp_boost)
         gained_pet_xp = - left_over_pet_xp
@@ -315,7 +314,7 @@ def exact_pet_levelling_inputs(calculator):
         setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
     input_variables = {}
     for pet_slot, pet_info in setup_pets.items():
-        input_variables[pet_slot + "_starting_pet_xp"] = {"dtype": float, "display": md.calculator_data[pet_info["pet"]]["display"] + " pet xp", "initial": 0, "options": None}
+        input_variables[pet_slot + "_starting_pet_xp"] = {"dtype": float, "display": calculator.md.calculator_data[pet_info["pet"]]["display"] + " pet xp", "initial": 0, "options": None}
     calculator.huim.edit_vars(lambda pet_data=setup_pets: exact_pet_levelling(calculator, pet_data), input_variables, False)
     return
 
@@ -324,11 +323,11 @@ def exact_pet_levelling(calculator, setup_pets):
     skill_xp = setup_data["xp"]
     main_pet = setup_pets["levelingpet"]["pet"]
     main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
-    if md.has_data_tag(main_pet, "dragon_pet"):
+    if calculator.md.has_data_tag(main_pet, "dragon_pet"):
         left_over_pet_xp = calculator.huim.edit_vars_output["levelingpet_starting_pet_xp"].get()
         for skill, amount in skill_xp.items():
             pet_xp_boost, xp_boost_pet_item = calculator.get_pet_xp_boosts(main_pet, skill, setup_data)
-            main_pet_xp[skill], left_over_pet_xp = dragon_pet_xp(amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
+            main_pet_xp[skill], left_over_pet_xp = dragon_pet_xp(calculator, amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
     else:
         for skill, amount in skill_xp.items():
             pet_xp_boost, xp_boost_pet_item = calculator.get_pet_xp_boosts(main_pet, skill, setup_data)
@@ -339,7 +338,7 @@ def exact_pet_levelling(calculator, setup_pets):
         if pet_slot == "levelingpet":
             continue
         exp_share_pet = pet_info["pet"]
-        if md.has_data_tag(exp_share_pet, "dragon_pet"):
+        if calculator.md.has_data_tag(exp_share_pet, "dragon_pet"):
             if exp_share_boost == 0:
                 continue
             left_over_pet_xp = calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get()
@@ -347,20 +346,20 @@ def exact_pet_levelling(calculator, setup_pets):
                 non_matching = calculator.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
                 equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
                 equiv_xp_boost_pet_item = 1 + exp_share_item / exp_share_boost
-                gained_pet_xp, left_over_pet_xp = dragon_pet_xp(amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
+                gained_pet_xp, left_over_pet_xp = dragon_pet_xp(calculator, amount, left_over_pet_xp, equiv_pet_xp_boost, equiv_xp_boost_pet_item)
                 pet_info["pet_xp"]["exp_share"] += gained_pet_xp
         else:
             for skill, amount in main_pet_xp.items():
                 non_matching = calculator.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
-                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching
+                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not calculator.md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching
     for pet_slot, pet_info in setup_pets.items():
-        if md.has_data_tag(pet_info["pet"], "dragon_pet"):
-            max_lvl_pet_xp = md.max_lvl_pet_xp_amounts["Dragon"]
+        if calculator.md.has_data_tag(pet_info["pet"], "dragon_pet"):
+            max_lvl_pet_xp = calculator.md.max_lvl_pet_xp_amounts["Dragon"]
         else:
-            max_lvl_pet_xp = md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
+            max_lvl_pet_xp = calculator.md.max_lvl_pet_xp_amounts[calculator.md.calculator_data[pet_info["pet"]]["rarity"]]
         pets_levelled = (calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get() + sum(pet_info["pet_xp"].values())) / max_lvl_pet_xp
         pet_info["levelled_pets"] = pets_levelled
-    output_string = ", ".join([f"{calculator.huim.reduced_number(pet_info['levelled_pets'], 4)} {md.calculator_data[pet_info["pet"]]["display"]}" for pet_info in setup_pets.values()])
+    output_string = ", ".join([f"{calculator.huim.reduced_number(pet_info['levelled_pets'], 4)} {calculator.md.calculator_data[pet_info["pet"]]["display"]}" for pet_info in setup_pets.values()])
     calculator.collect_addon_output("Exact Pet Levelling", output_string)
     return
 

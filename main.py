@@ -19,12 +19,12 @@ try:
     import webbrowser
     import pathlib
     import json
-    import HSB_minion_data as md
+    import Hero_data_Manager as HDM
     import Hero_UI_Manager as HPM
     import official_calculator_add_ons as Hero_addons
 except ModuleNotFoundError as import_error:
     missing_package = import_error.name
-    if missing_package in ["HSB_minion_data", "Hero_UI_Manager", "official_calculator_add_ons"]:
+    if missing_package in ["Hero_data_Manager", "Hero_UI_Manager", "official_calculator_add_ons"]:
         print(f"ERROR - import - Could not find calculator file {missing_package}.py,\nplease make sure all the calculator files are in the same folder.")
     else:
         print(f"ERROR - import - Could not find {missing_package} module,\nplease install this module using PIP")
@@ -189,7 +189,8 @@ class Calculator(tk.Tk):
         self.version = self.huim.def_var(dtype=str, initial="1.2.1")
         self.huim.logger.info(f"Calculator version {self.version.get()}")
 
-        # Getting calculator version data
+        # Getting calculator data
+        self.md = HDM.H_data_M(self.huim)
         self.ID_order = self.huim.read_json(pathlib.Path(r"calculator_version_data/id_order.json"))
         self.input_options = self.huim.read_json(pathlib.Path(r"calculator_version_data/input_options.json"))
 
@@ -597,14 +598,14 @@ class Calculator(tk.Tk):
 
         """
         if multi_ID == "minion":
-            if type(control) == str or self.miniontier.get() not in md.calculator_data[self.minion.get()]["speed"].keys():
-                self.miniontier.set(list(md.calculator_data[self.minion.get()]["speed"].keys())[-1])
+            if type(control) == str or self.miniontier.get() not in self.md.calculator_data[self.minion.get()]["speed"].keys():
+                self.miniontier.set(list(self.md.calculator_data[self.minion.get()]["speed"].keys())[-1])
             if type(control) == str:
                 self.huim.toggle_switch("potato_accessory_switch", control + str(self.afk.get()))
                 self.huim.toggle_switch("rising_celsius", control)
         elif multi_ID == "fuel":
             self.huim.toggle_switch("infernofuel", control)
-            self.huim.toggle_switch("fuel_amount", md.calculator_data[self.input_options["fuel"][control]]["fuel_duration"])
+            self.huim.toggle_switch("fuel_amount", self.md.calculator_data[self.input_options["fuel"][control]]["fuel_duration"])
         elif multi_ID == "afk":
             afkState = self.afk.get()
             self.huim.toggle_switch("afking", afkState)
@@ -714,7 +715,7 @@ class Calculator(tk.Tk):
             return_str += "\n> "
             key_formatting_function = lambda x: x
             if self.var_dict[var_key].has_tag("item_ID_to_display"):
-                key_formatting_function = lambda x: md.calculator_data[x]['display']
+                key_formatting_function = lambda x: self.md.calculator_data[x]['display']
             elif var_key == "pets_levelled":
                 key_formatting_function = lambda x: calculation_data[x]
             elif var_key == "setupcost_breakdown":
@@ -911,20 +912,20 @@ class Calculator(tk.Tk):
                 location = setup_data["bazaar_sell_type"]
                 if setup_data["bazaar_taxes"]:
                     bazaar_tax = 0.0125 - 0.00125 * setup_data["bazaar_flipper"]
-                    bazaar_tax *= md.calculator_data[setup_data["mayor"]]["tax_multiplier"]
+                    bazaar_tax *= self.md.calculator_data[setup_data["mayor"]]["tax_multiplier"]
                     multiplier = 1 - bazaar_tax
         elif location == "npc" and action == "buy":
             multiplier = 2
-        if item_ID in md.calculator_data:
-            if location in md.calculator_data[item_ID]["prices"]:
-                return multiplier * md.calculator_data[item_ID]["prices"][location]
+        if item_ID in self.md.calculator_data:
+            if location in self.md.calculator_data[item_ID]["prices"]:
+                return multiplier * self.md.calculator_data[item_ID]["prices"][location]
             elif force:
                 self.huim.logger.warning("no forced cost found for " + item_ID)
                 return 0
-            elif "custom" in md.calculator_data[item_ID]["prices"]:
-                return md.calculator_data[item_ID]["prices"]["custom"]
-            elif "npc" in md.calculator_data[item_ID]["prices"]:
-                return multiplier * md.calculator_data[item_ID]["prices"]["npc"]
+            elif "custom" in self.md.calculator_data[item_ID]["prices"]:
+                return self.md.calculator_data[item_ID]["prices"]["custom"]
+            elif "npc" in self.md.calculator_data[item_ID]["prices"]:
+                return multiplier * self.md.calculator_data[item_ID]["prices"]["npc"]
             else:
                 self.huim.logger.warning("no cost found for " + item_ID)
                 return 0
@@ -958,32 +959,32 @@ class Calculator(tk.Tk):
             Total additive speed boost.
         """
         speed_boost = 0
-        speed_boost += md.calculator_data[minion_fuel_id]["speed_boost"]
-        speed_boost += md.calculator_data[upgrade_ids[0]]["speed_boost"] + md.calculator_data[upgrade_ids[1]]["speed_boost"]
-        speed_boost += md.calculator_data[setup_data["beacon"]]["speed_boost"] + md.calculator_data["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
-        speed_boost += md.calculator_data["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + md.calculator_data["POSTCARD"]["speed_boost"] * setup_data["postcard"]
+        speed_boost += self.md.calculator_data[minion_fuel_id]["speed_boost"]
+        speed_boost += self.md.calculator_data[upgrade_ids[0]]["speed_boost"] + self.md.calculator_data[upgrade_ids[1]]["speed_boost"]
+        speed_boost += self.md.calculator_data[setup_data["beacon"]]["speed_boost"] + self.md.calculator_data["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
+        speed_boost += self.md.calculator_data["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + self.md.calculator_data["POSTCARD"]["speed_boost"] * setup_data["postcard"]
         if setup_data["crystal"] != "NONE":
-            if md.has_data_tag(minion, md.calculator_data[setup_data["crystal"]]["affected_minions"]):
-                speed_boost += md.calculator_data[setup_data["crystal"]]["speed_boost"]
+            if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["crystal"]]["affected_minions"]):
+                speed_boost += self.md.calculator_data[setup_data["crystal"]]["speed_boost"]
         if setup_data["beacon"] != "NONE" and setup_data["scorched"]:
-            speed_boost += md.calculator_data["SCORCHED_POWER_CRYSTAL"]["speed_boost"]
+            speed_boost += self.md.calculator_data["SCORCHED_POWER_CRYSTAL"]["speed_boost"]
         if minion == "INFERNO_MINION":
             if setup_data["rising_celsius_override"]:
                 speed_boost += 180
             else:
                 speed_boost += 18 * min(10, setup_data["amount"])
-        if minion_fuel_id == "EVERBURNING_FLAME" and md.has_data_tag(minion, md.calculator_data[minion_fuel_id]["upgrade_special"]["affected_minions"]):
-            speed_boost += md.calculator_data[minion_fuel_id]["upgrade_special"]["amount"]
-        if md.has_data_tag(minion, md.calculator_data[setup_data["mayor"]]["affected_minions"]):
-            speed_boost += md.calculator_data[setup_data["mayor"]]["speed_boost"]
+        if minion_fuel_id == "EVERBURNING_FLAME" and self.md.has_data_tag(minion, self.md.calculator_data[minion_fuel_id]["upgrade_special"]["affected_minions"]):
+            speed_boost += self.md.calculator_data[minion_fuel_id]["upgrade_special"]["amount"]
+        if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["mayor"]]["affected_minions"]):
+            speed_boost += self.md.calculator_data[setup_data["mayor"]]["speed_boost"]
         if not (afk_toggle or clock_override):
             return speed_boost
-        if md.has_data_tag(minion, md.calculator_data[setup_data["potato_accessory"]]["affected_minions"]):
-            speed_boost += md.calculator_data[setup_data["potato_accessory"]]["speed_boost"]
+        if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["potato_accessory"]]["affected_minions"]):
+            speed_boost += self.md.calculator_data[setup_data["potato_accessory"]]["speed_boost"]
         afkpet = setup_data["afkpet"]
         afkpet_rarity = setup_data["afkpet_rarity"]
-        if md.has_data_tag(minion, md.calculator_data[afkpet]["affected_minions"]) and afkpet_rarity in md.calculator_data[afkpet]["boosting_pet"]:
-            speed_boost += md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][0] + setup_data["afkpet_lvl"] * md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][1]
+        if self.md.has_data_tag(minion, self.md.calculator_data[afkpet]["affected_minions"]) and afkpet_rarity in self.md.calculator_data[afkpet]["boosting_pet"]:
+            speed_boost += self.md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][0] + setup_data["afkpet_lvl"] * self.md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][1]
         return speed_boost
 
     def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_data):
@@ -1010,19 +1011,19 @@ class Calculator(tk.Tk):
         """
         drop_multiplier = 1
         if afk_toggle and setup_data["player_harvests"] and (minion not in ["FISHING_MINION", "PUMPKIN_MINION", "MELON_MINION"]):
-            if md.has_data_tag(minion, "mob_minion"):
+            if self.md.has_data_tag(minion, "mob_minion"):
                 drop_multiplier *= 1 + 15 * setup_data["player_looting"] / 100
             return drop_multiplier
-        drop_multiplier *= md.calculator_data[minion_fuel_id]["drop_multiplier"]
-        drop_multiplier *= md.calculator_data[upgrade_ids[0]]["drop_multiplier"]
+        drop_multiplier *= self.md.calculator_data[minion_fuel_id]["drop_multiplier"]
+        drop_multiplier *= self.md.calculator_data[upgrade_ids[0]]["drop_multiplier"]
         if afk_toggle and drop_multiplier > 1:
             # drop multiplier greater than 1 is rounded down while online
             drop_multiplier = int(drop_multiplier)
-        drop_multiplier *= md.calculator_data[upgrade_ids[1]]["drop_multiplier"]
+        drop_multiplier *= self.md.calculator_data[upgrade_ids[1]]["drop_multiplier"]
         if afk_toggle and drop_multiplier > 1:
             drop_multiplier = int(drop_multiplier)
-        if md.has_data_tag(minion, md.calculator_data[setup_data["mayor"]]["affected_minions"]):
-            drop_multiplier *= md.calculator_data[setup_data["mayor"]]["drop_multiplier"]
+        if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["mayor"]]["affected_minions"]):
+            drop_multiplier *= self.md.calculator_data[setup_data["mayor"]]["drop_multiplier"]
         return drop_multiplier
     
     def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data, setup_notes):
@@ -1094,46 +1095,46 @@ class Calculator(tk.Tk):
         -------
         None.
         """
-        if md.has_data_tag(minion, "wood_minion"):
+        if self.md.has_data_tag(minion, "wood_minion"):
             if afk_toggle:
                 # chopped trees have 4 blocks of wood, unknown why offline gives 3
-                md.calculator_data[minion]["drops"][list(md.calculator_data[minion]["drops"].keys())[0]] = 4
+                self.md.calculator_data[minion]["drops"][list(self.md.calculator_data[minion]["drops"].keys())[0]] = 4
             else:
-                md.calculator_data[minion]["drops"][list(md.calculator_data[minion]["drops"].keys())[0]] = 3
+                self.md.calculator_data[minion]["drops"][list(self.md.calculator_data[minion]["drops"].keys())[0]] = 3
         elif minion == "GRAVEL_MINION":
             if afk_toggle:
                 # vanilla minecraft chance for gravel to become flint
-                md.calculator_data[minion]["drops"]["GRAVEL"] = 0.9
-                md.calculator_data[minion]["drops"]["FLINT"] = 0.1
+                self.md.calculator_data[minion]["drops"]["GRAVEL"] = 0.9
+                self.md.calculator_data[minion]["drops"]["FLINT"] = 0.1
             else:
-                md.calculator_data[minion]["drops"]["GRAVEL"] = 1
-                md.calculator_data[minion]["drops"]["FLINT"] = 0
+                self.md.calculator_data[minion]["drops"]["GRAVEL"] = 1
+                self.md.calculator_data[minion]["drops"]["FLINT"] = 0
         elif minion == "PUMPKIN_MINION":
             if afk_toggle:
                 # it just does this, idk, ask Hypixel
-                md.calculator_data[minion]["drops"]["PUMPKIN"] = 1
+                self.md.calculator_data[minion]["drops"]["PUMPKIN"] = 1
             else:
-                md.calculator_data[minion]["drops"]["PUMPKIN"] = 3
+                self.md.calculator_data[minion]["drops"]["PUMPKIN"] = 3
         elif minion == "SHEEP_MINION":
             if "ENCHANTED_SHEARS" in upgrades:
-                md.calculator_data[minion]["drops"]["WOOL"] = 0
+                self.md.calculator_data[minion]["drops"]["WOOL"] = 0
             else:
-                md.calculator_data[minion]["drops"]["WOOL"] = 1
+                self.md.calculator_data[minion]["drops"]["WOOL"] = 1
         elif minion == "FLOWER_MINION":
             if minion_fuel_id == "THORNY_VINES":
-                md.calculator_data[minion]["drops"] = { "WILD_ROSE": 2 }
+                self.md.calculator_data[minion]["drops"] = { "WILD_ROSE": 2 }
             elif afk_toggle and setup_data["special_layout"]:
                 # tall flowers blocked by low ceiling
-                md.calculator_data[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 8, "RED_ROSE:2": 0.5 / 8, "RED_ROSE:3": 0.5 / 8, "RED_ROSE:4": 0.5 / 8, "RED_ROSE:5": 0.5 / 8, "RED_ROSE:6": 0.5 / 8, "RED_ROSE:7": 0.5 / 8, "RED_ROSE:8": 0.5 / 8 }
+                self.md.calculator_data[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 8, "RED_ROSE:2": 0.5 / 8, "RED_ROSE:3": 0.5 / 8, "RED_ROSE:4": 0.5 / 8, "RED_ROSE:5": 0.5 / 8, "RED_ROSE:6": 0.5 / 8, "RED_ROSE:7": 0.5 / 8, "RED_ROSE:8": 0.5 / 8 }
             else:
-                md.calculator_data[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 11, "RED_ROSE:2": 0.5 / 11, "RED_ROSE:3": 0.5 / 11, "RED_ROSE:4": 0.5 / 11, "RED_ROSE:5": 0.5 / 11, "RED_ROSE:6": 0.5 / 11, "RED_ROSE:7": 0.5 / 11, "RED_ROSE:8": 0.5 / 11, "DOUBLE_PLANT:1": 0.5 / 11, "DOUBLE_PLANT:4": 0.5 / 11, "DOUBLE_PLANT:5": 0.5 / 11 }
+                self.md.calculator_data[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 11, "RED_ROSE:2": 0.5 / 11, "RED_ROSE:3": 0.5 / 11, "RED_ROSE:4": 0.5 / 11, "RED_ROSE:5": 0.5 / 11, "RED_ROSE:6": 0.5 / 11, "RED_ROSE:7": 0.5 / 11, "RED_ROSE:8": 0.5 / 11, "DOUBLE_PLANT:1": 0.5 / 11, "DOUBLE_PLANT:4": 0.5 / 11, "DOUBLE_PLANT:5": 0.5 / 11 }
         elif minion == "SUNFLOWER_MINION":
             if minion_fuel_id == "DAYSWITCH":
-                md.calculator_data[minion]["drops"] = { "DOUBLE_PLANT": 2 }
+                self.md.calculator_data[minion]["drops"] = { "DOUBLE_PLANT": 2 }
             elif minion_fuel_id == "NIGHTSWITCH":
-                md.calculator_data[minion]["drops"] = { "MOONFLOWER": 2 }
+                self.md.calculator_data[minion]["drops"] = { "MOONFLOWER": 2 }
             else:
-                md.calculator_data[minion]["drops"] = { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 }
+                self.md.calculator_data[minion]["drops"] = { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 }
         return
 
     def get_seconds_per_action(self, minion, minion_tier, minion_fuel_id, speed_boost, setup_data):
@@ -1158,10 +1159,10 @@ class Calculator(tk.Tk):
         float
             seconds per action.
         """
-        base_speed = md.calculator_data[minion]["speed"][minion_tier]
+        base_speed = self.md.calculator_data[minion]["speed"][str(minion_tier)]
         secondsPaction = base_speed / (1 + speed_boost / 100)
         if minion_fuel_id == "INFERNO_FUEL":
-            secondsPaction /= 1 + md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
+            secondsPaction /= 1 + self.md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
         secondsPaction = round(secondsPaction * 20) / 20
         return secondsPaction
 
@@ -1247,13 +1248,13 @@ class Calculator(tk.Tk):
         spreading_info = {}
         replace_info = {}
         for upgrade in upgrade_ids:
-            upgrade_type = md.calculator_data[upgrade]["upgrade_special"]["type"]
+            upgrade_type = self.md.calculator_data[upgrade]["upgrade_special"]["type"]
             if "spreading" in upgrade_type:
-                for item, amount in md.calculator_data[upgrade]["upgrade_special"]["items"].items():
+                for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
                     spreading_info[item] = amount
                     drops_list[item] = 0
             if "replace" in upgrade_type:
-                replace_info.update(md.calculator_data[upgrade]["upgrade_special"]["replacement_list"])
+                replace_info.update(self.md.calculator_data[upgrade]["upgrade_special"]["replacement_list"])
         return spreading_info, replace_info
     
     def add_drops(self, item, amount, drops_list, spreading_info=None, replace_info=None):
@@ -1287,7 +1288,7 @@ class Calculator(tk.Tk):
         :param harvests_per_time: float, amount of harvests between empties
         :param drop_multiplier: float, total drop multiplier
         """
-        for item, amount in md.calculator_data[minion]["drops"].items():
+        for item, amount in self.md.calculator_data[minion]["drops"].items():
             self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, spreading_info, replace_info)
         return
 
@@ -1307,16 +1308,16 @@ class Calculator(tk.Tk):
         :param seconds_per_action: float, seconds per minion action
         """
         for upgrade in upgrade_ids:
-            upgrade_type = md.calculator_data[upgrade]["upgrade_special"]["type"]
+            upgrade_type = self.md.calculator_data[upgrade]["upgrade_special"]["type"]
             specific_multiplier = 1
             if upgrade_type == "add":
                 # adding upgrades are like Corrupt Soils
                 if afk_toggle:
                     if "CORRUPT_SOIL" == upgrade:
-                        if "afkcorrupt" in md.calculator_data[minion]:
+                        if "afkcorrupt" in self.md.calculator_data[minion]:
                             # Certain mob minions get more corrupt drops when afking
                             # It is not a constant multiplier, it is equivalent in chance to the main drops of the minion
-                            specific_multiplier = md.calculator_data[minion]["afkcorrupt"]
+                            specific_multiplier = self.md.calculator_data[minion]["afkcorrupt"]
                         if minion == "CHICKEN_MINION" and "ENCHANTED_EGG" not in upgrade_ids:
                             # Online Chicken minion without Enchanted Egg does not make corrupt drops
                             specific_multiplier = 0
@@ -1324,10 +1325,10 @@ class Calculator(tk.Tk):
                         # Enchanted Eggs make one laid egg and one egg on kill while AFKing
                         # the egg on spawn is affected by drop multipliers and spreadings
                         self.add_drops("EGG", harvests_per_time * drop_multiplier, drops_list, spreading_info)
-                    for item, amount in md.calculator_data[upgrade]["upgrade_special"]["items"].items():
+                    for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
                         self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list)
                 else:
-                    for item, amount in md.calculator_data[upgrade]["upgrade_special"]["items"].items():
+                    for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
                         self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list, spreading_info)
             elif upgrade_type == "cooldown":
                 # cooldown upgrades are like Soulflow Engines
@@ -1335,12 +1336,12 @@ class Calculator(tk.Tk):
                 if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrade_ids:
                     continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
                 if afk_toggle:
-                    effective_cooldown = 2 * seconds_per_action * (1 + math.floor(math.ceil(md.calculator_data[upgrade]["upgrade_special"]["cooldown"] / seconds_per_action) / 2))
+                    effective_cooldown = 2 * seconds_per_action * (1 + math.floor(math.ceil(self.md.calculator_data[upgrade]["upgrade_special"]["cooldown"] / seconds_per_action) / 2))
                 else:
-                    effective_cooldown = md.calculator_data[upgrade]["upgrade_special"]["offline_cooldown"]
+                    effective_cooldown = self.md.calculator_data[upgrade]["upgrade_special"]["offline_cooldown"]
                 if "SOULFLOW_ENGINE" == upgrade and minion == "VOIDLING_MINION":
                     specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
-                for cooldown_item, cooldown_amount in md.calculator_data[upgrade]["upgrade_special"]["items"].items():
+                for cooldown_item, cooldown_amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
                     self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
         return
 
@@ -1365,8 +1366,8 @@ class Calculator(tk.Tk):
             return
         # distilate drops
         distilate = setup_data["inferno_distillate"]
-        distilate_item = md.inferno_fuel_data["distilates"][distilate][0]
-        amount_per = md.inferno_fuel_data["distilates"][distilate][1]
+        distilate_item = self.md.inferno_fuel_data["distilates"][distilate][0]
+        amount_per = self.md.inferno_fuel_data["distilates"][distilate][1]
         distillate_harvests = (harvests_per_time * 4) / 5
         if afk_toggle:
             self.get_base_drops(drops_list, spreading_info, replace_info, minion, - distillate_harvests, drop_multiplier)
@@ -1379,11 +1380,11 @@ class Calculator(tk.Tk):
             multiplier = 1
             if setup_data["inferno_eyedrops"] is True:  # Capsaicin Eyedrops
                 multiplier = 1.3
-            for item, chance in md.inferno_fuel_data["drops"].items():
+            for item, chance in self.md.inferno_fuel_data["drops"].items():
                 if item == "INFERNO_APEX" and minion_tier >= 10:  # Apex Minion perk
                     chance *= 2
                 self.add_drops(item, multiplier * chance * harvests_per_time, drops_list)
-            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", empty_time_seconds / md.calculator_data[minion_fuel]["fuel_duration"], drops_list)
+            self.add_drops("HYPERGOLIC_IONIZED_CERAMICS", empty_time_seconds / self.md.calculator_data[minion_fuel]["fuel_duration"], drops_list)
 
         # calculate fuel cost
         infernofuel_components = {
@@ -1395,7 +1396,7 @@ class Calculator(tk.Tk):
         costPerInfernofuel = 0
         for component_ID, amount in infernofuel_components.items():
             costPerInfernofuel += amount * self.get_price(component_ID, setup_data, action="buy", location="bazaar")
-        md.calculator_data["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
+        self.md.calculator_data["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
         # the fuel cost is put into the item data to be used later in the general fuel cost calculator
         return
 
@@ -1404,7 +1405,7 @@ class Calculator(tk.Tk):
         Applies given compacting rules to the drops list and returns a list of all compacted items
         
         :param drops_list: dict, all drops of the setup
-        :param compactor_list: dict of the form {item: {"makes": compacted item, "amount": amount of compacted, "per": amount of item needed}, ...}
+        :param compactor_list: dict of the form {item: `compacting recipe name`, ...}
 
         :return compacted_items: list, IDs of items that got compacted
         """
@@ -1414,18 +1415,19 @@ class Calculator(tk.Tk):
             item = compactables.pop(0)
             if item not in compacting_list:
                 continue
+            compacting_data = self.md.calculator_data[item]["compacting"][compacting_list[item]]
             amount = drops_list[item]
-            per_compacted = compacting_list[item]["per"]
+            per_compacted = compacting_data["per"]
             if amount < per_compacted:
                 continue
-            compacted_name = compacting_list[item]["makes"]
+            compacted_name = compacting_data["makes"]
             compacted_amount = int(amount / per_compacted)
-            if "amount" in compacting_list[item]:
-                compacted_amount *= compacting_list[item]["amount"]
+            if "amount" in compacting_data:
+                compacted_amount *= compacting_data["amount"]
             left_over = amount % per_compacted
             drops_list[item] = left_over
             drops_list[compacted_name] = compacted_amount
-            compacted_items.append({"from": item, **compacting_list[item]})
+            compacted_items.append({"from": item, **compacting_data})
             if compacted_name in compacting_list:
                 compactables.append(compacted_name)
         return compacted_items
@@ -1440,8 +1442,8 @@ class Calculator(tk.Tk):
         """
         compacted_items = []
         for upgrade in upgrades:
-            if "compact" in md.calculator_data[upgrade]["upgrade_special"]["type"]:
-                compacted_items.extend(self.apply_compactor(drops_list, md.calculator_data[upgrade]["upgrade_special"]["compacting_list"]))
+            if "compact" in self.md.calculator_data[upgrade]["upgrade_special"]["type"]:
+                compacted_items.extend(self.apply_compactor(drops_list, self.md.calculator_data[upgrade]["upgrade_special"]["compacting_list"]))
         return compacted_items
 
     def get_available_storage(self, minion, minion_tier, setup_data):
@@ -1453,11 +1455,11 @@ class Calculator(tk.Tk):
         :param setup_data: needed setup data: chest
         :return available_storage: available storage measured in slots
         """
-        available_storage = md.calculator_data[setup_data["chest"]]["storage_slots"]
-        if "storage" in md.calculator_data[minion] and minion_tier in md.calculator_data[minion]["storage"]:
-            available_storage += md.calculator_data[minion]["storage"][minion_tier]
+        available_storage = self.md.calculator_data[setup_data["chest"]]["storage_slots"]
+        if "storage" in self.md.calculator_data[minion] and minion_tier in self.md.calculator_data[minion]["storage"]:
+            available_storage += self.md.calculator_data[minion]["storage"][str(minion_tier)]
         else:
-            available_storage += md.standard_storage[minion_tier]
+            available_storage += self.md.standard_storage[minion_tier]
         return available_storage
     
     def get_used_storage(self, drops_list):
@@ -1506,7 +1508,7 @@ class Calculator(tk.Tk):
         elif minion_sell_loc == "Best (NPC/Bazaar)":
             sellto = "best"
         elif minion_sell_loc == "Hopper":
-            hopper_multiplier = md.calculator_data[setup_data["hopper"]]["hopper_selling_rate"]
+            hopper_multiplier = self.md.calculator_data[setup_data["hopper"]]["hopper_selling_rate"]
         return sellto, hopper_multiplier
     
     def get_item_profit(self, sell_location, hopper_multiplier, drops_list, setup_data):
@@ -1529,13 +1531,16 @@ class Calculator(tk.Tk):
             sell_itemtype = itemtype
             price_ratio = 1
             if setup_data["sell_form"] != 0:
-                for compacted_tier in range(setup_data["sell_form"]):
-                    if sell_itemtype in md.super_compactor_list:
-                        effective_per_compacted = md.super_compactor_list[sell_itemtype]["per"]
-                        if "amount" in md.super_compactor_list[sell_itemtype]:
-                            effective_per_compacted /= md.super_compactor_list[sell_itemtype]["amount"]
+                for compacted_tier in range(1, setup_data["sell_form"] + 1):
+                    if self.md.calculator_data[sell_itemtype]["compact_tier"] >= compacted_tier:
+                        continue
+                    if "compacting" in self.md.calculator_data[sell_itemtype] and "compact" in self.md.calculator_data[sell_itemtype]["compacting"]:
+                        compacting_data = self.md.calculator_data[sell_itemtype]["compacting"]["compact"]
+                        effective_per_compacted = compacting_data["per"]
+                        if "amount" in compacting_data:
+                            effective_per_compacted /= compacting_data["amount"]
                         price_ratio /= effective_per_compacted
-                        sell_itemtype = md.super_compactor_list[sell_itemtype]["makes"]
+                        sell_itemtype = compacting_data["makes"]
             item_prices.clear()
             item_prices["NPC"] = self.get_price(sell_itemtype, setup_data, "sell", "npc")
             item_prices["bazaar"] = self.get_price(sell_itemtype, setup_data, "sell", "bazaar")
@@ -1563,13 +1568,13 @@ class Calculator(tk.Tk):
         """
         skill_xp = {}
         for itemtype, amount in drops_list.items():
-            xptype, value = list(*md.calculator_data[itemtype]["xp"].items())
+            xptype, value = list(*self.md.calculator_data[itemtype]["xp"].items())
             if value == 0:
                 continue
             if xptype not in skill_xp:
                 skill_xp[xptype] = 0
             skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
-        self.huim.deepmultiply(skill_xp, md.calculator_data[mayor]["xp_multiplier"])
+        self.huim.deepmultiply(skill_xp, self.md.calculator_data[mayor]["xp_multiplier"])
         if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
             del skill_xp["combat"]
         return skill_xp
@@ -1597,7 +1602,7 @@ class Calculator(tk.Tk):
             cost = self.get_price(item, setup_data, "sell", per_item_sell_location[item]) * per_compact
             compact_cost = self.get_price(compact_item, setup_data, "sell", per_item_sell_location[compact_item]) * compact_amount
             if cost - compact_cost > self.compact_tolerance.get():
-                over_compacting.append(md.calculator_data[item]['display'])
+                over_compacting.append(self.md.calculator_data[item]['display'])
         if len(over_compacting) != 0:
             setup_notes["Over-compacting"] = ', '.join(over_compacting)
         return
@@ -1628,7 +1633,7 @@ class Calculator(tk.Tk):
 
         """
         pet_xp_boost = 1
-        if md.calculator_data[pet]["pet_type"] != "all" and md.calculator_data[pet]["pet_type"] != xp_type:
+        if self.md.calculator_data[pet]["pet_type"] != "all" and self.md.calculator_data[pet]["pet_type"] != xp_type:
             if xp_type in ["alchemy", "enchanting"]:
                 pet_xp_boost = 1 / 12
             else:
@@ -1638,8 +1643,8 @@ class Calculator(tk.Tk):
         if exp_share:
             return pet_xp_boost
         pet_xp_boost *= (1 + setup_data["taming"] / 100) * (1 + setup_data["beastmaster"] / 100)
-        if md.calculator_data[setup_data["pet_exp_boost"]]["exp_boost_type"] in [xp_type, "all"] and not md.has_data_tag(pet, "dragon_egg_pet"):
-            pet_item = 1 + md.calculator_data[setup_data["pet_exp_boost"]]["exp_boost_amount"] / 100
+        if self.md.calculator_data[setup_data["pet_exp_boost"]]["exp_boost_type"] in [xp_type, "all"] and not self.md.has_data_tag(pet, "dragon_egg_pet"):
+            pet_item = 1 + self.md.calculator_data[setup_data["pet_exp_boost"]]["exp_boost_amount"] / 100
         else:
             pet_item = 1
         if setup_data["mayor"] == "MAYOR_DIANA":
@@ -1676,9 +1681,9 @@ class Calculator(tk.Tk):
         # Main pet
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         dragon_pet_multiplier = lambda pet_item: 1
-        dragon_pet_xp_lvl_200 = md.max_lvl_pet_xp_amounts["Dragon"]
-        if md.has_data_tag(main_pet, "dragon_pet"):
-            dragon_pet_xp_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
+        dragon_pet_xp_lvl_200 = self.md.max_lvl_pet_xp_amounts["Dragon"]
+        if self.md.has_data_tag(main_pet, "dragon_pet"):
+            dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["Legendary"]
             dragon_pet_multiplier = lambda pet_item: dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (pet_item - 1))
         for skill, amount in skill_xp.items():
             pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
@@ -1692,21 +1697,21 @@ class Calculator(tk.Tk):
                 continue
             exp_share_pet = pet_info["pet"]
             dragon_pet_multiplier = 1
-            if md.has_data_tag(exp_share_pet, "dragon_pet"):
+            if self.md.has_data_tag(exp_share_pet, "dragon_pet"):
                 if exp_share_boost == 0:
                     continue
-                dragon_pet_xp_lvl_100 = md.max_lvl_pet_xp_amounts["Legendary"]
+                dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["Legendary"]
                 dragon_pet_multiplier = dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (exp_share_item / exp_share_boost))
             for skill, amount in main_pet_xp.items():
                 pet_xp_boost = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
-                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * pet_xp_boost * dragon_pet_multiplier
+                pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not self.md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * pet_xp_boost * dragon_pet_multiplier
 
         # Calculate levelled pets
         for pet_slot, pet_info in setup_pets.items():
-            if md.has_data_tag(pet_info["pet"], "dragon_pet"):
+            if self.md.has_data_tag(pet_info["pet"], "dragon_pet"):
                 max_lvl_pet_xp = dragon_pet_xp_lvl_200
             else:
-                max_lvl_pet_xp = md.max_lvl_pet_xp_amounts[md.calculator_data[pet_info["pet"]]["rarity"]]
+                max_lvl_pet_xp = self.md.max_lvl_pet_xp_amounts[self.md.calculator_data[pet_info["pet"]]["rarity"]]
             pet_info["levelled_pets"] = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
         return setup_pets
 
@@ -1725,17 +1730,17 @@ class Calculator(tk.Tk):
         for pet_slot, pet_info in setup_pets.items():
             if pet_info["pet"] not in self.pet_costs.list:
                 if pet_info["pet"] not in pet_prices:
-                    pet_prices[pet_info["pet"]] = f"Price for {md.calculator_data[pet_info['pet']]["display"]} not found"
+                    pet_prices[pet_info["pet"]] = f"Price for {self.md.calculator_data[pet_info['pet']]["display"]} not found"
             else:
                 pet_profit += pet_info["levelled_pets"] * (self.pet_costs.list[pet_info["pet"]]["max"] - self.pet_costs.list[pet_info["pet"]]["min"])
                 if pet_info["pet"] not in pet_prices:
                     pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["max"])}"
-            if md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
+            if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
-                pet_profit -= pet_info["levelled_pets"] * (md.pet_item_scrub_cost[md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
+                pet_profit -= pet_info["levelled_pets"] * (self.md.pet_item_scrub_cost[self.md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pet_info["levelled_pets"] * (md.pet_item_scrub_cost[md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
+                pet_profit -= pet_info["levelled_pets"] * (self.md.pet_item_scrub_cost[self.md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
         return pet_profit, pet_prices
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
@@ -1755,10 +1760,10 @@ class Calculator(tk.Tk):
             else:
                 beacon_fuel_ID = "POWER_CRYSTAL"
             cost_per_crystal = self.get_price(beacon_fuel_ID, setup_data, "buy", "bazaar")
-            fuel_cost += empty_time_seconds * cost_per_crystal / md.calculator_data[beacon_fuel_ID]["fuel_duration"] * int(not (setup_data["B_constant"]))
-        if md.calculator_data[minion_fuel]["fuel_duration"] != -1:
+            fuel_cost += empty_time_seconds * cost_per_crystal / self.md.calculator_data[beacon_fuel_ID]["fuel_duration"] * int(not (setup_data["B_constant"]))
+        if self.md.calculator_data[minion_fuel]["fuel_duration"] != -1:
             cost_per_fuel = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
-            needed_fuel = minion_amount * empty_time_seconds / md.calculator_data[minion_fuel]["fuel_duration"]
+            needed_fuel = minion_amount * empty_time_seconds / self.md.calculator_data[minion_fuel]["fuel_duration"]
             fuel_cost += needed_fuel * cost_per_fuel
         return fuel_cost, needed_fuel
 
@@ -1786,13 +1791,13 @@ class Calculator(tk.Tk):
         tier_loop = range(1, minion_tier + 1)
         for tier in tier_loop:
             tiered_coin_cost[tier] = 0.0
-            if minion_type in md.extraMinionCosts:
-                if tier in md.extraMinionCosts[minion_type]:
-                    if "COINS" in md.extraMinionCosts[minion_type][tier]:
-                        tiered_coin_cost[tier] += md.extraMinionCosts[minion_type][tier]["COINS"]
-                    if len(md.extraMinionCosts[minion_type][tier]) > 1 or "COINS" not in md.extraMinionCosts[minion_type][tier]:
-                        tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in md.extraMinionCosts[minion_type][tier].items() if cost_type != "COINS"}
-            for item, amount in md.minionCosts[minion_type][tier].items():
+            if "extra_minion_costs" in self.md.calculator_data[minion_type]:
+                if str(tier) in self.md.calculator_data[minion_type]["extra_minion_costs"]:
+                    if "COINS" in self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]:
+                        tiered_coin_cost[tier] += self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]["COINS"]
+                    if len(self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]) > 1 or "COINS" not in self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]:
+                        tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)].items() if cost_type != "COINS"}
+            for item, amount in self.md.calculator_data[minion_type]["minion_costs"][str(tier)].items():
                 if item not in cost_cache:
                     cost_cache[item] = self.get_price(item, setup_data, "buy", "bazaar")
                 tiered_coin_cost[tier] += amount * cost_cache[item]
@@ -1810,7 +1815,7 @@ class Calculator(tk.Tk):
         cost_per_part["minion"] = tiered_coin_cost[minion_tier]
 
         # Infinite fuel cost
-        if minion_fuel != "NONE" and md.calculator_data[minion_fuel]["fuel_duration"] == -1:
+        if minion_fuel != "NONE" and self.md.calculator_data[minion_fuel]["fuel_duration"] == -1:
             cost_per_part["fuel"] = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
 
         # Hopper cost
@@ -1882,7 +1887,7 @@ class Calculator(tk.Tk):
 
         # Pet Item costs
         for pet_slot in setup_pets.keys():
-            if md.has_data_tag(setup_pets[pet_slot]["pet"], "dragon_egg_pet"):
+            if self.md.has_data_tag(setup_pets[pet_slot]["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet":
                 cost_per_part["pet_exp_boost"] = self.get_price(setup_data["pet_exp_boost"], setup_data, "buy", "custom", True)
@@ -1893,9 +1898,9 @@ class Calculator(tk.Tk):
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
-            cost_per_part["toucan_attribute"] = md.attribute_shards["Epic"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
+            cost_per_part["toucan_attribute"] = self.md.attribute_shards["Epic"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
         if setup_data["falcon_attribute"] != 0:
-            cost_per_part["falcon_attribute"] = md.attribute_shards["Rare"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
+            cost_per_part["falcon_attribute"] = self.md.attribute_shards["Rare"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
 
 
         total_cost = sum(cost_per_part.values())
@@ -1929,9 +1934,9 @@ class Calculator(tk.Tk):
             self.update_prices(cooldown_warning=False, in_gui=inGUI)
             for pet_ID in [setup_data["levelingpet"], setup_data["expsharepet"], setup_data["expsharepetslot2"], setup_data["expsharepetslot3"]]:
                 self.update_pet_price(pet_ID)
-            if md.has_data_tag(setup_data["pet_exp_boost"], "auction_price_upon_request") and (time.time() - md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] > self.API_cooldown.get()):
-                md.calculator_data[setup_data["pet_exp_boost"]]["prices"]["custom"] = self.call_auction_house(setup_data["pet_exp_boost"])
-                md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] = time.time()
+            if self.md.has_data_tag(setup_data["pet_exp_boost"], "auction_price_upon_request") and (time.time() - self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] > self.API_cooldown.get()):
+                self.md.calculator_data[setup_data["pet_exp_boost"]]["prices"]["custom"] = self.call_auction_house(setup_data["pet_exp_boost"])
+                self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] = time.time()
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -2026,8 +2031,8 @@ class Calculator(tk.Tk):
         setup_ID = self.construct_id(setup_data)
 
         # Get minion notes
-        if "notes" in md.calculator_data[minion_type]:
-            setup_notes.update(md.calculator_data[minion_type]["notes"])
+        if "notes" in self.md.calculator_data[minion_type]:
+            setup_notes.update(self.md.calculator_data[minion_type]["notes"])
 
         # collect outputs
         outputs = {
@@ -2102,21 +2107,21 @@ class Calculator(tk.Tk):
         for item_data in raw_item_data["items"]:
             dict_item_data[item_data["id"]] = item_data
         
-        for item_id in md.calculator_data.keys():
-            if "prices" not in md.calculator_data[item_id]:
+        for item_id in self.md.calculator_data.keys():
+            if "prices" not in self.md.calculator_data[item_id]:
                 continue
             if item_id in dict_item_data and "npc_sell_price" in dict_item_data[item_id]:
-                md.calculator_data[item_id]["prices"]["npc"] = dict_item_data[item_id]["npc_sell_price"]
-            elif "npc" not in md.calculator_data[item_id]["prices"]:
-                md.calculator_data[item_id]["prices"]["npc"] = 0
+                self.md.calculator_data[item_id]["prices"]["npc"] = dict_item_data[item_id]["npc_sell_price"]
+            elif "npc" not in self.md.calculator_data[item_id]["prices"]:
+                self.md.calculator_data[item_id]["prices"]["npc"] = 0
             if item_id in raw_bazaar_data["products"]:
                 self.bazaar_items.append(item_id)
-            elif "recipe" in md.calculator_data[item_id]:
+            elif "recipe" in self.md.calculator_data[item_id]:
                 self.recipe_items.append(item_id)
-            elif md.has_data_tag(item_id, "auction_price"):
+            elif self.md.has_data_tag(item_id, "auction_price"):
                 self.AH_items.append(item_id)
-            elif md.has_data_tag(item_id, "auction_price_upon_request"):
-                md.calculator_data[item_id]["price_last_updated"] = 0
+            elif self.md.has_data_tag(item_id, "auction_price_upon_request"):
+                self.md.calculator_data[item_id]["price_last_updated"] = 0
         return  
 
 
@@ -2144,8 +2149,8 @@ class Calculator(tk.Tk):
             for action in ["buy", "sell"]:
                 top_amount = top_percent * sum([order["amount"] for order in raw_bazaar_data["products"][item_id][f"{action}_summary"]])
                 if top_amount == 0:
-                    md.calculator_data[item_id]["prices"][f"{action}Price"] = 0
-                    if "npc" not in md.calculator_data[item_id]["prices"]:
+                    self.md.calculator_data[item_id]["prices"][f"{action}Price"] = 0
+                    if "npc" not in self.md.calculator_data[item_id]["prices"]:
                         self.huim.logger.warning(f"no {action} supply for {item_id}")
                     continue
                 counter = top_amount
@@ -2163,10 +2168,10 @@ class Calculator(tk.Tk):
                 top_percent_avg_price = top_sum / top_amount
                 top_price = raw_bazaar_data["products"][item_id][f"{action}_summary"][0]["pricePerUnit"]
                 if top_price / top_percent_avg_price >= 2.5:
-                    md.calculator_data[item_id]["prices"][f"{action}Price"] = top_price
+                    self.md.calculator_data[item_id]["prices"][f"{action}Price"] = top_price
                     self.huim.logger.info(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
-                    md.calculator_data[item_id]["prices"][f"{action}Price"] = top_percent_avg_price
+                    self.md.calculator_data[item_id]["prices"][f"{action}Price"] = top_percent_avg_price
         self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(self.API_timer)))
         return
 
@@ -2196,21 +2201,21 @@ class Calculator(tk.Tk):
         -------
         None.
         """
-        if item_id not in md.calculator_data:
+        if item_id not in self.md.calculator_data:
             self.huim.logger.error(f"{item_id} not in calculator data")
             return
-        if "recipe" not in md.calculator_data[item_id]:
+        if "recipe" not in self.md.calculator_data[item_id]:
             self.huim.logger.error(f"{item_id} is not a recipe item")
             return
-        md.calculator_data[item_id]["prices"]["buyPrice"] = 0
-        md.calculator_data[item_id]["prices"]["sellPrice"] = 0
-        for material_id, amount in md.calculator_data[item_id]["recipe"].items():
-            if md.has_data_tag(material_id, "auction_price"):
-                md.calculator_data[item_id]["prices"]["buyPrice"] += amount * md.calculator_data[material_id]["prices"]["custom"]
-                md.calculator_data[item_id]["prices"]["sellPrice"] += amount * md.calculator_data[material_id]["prices"]["custom"]
+        self.md.calculator_data[item_id]["prices"]["buyPrice"] = 0
+        self.md.calculator_data[item_id]["prices"]["sellPrice"] = 0
+        for material_id, amount in self.md.calculator_data[item_id]["recipe"].items():
+            if self.md.has_data_tag(material_id, "auction_price"):
+                self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["custom"]
+                self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["custom"]
                 continue
-            md.calculator_data[item_id]["prices"]["buyPrice"] += amount * md.calculator_data[material_id]["prices"]["buyPrice"]
-            md.calculator_data[item_id]["prices"]["sellPrice"] += amount * md.calculator_data[material_id]["prices"]["sellPrice"]
+            self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["buyPrice"]
+            self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["sellPrice"]
         return
 
     def update_prices(self, cooldown_warning=True, in_gui=True):
@@ -2231,7 +2236,7 @@ class Calculator(tk.Tk):
         self.call_bazaar()
         self.huim.logger.info("Updating Auction House prices")
         for item_id in self.AH_items:
-            md.calculator_data[item_id]["prices"]["custom"] = self.call_auction_house(item_id)
+            self.md.calculator_data[item_id]["prices"]["custom"] = self.call_auction_house(item_id)
         self.huim.logger.info("Updating Recipe prices")
         for item_id in self.recipe_items:
             self.update_recipe_price(item_id)
@@ -2261,15 +2266,15 @@ class Calculator(tk.Tk):
         rarity_options = { "Common": "COMMON", "Uncommon": "UNCOMMON", "Rare": "RARE", "Epic": "EPIC", "Legendary": "LEGENDARY", "Mythic": "MYTHIC"}
         level_ranges = { "min": "1", "max": "100" }
         api_end_point = r"https://sky.coflnet.com/api/item/price/"
-        if md.has_data_tag(pet_ID, "dragon_egg_pet"):
+        if self.md.has_data_tag(pet_ID, "dragon_egg_pet"):
             api_pet_id = pet_ID.removesuffix("_EGG")
             level_ranges["max"] = "100-103"
         else:
             api_pet_id = pet_ID
-        if md.has_data_tag(pet_ID, "dragon_pet"):
+        if self.md.has_data_tag(pet_ID, "dragon_pet"):
             level_ranges["max"] = "200"
         api_bin = r"/bin"
-        api_static_filters = r"?filters[Rarity]=" + rarity_options[md.calculator_data[pet_ID]["rarity"]] + r"&filters[Candy]=0&filters[PetLevel]="
+        api_static_filters = r"?filters[Rarity]=" + rarity_options[self.md.calculator_data[pet_ID]["rarity"]] + r"&filters[Candy]=0&filters[PetLevel]="
         results = {"min": 0, "max": 0}
         for level_type, level_range in level_ranges.items():
             raw_auction_data = self.huim.call_API(api_end_point + api_pet_id + api_bin + api_static_filters + level_range, f"SkyCofl pet AH BIN API: {api_pet_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
@@ -2312,7 +2317,7 @@ class Calculator(tk.Tk):
                     continue
                 format_function = lambda x: x
                 if self.var_dict[var_key].has_tag("item_ID_to_display"):
-                    format_function = lambda x: md.calculator_data[x]["display"]
+                    format_function = lambda x: self.md.calculator_data[x]["display"]
                 self.var_dict[var_key].update_listbox(key_format_function=format_function)
         return
 
