@@ -100,19 +100,21 @@ templateList = {
         "afkpet_lvl": 100,
         "afk": True
     },
-    "Solo Wisdom": {
-        "mining_wisdom": 83.5,  # max Seasoned Mineman (15), cookie (25), god pot (20), Cavern Wisdom (6.5), Refined Divine drill with Compact X (7 + 10)
-        "combat_wisdom": 109,  # max Slayer unique tier kills (6 + 6 + 6 + 12 + 6), Rift Necklace (1), Hunter Ring (5), Bubba Blister (2), Veteran (10), cookie (25), god pot (30)
-        "farming_wisdom": 72.5,  # Fruit Bowl (1), Pelt Belt (1), Zorro's Cape (1), Rift Necklace (1), Agarimoo Artifact (1), Garden Wisdom (6.5) cookie (25), god pot (20), Blessed Mythic farming tool with Cultivating X (6 + 10)
-        "fishing_wisdom": 55.5,  # Moby-Duck (1), Future Calories Talisman (1), Agarimoo Artifact (1), Chumming Talisman (1), Sea Wisdom (6.5), cookie (25), god pot (20)
-        "foraging_wisdom": 93.82,  # Efficient Forager (15), Foraging Wisdom (6.5), David's Cloak (5), Foraging Wisdom Boosters armor and equipment (4 + 2), cookie (25), god pot (20), Moonglade Legendary Axe with Absorb X, Foraging Wisdom Boosters and essence shop perk Axed I ((5 + 10 + 1) * 1.02)
+    "Solo Wisdom": {  # consists of non-random sources of wisdom that can be achieved alone on the private island, excluding pets
+        "mining_wisdom": 97.1,  # Abicase (1.5), cookie (25), god pot (20), Refined Divine drill with Compact X (7 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
+        "combat_wisdom": 110.5,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), Rift Necklace (1), cookie (25), god pot (30), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
+        "farming_wisdom": 187,  # Agarimoo Artifact (1), Abicase (1.5), Lunar Legendary Pelt Belt (1 + 3), Lunar Mythic Zorro's Cape during Contest (2 * (1 + 4)), Lunar Mythic Rift Necklace (1 + 6), Lunar Mythic Gillsplash Gloves (4), Blessed Legendary Mk. III farming tool with Cultivating X (3 + 5 + 10), Mythic Sunny armor (4 * 6), cookie (25), god pot (20), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
+        "fishing_wisdom": 88.5,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
+        "foraging_wisdom": 95.32,  # Abicase (1.5), cookie (25), god pot (20), David's Cloak (5), Foraging Wisdom Boosters armor and equipment (4 + 2), Moonglade Legendary Axe with Absorb X, Foraging Wisdom Boosters and essence shop perk Axed I ((5 + 10 + 1) * 1.02), Efficient Forager (15), Foraging Wisdom (6.5)
+        "alchemy_wisdom": 51.5  # Witch's Artifact (1.5), cookie (25), god pot (20), Spider Slayer VIII (5)
     },
-    "Full Coop Wisdom": {  # cookie (25), god pot (20), 8 * (1 + 45 / 100) = 8 + (8 * 45) / 100 =  1 + (700 + 8 * 45) / 100 = 1 + 1060 / 100
-        "mining_wisdom": 1060,  
-        "combat_wisdom": 1060,
-        "farming_wisdom": 1060,
-        "fishing_wisdom": 1060,
-        "foraging_wisdom": 1060,
+    "Full Coop Wisdom": {  # effective wisdom of 8 players, for each player same sources as above, but no tools, armor or equipment. Calculates as `8 * (1 + W / 100) = (1 + (700 + 8 * W) / 100)`
+        "mining_wisdom": 1244,  # Abicase (1.5), cookie (25), god pot (20), Cavern Wisdom (6.5), Seasoned Mineman (15)
+        "combat_wisdom": 1576,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), cookie (25), god pot (30), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
+        "farming_wisdom": 1660,  # Agarimoo Artifact (1), Abicase (1.5), cookie (25), god pot (20), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
+        "fishing_wisdom": 1408,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
+        "foraging_wisdom": 1244,  # Abicase (1.5), cookie (25), god pot (20), Efficient Forager (15), Foraging Wisdom (6.5)
+        "alchemy_wisdom": 1112  # Witch's Artifact (1.5), cookie (25), god pot (20), Spider Slayer VIII (5)
     },
     "Combat Pet Leveling": {
         "expshareitem": True,
@@ -543,7 +545,10 @@ class Calculator(tk.Tk):
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
-            "**Setup Information**": {"\n> ": ("calculated_ID", "actiontime", "fuelamount", "available_storage", "optimal_tier_free_will", "setupcost", "extracost")},
+            "**Setup Information**\n": {
+                "> ": ["calculated_ID"],
+                "\n> ": ["actiontime", "fuelamount", "available_storage", "optimal_tier_free_will", "setupcost", "extracost"]
+            },
             "setupcost_breakdown": None,
             "Market Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
             "notes": None,

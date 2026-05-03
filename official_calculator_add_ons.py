@@ -185,7 +185,8 @@ def inferno_minion_loop(calculator):
     markdown_output = calculator.huim.edit_vars_output["markdown_output"].get()
     setup_data["minion"] = "INFERNO_MINION"
     setup_data["fuel"] = "INFERNO_FUEL"
-    setup_data["chest"] = "XXLARGE_ENCHANTED_CHEST"
+    if setup_data["inferno_grade"] == "HYPERGOLIC_GABAGOOL":
+        setup_data["chest"] = "XXLARGE_ENCHANTED_CHEST"
     setup_data["rising_celsius_override"] = True
 
     loop_tiers = range(1, 12)
