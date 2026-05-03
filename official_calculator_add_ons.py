@@ -114,7 +114,7 @@ def basic_minion_loop(calculator):
         if "CORRUPT_SOIL" in upgrades and not calculator.md.has_data_tag(loop_minion, "mob_minion"):
             continue
         setup_data["minion"] = loop_minion
-        setup_data["miniontier"] = list(calculator.md.calculator_data[setup_data["minion"]]["speed"].keys())[-1]
+        setup_data["miniontier"] = int(list(calculator.md.calculator_data[setup_data["minion"]]["speed"].keys())[-1])
         if super_compactor:
             if loop_minion in loop_minion_smelting:
                 setup_data["upgrade1"] = "DWARVEN_COMPACTOR"
@@ -129,7 +129,7 @@ def basic_minion_loop(calculator):
         calculator.collect_addon_output("Basic Minion Loop", "No setups pass the cost filter")
         return
     setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
-    setup_data["used_pet_prices"] = outputs["used_pet_prices"]
+    setup_data.update(outputs)
     setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
     output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
             "amount": None,
@@ -145,7 +145,7 @@ def basic_minion_loop(calculator):
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
-            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
+            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
             }, markdown=markdown_output, to_terminal=False)
     if markdown_output:
         output_str += "\n```"
@@ -205,7 +205,7 @@ def inferno_minion_loop(calculator):
         calculator.collect_addon_output("Inferno Minion Loop", "No setups pass the cost filter")
         return
     setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
-    setup_data["used_pet_prices"] = outputs["used_pet_prices"]
+    setup_data.update(outputs)
     setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
     output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
             "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
@@ -220,7 +220,7 @@ def inferno_minion_loop(calculator):
                 "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
             },
             "used_pet_prices": None,
-            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper"]},
+            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
             }, markdown=markdown_output, to_terminal=False)
     if markdown_output:
         output_str += "\n```"
@@ -252,11 +252,11 @@ def inferno_minion_loop_inputs(calculator):
     return
 
 def craft_material_amount(calculator):
-    setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])
-    materials = calculator.md.minionCostSum(setup_data["minion"], setup_data["miniontier"])
+    setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])  # TODO: make it get calculated_ID, to stop desync inputs and output
+    materials = calculator.md.minion_cost_sum(setup_data["minion"], setup_data["miniontier"])
     extra_costs_string = setup_data["extracost"]
     materials_string = ", ".join([f"{amount * setup_data["amount"]} {calculator.md.calculator_data[material]["display"]}" for material, amount in materials.items()])
-    if len(extra_costs_string) != 0:
+    if extra_costs_string != "None":
         materials_string += ", " + extra_costs_string
     calculator.collect_addon_output("Minion Crafting Materials", materials_string)
     return

@@ -83,6 +83,16 @@ class H_data_M():
                 return True
         return False
 
+    def minion_cost_sum(self, minion_type, final_tier):
+        final_cost = {}
+        tier_loop = range(1, final_tier + 1)
+        for tier in tier_loop:
+            for item, amount in self.calculator_data[minion_type]["minion_costs"][str(tier)].items():
+                if item not in final_cost:
+                    final_cost[item] = 0
+                final_cost[item] += amount
+        return final_cost
+
 """
 Calculator Data Notes
 
@@ -91,8 +101,6 @@ If information has been checked but still isn't a logical value, then there is "
 These are inaccuracies from Hypixel and they can correct them at any point in time, so they should be checked regularly
 If that date is missing, it was confirmed by an old test and might need to be checked again.
 
-On going research
-- compacting of ENCHANTED_BONE -> ENCHANTED_BONE_BLOCK
 
 LAPIS_MINION: drops  # correct
 HARD_STONE_MINION: drops  # correct

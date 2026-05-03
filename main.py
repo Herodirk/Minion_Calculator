@@ -540,7 +540,7 @@ class Calculator(tk.Tk):
             "used_pet_prices": None,
             "**Setup Information**": {"\n> ": ("calculated_ID", "actiontime", "fuelamount", "available_storage", "optimal_tier_free_will", "setupcost", "extracost")},
             "setupcost_breakdown": None,
-            "Bazaar Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
+            "Market Info": {"\n> ": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
             "notes": None,
             "empty_time": None,
             "**Outputs** for ": {"": {"scaled_time"}},
@@ -749,7 +749,7 @@ class Calculator(tk.Tk):
                 continue
             if section_key == "Inferno Info" and calculation_data["minion"] != "Inferno" and calculation_data["fuel"] != "Inferno Minion Fuel":
                 continue
-            if section_key == "Bazaar Info" and ("bazaar_update_txt" in output_switches and output_switches["bazaar_update_txt"] is False):
+            if section_key == "Market Info" and ("bazaar_update_txt" in output_switches and output_switches["bazaar_update_txt"] is False):
                 continue
 
             line_str = ""
