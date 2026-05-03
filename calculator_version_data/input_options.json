@@ -96,7 +96,8 @@
         "Inferno Minion Fuel": "INFERNO_FUEL",
         "Dayswitch": "DAYSWITCH",
         "Nightswitch": "NIGHTSWITCH",
-        "Thorny Vines": "THORNY_VINES"
+        "Thorny Vines": "THORNY_VINES",
+        "Jacob's Participation Medal": "JACOBS_PARTICIPATION_MEDAL"
     },
     "inferno_grade": {
         "Hypergolic Gabagool": "HYPERGOLIC_GABAGOOL",
@@ -157,6 +158,7 @@
     "crystal": {
         "None": "NONE",
         "Farm Crystal": "FARM_CRYSTAL",
+        "Cornucopia Crystal": "CORNUCOPIA_CRYSTAL",
         "Woodcutting Crystal": "WOODCUTTING_CRYSTAL",
         "Mithril Crystal": "MITHRIL_CRYSTAL",
         "Winter Crystal": "WINTER_ISLAND_CRYSTAL",

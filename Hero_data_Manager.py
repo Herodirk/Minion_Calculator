@@ -146,6 +146,7 @@ Offline cooldown of the following upgrades are not confirmed:
 - SOULFLOW_ENGINE
 - BERBERIS_FUEL_INJECTOR
 
+JACOBS_PARTICIPATION_MEDAL: upgrade_special  # rough estimate of drop rate
 ENCHANTED_SHEARS: upgrade_special  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
 
 Compacting recipes notes:

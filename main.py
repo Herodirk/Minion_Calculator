@@ -220,7 +220,8 @@ class Calculator(tk.Tk):
         self.B_constant = HPM.Hvar(self.huim, key="B_constant", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
         self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
         self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
-        self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=self.input_options["crystal"])
+        self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=self.input_options["crystal"], command=self.huim.create_switch_call("cornucopia_bonus", controlvar="self"))
+        self.unique_farming_minions = HPM.Hvar(self.huim, key="unique_farming_minions", vtype="input", dtype=int, display="Uniques", fancy_display="Unique Farming Minions", frame="inputs_minion_grid", initial=1)
         self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("optimal_free_will", controlvar="free_will"))
         self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
         self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
@@ -362,6 +363,7 @@ class Calculator(tk.Tk):
                 "B_constant": None,
                 "B_acquired": None,
                 "crystal": None,
+                "unique_farming_minions": None,
                 "postcard": None,
             },
             "inputs_player_grid": {
@@ -496,6 +498,8 @@ class Calculator(tk.Tk):
                             locations="grid", control=True, negate=False, initial=False)
         self.huim.def_switch("setup_cost_breakdown", widget_references="setupcost_breakdown",
                             locations="grid", control=None, negate=False, initial=False)
+        self.huim.def_switch("cornucopia_bonus", widget_references="unique_farming_minions",
+                            locations="grid", control="Cornucopia Crystal", negate=False, initial=False)
         self.huim.def_switch("addons", widget_references=self.frames["addons_main"],
                             locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
         
@@ -527,6 +531,7 @@ class Calculator(tk.Tk):
                 "\n> External: ": {"chest", "beacon", "crystal", "postcard"},
                 "\n> Permanent: ": {"infusion", "free_will"}
             },
+            "unique_farming_minions": None,
             "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
             "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
@@ -598,7 +603,7 @@ class Calculator(tk.Tk):
 
         """
         if multi_ID == "minion":
-            if type(control) == str or self.miniontier.get() not in self.md.calculator_data[self.minion.get()]["speed"].keys():
+            if type(control) == str or str(self.miniontier.get()) not in self.md.calculator_data[self.minion.get()]["speed"].keys():
                 self.miniontier.set(list(self.md.calculator_data[self.minion.get()]["speed"].keys())[-1])
             if type(control) == str:
                 self.huim.toggle_switch("potato_accessory_switch", control + str(self.afk.get()))
@@ -671,6 +676,9 @@ class Calculator(tk.Tk):
                 return None
         elif var_key in ["rising_celsius_override"]:  # special case: Rising Celsius only applies to Inferno minions
             if calculation_data["minion"] != "Inferno":
+                return None
+        elif var_key in ["unique_farming_minions"]:  # special case: Unique Farming Minions only matters for Cornucopia Crystal
+            if calculation_data["crystal"] != "Cornucopia Crystal":
                 return None
         elif var_key == "scaled_time" and calculation_data["scale_time"] is False and output_switches["empty_time"] is False:  # special case: scale time is off and empty time is off
             return None
@@ -966,6 +974,8 @@ class Calculator(tk.Tk):
         if setup_data["crystal"] != "NONE":
             if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["crystal"]]["affected_minions"]):
                 speed_boost += self.md.calculator_data[setup_data["crystal"]]["speed_boost"]
+                if setup_data["crystal"] == "CORNUCOPIA_CRYSTAL":
+                    speed_boost += setup_data["unique_farming_minions"]
         if setup_data["beacon"] != "NONE" and setup_data["scorched"]:
             speed_boost += self.md.calculator_data["SCORCHED_POWER_CRYSTAL"]["speed_boost"]
         if minion == "INFERNO_MINION":
@@ -1160,11 +1170,13 @@ class Calculator(tk.Tk):
             seconds per action.
         """
         base_speed = self.md.calculator_data[minion]["speed"][str(minion_tier)]
-        secondsPaction = base_speed / (1 + speed_boost / 100)
+        seconds_per_action = base_speed / (1 + speed_boost / 100)
         if minion_fuel_id == "INFERNO_FUEL":
-            secondsPaction /= 1 + self.md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
-        secondsPaction = round(secondsPaction * 20) / 20
-        return secondsPaction
+            seconds_per_action /= 1 + self.md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
+        seconds_per_action = round(seconds_per_action * 20) / 20
+        if seconds_per_action < 0.05:
+            seconds_per_action = 0.05
+        return seconds_per_action
 
     def get_time_constants(self, seconds_per_action, actions_per_harvest, setup_data):
         """
@@ -1228,12 +1240,14 @@ class Calculator(tk.Tk):
             drop_multiplier = 1
         return harvests_per_time, drop_multiplier
 
-    def get_upgrade_info(self, upgrade_ids, drops_list):
+    def get_upgrade_info(self, minion_fuel_id, upgrade_ids, drops_list):
         """
         Generates
         
         Parameters
         ----------
+        minion_fuel_id : str
+            Minion fuel ID
         upgrade_ids : list
             list of upgrade IDs
         drops_list : dict
@@ -1247,7 +1261,9 @@ class Calculator(tk.Tk):
         """
         spreading_info = {}
         replace_info = {}
-        for upgrade in upgrade_ids:
+        for upgrade in [*upgrade_ids, minion_fuel_id]:
+            if "upgrade_special" not in self.md.calculator_data[upgrade]:
+                continue
             upgrade_type = self.md.calculator_data[upgrade]["upgrade_special"]["type"]
             if "spreading" in upgrade_type:
                 for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
@@ -1982,7 +1998,7 @@ class Calculator(tk.Tk):
         harvests_per_time, drop_multiplier = self.get_harvests_per_time(empty_time_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier, setup_data)
 
         # initialise drops list and get upgrade info
-        spreading_info, replace_info = self.get_upgrade_info(upgrades, drops_list)
+        spreading_info, replace_info = self.get_upgrade_info(minion_fuel, upgrades, drops_list)
         
         # base drops
         self.get_base_drops(drops_list, spreading_info, replace_info, minion_type, harvests_per_time, drop_multiplier)

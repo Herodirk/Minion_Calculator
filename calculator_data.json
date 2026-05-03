@@ -108,6 +108,14 @@
         },
         "compact_tier": 0
     },
+    "JACOBS_TICKET": {
+        "display": "Jacob's Ticket",
+        "prices": {},
+        "xp": {
+            "farming": 0
+        },
+        "compact_tier": 0
+    },
     "RAW_SOULFLOW": {
         "display": "Raw Soulflow",
         "prices": {},
@@ -3179,6 +3187,19 @@
         "fuel_duration": -1,
         "prices": {}
     },
+    "JACOBS_PARTICIPATION_MEDAL": {
+        "display": "Jacob's Participation Medal",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "fuel_duration": 259200,
+        "upgrade_special": {
+            "type": "spreading",
+            "items": {
+                "JACOBS_TICKET": 0.000222222222
+            }
+        },
+        "prices": {}
+    },
     "BUDGET_HOPPER": {
         "display": "Budget Hopper",
         "hopper_selling_rate": 0.5,
@@ -3799,12 +3820,27 @@
         "display": "Farm Crystal",
         "speed_boost": 10,
         "affected_minions": [
-            "farming_crop_minion"
+            "farming_crop_minion",
+            "farm_animal_minion"
         ],
         "prices": {},
         "recipe": {
             "ENCHANTED_PUMPKIN": 96,
             "ENCHANTED_QUARTZ": 1
+        }
+    },
+    "CORNUCOPIA_CRYSTAL": {
+        "display": "Cornucopia Crystal",
+        "speed_boost": 10,
+        "affected_minions": [
+            "farming_crop_minion",
+            "farm_animal_minion"
+        ],
+        "prices": {},
+        "recipe": {
+            "ENCHANTED_PUMPKIN": 96,
+            "ENCHANTED_QUARTZ": 1,
+            "CORNUCOPIA": 64
         }
     },
     "WOODCUTTING_CRYSTAL": {
@@ -3989,6 +4025,10 @@
         "tags": [
             "auction_price"
         ]
+    },
+    "CORNUCOPIA": {
+        "display": "Cornucopia",
+        "prices": {}
     },
     "PET_ITEM_MINING_SKILL_BOOST_COMMON": {
         "display": "Common Mining Exp Boost",
