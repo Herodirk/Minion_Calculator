@@ -3807,6 +3807,7 @@
     },
     "POWER_CRYSTAL": {
         "display": "Power Crystal",
+        "speed_boost": 0,
         "prices": {},
         "fuel_duration": 172800
     },
@@ -8669,6 +8670,14 @@
             "dragon_egg_pet"
         ]
     },
+    "PET_GOLDEN_DRAGON_HATCHED": {
+        "display": "Golden Dragon Hatched",
+        "pet_type": "combat",
+        "rarity": "Legendary",
+        "tags": [
+            "hatched_dragon_pet"
+        ]
+    },
     "PET_GOLEM": {
         "display": "Golem",
         "pet_type": "combat",
@@ -8728,6 +8737,14 @@
         "rarity": "Legendary",
         "tags": [
             "dragon_egg_pet"
+        ]
+    },
+    "PET_JADE_DRAGON_HATCHED": {
+        "display": "Jade Dragon Hatched",
+        "pet_type": "combat",
+        "rarity": "Legendary",
+        "tags": [
+            "hatched_dragon_pet"
         ]
     },
     "PET_JELLYFISH": {
@@ -8971,6 +8988,14 @@
         "rarity": "Legendary",
         "tags": [
             "dragon_egg_pet"
+        ]
+    },
+    "PET_ROSE_DRAGON_HATCHED": {
+        "display": "Rose Dragon Hatched",
+        "pet_type": "combat",
+        "rarity": "Legendary",
+        "tags": [
+            "hatched_dragon_pet"
         ]
     },
     "PET_SCATHA": {

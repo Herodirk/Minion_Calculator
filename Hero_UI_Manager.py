@@ -12,6 +12,7 @@ import numpy as np
 import urllib.request
 import logging
 import json
+import time
 from copy import deepcopy
 import math
 
@@ -642,15 +643,27 @@ class H_UI_M():
 
     ### Data logistics
 
-    def call_API(self, api_url, api_name="API", data=None, headers={}):
+    def call_API(self, api_url, api_name="API", data=None, headers={}, retried=False):
         self.logger.debug(f"Calling {api_name}")
+        failed = False
         try:
             req = urllib.request.Request(api_url, data=data, headers=headers)
             call_data = urllib.request.urlopen(req).read().decode('utf-8')
-        except Exception as error:
-            self.logger.error(f"Could not finish {api_name} call\n{error}")
-            return
-        return json.loads(call_data)
+        except urllib.error.HTTPError as error:
+            self.logger.error(f"Could not finish {api_name} call: \n{error.code}: {error.reason}")
+            failed = True
+        except urllib.error.URLError as error:
+            self.logger.error(f"Could not finish {api_name} call: \n{error.reason}")
+            failed = True
+        if failed:
+            if retried:
+                return {}
+            else:
+                self.logger.warning(f"Retrying {api_name} call in 10 seconds")
+                time.sleep(10)
+                return self.call_API(api_url, api_name=api_name, data=data, headers=headers, retried=True)
+        else:
+            return json.loads(call_data)
 
     def get_from_GUI(self, var_keys, translate=True):
         """

@@ -155,6 +155,10 @@
         "Beacon IV": "BEACON_4",
         "Beacon V": "BEACON_5"
     },
+    "beacon_fuel": {
+        "Power Crystal": "POWER_CRYSTAL",
+        "Scorched Power Crystal": "SCORCHED_POWER_CRYSTAL"
+    },
     "crystal": {
         "None": "NONE",
         "Farm Crystal": "FARM_CRYSTAL",
@@ -240,6 +244,7 @@
         "Goblin": "PET_GOBLIN",
         "Golden Dragon": "PET_GOLDEN_DRAGON",
         "Golden Dragon Egg": "PET_GOLDEN_DRAGON_EGG",
+        "Golden Dragon Hatched": "PET_GOLDEN_DRAGON_HATCHED",
         "Golem": "PET_GOLEM",
         "Grandma Wolf": "PET_GRANDMA_WOLF",
         "Griffin": "PET_GRIFFIN",
@@ -251,6 +256,7 @@
         "Jerry": "PET_JERRY",
         "Jade Dragon": "PET_JADE_DRAGON",
         "Jade Dragon Egg": "PET_JADE_DRAGON_EGG",
+        "Jade Dragon Hatched": "PET_JADE_DRAGON_HATCHED",
         "Jellyfish": "PET_JELLYFISH",
         "Kuudra": "PET_KUUDRA",
         "Lion": "PET_LION",
@@ -277,6 +283,7 @@
         "Rock": "PET_ROCK",
         "Rose Dragon": "PET_ROSE_DRAGON",
         "Rose Dragon Egg": "PET_ROSE_DRAGON_EGG",
+        "Rose Dragon Hatched": "PET_ROSE_DRAGON_HATCHED",
         "Scatha": "PET_SCATHA",
         "Seal": "PET_SEAL",
         "Sheep": "PET_SHEEP",

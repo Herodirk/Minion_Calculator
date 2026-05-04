@@ -135,7 +135,7 @@ templateList = {
         "upgrade2": "Flycatcher",
         "chest": "XX-Large Storage",
         "beacon": "Beacon V",
-        "scorched": True,
+        "beacon_fuel": "Scorched Power Crystal",
         "infusion": True,
         "free_will": True,
         "postcard": True,
@@ -218,9 +218,8 @@ class Calculator(tk.Tk):
         self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=self.input_options["upgrade"])
         self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="None", options=self.input_options["chest"])
         self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=str, display="Beacon", frame="inputs_minion_grid", initial="None", options=self.input_options["beacon"], command=self.huim.create_switch_call("beacon", controlvar="self"))
-        self.scorched = HPM.Hvar(self.huim, key="scorched", vtype="input", dtype=bool, display="Scorched", frame="inputs_minion_grid", initial=False)
-        self.B_constant = HPM.Hvar(self.huim, key="B_constant", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
-        self.B_acquired = HPM.Hvar(self.huim, key="B_acquired", vtype="input", dtype=bool, display="Acquired Beacon", frame="inputs_minion_grid", initial=False)
+        self.beacon_fuel = HPM.Hvar(self.huim, key="beacon_fuel", vtype="input", dtype=str, display="Beacon Fuel", frame="inputs_minion_grid", initial="Power Crystal", options=self.input_options["beacon_fuel"])
+        self.free_fuel_beacon = HPM.Hvar(self.huim, key="free_fuel_beacon", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
         self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
         self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=self.input_options["crystal"], command=self.huim.create_switch_call("cornucopia_bonus", controlvar="self"))
         self.unique_farming_minions = HPM.Hvar(self.huim, key="unique_farming_minions", vtype="input", dtype=int, display="Uniques", fancy_display="Unique Farming Minions", frame="inputs_minion_grid", initial=1)
@@ -361,9 +360,8 @@ class Calculator(tk.Tk):
                 "free_will": None,
                 "island_label": [None, islandtitleLB],
                 "beacon": None,
-                "scorched": None,
-                "B_constant": None,
-                "B_acquired": None,
+                "beacon_fuel": None,
+                "free_fuel_beacon": None,
                 "crystal": None,
                 "unique_farming_minions": None,
                 "postcard": None,
@@ -484,7 +482,7 @@ class Calculator(tk.Tk):
                             locations="grid", control="Inferno Minion Fuel", negate=False, initial=False)
         self.huim.def_switch("rising_celsius", widget_references="rising_celsius_override",
                             locations="grid", control="Inferno", negate=False, initial=False)
-        self.huim.def_switch("beacon", widget_references=["scorched", "B_constant", "B_acquired"],
+        self.huim.def_switch("beacon", widget_references=["beacon_fuel", "free_fuel_beacon"],
                             locations="grid", control="None", negate=True, initial=False)
         self.huim.def_switch("potato_accessory_switch", widget_references="potato_accessory",
                             locations="grid", control="PotatoTrue", negate=False, initial=False)
@@ -531,10 +529,10 @@ class Calculator(tk.Tk):
             "**Minion Upgrades**": {
                 "\n> Internal: ": {"fuel", "hopper", "upgrade1", "upgrade2"},
                 "\n> External: ": {"chest", "beacon", "crystal", "postcard"},
+                "\n-# ": ["unique_farming_minions"],
                 "\n> Permanent: ": {"infusion", "free_will"}
             },
-            "unique_farming_minions": None,
-            "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
+            "Beacon Info": {"\n> ": ["beacon_fuel", "free_fuel_beacon"]},
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
             "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
             "player_harvests": {"\n> ": ["player_looting"]},
@@ -963,7 +961,7 @@ class Calculator(tk.Tk):
         clock_override : boolean
             True if using the Enchanted Clock
         setup_data : dict
-            Needed setup data: amount, mayor, beacon, scorched, infusion, free_will, postcard, crystal,\n
+            Needed setup data: amount, mayor, beacon, beacon_fuel, infusion, free_will, postcard, crystal,\n
             potato_accessory, afkpet, afkpet_rarity, afkpet_lvl, rising_celsius_override
 
         Returns
@@ -981,8 +979,8 @@ class Calculator(tk.Tk):
                 speed_boost += self.md.calculator_data[setup_data["crystal"]]["speed_boost"]
                 if setup_data["crystal"] == "CORNUCOPIA_CRYSTAL":
                     speed_boost += setup_data["unique_farming_minions"]
-        if setup_data["beacon"] != "NONE" and setup_data["scorched"]:
-            speed_boost += self.md.calculator_data["SCORCHED_POWER_CRYSTAL"]["speed_boost"]
+        if setup_data["beacon"] != "NONE":
+            speed_boost += self.md.calculator_data[setup_data["beacon_fuel"]]["speed_boost"]
         if minion == "INFERNO_MINION":
             if setup_data["rising_celsius_override"]:
                 speed_boost += 180
@@ -1703,8 +1701,8 @@ class Calculator(tk.Tk):
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         dragon_pet_multiplier = lambda pet_item: 1
         dragon_pet_xp_lvl_200 = self.md.max_lvl_pet_xp_amounts["Dragon"]
+        dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["Legendary"]
         if self.md.has_data_tag(main_pet, "dragon_pet"):
-            dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["Legendary"]
             dragon_pet_multiplier = lambda pet_item: dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (pet_item - 1))
         for skill, amount in skill_xp.items():
             pet_xp_boost, xp_boost_pet_item = self.get_pet_xp_boosts(main_pet, skill, setup_data)
@@ -1721,7 +1719,6 @@ class Calculator(tk.Tk):
             if self.md.has_data_tag(exp_share_pet, "dragon_pet"):
                 if exp_share_boost == 0:
                     continue
-                dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["Legendary"]
                 dragon_pet_multiplier = dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (exp_share_item / exp_share_boost))
             for skill, amount in main_pet_xp.items():
                 pet_xp_boost = self.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
@@ -1731,6 +1728,8 @@ class Calculator(tk.Tk):
         for pet_slot, pet_info in setup_pets.items():
             if self.md.has_data_tag(pet_info["pet"], "dragon_pet"):
                 max_lvl_pet_xp = dragon_pet_xp_lvl_200
+            elif self.md.has_data_tag(pet_info["pet"], "hatched_dragon_pet"):
+                max_lvl_pet_xp = dragon_pet_xp_lvl_200 - dragon_pet_xp_lvl_100
             else:
                 max_lvl_pet_xp = self.md.max_lvl_pet_xp_amounts[self.md.calculator_data[pet_info["pet"]]["rarity"]]
             pet_info["levelled_pets"] = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
@@ -1771,17 +1770,13 @@ class Calculator(tk.Tk):
         :param minion_amount: int, minion amount
         :param minion_fuel: str, ID of minion fuel
         :param empty_time_seconds: float, time between empties in seconds
-        :param setup_data: needed setup data: beacon, scorched, B_constant, setup data for self.get_price
+        :param setup_data: needed setup data: beacon, beacon_fuel, free_fuel_beacon, setup data for self.get_price
         """
         fuel_cost = 0.0
         needed_fuel = 0.0
         if setup_data["beacon"] != "NONE":
-            if setup_data["scorched"]:
-                beacon_fuel_ID = "SCORCHED_POWER_CRYSTAL"
-            else:
-                beacon_fuel_ID = "POWER_CRYSTAL"
-            cost_per_crystal = self.get_price(beacon_fuel_ID, setup_data, "buy", "bazaar")
-            fuel_cost += empty_time_seconds * cost_per_crystal / self.md.calculator_data[beacon_fuel_ID]["fuel_duration"] * int(not (setup_data["B_constant"]))
+            cost_per_crystal = self.get_price(setup_data["beacon_fuel"], setup_data, "buy", "bazaar")
+            fuel_cost += empty_time_seconds * cost_per_crystal / self.md.calculator_data[setup_data["beacon_fuel"]]["fuel_duration"] * int(not (setup_data["free_fuel_beacon"]))
         if self.md.calculator_data[minion_fuel]["fuel_duration"] != -1:
             cost_per_fuel = self.get_price(minion_fuel, setup_data, "buy", "bazaar")
             needed_fuel = minion_amount * empty_time_seconds / self.md.calculator_data[minion_fuel]["fuel_duration"]
@@ -1797,7 +1792,7 @@ class Calculator(tk.Tk):
         :param minion_amount: int, minion amount
         :param minion_fuel: str, ID of minion fuel
         :param upgrades: list, IDs of upgrades
-        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, B_acquired, crystal, postcard, potato_accessory, pet_exp_boost, expshareitem, toucan_attribute, falcon_attribute, setup data for self.get_price
+        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, crystal, postcard, potato_accessory, pet_exp_boost, expshareitem, toucan_attribute, falcon_attribute, setup data for self.get_price
         :return total_cost: float, total setup cost
         :return extra_cost: str, total extra cost 
         :return cost_per_part: dict, cost per setup part
@@ -1891,7 +1886,7 @@ class Calculator(tk.Tk):
         self.huim.deepmultiply(cost_per_part, minion_amount)
 
         # Beacon cost
-        if setup_data["beacon"] != "NONE" and not setup_data["B_acquired"]:
+        if setup_data["beacon"] != "NONE":
             cost_per_part["beacon"] = self.get_price(setup_data["beacon"], setup_data, "buy", "bazaar")
 
         # Floating Crystal cost
@@ -2290,6 +2285,10 @@ class Calculator(tk.Tk):
         if self.md.has_data_tag(pet_ID, "dragon_egg_pet"):
             api_pet_id = pet_ID.removesuffix("_EGG")
             level_ranges["max"] = "100-103"
+        elif self.md.has_data_tag(pet_ID, "hatched_dragon_pet"):
+            api_pet_id = pet_ID.removesuffix("_HATCHED")
+            level_ranges["min"] = "100-103"
+            level_ranges["max"] = "200"
         else:
             api_pet_id = pet_ID
         if self.md.has_data_tag(pet_ID, "dragon_pet"):

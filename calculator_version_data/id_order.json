@@ -1,6 +1,6 @@
 [
     "minion", "miniontier", "amount", "fuel",
-    "hopper", "upgrade1", "upgrade2", "chest", "beacon", "scorched", "B_constant", "B_acquired",
+    "hopper", "upgrade1", "upgrade2", "chest", "beacon", "beacon_fuel", "free_fuel_beacon",
     "infusion", "crystal", "unique_farming_minions", "free_will", "postcard",
     "inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override",
     "afk", "afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout",
