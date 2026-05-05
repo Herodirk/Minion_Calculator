@@ -226,8 +226,8 @@ class Calculator(tk.Tk):
         self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("optimal_free_will", controlvar="free_will"))
         self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
         self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
-        self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=self.input_options["afkpet"])
-        self.afkpet_rarity = HPM.Hvar(self.huim, key="afkpet_rarity", vtype="input", dtype=str, display="AFK Pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.input_options["afkpet_rarity"])
+        self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=self.input_options["afkpet"], command=lambda x: self.afkpet_rarity.update_option_list(list(self.md.calculator_data[self.input_options["afkpet"][x]]["boosting_pet"].keys()), True))
+        self.afkpet_rarity = HPM.Hvar(self.huim, key="afkpet_rarity", vtype="input", dtype=str, display="AFK Pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.input_options["pet_rarity"])
         self.afkpet_lvl = HPM.Hvar(self.huim, key="afkpet_lvl", vtype="input", dtype=float, display="AFK Pet level", frame="inputs_player_grid", initial=0.0)
         self.enchanted_clock = HPM.Hvar(self.huim, key="enchanted_clock", vtype="input", dtype=bool, display="Enchanted Clock", frame="inputs_player_grid", initial=False)
         self.special_layout = HPM.Hvar(self.huim, key="special_layout", vtype="input", dtype=bool, display="Special Layout", frame="inputs_player_grid", initial=False)
@@ -242,14 +242,18 @@ class Calculator(tk.Tk):
         self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="input", dtype=float, display="Alchemy wisdom", fancy_display="Alchemy", frame="inputs_player_grid", initial=0.0)
         self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=self.input_options["mayor"], command=lambda x: self.multiswitch("mayors", x))
         self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"], command=lambda x: self.multiswitch("pet_leveling", x))
+        self.levelingpet_rarity = HPM.Hvar(self.huim, key="levelingpet_rarity", vtype="input", dtype=str, display="Leveling pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.input_options["pet_rarity"])
         self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
         self.falcon_attribute = HPM.Hvar(self.huim, key="falcon_attribute", vtype="input", dtype=int, display="Battle Experience", frame="inputs_player_grid", initial=0, options=self.input_options["attribute"])
         self.toucan_attribute = HPM.Hvar(self.huim, key="toucan_attribute", vtype="input", dtype=int, display="Why Not More", frame="inputs_player_grid", initial=0, options=self.input_options["attribute"])
         self.pet_exp_boost = HPM.Hvar(self.huim, key="pet_exp_boost", vtype="input", dtype=str, display="Pet XP boost", frame="inputs_player_grid", initial="None", options=self.input_options["pet_exp_boost"])
         self.beastmaster = HPM.Hvar(self.huim, key="beastmaster", vtype="input", dtype=float, display="Beastmaster", frame="inputs_player_grid", initial=0.0)
-        self.expsharepet = HPM.Hvar(self.huim, key="expsharepet", vtype="input", dtype=str, display="Exp Share pet", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"])
-        self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"])
-        self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"])
+        self.expsharepet = HPM.Hvar(self.huim, key="expsharepet", vtype="input", dtype=str, display="Exp Share pet", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"], command=lambda x: self.expsharepet_rarity.update_option_list(self.md.calculator_data[self.input_options["levelingpet"][x]]["pet_rarities"], True))
+        self.expsharepet_rarity = HPM.Hvar(self.huim, key="expsharepet_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.input_options["pet_rarity"])
+        self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"], command=lambda x: self.expsharepetslot2_rarity.update_option_list(self.md.calculator_data[self.input_options["levelingpet"][x]]["pet_rarities"], True))
+        self.expsharepetslot2_rarity = HPM.Hvar(self.huim, key="expsharepetslot2_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.input_options["pet_rarity"])
+        self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="None", options=self.input_options["levelingpet"], command=lambda x: self.expsharepetslot3_rarity.update_option_list(self.md.calculator_data[self.input_options["levelingpet"][x]]["pet_rarities"], True))
+        self.expsharepetslot3_rarity = HPM.Hvar(self.huim, key="expsharepetslot3_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.input_options["pet_rarity"])
         self.expshareitem = HPM.Hvar(self.huim, key="expshareitem", vtype="input", dtype=bool, display="Exp Share pet item", frame="inputs_player_grid", initial=False)
         self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.create_switch_call("scaled_time_switch", controlvar="scale_time"))
         self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=self.input_options["sell_loc"], command=self.huim.create_switch_call("NPC_Bazaar", controlvar="self"))
@@ -290,11 +294,16 @@ class Calculator(tk.Tk):
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
         self.scaled_time_unit = HPM.Hvar(self.huim, key="scaled_time_unit", vtype="input", dtype=str, display="Scaled Time unit", initial="Days", frame="inputs_player_grid", options=self.input_options["time_unit"])
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
-        self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"min": 1, "max": 1, "last_updated": 0}})
-        self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True, tags=["item_ID_to_display"])
+        self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"LEGENDARY": {"min": 1, "max": 1, "last_updated": 0}}})
+        self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True)
 
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.afkpet_rarity.widget[-1].place(in_=self.afkpet.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.levelingpet_rarity.widget[-1].place(in_=self.levelingpet.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.expsharepet_rarity.widget[-1].place(in_=self.expsharepet.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.expsharepetslot2_rarity.widget[-1].place(in_=self.expsharepetslot2.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
+        self.expsharepetslot3_rarity.widget[-1].place(in_=self.expsharepetslot3.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
 
         self.notesAnchor = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="")
 
@@ -370,7 +379,6 @@ class Calculator(tk.Tk):
                 "player_label": [None, playertitleLB],
                 "afk": None,
                 "afkpet": None,
-                "afkpet_rarity": None,
                 "afkpet_lvl": None,
                 "enchanted_clock": None,
                 "special_layout": None,
@@ -488,7 +496,7 @@ class Calculator(tk.Tk):
                             locations="grid", control="PotatoTrue", negate=False, initial=False)
         self.huim.def_switch("bazaar_tax", widget_references="bazaar_flipper",
                             locations="grid", control=1, negate=False, initial=True)
-        self.huim.def_switch("afking", widget_references=["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "player_harvests", "player_looting"],
+        self.huim.def_switch("afking", widget_references=["afkpet", "afkpet_lvl", "enchanted_clock", "special_layout", "player_harvests", "player_looting"],
                             locations="grid", control=True, negate=False, initial=False)
         self.huim.def_switch("fuel_amount", widget_references="fuelamount",
                             locations="grid", control=-1, negate=True, initial=False)
@@ -509,7 +517,22 @@ class Calculator(tk.Tk):
         
         self.huim.logger.debug("Switches activated")
 
-        self.dependent_variables = {"afkpet_rarity": "afkpet", "afkpet_lvl": "afkpet", "player_harvests": "afk", "empty_time": "scale_time", "optimal_tier_free_will": "free_will", "expshareitem": "expsharepet", "pets_levelled": "levelingpet", "used_pet_prices": "levelingpet", "pet_profit": "levelingpet"}
+        self.dependent_variables = {
+            "afkpet_rarity": "afkpet",
+            "afkpet_lvl": "afkpet",
+            "player_harvests": "afk",
+            "empty_time": "scale_time",
+            "optimal_tier_free_will": "free_will",
+            "expshareitem": "expsharepet",
+            "pets_levelled": "levelingpet",
+            "used_pet_prices": "levelingpet",
+            "pet_profit": "levelingpet",
+            "levelingpet_rarity": "levelingpet",
+            "expsharepet_rarity": "expsharepet",
+            "expsharepetslot2_rarity": "expsharepetslot2",
+            "expsharepetslot3_rarity": "expsharepetslot3",
+            "beacon_fuel": "beacon"
+        }
         # dependent variables are only active when another specified variable is not equivalent to 0,
         # this overrides forced outputs as inactive variables might not be equivalent to 0
         self.key_replace_bool = ["infusion", "free_will", "postcard"]  # variables that are booleans that need their display name outputted instead of the boolean value
@@ -538,9 +561,10 @@ class Calculator(tk.Tk):
             "player_harvests": {"\n> ": ["player_looting"]},
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
-            "levelingpet": {
+            "Leveling pet: ": {
+                "%": [["levelingpet_rarity", "levelingpet"]],
                 "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
-                "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
+                "%\n> Exp Share Pets: ": [["expsharepet_rarity", "expsharepet"], ["expsharepetslot2_rarity", "expsharepetslot2"], ["expsharepetslot3_rarity", "expsharepetslot3"]]
             },
             "used_pet_prices": None,
             "**Setup Information**\n": {
@@ -623,6 +647,8 @@ class Calculator(tk.Tk):
             mayor = self.mayor.get(False)
             pet_leveling_state = self.switches["pet_leveling"]["state"]
             self.huim.toggle_switch("exp_share_diana", mayor + str(pet_leveling_state))
+            if control is not None:
+                self.levelingpet_rarity.update_option_list(self.md.calculator_data[self.input_options["levelingpet"][control]]["pet_rarities"], True)
         elif multi_ID == "mayors":
             pet_leveling_state = self.switches["pet_leveling"]["state"]
             self.huim.toggle_switch("exp_share_diana", control + str(pet_leveling_state))
@@ -728,9 +754,11 @@ class Calculator(tk.Tk):
             if self.var_dict[var_key].has_tag("item_ID_to_display"):
                 key_formatting_function = lambda x: self.md.calculator_data[x]['display']
             elif var_key == "pets_levelled":
-                key_formatting_function = lambda x: calculation_data[x]
+                key_formatting_function = lambda x: calculation_data[x + "_rarity"] + " " + calculation_data[x]
             elif var_key == "setupcost_breakdown":
                 key_formatting_function = lambda x: self.var_dict[x].get_display(True)
+            elif var_key == "used_pet_prices":
+                key_formatting_function = lambda x: " ".join([self.md.calculator_data[y]["display"] for y in x.split(".")])
             formatted_list = []
             for list_key, list_val in data.items():
                 if type(list_val) in [float, int]:
@@ -783,6 +811,9 @@ class Calculator(tk.Tk):
                     if "$" in sub_key:  # value only: no display, no markdown
                         sub_key = sub_key[1:]
                         line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, display=False, markdown=False)) is not None)
+                    elif "%" in sub_key:  # combined text: no display
+                        sub_key = sub_key[1:]
+                        line_data += ", ".join(t for key_group in key_arr if (t := " ".join(s for var_key in key_group if (s := self.data_to_text(var_key, calculation_data, output_switches, display=False, markdown=markdown)) is not None)) != "")
                     elif type(key_arr) == list:  # standard
                         line_data += ", ".join(s for var_key in key_arr if (s := self.data_to_text(var_key, calculation_data, output_switches, markdown=markdown)) is not None)
                     elif type(key_arr) == tuple:  # repeated sub_key
@@ -1683,7 +1714,7 @@ class Calculator(tk.Tk):
 
         :param skill_xp: dict, gained skill xp per type
         :param mayor: str, mayor
-        :param setup_data: needed setup data: levelingpet, expsharepet, expsharepetslot2, expsharepetslot3, taming, toucan_attribute, expshareitem, pet_exp_boost, beastmaster, setup data for self.get_price
+        :param setup_data: needed setup data: levelingpet, levelingpet_rarity, expsharepet, expsharepet_rarity, expsharepetslot2, expsharepetslot2_rarity, expsharepetslot3, expsharepetslot3_rarity, taming, toucan_attribute, expshareitem, pet_exp_boost, beastmaster, setup data for self.get_price
         :return setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets        
         """
         main_pet = setup_data["levelingpet"]
@@ -1691,17 +1722,17 @@ class Calculator(tk.Tk):
             return {}
 
         # Creating setup_pets
-        setup_pets = { "levelingpet": { "pet": main_pet, "pet_xp": {}, "levelled_pets": 0.0 } }
+        setup_pets = { "levelingpet": { "pet": main_pet, "rarity": setup_data["levelingpet_rarity"], "pet_xp": {}, "levelled_pets": 0.0 } }
         for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
             if setup_data[var_key] == "NONE" or (mayor != "MAYOR_DIANA" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
                 continue
-            setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
+            setup_pets[var_key] = { "pet": setup_data[var_key], "rarity": setup_data[var_key + "_rarity"], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
 
         # Main pet
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         dragon_pet_multiplier = lambda pet_item: 1
-        dragon_pet_xp_lvl_200 = self.md.max_lvl_pet_xp_amounts["Dragon"]
-        dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["Legendary"]
+        dragon_pet_xp_lvl_200 = self.md.max_lvl_pet_xp_amounts["DRAGON"]
+        dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["LEGENDARY"]
         if self.md.has_data_tag(main_pet, "dragon_pet"):
             dragon_pet_multiplier = lambda pet_item: dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (pet_item - 1))
         for skill, amount in skill_xp.items():
@@ -1731,7 +1762,7 @@ class Calculator(tk.Tk):
             elif self.md.has_data_tag(pet_info["pet"], "hatched_dragon_pet"):
                 max_lvl_pet_xp = dragon_pet_xp_lvl_200 - dragon_pet_xp_lvl_100
             else:
-                max_lvl_pet_xp = self.md.max_lvl_pet_xp_amounts[self.md.calculator_data[pet_info["pet"]]["rarity"]]
+                max_lvl_pet_xp = self.md.max_lvl_pet_xp_amounts[pet_info["rarity"]]
             pet_info["levelled_pets"] = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
         return setup_pets
 
@@ -1748,13 +1779,14 @@ class Calculator(tk.Tk):
         pet_prices = {}
         super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
         for pet_slot, pet_info in setup_pets.items():
-            if pet_info["pet"] not in self.pet_costs.list:
-                if pet_info["pet"] not in pet_prices:
-                    pet_prices[pet_info["pet"]] = f"Price for {self.md.calculator_data[pet_info['pet']]["display"]} not found"
+            combined_pet_id = pet_info['rarity'] + "." + pet_info["pet"]
+            if pet_info["pet"] not in self.pet_costs.list or pet_info['rarity'] not in self.pet_costs.list[pet_info["pet"]]:
+                if combined_pet_id not in pet_prices:
+                    pet_prices[combined_pet_id] = f"Price not found"
             else:
-                pet_profit += pet_info["levelled_pets"] * (self.pet_costs.list[pet_info["pet"]]["max"] - self.pet_costs.list[pet_info["pet"]]["min"])
-                if pet_info["pet"] not in pet_prices:
-                    pet_prices[pet_info["pet"]] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]]["max"])}"
+                pet_profit += pet_info["levelled_pets"] * (self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["max"] - self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["min"])
+                if combined_pet_id not in pet_prices:
+                    pet_prices[combined_pet_id] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["max"])}"
             if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
@@ -1914,9 +1946,9 @@ class Calculator(tk.Tk):
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
-            cost_per_part["toucan_attribute"] = self.md.attribute_shards["Epic"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
+            cost_per_part["toucan_attribute"] = self.md.attribute_shards["EPIC"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
         if setup_data["falcon_attribute"] != 0:
-            cost_per_part["falcon_attribute"] = self.md.attribute_shards["Rare"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
+            cost_per_part["falcon_attribute"] = self.md.attribute_shards["RARE"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
 
 
         total_cost = sum(cost_per_part.values())
@@ -1948,8 +1980,8 @@ class Calculator(tk.Tk):
         # auto update API
         if self.API_auto_update.get():
             self.update_prices(cooldown_warning=False, in_gui=inGUI)
-            for pet_ID in [setup_data["levelingpet"], setup_data["expsharepet"], setup_data["expsharepetslot2"], setup_data["expsharepetslot3"]]:
-                self.update_pet_price(pet_ID)
+            for pet_slot in ["levelingpet", "expsharepet", "expsharepetslot2", "expsharepetslot3"]:
+                self.update_pet_price(setup_data[pet_slot], setup_data[pet_slot + "_rarity"])
             if self.md.has_data_tag(setup_data["pet_exp_boost"], "auction_price_upon_request") and (time.time() - self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] > self.API_cooldown.get()):
                 self.md.calculator_data[setup_data["pet_exp_boost"]]["prices"]["custom"] = self.call_auction_house(setup_data["pet_exp_boost"])
                 self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] = time.time()
@@ -2261,7 +2293,7 @@ class Calculator(tk.Tk):
             self.statusC.update()
         return
 
-    def update_pet_price(self, pet_ID):
+    def update_pet_price(self, pet_ID, rarity):
         """
         API call to SkyCofl to update Auction House price of the given pet.
         First calls to BIN, and takes the average of the two lowest.
@@ -2274,12 +2306,11 @@ class Calculator(tk.Tk):
         
         :param pet_ID: str, pet ID as seen in calculator data
         """
-        if pet_ID == "NONE":
+        if pet_ID in ["NONE", "PET_CUSTOM_PET", "PET_BINGO"]:
             return
-        if pet_ID in self.pet_costs.list and time.time() - self.pet_costs.list[pet_ID]["last_updated"] < self.pet_API_cooldown.get():
-            self.huim.logger.debug(f"{pet_ID} price update is on cooldown")
+        if pet_ID in self.pet_costs.list and rarity in self.pet_costs.list[pet_ID] and time.time() - self.pet_costs.list[pet_ID][rarity]["last_updated"] < self.pet_API_cooldown.get():
+            self.huim.logger.debug(f"{pet_ID} {rarity} price update is on cooldown")
             return
-        rarity_options = { "Common": "COMMON", "Uncommon": "UNCOMMON", "Rare": "RARE", "Epic": "EPIC", "Legendary": "LEGENDARY", "Mythic": "MYTHIC"}
         level_ranges = { "min": "1", "max": "100" }
         api_end_point = r"https://sky.coflnet.com/api/item/price/"
         if self.md.has_data_tag(pet_ID, "dragon_egg_pet"):
@@ -2294,7 +2325,7 @@ class Calculator(tk.Tk):
         if self.md.has_data_tag(pet_ID, "dragon_pet"):
             level_ranges["max"] = "200"
         api_bin = r"/bin"
-        api_static_filters = r"?filters[Rarity]=" + rarity_options[self.md.calculator_data[pet_ID]["rarity"]] + r"&filters[Candy]=0&filters[PetLevel]="
+        api_static_filters = r"?filters[Rarity]=" + rarity + r"&filters[Candy]=0&filters[PetLevel]="
         results = {"min": 0, "max": 0}
         for level_type, level_range in level_ranges.items():
             raw_auction_data = self.huim.call_API(api_end_point + api_pet_id + api_bin + api_static_filters + level_range, f"SkyCofl pet AH BIN API: {api_pet_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
@@ -2307,15 +2338,18 @@ class Calculator(tk.Tk):
                 results[level_type] = (lowest_price + second_lowest_price) / 2
         if pet_ID not in self.pet_costs.list:
             # non-zero min and max is required for new entry
-            if results["min"] != 0 and results["max"] != 0:
-                self.pet_costs.list[pet_ID] = { "min": 0, "max": 0, "last_updated": 0 }
-            else:
+            if results["min"] == 0 or results["max"] == 0:
                 return
+            self.pet_costs.list[pet_ID] = {}
+        if rarity not in self.pet_costs.list[pet_ID]:
+            if results["min"] == 0 or results["max"] == 0:
+                return
+            self.pet_costs.list[pet_ID][rarity] = { "min": 0, "max": 0, "last_updated": 0 }
         if results["min"] != 0:
-            self.pet_costs.list[pet_ID]["min"] = results["min"]
+            self.pet_costs.list[pet_ID][rarity]["min"] = results["min"]
         if results["max"] != 0:
-            self.pet_costs.list[pet_ID]["max"] = results["max"]
-        self.pet_costs.list[pet_ID]["last_updated"] = time.time()
+            self.pet_costs.list[pet_ID][rarity]["max"] = results["max"]
+        self.pet_costs.list[pet_ID][rarity]["last_updated"] = time.time()
         return
 
     def update_listboxes(self):
@@ -2330,10 +2364,13 @@ class Calculator(tk.Tk):
         for var_key in self.var_dict:
             if self.var_dict[var_key].dtype in [list, dict]:
                 if var_key == "pets_levelled":
-                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x].get(False))
+                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x + "_rarity"].get(False) + " " + self.var_dict[x].get(False))
                     continue
                 elif var_key == "setupcost_breakdown":
                     self.setupcost_breakdown.update_listbox(key_format_function=lambda x: self.var_dict[x].get_display(False))
+                    continue
+                elif var_key == "used_pet_prices":
+                    self.used_pet_prices.update_listbox(key_format_function=lambda x: " ".join([self.md.calculator_data[y]["display"] for y in x.split(".")]))
                     continue
                 format_function = lambda x: x
                 if self.var_dict[var_key].has_tag("item_ID_to_display"):

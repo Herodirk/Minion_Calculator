@@ -178,14 +178,15 @@
         "Snail": "PET_SNAIL",
         "Spider": "PET_SPIDER"
     },
-    "afkpet_rarity": [
-        "Common",
-        "Uncommon",
-        "Rare",
-        "Epic",
-        "Legendary",
-        "Mythic"
-    ],
+    "afkpet_rarity": "pet_rarity",
+    "pet_rarity": {
+        "Common": "COMMON",
+        "Uncommon": "UNCOMMON",
+        "Rare": "RARE",
+        "Epic": "EPIC",
+        "Legendary": "LEGENDARY",
+        "Mythic": "MYTHIC"
+    },
     "player_looting": [
         0,
         1,
@@ -253,11 +254,11 @@
         "Hermit Crab": "PET_HERMIT_CRAB",
         "Horse": "PET_HORSE",
         "Hound": "PET_HOUND",
-        "Jerry": "PET_JERRY",
         "Jade Dragon": "PET_JADE_DRAGON",
         "Jade Dragon Egg": "PET_JADE_DRAGON_EGG",
         "Jade Dragon Hatched": "PET_JADE_DRAGON_HATCHED",
         "Jellyfish": "PET_JELLYFISH",
+        "Jerry": "PET_JERRY",
         "Kuudra": "PET_KUUDRA",
         "Lion": "PET_LION",
         "Magma Cube": "PET_MAGMA_CUBE",
@@ -306,6 +307,10 @@
         "Wolf": "PET_WOLF",
         "Zombie": "PET_ZOMBIE"
     },
+    "levelingpet_rarity": "pet_rarity",
+    "expsharepet_rarity": "pet_rarity",
+    "expsharepetslot2_rarity": "pet_rarity",
+    "expsharepetslot3_rarity": "pet_rarity",
     "attribute": [
         0,
         1,

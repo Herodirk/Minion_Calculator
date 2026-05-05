@@ -7,8 +7,8 @@
     "player_harvests", "player_looting", "potato_accessory",
     "combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom",
     "mayor",
-    "levelingpet", "taming", "falcon_attribute", "toucan_attribute", "pet_exp_boost", "beastmaster",
-    "expsharepet", "expsharepetslot2", "expsharepetslot3", "expshareitem",
+    "levelingpet", "levelingpet_rarity", "taming", "falcon_attribute", "toucan_attribute", "pet_exp_boost", "beastmaster",
+    "expsharepet", "expsharepet_rarity", "expsharepetslot2", "expsharepetslot2_rarity", "expsharepetslot3", "expsharepetslot3_rarity", "expshareitem",
     "sell_loc", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form",
     "empty_time_amount", "empty_time_unit", "scale_time", "scaled_time_amount", "scaled_time_unit"
 ]

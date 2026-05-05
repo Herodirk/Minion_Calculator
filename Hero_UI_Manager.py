@@ -1076,7 +1076,7 @@ class Hvar():
             self.list = self.initial
         self.widget = None
         self.translation = None  # Translation: untranslated (display) -> translated (internal)
-        self.reverse_translation = None
+        self.reverse_translation = None  # Reverse Translation: translated (internal) -> untranslated (display)
         if type(self.options) is dict:
             self.translation = self.options
             self.options = list(self.options.keys())
@@ -1143,4 +1143,18 @@ class Hvar():
                     continue
                 listbox_list.append(key_format_function(val))
         self.set(listbox_list)
+        return
+
+    def update_option_list(self, new_list, translated=False):
+        if self.dtype == bool:
+            return
+        if self.options == None:
+            return
+        if translated:
+            new_list = [self.reverse_translation[list_item] for list_item in new_list]
+        if not (set(new_list) <= set(self.options)):
+            return
+        self.widget[1].config(values=new_list)
+        if self.get(False) not in new_list:
+            self.set(new_list[-1])
         return

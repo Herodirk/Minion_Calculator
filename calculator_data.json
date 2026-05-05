@@ -2,7 +2,9 @@
     "NONE": {
         "display": "None",
         "pet_type": "all",
-        "rarity": "Common",
+        "rarity": "COMMON",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "boosting_pet": { "COMMON": [0, 0], "UNCOMMON": [0, 0], "RARE": [0, 0], "EPIC": [0, 0], "LEGENDARY": [0, 0], "MYTHIC": [0, 0] },
         "hopper_selling_rate": 1,
         "storage_slots": 0,
         "exp_boost_type": "all",
@@ -4033,7 +4035,7 @@
     },
     "PET_ITEM_MINING_SKILL_BOOST_COMMON": {
         "display": "Common Mining Exp Boost",
-        "rarity": "Common",
+        "rarity": "COMMON",
         "exp_boost_type": "mining",
         "exp_boost_amount": 20,
         "prices": {
@@ -4042,7 +4044,7 @@
     },
     "PET_ITEM_MINING_SKILL_BOOST_UNCOMMON": {
         "display": "Uncommon Mining Exp Boost",
-        "rarity": "Uncommon",
+        "rarity": "UNCOMMON",
         "exp_boost_type": "mining",
         "exp_boost_amount": 30,
         "prices": {
@@ -4051,7 +4053,7 @@
     },
     "PET_ITEM_MINING_SKILL_BOOST_RARE": {
         "display": "Rare Mining Exp Boost",
-        "rarity": "Rare",
+        "rarity": "RARE",
         "exp_boost_type": "mining",
         "exp_boost_amount": 40,
         "prices": {},
@@ -4061,7 +4063,7 @@
     },
     "PET_ITEM_FARMING_SKILL_BOOST_COMMON": {
         "display": "Common Farming Exp Boost",
-        "rarity": "Common",
+        "rarity": "COMMON",
         "exp_boost_type": "farming",
         "exp_boost_amount": 20,
         "prices": {
@@ -4070,7 +4072,7 @@
     },
     "PET_ITEM_FARMING_SKILL_BOOST_UNCOMMON": {
         "display": "Uncommon Farming Exp Boost",
-        "rarity": "Uncommon",
+        "rarity": "UNCOMMON",
         "exp_boost_type": "farming",
         "exp_boost_amount": 30,
         "prices": {},
@@ -4080,7 +4082,7 @@
     },
     "PET_ITEM_FARMING_SKILL_BOOST_RARE": {
         "display": "Rare Farming Exp Boost",
-        "rarity": "Rare",
+        "rarity": "RARE",
         "exp_boost_type": "farming",
         "exp_boost_amount": 40,
         "prices": {
@@ -4089,7 +4091,7 @@
     },
     "PET_ITEM_FARMING_SKILL_BOOST_EPIC": {
         "display": "Epic Farming Exp Boost",
-        "rarity": "Epic",
+        "rarity": "EPIC",
         "exp_boost_type": "farming",
         "exp_boost_amount": 50,
         "prices": {
@@ -4098,7 +4100,7 @@
     },
     "PET_ITEM_FISHING_SKILL_BOOST_COMMON": {
         "display": "Common Fishing Exp Boost",
-        "rarity": "Common",
+        "rarity": "COMMON",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 20,
         "prices": {
@@ -4107,7 +4109,7 @@
     },
     "PET_ITEM_FISHING_SKILL_BOOST_UNCOMMON": {
         "display": "Uncommon Fishing Exp Boost",
-        "rarity": "Uncommon",
+        "rarity": "UNCOMMON",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 30,
         "prices": {},
@@ -4117,7 +4119,7 @@
     },
     "PET_ITEM_FISHING_SKILL_BOOST_RARE": {
         "display": "Rare Fishing Exp Boost",
-        "rarity": "Rare",
+        "rarity": "RARE",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 40,
         "prices": {},
@@ -4127,7 +4129,7 @@
     },
     "PET_ITEM_FISHING_SKILL_BOOST_EPIC": {
         "display": "Epic Fishing Exp Boost",
-        "rarity": "Epic",
+        "rarity": "EPIC",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 50,
         "prices": {},
@@ -4137,7 +4139,7 @@
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_COMMON": {
         "display": "Common Combat Exp Boost",
-        "rarity": "Common",
+        "rarity": "COMMON",
         "exp_boost_type": "combat",
         "exp_boost_amount": 20,
         "prices": {
@@ -4146,7 +4148,7 @@
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_UNCOMMON": {
         "display": "Uncommon Combat Exp Boost",
-        "rarity": "Uncommon",
+        "rarity": "UNCOMMON",
         "exp_boost_type": "combat",
         "exp_boost_amount": 30,
         "prices": {},
@@ -4156,7 +4158,7 @@
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_RARE": {
         "display": "Rare Combat Exp Boost",
-        "rarity": "Rare",
+        "rarity": "RARE",
         "exp_boost_type": "combat",
         "exp_boost_amount": 40,
         "prices": {},
@@ -4166,7 +4168,7 @@
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_EPIC": {
         "display": "Epic Combat Exp Boost",
-        "rarity": "Epic",
+        "rarity": "EPIC",
         "exp_boost_type": "combat",
         "exp_boost_amount": 50,
         "prices": {},
@@ -4176,7 +4178,7 @@
     },
     "PET_ITEM_FORAGING_SKILL_BOOST_COMMON": {
         "display": "Common Foraging Exp Boost",
-        "rarity": "Common",
+        "rarity": "COMMON",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 20,
         "prices": {
@@ -4185,7 +4187,7 @@
     },
     "PET_ITEM_FORAGING_SKILL_BOOST_EPIC": {
         "display": "Epic Foraging Exp Boost",
-        "rarity": "Epic",
+        "rarity": "EPIC",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 50,
         "prices": {},
@@ -4195,7 +4197,7 @@
     },
     "PET_ITEM_ALL_SKILLS_BOOST_COMMON": {
         "display": "All Skills Exp Boost",
-        "rarity": "Common",
+        "rarity": "COMMON",
         "exp_boost_type": "all",
         "exp_boost_amount": 10,
         "prices": {
@@ -4204,7 +4206,7 @@
     },
     "ALL_SKILLS_SUPER_BOOST": {
         "display": "All Skills Exp Super-Boost",
-        "rarity": "Uncommon",
+        "rarity": "UNCOMMON",
         "exp_boost_type": "all",
         "exp_boost_amount": 20,
         "prices": {},
@@ -4214,7 +4216,7 @@
     },
     "PET_ITEM_EXP_SHARE": {
         "display": "Exp Share",
-        "rarity": "Epic",
+        "rarity": "EPIC",
         "prices": {},
         "recipe": {
             "PET_ITEM_EXP_SHARE_DROP": 1,
@@ -8527,137 +8529,137 @@
     "PET_CUSTOM_PET": {
         "display": "Custom Pet",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "RARE", "LEGENDARY"]
     },
     "PET_AMMONITE": {
         "display": "Ammonite",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_ANKYLOSAURUS": {
         "display": "Ankylosaurus",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_ARMADILLO": {
         "display": "Armadillo",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_BABY_YETI": {
         "display": "Baby Yeti",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_BAL": {
         "display": "Bal",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_BAT": {
         "display": "Bat",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_BEE": {
         "display": "Bee",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_BINGO": {
         "display": "Bingo",
         "pet_type": "all",
-        "rarity": "Common"
+        "pet_rarities": ["COMMON"]
     },
     "PET_BLACK_CAT": {
         "display": "Black Cat",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY", "MYTHIC"]
     },
     "PET_BLAZE": {
         "display": "Blaze",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_BLUE_WHALE": {
         "display": "Blue Whale",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_CHICKEN": {
         "display": "Chicken",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_CROW": {
         "display": "Crow",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_DOLPHIN": {
         "display": "Dolphin",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_EERIE": {
         "display": "Eerie",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "RARE", "LEGENDARY"]
     },
     "PET_ELEPHANT": {
         "display": "Elephant",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_ENDER_DRAGON": {
         "display": "Ender Dragon",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_ENDERMAN": {
         "display": "Enderman",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_ENDERMITE": {
         "display": "Endermite",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_FLYING_FISH": {
         "display": "Flying Fish",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_FROG": {
         "display": "Frog",
         "pet_type": "foraging",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_GHOUL": {
         "display": "Ghoul",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_GIRAFFE": {
         "display": "Giraffe",
         "pet_type": "foraging",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_GLACITE_GOLEM": {
         "display": "Glacite Golem",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_GOBLIN": {
         "display": "Goblin",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_GOLDEN_DRAGON": {
         "display": "Golden Dragon",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "dragon_pet"
         ]
@@ -8665,7 +8667,7 @@
     "PET_GOLDEN_DRAGON_EGG": {
         "display": "Golden Dragon Egg",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "dragon_egg_pet"
         ]
@@ -8673,7 +8675,7 @@
     "PET_GOLDEN_DRAGON_HATCHED": {
         "display": "Golden Dragon Hatched",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "hatched_dragon_pet"
         ]
@@ -8681,52 +8683,47 @@
     "PET_GOLEM": {
         "display": "Golem",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_GRANDMA_WOLF": {
         "display": "Grandma Wolf",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_GRIFFIN": {
         "display": "Griffin",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_GUARDIAN": {
         "display": "Guardian",
         "pet_type": "enchanting",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_HEDGEHOG": {
         "display": "Hedgehog",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_HERMIT_CRAB": {
         "display": "Hermit Crab",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_HORSE": {
         "display": "Horse",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_HOUND": {
         "display": "Hound",
         "pet_type": "combat",
-        "rarity": "Legendary"
-    },
-    "PET_JERRY": {
-        "display": "Jerry",
-        "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_JADE_DRAGON": {
         "display": "Jade Dragon",
         "pet_type": "foraging",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "dragon_pet"
         ]
@@ -8734,7 +8731,7 @@
     "PET_JADE_DRAGON_EGG": {
         "display": "Jade Dragon Egg",
         "pet_type": "foraging",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "dragon_egg_pet"
         ]
@@ -8742,7 +8739,7 @@
     "PET_JADE_DRAGON_HATCHED": {
         "display": "Jade Dragon Hatched",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "hatched_dragon_pet"
         ]
@@ -8750,40 +8747,45 @@
     "PET_JELLYFISH": {
         "display": "Jellyfish",
         "pet_type": "alchemy",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
+    },
+    "PET_JERRY": {
+        "display": "Jerry",
+        "pet_type": "combat",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_KUUDRA": {
         "display": "Kuudra",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_LION": {
         "display": "Lion",
         "pet_type": "foraging",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_MAGMA_CUBE": {
         "display": "Magma Cube",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "boosting_pet": {
-            "Common": [
+            "COMMON": [
                 0,
                 0.2
             ],
-            "Uncommon": [
+            "UNCOMMON": [
                 0,
                 0.25
             ],
-            "Rare": [
+            "RARE": [
                 0,
                 0.25
             ],
-            "Epic": [
+            "EPIC": [
                 0,
                 0.3
             ],
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ]
@@ -8796,50 +8798,50 @@
     "PET_MAMMOTH": {
         "display": "Mammoth",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_MEGALODON": {
         "display": "Megalodon",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_MITHRIL_GOLEM": {
         "display": "Mithril Golem",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_MOLE": {
         "display": "Mole",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_MONKEY": {
         "display": "Monkey",
         "pet_type": "foraging",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_MOOSHROOM_COW": {
         "display": "Mooshroom Cow",
         "pet_type": "farming",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "boosting_pet": {
-            "Common": [
+            "COMMON": [
                 0,
                 0.2
             ],
-            "Uncommon": [
+            "UNCOMMON": [
                 0,
                 0.2
             ],
-            "Rare": [
+            "RARE": [
                 0,
                 0.3
             ],
-            "Epic": [
+            "EPIC": [
                 0,
                 0.3
             ],
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ]
@@ -8852,22 +8854,22 @@
     "PET_MOSQUITO": {
         "display": "Mosquito",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_OCELOT": {
         "display": "Ocelot",
         "pet_type": "foraging",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "boosting_pet": {
-            "Rare": [
+            "RARE": [
                 0,
                 0.3
             ],
-            "Epic": [
+            "EPIC": [
                 0,
                 0.3
             ],
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ]
@@ -8879,50 +8881,50 @@
     "PET_OWL": {
         "display": "Owl",
         "pet_type": "taming",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_PARROT": {
         "display": "Parrot",
         "pet_type": "alchemy",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_PENGUIN": {
         "display": "Penguin",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_PHOENIX": {
         "display": "Phoenix",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_PIG": {
         "display": "Pig",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_PIGMAN": {
         "display": "Pigman",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "boosting_pet": {
-            "Common": [
+            "COMMON": [
                 0,
                 0.1
             ],
-            "Uncommon": [
+            "UNCOMMON": [
                 0,
                 0.2
             ],
-            "Rare": [
+            "RARE": [
                 0,
                 0.2
             ],
-            "Epic": [
+            "EPIC": [
                 0,
                 0.3
             ],
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ]
@@ -8934,18 +8936,18 @@
     "PET_PRECURSOR_DRONE": {
         "display": "Precursor Drone",
         "pet_type": "combat",
-        "rarity": "Common"
+        "pet_rarities": ["COMMON"]
     },
     "PET_RABBIT": {
         "display": "Rabbit",
         "pet_type": "farming",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
         "boosting_pet": {
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ],
-            "Mythic": [
+            "MYTHIC": [
                 0,
                 0.3
             ]
@@ -8957,27 +8959,27 @@
     "PET_RAT": {
         "display": "Rat",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY", "MYTHIC"]
     },
     "PET_REINDEER": {
         "display": "Reindeer",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_RIFT_FERRET": {
         "display": "Rift Ferret",
         "pet_type": "combat",
-        "rarity": "Epic"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_ROCK": {
         "display": "Rock",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_ROSE_DRAGON": {
         "display": "Rose Dragon",
         "pet_type": "farming",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "dragon_pet"
         ]
@@ -8985,7 +8987,7 @@
     "PET_ROSE_DRAGON_EGG": {
         "display": "Rose Dragon Egg",
         "pet_type": "farming",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "dragon_egg_pet"
         ]
@@ -8993,7 +8995,7 @@
     "PET_ROSE_DRAGON_HATCHED": {
         "display": "Rose Dragon Hatched",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["LEGENDARY"],
         "tags": [
             "hatched_dragon_pet"
         ]
@@ -9001,60 +9003,60 @@
     "PET_SCATHA": {
         "display": "Scatha",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["RARE", "EPIC", "LEGENDARY"]
     },
     "PET_SEAL": {
         "display": "Seal",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_SHEEP": {
         "display": "Sheep",
         "pet_type": "alchemy",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_SILVERFISH": {
         "display": "Silverfish",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_SKELETON": {
         "display": "Skeleton",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_SKELETON_HORSE": {
         "display": "Skeleton Horse",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_SLUG": {
         "display": "Slug",
         "pet_type": "farming",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_SNAIL": {
         "display": "Snail",
         "pet_type": "mining",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "boosting_pet": {
-            "Common": [
+            "COMMON": [
                 0,
                 0.1
             ],
-            "Uncommon": [
+            "UNCOMMON": [
                 0,
                 0.2
             ],
-            "Rare": [
+            "RARE": [
                 0,
                 0.2
             ],
-            "Epic": [
+            "EPIC": [
                 0,
                 0.3
             ],
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ]
@@ -9066,18 +9068,18 @@
     "PET_SNOWMAN": {
         "display": "Snowman",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY", "MYTHIC"]
     },
     "PET_SPIDER": {
         "display": "Spider",
         "pet_type": "combat",
-        "rarity": "Legendary",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
         "boosting_pet": {
-            "Legendary": [
+            "LEGENDARY": [
                 0,
                 0.3
             ],
-            "Mythic": [
+            "MYTHIC": [
                 0,
                 0.3
             ]
@@ -9091,56 +9093,77 @@
     "PET_SPINOSAURUS": {
         "display": "Spinosaurus",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_SPIRIT": {
         "display": "Spirit",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_SQUID": {
         "display": "Squid",
         "pet_type": "fishing",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_TYRANNOSAURUS": {
         "display": "T-Rex",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["LEGENDARY"]
     },
     "PET_TARANTULA": {
         "display": "Tarantula",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY", "MYTHIC"]
     },
     "PET_TIGER": {
         "display": "Tiger",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_TURTLE": {
         "display": "Turtle",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["EPIC", "LEGENDARY"]
     },
     "PET_WITCH": {
         "display": "Witch",
         "pet_type": "alchemy",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_WITHER_SKELETON": {
         "display": "Wither Skeleton",
         "pet_type": "mining",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_WOLF": {
         "display": "Wolf",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "PET_ZOMBIE": {
         "display": "Zombie",
         "pet_type": "combat",
-        "rarity": "Legendary"
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+    },
+    "COMMON": {
+        "display": "Common"
+    },
+    "UNCOMMON": {
+        "display": "Uncommon"
+    },
+    "RARE": {
+        "display": "Rare"
+    },
+    "EPIC": {
+        "display": "Epic"
+    },
+    "LEGENDARY": {
+        "display": "Legendary"
+    },
+    "MYTHIC": {
+        "display": "Mythic"
+    },
+    "DIVINE": {
+        "display": "Divine"
     }
 }
