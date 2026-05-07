@@ -33,7 +33,7 @@
         },
         "compacting": {
             "block": {
-                "makes": "COMPACTED_CUSTOM",
+                "makes": "CUSTOM_BLOCK",
                 "amount": 2,
                 "per": 8
             },
@@ -45,8 +45,8 @@
         },
         "compact_tier": 0
     },
-    "COMPACTED_CUSTOM": {
-        "display": "Compacted Custom",
+    "CUSTOM_BLOCK": {
+        "display": "Custom Block",
         "prices": {
             "npc": 4
         },
@@ -70,7 +70,24 @@
         "xp": {
             "combat": 160
         },
+        "compacting": {
+            "compact": {
+                "makes": "ENCHANTED_CUSTOM_BLOCK",
+                "amount": 1,
+                "per": 160
+            }
+        },
         "compact_tier": 1
+    },
+    "ENCHANTED_CUSTOM_BLOCK": {
+        "display": "Enchanted Custom Block",
+        "prices": {
+            "npc": 25600
+        },
+        "xp": {
+            "combat": 25600
+        },
+        "compact_tier": 2
     },
     "LUSH_BERBERIS": {
         "display": "Lush Berberis",
@@ -3212,6 +3229,15 @@
         "hopper_selling_rate": 0.7,
         "prices": {}
     },
+    "CUSTOM_UPGRADE": {
+        "display": "Custom Upgrade",
+        "speed_boost": 10,
+        "drop_multiplier": 1,
+        "upgrade_special": {
+            "type": "None"
+        },
+        "prices": {}
+    },
     "AUTO_SMELTER": {
         "display": "Auto Smelter",
         "speed_boost": 0,
@@ -3273,7 +3299,8 @@
             "type": "compact",
             "compacting_list": {
                 "CUSTOM": "compact",
-                "COMPACTED_CUSTOM": "compact",
+                "CUSTOM_BLOCK": "compact",
+                "ENCHANTED_CUSTOM": "compact",
                 "LUSH_BERBERIS": "compact",
                 "RAW_SOULFLOW": "compact",
                 "SULPHUR_ORE": "compact",
@@ -3439,7 +3466,8 @@
             },
             "compacting_list": {
                 "CUSTOM": "compact",
-                "COMPACTED_CUSTOM": "compact",
+                "CUSTOM_BLOCK": "compact",
+                "ENCHANTED_CUSTOM": "compact",
                 "LUSH_BERBERIS": "compact",
                 "RAW_SOULFLOW": "compact",
                 "SULPHUR_ORE": "compact",
@@ -4256,14 +4284,25 @@
             "11": 11,
             "12": 12
         },
+        "storage": {
+            "1": 15,
+            "2": 15,
+            "3": 15,
+            "4": 15,
+            "5": 15,
+            "6": 15,
+            "7": 15,
+            "8": 15,
+            "9": 15,
+            "10": 15,
+            "11": 15,
+            "12": 15
+        },
         "afkcorrupt": 2,
         "notes": {
             "Custom": "Custom Minion does not exist",
             "AFK": "multiple corrupt drops"
         },
-        "tags": [
-            "custom_object"
-        ],
         "minion_costs": {
             "1": {
                 "CUSTOM": 80
@@ -8529,7 +8568,7 @@
     "PET_CUSTOM_PET": {
         "display": "Custom Pet",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "RARE", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "CUSTOM_RARITY"]
     },
     "PET_AMMONITE": {
         "display": "Ammonite",
@@ -9146,24 +9185,51 @@
         "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
     },
     "COMMON": {
-        "display": "Common"
+        "display": "Common",
+        "pet_item_scrub_cost": 25000,
+        "max_lvl_pet_xp_amount": 5624785,
+        "attribute_shards": { "1": 1, "2": 4, "3": 9, "4": 15, "5": 22, "6": 30, "7": 40, "8": 54, "9": 72, "10": 96 }
     },
     "UNCOMMON": {
-        "display": "Uncommon"
+        "display": "Uncommon",
+        "pet_item_scrub_cost": 50000,
+        "max_lvl_pet_xp_amount": 8644220,
+        "attribute_shards": { "1": 1, "2": 3, "3": 6, "4": 10, "5": 15, "6": 21, "7": 28, "8": 36, "9": 48, "10": 64 }
     },
     "RARE": {
-        "display": "Rare"
+        "display": "Rare",
+        "pet_item_scrub_cost": 100000,
+        "max_lvl_pet_xp_amount": 12626665,
+        "attribute_shards": { "1": 1, "2": 3, "3": 6, "4": 9, "5": 13, "6": 17, "7": 22, "8": 28, "9": 36, "10": 48 }
     },
     "EPIC": {
-        "display": "Epic"
+        "display": "Epic",
+        "pet_item_scrub_cost": 250000,
+        "max_lvl_pet_xp_amount": 18608500,
+        "attribute_shards": { "1": 1, "2": 2, "3": 4, "4": 6, "5": 9, "6": 12, "7": 16, "8": 20, "9": 25, "10": 32 }
     },
     "LEGENDARY": {
-        "display": "Legendary"
+        "display": "Legendary",
+        "pet_item_scrub_cost": 500000,
+        "max_lvl_pet_xp_amount": 25353230,
+        "attribute_shards": { "1": 1, "2": 2, "3": 3, "4": 5, "5": 7, "6": 9, "7": 12, "8": 15, "9": 19, "10": 24 }
     },
     "MYTHIC": {
-        "display": "Mythic"
+        "display": "Mythic",
+        "pet_item_scrub_cost": 1000000,
+        "max_lvl_pet_xp_amount": 25353230
     },
     "DIVINE": {
-        "display": "Divine"
+        "display": "Divine",
+        "pet_item_scrub_cost": 2500000,
+        "max_lvl_pet_xp_amount": 25353230
+    },
+    "DRAGON": {
+        "display": "Dragon",
+        "max_lvl_pet_xp_amount": 210255385
+    },
+    "CUSTOM_RARITY": {
+        "display": "Custom",
+        "max_lvl_pet_xp_amount": 25353230
     }
 }

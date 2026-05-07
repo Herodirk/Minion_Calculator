@@ -285,8 +285,8 @@ def dragon_pet_xp(calculator, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boos
             Left over pet xp on the pet after applying the gained skill xp.
 
         """
-        drag_lvl_100 = calculator.md.max_lvl_pet_xp_amounts["Legendary"]
-        drag_lvl_200 = calculator.md.max_lvl_pet_xp_amounts["Dragon"]
+        drag_lvl_100 = calculator.md.calculator_data["LEGENDARY"]["max_lvl_pet_xp_amount"]
+        drag_lvl_200 = calculator.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"]
         gained_pet_xp = 0.0
         skill_xp_per_pet = (drag_lvl_200 + drag_lvl_100 * (xp_boost_pet_item - 1)) / (xp_boost_pet_item * pet_xp_boost)
         gained_pet_xp = - left_over_pet_xp
@@ -304,18 +304,18 @@ def dragon_pet_xp(calculator, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boos
         return gained_pet_xp, left_over_pet_xp
 
 def exact_pet_levelling_inputs(calculator):
-    setup_data = calculator.huim.get_from_GUI(["mayor", "levelingpet", "expsharepet", "expsharepetslot2", "expsharepetslot3"])
+    setup_data = calculator.huim.get_from_GUI(["mayor", "levelingpet", "levelingpet_rarity", "expsharepet", "expsharepetslot2", "expsharepetslot3"])
     if setup_data["levelingpet"] == "NONE":
         calculator.collect_addon_output("Exact Pet Levelling", "No pet levelling active")
         return
-    setup_pets = { "levelingpet": { "pet": setup_data["levelingpet"], "pet_xp": {}, "levelled_pets": 0.0 } }
+    setup_pets = { "levelingpet": { "pet": setup_data["levelingpet"], "rarity": setup_data["levelingpet_rarity"], "pet_xp": {}, "levelled_pets": 0.0 } }
     for var_key in ["expsharepet", "expsharepetslot2", "expsharepetslot3"]:
         if setup_data[var_key] == "NONE" or (setup_data["mayor"] != "MAYOR_DIANA" and var_key in ["expsharepetslot2", "expsharepetslot3"]):
             continue
-        setup_pets[var_key] = { "pet": setup_data[var_key], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
+        setup_pets[var_key] = { "pet": setup_data[var_key], "rarity": setup_data[var_key + "_rarity"], "pet_xp": { "exp_share": 0.0 }, "levelled_pets": 0.0 }
     input_variables = {}
     for pet_slot, pet_info in setup_pets.items():
-        input_variables[pet_slot + "_starting_pet_xp"] = {"dtype": float, "display": calculator.md.calculator_data[pet_info["pet"]]["display"] + " pet xp", "initial": 0, "options": None}
+        input_variables[pet_slot + "_starting_pet_xp"] = {"dtype": float, "display": calculator.md.calculator_data[pet_info["rarity"]]["display"] + " " + calculator.md.calculator_data[pet_info["pet"]]["display"] + " starting pet xp", "initial": 0, "options": None}
     calculator.huim.edit_vars(lambda pet_data=setup_pets: exact_pet_levelling(calculator, pet_data), input_variables, False)
     return
 
@@ -355,12 +355,14 @@ def exact_pet_levelling(calculator, setup_pets):
                 pet_info["pet_xp"]["exp_share"] += amount * ((exp_share_boost + exp_share_item * (not calculator.md.has_data_tag(exp_share_pet, "dragon_egg_pet"))) / 100) * non_matching
     for pet_slot, pet_info in setup_pets.items():
         if calculator.md.has_data_tag(pet_info["pet"], "dragon_pet"):
-            max_lvl_pet_xp = calculator.md.max_lvl_pet_xp_amounts["Dragon"]
+            max_lvl_pet_xp = calculator.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"]
+        elif calculator.md.has_data_tag(pet_info["pet"], "hatched_dragon_pet"):
+            max_lvl_pet_xp = calculator.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"] - calculator.md.calculator_data["LEGENDARY"]["max_lvl_pet_xp_amount"]
         else:
-            max_lvl_pet_xp = calculator.md.max_lvl_pet_xp_amounts[calculator.md.calculator_data[pet_info["pet"]]["rarity"]]
+            max_lvl_pet_xp = calculator.md.calculator_data[pet_info["rarity"]]["max_lvl_pet_xp_amount"]
         pets_levelled = (calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get() + sum(pet_info["pet_xp"].values())) / max_lvl_pet_xp
         pet_info["levelled_pets"] = pets_levelled
-    output_string = ", ".join([f"{calculator.huim.reduced_number(pet_info['levelled_pets'], 4)} {calculator.md.calculator_data[pet_info["pet"]]["display"]}" for pet_info in setup_pets.values()])
+    output_string = ", ".join([f"{calculator.huim.reduced_number(pet_info['levelled_pets'], 4)} {calculator.md.calculator_data[pet_info["rarity"]]["display"]} {calculator.md.calculator_data[pet_info["pet"]]["display"]}" for pet_info in setup_pets.values()])
     calculator.collect_addon_output("Exact Pet Levelling", output_string)
     return
 

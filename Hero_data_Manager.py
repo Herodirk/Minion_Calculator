@@ -10,12 +10,19 @@ Calculator Data includes:
 - Pets and related items
 - Minions with speed, storage and upgrade costs
 - Mayors
-Other data points:
-- Inferno fuel data
-- Standard storage amounts
 - Shards per attribute level
 - Pet item replacement costs
 - Pet exp amounts for max level
+Other data points:
+- Inferno fuel data
+- Standard storage amounts
+
+Custom Data:
+- Custom inputs:
+    - Minion: base speeds, drops, storage
+    - Drops: xp, compacting, npc price
+    - Upgrade: speed bonus, drop multiplier, upgrade special (spreading, adding, cooldown)
+    - Levelling pet: type, max pet xp
 
 Bazaar and NPC price data from https://api.hypixel.net
 AH data from https://sky.coflnet.com/data
@@ -49,22 +56,78 @@ class H_data_M():
 
         self.standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10: 15, 11: 15, 12: 15 }
 
-        self.attribute_shards = {
-            "COMMON": { 1: 1, 2: 4, 3: 9, 4: 15, 5: 22, 6: 30, 7: 40, 8: 54, 9: 72, 10: 96 },
-            "UNCOMMON": { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15, 6: 21, 7: 28, 8: 36, 9: 48, 10: 64 },
-            "RARE": { 1: 1, 2: 3, 3: 6, 4: 9, 5: 13, 6: 17, 7: 22, 8: 28, 9: 36, 10: 48 },
-            "EPIC": { 1: 1, 2: 2, 3: 4, 4: 6, 5: 9, 6: 12, 7: 16, 8: 20, 9: 25, 10: 32 },
-            "LEGENDARY": { 1: 1, 2: 2, 3: 3, 4: 5, 5: 7, 6: 9, 7: 12, 8: 15, 9: 19, 10: 24 }
+        self.instance_data_file_locations = {
+            # "pet_costs": pathlib.Path("calculator_instance_data/pet_costs.json"),
+            "custom_inputs": pathlib.Path("calculator_instance_data/custom_inputs.json"),
+            # "custom_prices": pathlib.Path("calculator_instance_data/custom_prices.json")
         }
 
-        self.pet_item_scrub_cost = { "COMMON": 25000, "UNCOMMON": 50000, "RARE": 100000, "EPIC": 250000, "LEGENDARY": 500000, "MYTHIC": 1000000, "DIVINE": 2500000 }
+        self.instance_data = {
+            # "pet_costs": { "NONE": { "LEGENDARY": { "min": 1, "max": 1, "last_updated": 0 } } },
+            "custom_inputs": {
+                "CUSTOM.prices.npc": 1,
+                "CUSTOM.xp": { "combat": 1 },
+                "CUSTOM.compacting.block.amount": 2,
+                "CUSTOM.compacting.block.per": 8,
+                "CUSTOM.compacting.compact.amount": 1,
+                "CUSTOM.compacting.compact.per": 160,
+                "CUSTOM_BLOCK.prices.npc": 4,
+                "CUSTOM_BLOCK.xp": { "combat": 4 },
+                "CUSTOM_BLOCK.compacting.compact.amount": 4,
+                "CUSTOM_BLOCK.compacting.compact.per": 160,
+                "ENCHANTED_CUSTOM.prices.npc": 160,
+                "ENCHANTED_CUSTOM.xp": { "combat": 160 },
+                "ENCHANTED_CUSTOM.compacting.compact.amount": 1,
+                "ENCHANTED_CUSTOM.compacting.compact.per": 160,
+                "ENCHANTED_CUSTOM_BLOCK.prices.npc": 25600,
+                "ENCHANTED_CUSTOM_BLOCK.xp": { "combat": 25600 },
+                "CUSTOM_MINION.drops": { "CUSTOM": 1 },
+                "CUSTOM_MINION.speed.1": 1,
+                "CUSTOM_MINION.speed.2": 2,
+                "CUSTOM_MINION.speed.3": 3,
+                "CUSTOM_MINION.speed.4": 4,
+                "CUSTOM_MINION.speed.5": 5,
+                "CUSTOM_MINION.speed.6": 6,
+                "CUSTOM_MINION.speed.7": 7,
+                "CUSTOM_MINION.speed.8": 8,
+                "CUSTOM_MINION.speed.9": 9,
+                "CUSTOM_MINION.speed.10": 10,
+                "CUSTOM_MINION.speed.11": 11,
+                "CUSTOM_MINION.speed.12": 12,
+                "CUSTOM_MINION.storage.1": 15,
+                "CUSTOM_MINION.storage.2": 15,
+                "CUSTOM_MINION.storage.3": 15,
+                "CUSTOM_MINION.storage.4": 15,
+                "CUSTOM_MINION.storage.5": 15,
+                "CUSTOM_MINION.storage.6": 15,
+                "CUSTOM_MINION.storage.7": 15,
+                "CUSTOM_MINION.storage.8": 15,
+                "CUSTOM_MINION.storage.9": 15,
+                "CUSTOM_MINION.storage.10": 15,
+                "CUSTOM_MINION.storage.11": 15,
+                "CUSTOM_MINION.storage.12": 15,
+                "CUSTOM_MINION.afkcorrupt": 2,
+                "PET_CUSTOM_PET.pet_type": "farming",
+                "CUSTOM_RARITY.max_lvl_pet_xp_amount": 25353230,
+                "CUSTOM_UPGRADE.speed_boost": 10,
+                "CUSTOM_UPGRADE.drop_multiplier": 1
+            },
+            # "custom_prices": {}
+        }
 
-        self.max_lvl_pet_xp_amounts = { "COMMON": 5624785, "UNCOMMON": 8644220, "RARE": 12626665, "EPIC": 18608500, "LEGENDARY": 25353230, "MYTHIC": 25353230, "DRAGON": 210255385 }
-        pass
+
+        for file_key, file_path in self.instance_data_file_locations.items():
+            huim.check_json(file_path, self.instance_data[file_key])
+            self.instance_data[file_key].update(huim.read_json(file_path))
+        for file_data in self.instance_data.values():
+            for data_loc, data_val in file_data.items():
+                self.set_data(data_loc, data_val)
+        # TODO: and make a function to edit the custom data
+        return
 
     def has_data_tag(self, data_ID, tag):
         if data_ID not in self.calculator_data:
-            print(f"ERROR - has_data_tag - data ID {data_ID} not in calculator data")
+            print(f"ERROR - has_data_tag - data ID {data_ID} not in calculator data")  # TODO: connect to HUIM logger
             return False
         if tag is None:
             return False
@@ -92,6 +155,35 @@ class H_data_M():
                     final_cost[item] = 0
                 final_cost[item] += amount
         return final_cost
+
+    def get_data(self, data_location):
+        data_pointer = self.calculator_data
+        data_location_keys = data_location.split(".")
+        for key in data_location_keys:
+            if key not in data_pointer:
+                # TODO: connect HUIM logger to here and make a warning
+                return None
+            data_pointer = data_pointer[key]
+        return data_pointer
+
+    def set_data(self, data_location, data_value):
+        data_pointer = self.calculator_data
+        data_location_keys = data_location.split(".")
+        set_location = data_location_keys[-1]
+        for key in data_location_keys:
+            if key == set_location:
+                data_pointer[key] = data_value
+            else:
+                if key not in data_pointer:
+                    data_pointer[key] = {}
+                data_pointer = data_pointer[key]
+        return
+
+    def save_instance_data(self, huim):
+        for file_key, file_data in self.instance_data.items():
+            for data_loc in file_data.keys():
+                file_data[data_loc] = self.get_data(data_loc)
+            huim.write_json(self.instance_data_file_locations[file_key], file_data)
 
 """
 Calculator Data Notes

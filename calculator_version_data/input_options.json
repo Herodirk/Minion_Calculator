@@ -185,7 +185,8 @@
         "Rare": "RARE",
         "Epic": "EPIC",
         "Legendary": "LEGENDARY",
-        "Mythic": "MYTHIC"
+        "Mythic": "MYTHIC",
+        "Custom": "CUSTOM_RARITY"
     },
     "player_looting": [
         0,
@@ -359,13 +360,11 @@
     ],
     "bazaar_sell_type": {
         "Sell Offer": "buyPrice",
-        "Insta Sell": "sellPrice",
-        "Custom": "custom"
+        "Insta Sell": "sellPrice"
     },
     "bazaar_buy_type": {
         "Buy Order": "sellPrice",
-        "Insta Buy": "buyPrice",
-        "Custom": "custom"
+        "Insta Buy": "buyPrice"
     },
     "bazaar_flipper": [
         0,

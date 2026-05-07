@@ -296,6 +296,7 @@ class Calculator(tk.Tk):
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
         self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"LEGENDARY": {"min": 1, "max": 1, "last_updated": 0}}})
         self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True)
+        # self.custom_upgrade_toggle = HPM.Hvar(self.huim, key="custom_upgrade_toggle", vtype="storage", dtype=bool, display="Custom Upgrade", initial=False)
 
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -603,8 +604,6 @@ class Calculator(tk.Tk):
         # Calculator Data locations
         self.calculator_data_files = {
             "pet_costs": pathlib.Path("calculator_instance_data/pet_costs.json"),
-            # "custom_inputs": pathlib.Path("calculator_instance_data/custom_inputs.json")
-            # "custom_prices": pathlib.Path("calculator_instance_data/custom_prices.json")
         }
         for var_key, data_file in self.calculator_data_files.items():
             self.huim.check_json(data_file, self.var_dict[var_key].initial)
@@ -1731,8 +1730,8 @@ class Calculator(tk.Tk):
         # Main pet
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
         dragon_pet_multiplier = lambda pet_item: 1
-        dragon_pet_xp_lvl_200 = self.md.max_lvl_pet_xp_amounts["DRAGON"]
-        dragon_pet_xp_lvl_100 = self.md.max_lvl_pet_xp_amounts["LEGENDARY"]
+        dragon_pet_xp_lvl_200 = self.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"]
+        dragon_pet_xp_lvl_100 = self.md.calculator_data["LEGENDARY"]["max_lvl_pet_xp_amount"]
         if self.md.has_data_tag(main_pet, "dragon_pet"):
             dragon_pet_multiplier = lambda pet_item: dragon_pet_xp_lvl_200 / ( dragon_pet_xp_lvl_200 + dragon_pet_xp_lvl_100 * (pet_item - 1))
         for skill, amount in skill_xp.items():
@@ -1762,7 +1761,7 @@ class Calculator(tk.Tk):
             elif self.md.has_data_tag(pet_info["pet"], "hatched_dragon_pet"):
                 max_lvl_pet_xp = dragon_pet_xp_lvl_200 - dragon_pet_xp_lvl_100
             else:
-                max_lvl_pet_xp = self.md.max_lvl_pet_xp_amounts[pet_info["rarity"]]
+                max_lvl_pet_xp = self.md.calculator_data[pet_info["rarity"]]["max_lvl_pet_xp_amount"]
             pet_info["levelled_pets"] = sum(pet_info["pet_xp"].values()) / max_lvl_pet_xp
         return setup_pets
 
@@ -1790,9 +1789,9 @@ class Calculator(tk.Tk):
             if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
-                pet_profit -= pet_info["levelled_pets"] * (self.md.pet_item_scrub_cost[self.md.calculator_data[main_pet_item]["rarity"]] + super_scrubber_price)
+                pet_profit -= pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data[main_pet_item]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pet_info["levelled_pets"] * (self.md.pet_item_scrub_cost[self.md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]] + super_scrubber_price)
+                pet_profit -= pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
         return pet_profit, pet_prices
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
@@ -1946,9 +1945,9 @@ class Calculator(tk.Tk):
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
-            cost_per_part["toucan_attribute"] = self.md.attribute_shards["EPIC"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
+            cost_per_part["toucan_attribute"] = self.md.calculator_data["EPIC"]["attribute_shards"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
         if setup_data["falcon_attribute"] != 0:
-            cost_per_part["falcon_attribute"] = self.md.attribute_shards["RARE"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
+            cost_per_part["falcon_attribute"] = self.md.calculator_data["RARE"]["attribute_shards"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
 
 
         total_cost = sum(cost_per_part.values())
@@ -2419,6 +2418,8 @@ class Calculator(tk.Tk):
 
         for var_key, data_file in self.calculator_data_files.items():
             self.huim.write_json(data_file, self.var_dict[var_key].list)
+        
+        self.md.save_instance_data(self.huim)
         return
 
 #%% main loop
