@@ -3,7 +3,7 @@
         "display": "None",
         "pet_type": "all",
         "rarity": "COMMON",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "CUSTOM_RARITY"],
         "boosting_pet": { "COMMON": [0, 0], "UNCOMMON": [0, 0], "RARE": [0, 0], "EPIC": [0, 0], "LEGENDARY": [0, 0], "MYTHIC": [0, 0] },
         "hopper_selling_rate": 1,
         "storage_slots": 0,
@@ -29,7 +29,12 @@
             "npc": 1
         },
         "xp": {
-            "combat": 1
+            "alchemy": 0,
+            "combat": 1,
+            "farming": 0,
+            "fishing": 0,
+            "foraging": 0,
+            "mining": 0
         },
         "compacting": {
             "block": {
@@ -51,7 +56,12 @@
             "npc": 4
         },
         "xp": {
-            "combat": 4
+            "alchemy": 0,
+            "combat": 4,
+            "farming": 0,
+            "fishing": 0,
+            "foraging": 0,
+            "mining": 0
         },
         "compacting": {
             "compact": {
@@ -68,7 +78,12 @@
             "npc": 160
         },
         "xp": {
-            "combat": 160
+            "alchemy": 0,
+            "combat": 160,
+            "farming": 0,
+            "fishing": 0,
+            "foraging": 0,
+            "mining": 0
         },
         "compacting": {
             "compact": {
@@ -85,7 +100,12 @@
             "npc": 25600
         },
         "xp": {
-            "combat": 25600
+            "alchemy": 0,
+            "combat": 25600,
+            "farming": 0,
+            "fishing": 0,
+            "foraging": 0,
+            "mining": 0
         },
         "compact_tier": 2
     },
@@ -3231,7 +3251,7 @@
     },
     "CUSTOM_UPGRADE": {
         "display": "Custom Upgrade",
-        "speed_boost": 10,
+        "speed_boost": 0,
         "drop_multiplier": 1,
         "upgrade_special": {
             "type": "None"

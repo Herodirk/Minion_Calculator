@@ -296,7 +296,9 @@ class Calculator(tk.Tk):
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
         self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"LEGENDARY": {"min": 1, "max": 1, "last_updated": 0}}})
         self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True)
-        # self.custom_upgrade_toggle = HPM.Hvar(self.huim, key="custom_upgrade_toggle", vtype="storage", dtype=bool, display="Custom Upgrade", initial=False)
+        self.custom_upgrade_toggle = HPM.Hvar(self.huim, key="custom_upgrade_toggle", vtype="storage", dtype=bool, display="Custom Upgrade", initial=False)
+
+        self.huim.edit_vars_output["custom_input_custom_upgrade_toggle"] = self.custom_upgrade_toggle.tkvar
 
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -327,9 +329,10 @@ class Calculator(tk.Tk):
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
         self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
         self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars(self.edit_settings, ["API_auto_update", "API_cooldown", "pet_API_cooldown", "compact_tolerance", "output_to_clipboard", "debug_mode", "color_palette"], True))
+        self.custom_inputsB = tk.Button(self.frames["controls"], text="Custom Inputs", command=lambda: self.md.edit_custom_inputs(self.huim, self.md.custom_inputs_edit_tree))
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
-        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB, self.settingsB]
+        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB, self.settingsB, self.custom_inputsB]
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
@@ -553,7 +556,7 @@ class Calculator(tk.Tk):
             "**Minion Upgrades**": {
                 "\n> Internal: ": {"fuel", "hopper", "upgrade1", "upgrade2"},
                 "\n> External: ": {"chest", "beacon", "crystal", "postcard"},
-                "\n-# ": ["unique_farming_minions"],
+                "\n-# ": ["unique_farming_minions", "custom_upgrade_toggle"],
                 "\n> Permanent: ": {"infusion", "free_will"}
             },
             "Beacon Info": {"\n> ": ["beacon_fuel", "free_fuel_beacon"]},
@@ -729,6 +732,8 @@ class Calculator(tk.Tk):
                 return None  # no output if zero-like
         elif var_key == "special_layout" and "Special Layout" in calculation_data["notes"]:  # special case: special layout description instead of True
             data = f"{calculation_data["notes"]["Special Layout"]}"
+        elif var_key == "custom_upgrade_toggle":
+            data = f"Speed boost: {self.md.calculator_data["CUSTOM_UPGRADE"]["speed_boost"]}, Drop multiplier: {self.md.calculator_data["CUSTOM_UPGRADE"]["drop_multiplier"]}"
         elif self.var_dict[var_key].dtype in [dict, list]:
             data = calculation_data[var_key]
         elif self.var_dict[var_key].dtype in [int, float]:
@@ -1004,6 +1009,8 @@ class Calculator(tk.Tk):
         speed_boost += self.md.calculator_data[upgrade_ids[0]]["speed_boost"] + self.md.calculator_data[upgrade_ids[1]]["speed_boost"]
         speed_boost += self.md.calculator_data[setup_data["beacon"]]["speed_boost"] + self.md.calculator_data["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
         speed_boost += self.md.calculator_data["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + self.md.calculator_data["POSTCARD"]["speed_boost"] * setup_data["postcard"]
+        if setup_data["custom_upgrade_toggle"]:
+            speed_boost += self.md.calculator_data["CUSTOM_UPGRADE"]["speed_boost"]
         if setup_data["crystal"] != "NONE":
             if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["crystal"]]["affected_minions"]):
                 speed_boost += self.md.calculator_data[setup_data["crystal"]]["speed_boost"]
@@ -1059,6 +1066,8 @@ class Calculator(tk.Tk):
             return drop_multiplier
         drop_multiplier *= self.md.calculator_data[minion_fuel_id]["drop_multiplier"]
         drop_multiplier *= self.md.calculator_data[upgrade_ids[0]]["drop_multiplier"]
+        if setup_data["custom_upgrade_toggle"]:
+            drop_multiplier *=  self.md.calculator_data["CUSTOM_UPGRADE"]["drop_multiplier"]
         if afk_toggle and drop_multiplier > 1:
             # drop multiplier greater than 1 is rounded down while online
             drop_multiplier = int(drop_multiplier)
@@ -1617,12 +1626,12 @@ class Calculator(tk.Tk):
         """
         skill_xp = {}
         for itemtype, amount in drops_list.items():
-            xptype, value = list(*self.md.calculator_data[itemtype]["xp"].items())
-            if value == 0:
-                continue
-            if xptype not in skill_xp:
-                skill_xp[xptype] = 0
-            skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
+            for xptype, value in self.md.calculator_data[itemtype]["xp"].items():
+                if value == 0:
+                    continue
+                if xptype not in skill_xp:
+                    skill_xp[xptype] = 0
+                skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
         self.huim.deepmultiply(skill_xp, self.md.calculator_data[mayor]["xp_multiplier"])
         if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
             del skill_xp["combat"]

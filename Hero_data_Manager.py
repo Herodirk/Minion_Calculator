@@ -66,21 +66,41 @@ class H_data_M():
             # "pet_costs": { "NONE": { "LEGENDARY": { "min": 1, "max": 1, "last_updated": 0 } } },
             "custom_inputs": {
                 "CUSTOM.prices.npc": 1,
-                "CUSTOM.xp": { "combat": 1 },
+                "CUSTOM.xp.alchemy": 0,
+                "CUSTOM.xp.combat": 1,
+                "CUSTOM.xp.farming": 0,
+                "CUSTOM.xp.fishing": 0,
+                "CUSTOM.xp.foraging": 0,
+                "CUSTOM.xp.mining": 0,
                 "CUSTOM.compacting.block.amount": 2,
                 "CUSTOM.compacting.block.per": 8,
                 "CUSTOM.compacting.compact.amount": 1,
                 "CUSTOM.compacting.compact.per": 160,
                 "CUSTOM_BLOCK.prices.npc": 4,
-                "CUSTOM_BLOCK.xp": { "combat": 4 },
+                "CUSTOM_BLOCK.xp.alchemy": 0,
+                "CUSTOM_BLOCK.xp.combat": 4,
+                "CUSTOM_BLOCK.xp.farming": 0,
+                "CUSTOM_BLOCK.xp.fishing": 0,
+                "CUSTOM_BLOCK.xp.foraging": 0,
+                "CUSTOM_BLOCK.xp.mining": 0,
                 "CUSTOM_BLOCK.compacting.compact.amount": 4,
                 "CUSTOM_BLOCK.compacting.compact.per": 160,
                 "ENCHANTED_CUSTOM.prices.npc": 160,
-                "ENCHANTED_CUSTOM.xp": { "combat": 160 },
+                "ENCHANTED_CUSTOM.xp.alchemy": 0,
+                "ENCHANTED_CUSTOM.xp.combat": 160,
+                "ENCHANTED_CUSTOM.xp.farming": 0,
+                "ENCHANTED_CUSTOM.xp.fishing": 0,
+                "ENCHANTED_CUSTOM.xp.foraging": 0,
+                "ENCHANTED_CUSTOM.xp.mining": 0,
                 "ENCHANTED_CUSTOM.compacting.compact.amount": 1,
                 "ENCHANTED_CUSTOM.compacting.compact.per": 160,
                 "ENCHANTED_CUSTOM_BLOCK.prices.npc": 25600,
-                "ENCHANTED_CUSTOM_BLOCK.xp": { "combat": 25600 },
+                "ENCHANTED_CUSTOM_BLOCK.xp.alchemy": 0,
+                "ENCHANTED_CUSTOM_BLOCK.xp.combat": 25600,
+                "ENCHANTED_CUSTOM_BLOCK.xp.farming": 0,
+                "ENCHANTED_CUSTOM_BLOCK.xp.fishing": 0,
+                "ENCHANTED_CUSTOM_BLOCK.xp.foraging": 0,
+                "ENCHANTED_CUSTOM_BLOCK.xp.mining": 0,
                 "CUSTOM_MINION.drops": { "CUSTOM": 1 },
                 "CUSTOM_MINION.speed.1": 1,
                 "CUSTOM_MINION.speed.2": 2,
@@ -109,12 +129,109 @@ class H_data_M():
                 "CUSTOM_MINION.afkcorrupt": 2,
                 "PET_CUSTOM_PET.pet_type": "farming",
                 "CUSTOM_RARITY.max_lvl_pet_xp_amount": 25353230,
-                "CUSTOM_UPGRADE.speed_boost": 10,
+                "CUSTOM_UPGRADE.speed_boost": 0,
                 "CUSTOM_UPGRADE.drop_multiplier": 1
             },
             # "custom_prices": {}
         }
 
+        self.custom_inputs_edit_tree = {
+            "Cancel": "Object to edit",
+            "Materials": {
+                "Cancel": "Material to edit",
+                "Base Custom": {
+                    "CUSTOM.prices.npc": {"dtype": float, "display": "Base Custom NPC price", "options": None},
+                    "CUSTOM.xp.alchemy": {"dtype": float, "display": "Base Custom Alchemy XP", "options": None},
+                    "CUSTOM.xp.combat": {"dtype": float, "display": "Base Custom Combat XP", "options": None},
+                    "CUSTOM.xp.farming": {"dtype": float, "display": "Base Custom Farming XP", "options": None},
+                    "CUSTOM.xp.fishing": {"dtype": float, "display": "Base Custom Fishing XP", "options": None},
+                    "CUSTOM.xp.foraging": {"dtype": float, "display": "Base Custom Foraging XP", "options": None},
+                    "CUSTOM.xp.mining": {"dtype": float, "display": "Base Custom Mining XP", "options": None},
+                    "CUSTOM.compacting.block.per": {"dtype": float, "display": "Base Custom per Custom Block craft", "options": None},
+                    "CUSTOM.compacting.block.amount": {"dtype": float, "display": "Custom Block amount from craft", "options": None},
+                    "CUSTOM.compacting.compact.per": {"dtype": float, "display": "Base Custom per Enchanted Custom craft", "options": None},
+                    "CUSTOM.compacting.compact.amount": {"dtype": float, "display": "Enchanted Custom amount from craft", "options": None},
+                },
+                "Custom Block": {
+                    "CUSTOM_BLOCK.prices.npc": {"dtype": float, "display": "Custom Block NPC price", "options": None},
+                    "CUSTOM_BLOCK.xp.alchemy": {"dtype": float, "display": "Custom Block Alchemy XP", "options": None},
+                    "CUSTOM_BLOCK.xp.combat": {"dtype": float, "display": "Custom Block Combat XP", "options": None},
+                    "CUSTOM_BLOCK.xp.farming": {"dtype": float, "display": "Custom Block Farming XP", "options": None},
+                    "CUSTOM_BLOCK.xp.fishing": {"dtype": float, "display": "Custom Block Fishing XP", "options": None},
+                    "CUSTOM_BLOCK.xp.foraging": {"dtype": float, "display": "Custom Block Foraging XP", "options": None},
+                    "CUSTOM_BLOCK.xp.mining": {"dtype": float, "display": "Custom Block Mining XP", "options": None},
+                    "CUSTOM_BLOCK.compacting.compact.per": {"dtype": float, "display": "Custom Block per Enchanted Custom craft", "options": None},
+                    "CUSTOM_BLOCK.compacting.compact.amount": {"dtype": float, "display": "Enchanted Custom amount from craft", "options": None},
+                },
+                "Enchanted Custom": {
+                    "ENCHANTED_CUSTOM.prices.npc": {"dtype": float, "display": "Enchanted Custom NPC price", "options": None},
+                    "ENCHANTED_CUSTOM.xp.alchemy": {"dtype": float, "display": "Enchanted Custom Alchemy XP", "options": None},
+                    "ENCHANTED_CUSTOM.xp.combat": {"dtype": float, "display": "Enchanted Custom Combat XP", "options": None},
+                    "ENCHANTED_CUSTOM.xp.farming": {"dtype": float, "display": "Enchanted Custom Farming XP", "options": None},
+                    "ENCHANTED_CUSTOM.xp.fishing": {"dtype": float, "display": "Enchanted Custom Fishing XP", "options": None},
+                    "ENCHANTED_CUSTOM.xp.foraging": {"dtype": float, "display": "Enchanted Custom Foraging XP", "options": None},
+                    "ENCHANTED_CUSTOM.xp.mining": {"dtype": float, "display": "Enchanted Custom Mining XP", "options": None},
+                    "ENCHANTED_CUSTOM.compacting.compact.per": {"dtype": float, "display": "Enchanted Custom per Enchanted Custom Block craft", "options": None},
+                    "ENCHANTED_CUSTOM.compacting.compact.amount": {"dtype": float, "display": "Enchanted Custom Block amount from craft", "options": None},
+                },
+                "Enchanted Custom Block": {
+                    "ENCHANTED_CUSTOM_BLOCK.prices.npc": {"dtype": float, "display": "Enchanted Custom Block NPC price", "options": None},
+                    "ENCHANTED_CUSTOM_BLOCK.xp.alchemy": {"dtype": float, "display": "Enchanted Custom Block Alchemy XP", "options": None},
+                    "ENCHANTED_CUSTOM_BLOCK.xp.combat": {"dtype": float, "display": "Enchanted Custom Block Combat XP", "options": None},
+                    "ENCHANTED_CUSTOM_BLOCK.xp.farming": {"dtype": float, "display": "Enchanted Custom Block Farming XP", "options": None},
+                    "ENCHANTED_CUSTOM_BLOCK.xp.fishing": {"dtype": float, "display": "Enchanted Custom Block Fishing XP", "options": None},
+                    "ENCHANTED_CUSTOM_BLOCK.xp.foraging": {"dtype": float, "display": "Enchanted Custom Block Foraging XP", "options": None},
+                    "ENCHANTED_CUSTOM_BLOCK.xp.mining": {"dtype": float, "display": "Enchanted Custom Block Mining XP", "options": None},
+                }
+            },
+            "Custom Minion": {
+                "Cancel": "Attribute to edit",
+                # "Drops": {
+                #     "CUSTOM_MINION.drops": {}
+                # },  # TODO: create dict edit function
+                "Action Time": {
+                    "CUSTOM_MINION.speed.1": {"dtype": float, "display": "Action time (s) t1", "options": None},
+                    "CUSTOM_MINION.speed.2": {"dtype": float, "display": "Action time (s) t2", "options": None},
+                    "CUSTOM_MINION.speed.3": {"dtype": float, "display": "Action time (s) t3", "options": None},
+                    "CUSTOM_MINION.speed.4": {"dtype": float, "display": "Action time (s) t4", "options": None},
+                    "CUSTOM_MINION.speed.5": {"dtype": float, "display": "Action time (s) t5", "options": None},
+                    "CUSTOM_MINION.speed.6": {"dtype": float, "display": "Action time (s) t6", "options": None},
+                    "CUSTOM_MINION.speed.7": {"dtype": float, "display": "Action time (s) t7", "options": None},
+                    "CUSTOM_MINION.speed.8": {"dtype": float, "display": "Action time (s) t8", "options": None},
+                    "CUSTOM_MINION.speed.9": {"dtype": float, "display": "Action time (s) t9", "options": None},
+                    "CUSTOM_MINION.speed.10": {"dtype": float, "display": "Action time (s) t10", "options": None},
+                    "CUSTOM_MINION.speed.11": {"dtype": float, "display": "Action time (s) t11", "options": None},
+                    "CUSTOM_MINION.speed.12": {"dtype": float, "display": "Action time (s) t12", "options": None},
+                },
+                "Storage": {
+                    "CUSTOM_MINION.storage.1": {"dtype": float, "display": "Storage (slots) t1", "options": None},
+                    "CUSTOM_MINION.storage.2": {"dtype": float, "display": "Storage (slots) t2", "options": None},
+                    "CUSTOM_MINION.storage.3": {"dtype": float, "display": "Storage (slots) t3", "options": None},
+                    "CUSTOM_MINION.storage.4": {"dtype": float, "display": "Storage (slots) t4", "options": None},
+                    "CUSTOM_MINION.storage.5": {"dtype": float, "display": "Storage (slots) t5", "options": None},
+                    "CUSTOM_MINION.storage.6": {"dtype": float, "display": "Storage (slots) t6", "options": None},
+                    "CUSTOM_MINION.storage.7": {"dtype": float, "display": "Storage (slots) t7", "options": None},
+                    "CUSTOM_MINION.storage.8": {"dtype": float, "display": "Storage (slots) t8", "options": None},
+                    "CUSTOM_MINION.storage.9": {"dtype": float, "display": "Storage (slots) t9", "options": None},
+                    "CUSTOM_MINION.storage.10": {"dtype": float, "display": "Storage (slots) t10", "options": None},
+                    "CUSTOM_MINION.storage.11": {"dtype": float, "display": "Storage (slots) t11", "options": None},
+                    "CUSTOM_MINION.storage.12": {"dtype": float, "display": "Storage (slots) t12", "options": None},
+                },
+                "AFK corrupt multiplier": {
+                    "CUSTOM_MINION.afkcorrupt": {"dtype": float, "display": "AFK corrupt multiplier", "options": None}
+                }
+            },
+            "Custom Upgrade": {
+                "custom_upgrade_toggle": {"dtype": bool, "display": "Use Custom Upgrade", "options": None},
+                "CUSTOM_UPGRADE.speed_boost": {"dtype": float, "display": "Custom Upgrade Speed boost", "options": None},
+                "CUSTOM_UPGRADE.drop_multiplier": {"dtype": float, "display": "Custom Upgrade Drop multiplier", "options": None}
+            },
+            "Custom Pet": {
+                "PET_CUSTOM_PET.pet_type": {"dtype": str, "display": "Pet Type", "options": ["all", "alchemy", "combat", "enchanting", "farming", "fishing", "foraging", "mining"]},
+                "CUSTOM_RARITY.max_lvl_pet_xp_amount": {"dtype": float, "display": "Custom Rarity max Pet XP", "options": None},
+            }
+        }
+        # TODO: combine all instance data files into one
 
         for file_key, file_path in self.instance_data_file_locations.items():
             huim.check_json(file_path, self.instance_data[file_key])
@@ -122,7 +239,6 @@ class H_data_M():
         for file_data in self.instance_data.values():
             for data_loc, data_val in file_data.items():
                 self.set_data(data_loc, data_val)
-        # TODO: and make a function to edit the custom data
         return
 
     def has_data_tag(self, data_ID, tag):
@@ -184,6 +300,30 @@ class H_data_M():
             for data_loc in file_data.keys():
                 file_data[data_loc] = self.get_data(data_loc)
             huim.write_json(self.instance_data_file_locations[file_key], file_data)
+
+    def edit_custom_inputs(self, huim, option_tree, new_path_choice=False):
+        if new_path_choice:
+            edit_path_choice = huim.edit_vars_output["custom_input_edit_choice"].get()
+            if edit_path_choice == "Cancel":
+                return
+            option_tree = option_tree[edit_path_choice]
+            huim.edit_vars_output["custom_input_edit_choice"].set("Cancel")
+        if "Cancel" in option_tree:
+            huim.edit_vars(lambda: self.edit_custom_inputs(huim, option_tree, True), {"custom_input_edit_choice": {"dtype": str, "display": option_tree["Cancel"], "initial": "Cancel", "options": list(option_tree.keys())}}, False)
+            return
+        input_variables = {}
+        for data_loc, custom_input_options in option_tree.items():
+            input_variables["custom_input_" + data_loc] = custom_input_options
+            input_variables["custom_input_" + data_loc]["initial"] = self.get_data(data_loc)
+        huim.edit_vars(lambda: self.set_custom_inputs(huim, option_tree), input_variables, False)
+        return
+
+    def set_custom_inputs(self, huim, edited_data_locs):
+        for data_loc in edited_data_locs:
+            self.set_data(data_loc, huim.edit_vars_output["custom_input_" + data_loc].get())
+        return
+
+
 
 """
 Calculator Data Notes

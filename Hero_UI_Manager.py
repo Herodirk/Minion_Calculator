@@ -1034,10 +1034,10 @@ class H_UI_M():
         except tk._tkinter.TclError:
             self.logger.error("Inputted wrong data type, please try again")
         else:
-            if exit_func is not None:
-                exit_func()
             self.edit_vars_mainframe.destroy()
             self.edit_vars_active = False
+            if exit_func is not None:
+                exit_func()
         return
 
 
