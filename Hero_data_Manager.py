@@ -130,7 +130,12 @@ class H_data_M():
                 "PET_CUSTOM_PET.pet_type": "farming",
                 "CUSTOM_RARITY.max_lvl_pet_xp_amount": 25353230,
                 "CUSTOM_UPGRADE.speed_boost": 0,
-                "CUSTOM_UPGRADE.drop_multiplier": 1
+                "CUSTOM_UPGRADE.drop_multiplier": 1,
+                "CUSTOM_UPGRADE.upgrade_effects.spreading": {},
+                "CUSTOM_UPGRADE.upgrade_effects.adding": {},
+                "CUSTOM_UPGRADE.upgrade_effects.cooldown.items": {},
+                "CUSTOM_UPGRADE.upgrade_effects.cooldown.online_cooldown": 60,
+                "CUSTOM_UPGRADE.upgrade_effects.cooldown.offline_cooldown": 60,
             },
             # "custom_prices": {}
         }
@@ -222,9 +227,17 @@ class H_data_M():
                 }
             },
             "Custom Upgrade": {
-                "custom_upgrade_toggle": {"dtype": bool, "display": "Use Custom Upgrade", "options": None},
-                "CUSTOM_UPGRADE.speed_boost": {"dtype": float, "display": "Custom Upgrade Speed boost", "options": None},
-                "CUSTOM_UPGRADE.drop_multiplier": {"dtype": float, "display": "Custom Upgrade Drop multiplier", "options": None}
+                "Cancel": "Attribute to edit",
+                "General": {
+                    "custom_upgrade_toggle": {"dtype": bool, "display": "Use Custom Upgrade", "options": None},
+                    "CUSTOM_UPGRADE.speed_boost": {"dtype": float, "display": "Custom Upgrade Speed boost", "options": None},
+                    "CUSTOM_UPGRADE.drop_multiplier": {"dtype": float, "display": "Custom Upgrade Drop multiplier", "options": None},
+                    "CUSTOM_UPGRADE.upgrade_effects.cooldown.online_cooldown": {"dtype": float, "display": "Custom Upgrade Online Cooldown", "options": None},
+                    "CUSTOM_UPGRADE.upgrade_effects.cooldown.offline_cooldown": {"dtype": float, "display": "Custom Upgrade Offline Cooldown", "options": None},
+                },
+                # "Spreading effect": {},
+                # "Adding effect": {},
+                # "Cooldown effect": {}
             },
             "Custom Pet": {
                 "PET_CUSTOM_PET.pet_type": {"dtype": str, "display": "Pet Type", "options": ["all", "alchemy", "combat", "enchanting", "farming", "fishing", "foraging", "mining"]},
@@ -378,8 +391,8 @@ Offline cooldown of the following upgrades are not confirmed:
 - SOULFLOW_ENGINE
 - BERBERIS_FUEL_INJECTOR
 
-JACOBS_PARTICIPATION_MEDAL: upgrade_special  # rough estimate of drop rate
-ENCHANTED_SHEARS: upgrade_special  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
+JACOBS_PARTICIPATION_MEDAL: upgrade_effects  # rough estimate of drop rate
+ENCHANTED_SHEARS: upgrade_effects  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
 
 Compacting recipes notes:
 GLOWSTONE  # TODO: check if its not per 160 with amount 4
@@ -395,8 +408,11 @@ POISONOUS_POTATO  # TODO: check if compacting is even possible
 
 XP notes:
 - ENCHANTED_GLOWSTONE  # correct inaccuracy
+- WHEAT  # correct (2026-5-10)
+- SEEDS  # correct (2026-5-10)
 - ENCHANTED_WHEAT  # correct
 - ENCHANTED_HAY_BALE  # correct
+- MELON_SLICE  # correct (2026-5-10)
 - ENCHANTED_GOLDEN_CARROT  # correct (2026-3-7)
 - HUGE_MUSHROOM_2  # correct inaccuracy
 - HUGE_MUSHROOM_1  # correct inaccuracy
@@ -405,7 +421,7 @@ XP notes:
 - ENCHANTED_CACTUS_GREEN  # correct inaccuracy
 - ENCHANTED_CACTUS  # correct inaccuracy
 - ENCHANTED_COOKIE  # correct (2026-3-9)
-- ENCHANTED_SUGAR  # correct type
+- ENCHANTED_SUGAR  # correct type and amount (2026-5-10)
 - ENCHANTED_SUGAR_CANE  # correct type
 - WILD_ROSE  # correct (2025-12-17)
 - ENCHANTED_WILD_ROSE  # correct (2025-12-17)

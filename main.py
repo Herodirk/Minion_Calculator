@@ -732,7 +732,7 @@ class Calculator(tk.Tk):
                 return None  # no output if zero-like
         elif var_key == "special_layout" and "Special Layout" in calculation_data["notes"]:  # special case: special layout description instead of True
             data = f"{calculation_data["notes"]["Special Layout"]}"
-        elif var_key == "custom_upgrade_toggle":
+        elif var_key == "custom_upgrade_toggle" and calculation_data[var_key]:
             data = f"Speed boost: {self.md.calculator_data["CUSTOM_UPGRADE"]["speed_boost"]}, Drop multiplier: {self.md.calculator_data["CUSTOM_UPGRADE"]["drop_multiplier"]}"
         elif self.var_dict[var_key].dtype in [dict, list]:
             data = calculation_data[var_key]
@@ -806,11 +806,16 @@ class Calculator(tk.Tk):
                 if not markdown:
                     header = header.replace("*", "")
                     header = header.replace("### ", "")
+                    header = header.replace("-# ", "- ")
             if header is None:
                 continue
 
             if type(output_order[section_key]) is dict:
                 for sub_key, key_arr in output_order[section_key].items():
+                    if not markdown:
+                        sub_key = sub_key.replace("*", "")
+                        sub_key = sub_key.replace("### ", "")
+                        sub_key = sub_key.replace("-# ", "- ")
                     line_data = ""
                     if "$" in sub_key:  # value only: no display, no markdown
                         sub_key = sub_key[1:]
@@ -979,7 +984,7 @@ class Calculator(tk.Tk):
             self.huim.logger.error(item_ID + " not in calculator data")
             return 0
 
-    def get_speed_boosts(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, clock_override, setup_data):
+    def get_speed_boosts(self, minion, upgrade_ids, upgrade_effects, afk_toggle, clock_override, setup_data):
         """
         Adds up speed boosts, uses the fact that booleans can be seen as 0 and 1 for false and true resp.
 
@@ -987,10 +992,10 @@ class Calculator(tk.Tk):
         ----------
         minion : str
             Minion type ID.
-        minion_fuel_id : str
-            Minion fuel ID.
         upgrade_ids : list
             List of upgrade IDs
+        upgrade_effects : dict
+            Active upgrade effects sorted by type
         afk_toggle : boolean
             True if AFKing, False if offline
         clock_override : boolean
@@ -1005,8 +1010,8 @@ class Calculator(tk.Tk):
             Total additive speed boost.
         """
         speed_boost = 0
-        speed_boost += self.md.calculator_data[minion_fuel_id]["speed_boost"]
-        speed_boost += self.md.calculator_data[upgrade_ids[0]]["speed_boost"] + self.md.calculator_data[upgrade_ids[1]]["speed_boost"]
+        for upgrade in upgrade_ids:
+            speed_boost += self.md.calculator_data[upgrade]["speed_boost"]
         speed_boost += self.md.calculator_data[setup_data["beacon"]]["speed_boost"] + self.md.calculator_data["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
         speed_boost += self.md.calculator_data["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + self.md.calculator_data["POSTCARD"]["speed_boost"] * setup_data["postcard"]
         if setup_data["custom_upgrade_toggle"]:
@@ -1023,8 +1028,9 @@ class Calculator(tk.Tk):
                 speed_boost += 180
             else:
                 speed_boost += 18 * min(10, setup_data["amount"])
-        if minion_fuel_id == "EVERBURNING_FLAME" and self.md.has_data_tag(minion, self.md.calculator_data[minion_fuel_id]["upgrade_special"]["affected_minions"]):
-            speed_boost += self.md.calculator_data[minion_fuel_id]["upgrade_special"]["amount"]
+        for item_ID, effect_data in upgrade_effects["speed_bonus"].items():
+            if self.md.has_data_tag(minion, effect_data["affected_minions"]):
+                speed_boost += effect_data["amount"]
         if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["mayor"]]["affected_minions"]):
             speed_boost += self.md.calculator_data[setup_data["mayor"]]["speed_boost"]
         if not (afk_toggle or clock_override):
@@ -1037,7 +1043,7 @@ class Calculator(tk.Tk):
             speed_boost += self.md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][0] + setup_data["afkpet_lvl"] * self.md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][1]
         return speed_boost
 
-    def get_drop_multiplier(self, minion, minion_fuel_id, upgrade_ids, afk_toggle, setup_data):
+    def get_drop_multiplier(self, minion, upgrade_ids, afk_toggle, setup_data):
         """
         Multiplies together drop multipliers.
 
@@ -1045,8 +1051,6 @@ class Calculator(tk.Tk):
         ----------
         minion : str
             Minion type ID.
-        minion_fuel_id : str
-            Minion fuel ID.
         upgrade_ids : list
             List of upgrade IDs
         afk_toggle : boolean
@@ -1064,21 +1068,16 @@ class Calculator(tk.Tk):
             if self.md.has_data_tag(minion, "mob_minion"):
                 drop_multiplier *= 1 + 15 * setup_data["player_looting"] / 100
             return drop_multiplier
-        drop_multiplier *= self.md.calculator_data[minion_fuel_id]["drop_multiplier"]
-        drop_multiplier *= self.md.calculator_data[upgrade_ids[0]]["drop_multiplier"]
-        if setup_data["custom_upgrade_toggle"]:
-            drop_multiplier *=  self.md.calculator_data["CUSTOM_UPGRADE"]["drop_multiplier"]
-        if afk_toggle and drop_multiplier > 1:
-            # drop multiplier greater than 1 is rounded down while online
-            drop_multiplier = int(drop_multiplier)
-        drop_multiplier *= self.md.calculator_data[upgrade_ids[1]]["drop_multiplier"]
-        if afk_toggle and drop_multiplier > 1:
-            drop_multiplier = int(drop_multiplier)
+        for upgrade in upgrade_ids:
+            drop_multiplier *= self.md.calculator_data[upgrade]["drop_multiplier"]
+            if afk_toggle and drop_multiplier > 1:
+                # drop multiplier greater than 1 is rounded down while online, TODO: test again
+                drop_multiplier = int(drop_multiplier)
         if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["mayor"]]["affected_minions"]):
             drop_multiplier *= self.md.calculator_data[setup_data["mayor"]]["drop_multiplier"]
         return drop_multiplier
     
-    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data, setup_notes):
+    def get_actions_per_harvest(self, minion, upgrade_ids, upgrade_effects, afk_toggle, setup_data, setup_notes):
         """
         Multiplies together drop multipliers.
 
@@ -1086,8 +1085,8 @@ class Calculator(tk.Tk):
         ----------
         minion : str
             Minion type ID.
-        upgrade_ids : list
-            List of upgrade IDs
+        upgrade_effects : dict
+            Active upgrade effects sorted by type
         afk_toggle : boolean
             True if AFKing, False if offline
         setup_data : dict
@@ -1114,7 +1113,7 @@ class Calculator(tk.Tk):
                 else:
                     actions_per_harvest = 1
                     if minion in ["GRAVEL_MINION"]:
-                        upgrade_ids.append("FLINT_SHOVEL")
+                        upgrade_effects["replacing"]["GRAVEL"] = { "FLINT": 1 }
                         setup_notes["Player Tools"] = "Assuming Player is using Flint Shovel"
                     if minion in ["ICE_MINION"]:
                         setup_notes["Player Tools"] = "Assuming Player is using Silk Touch"
@@ -1122,13 +1121,17 @@ class Calculator(tk.Tk):
                 if minion in ["COBBLESTONE_MINION", "MYCELIUM_MINION", "ICE_MINION"]:
                     # cobblestone generator, regrowing mycelium, freezing water
                     actions_per_harvest = 1
-                if minion in ["FLOWER_MINION", "SAND_MINION", "RED_SAND_MINION", "GRAVEL_MINION"]:
-                    # harvests through natural means: water flushing, gravity
+                if minion == "FLOWER_MINION" and "THORNY_VINES" not in upgrade_ids:
+                    # harvests through natural means: water flushing
+                    actions_per_harvest = 1
+                    # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
+                if minion in ["SAND_MINION", "RED_SAND_MINION", "GRAVEL_MINION"]:
+                    # harvests through natural means: gravity
                     actions_per_harvest = 1
                     # speedBonus -= 10  # only spawning has 10% action speed reduction, not confirmed yet.
         return actions_per_harvest
 
-    def update_loot_table(self, minion, minion_fuel_id, upgrades, afk_toggle, setup_data):
+    def update_loot_table(self, minion, upgrade_ids, upgrade_effects, afk_toggle, setup_data):
         """
         Applies changes to the loot tables of the minions depending on things like AFKing or special layouts.
 
@@ -1136,8 +1139,10 @@ class Calculator(tk.Tk):
         ----------
         minion : str
             Minion type ID.
-        minion_fuel_id : str
-            Minion fuel ID
+        upgrade_ids : list
+            List of upgrade IDs
+        upgrade_effects : dict
+            Active upgrade effects sorted by type
         afk_toggle : boolean
             True if AFKing, False if offline
         setup_data : dict
@@ -1150,9 +1155,14 @@ class Calculator(tk.Tk):
         if self.md.has_data_tag(minion, "wood_minion"):
             if afk_toggle:
                 # chopped trees have 4 blocks of wood, unknown why offline gives 3
-                self.md.calculator_data[minion]["drops"][list(self.md.calculator_data[minion]["drops"].keys())[0]] = 4
-            else:
-                self.md.calculator_data[minion]["drops"][list(self.md.calculator_data[minion]["drops"].keys())[0]] = 3
+                upgrade_effects["replacing"].update({
+                    "LOG": {"LOG": 4 / 3},
+                    "LOG:1": {"LOG:1": 4 / 3},
+                    "LOG:2": {"LOG:2": 4 / 3},
+                    "LOG_2:1": {"LOG_2:1": 4 / 3},
+                    "LOG_2": {"LOG_2": 4 / 3},
+                    "LOG:3": {"LOG:3": 4 / 3},
+                })
         elif minion == "GRAVEL_MINION":
             if afk_toggle:
                 # vanilla minecraft chance for gravel to become flint
@@ -1162,31 +1172,28 @@ class Calculator(tk.Tk):
                 self.md.calculator_data[minion]["drops"]["GRAVEL"] = 1
                 self.md.calculator_data[minion]["drops"]["FLINT"] = 0
         elif minion == "PUMPKIN_MINION":
-            if afk_toggle:
+            if not afk_toggle:
+                upgrade_effects["replacing"].update({"PUMPKIN": {"PUMPKIN": 3}})
                 # it just does this, idk, ask Hypixel
-                self.md.calculator_data[minion]["drops"]["PUMPKIN"] = 1
-            else:
-                self.md.calculator_data[minion]["drops"]["PUMPKIN"] = 3
         elif minion == "SHEEP_MINION":
-            if "ENCHANTED_SHEARS" in upgrades:
-                self.md.calculator_data[minion]["drops"]["WOOL"] = 0
-            else:
-                self.md.calculator_data[minion]["drops"]["WOOL"] = 1
+            if "ENCHANTED_SHEARS" in upgrade_ids:
+                upgrade_effects["replacing"].update({"WOOL": {"WOOL": 0}})
         elif minion == "FLOWER_MINION":
-            if minion_fuel_id == "THORNY_VINES":
-                self.md.calculator_data[minion]["drops"] = { "WILD_ROSE": 2 }
-            elif afk_toggle and setup_data["special_layout"]:
+            if afk_toggle and setup_data["special_layout"] and "THORNY_VINES" not in upgrade_ids:
                 # tall flowers blocked by low ceiling
-                self.md.calculator_data[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 8, "RED_ROSE:2": 0.5 / 8, "RED_ROSE:3": 0.5 / 8, "RED_ROSE:4": 0.5 / 8, "RED_ROSE:5": 0.5 / 8, "RED_ROSE:6": 0.5 / 8, "RED_ROSE:7": 0.5 / 8, "RED_ROSE:8": 0.5 / 8 }
-            else:
-                self.md.calculator_data[minion]["drops"] = { "YELLOW_FLOWER": 0.35, "RED_ROSE": 0.15, "RED_ROSE:1": 0.5 / 11, "RED_ROSE:2": 0.5 / 11, "RED_ROSE:3": 0.5 / 11, "RED_ROSE:4": 0.5 / 11, "RED_ROSE:5": 0.5 / 11, "RED_ROSE:6": 0.5 / 11, "RED_ROSE:7": 0.5 / 11, "RED_ROSE:8": 0.5 / 11, "DOUBLE_PLANT:1": 0.5 / 11, "DOUBLE_PLANT:4": 0.5 / 11, "DOUBLE_PLANT:5": 0.5 / 11 }
-        elif minion == "SUNFLOWER_MINION":
-            if minion_fuel_id == "DAYSWITCH":
-                self.md.calculator_data[minion]["drops"] = { "DOUBLE_PLANT": 2 }
-            elif minion_fuel_id == "NIGHTSWITCH":
-                self.md.calculator_data[minion]["drops"] = { "MOONFLOWER": 2 }
-            else:
-                self.md.calculator_data[minion]["drops"] = { "DOUBLE_PLANT": 1, "MOONFLOWER": 1 }
+                upgrade_effects["replacing"].update({
+                    "RED_ROSE:1": {"RED_ROSE:1": 11 / 8},
+                    "RED_ROSE:2": {"RED_ROSE:2": 11 / 8},
+                    "RED_ROSE:3": {"RED_ROSE:3": 11 / 8},
+                    "RED_ROSE:4": {"RED_ROSE:4": 11 / 8},
+                    "RED_ROSE:5": {"RED_ROSE:5": 11 / 8},
+                    "RED_ROSE:6": {"RED_ROSE:6": 11 / 8},
+                    "RED_ROSE:7": {"RED_ROSE:7": 11 / 8},
+                    "RED_ROSE:8": {"RED_ROSE:8": 11 / 8},
+                    "DOUBLE_PLANT:1": {},
+                    "DOUBLE_PLANT:4": {},
+                    "DOUBLE_PLANT:5": {}
+                })
         return
 
     def get_seconds_per_action(self, minion, minion_tier, minion_fuel_id, speed_boost, setup_data):
@@ -1282,40 +1289,54 @@ class Calculator(tk.Tk):
             drop_multiplier = 1
         return harvests_per_time, drop_multiplier
 
-    def get_upgrade_info(self, minion_fuel_id, upgrade_ids, drops_list):
+    def get_upgrade_info(self, minion_fuel_id, drops_list, setup_data):
         """
-        Generates
+        Compiles upgrades and upgrade effects
         
         Parameters
         ----------
         minion_fuel_id : str
             Minion fuel ID
-        upgrade_ids : list
-            list of upgrade IDs
         drops_list : dict
             dict containing all drops of the setup
+        setup_data : dict
+            needed setup data: upgrade1, upgrade2, custom_upgrade_toggle
 
         Returns
         -------
-        dict, dict
-            spreading_info contains the average amount of a spreading item generated per drop\n
-            replace_info contains the replacements of original item ID as key and final item ID as value
+        list, dict
+            upgrade_ids: list of IDs of the used upgrades\n
+            upgrade_effects: dict of active upgrade effects sorted by type            
         """
-        spreading_info = {}
-        replace_info = {}
-        for upgrade in [*upgrade_ids, minion_fuel_id]:
-            if "upgrade_special" not in self.md.calculator_data[upgrade]:
+        upgrade_effects = {
+            "replacing": {},  # old item: {new item: ratio = (new item / old item)}, or {} (empty dict) to remove old item
+            "spreading": {},  # item: average per drop
+            "adding": {},  # "ID": {item: amount}
+            "cooldown": {},  # "ID": {items: {item: amount}, online_cooldown: seconds, offline_cooldown: seconds}
+            "speed_bonus": {},  # "ID": {amount: +%, affected_minions: [affected minion tags and IDs]}
+            "compacting": {},  # "ID": {item: compacting recipes}
+            "expanding": 0
+        }
+        upgrade_ids = [minion_fuel_id, setup_data["upgrade1"], setup_data["upgrade2"]]
+        if setup_data["custom_upgrade_toggle"]:
+            upgrade_ids.append("CUSTOM_UPGRADE")
+        for upgrade in upgrade_ids:
+            if "upgrade_effects" not in self.md.calculator_data[upgrade]:
                 continue
-            upgrade_type = self.md.calculator_data[upgrade]["upgrade_special"]["type"]
-            if "spreading" in upgrade_type:
-                for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
-                    spreading_info[item] = amount
-                    drops_list[item] = 0
-            if "replace" in upgrade_type:
-                replace_info.update(self.md.calculator_data[upgrade]["upgrade_special"]["replacement_list"])
-        return spreading_info, replace_info
+            for effect_type, upgrade_effect_data in self.md.calculator_data[upgrade]["upgrade_effects"].items():
+                if "replacing" == effect_type:
+                    upgrade_effects["replacing"].update(upgrade_effect_data)
+                elif "spreading" == effect_type:
+                    for item, amount in upgrade_effect_data.items():
+                        upgrade_effects["spreading"][item] = amount
+                        drops_list[item] = 0
+                elif "expanding" == effect_type:
+                    upgrade_effects[effect_type] += upgrade_effect_data
+                else:
+                    upgrade_effects[effect_type][upgrade] = upgrade_effect_data
+        return upgrade_ids, upgrade_effects
     
-    def add_drops(self, item, amount, drops_list, spreading_info=None, replace_info=None):
+    def add_drops(self, item, amount, drops_list, spreading_info=None, replacing_info=None):
         """
         Adds drops to drops_list, automatically applies spreading_info and replace_info if given
         
@@ -1325,8 +1346,10 @@ class Calculator(tk.Tk):
         :param spreading_info: dict, the average amount of a spreading item generated per drop
         :param replace_info: dict, the replacements of original item ID as key and final item ID as value
         """
-        if replace_info is not None and item in replace_info:
-            item = replace_info[item]
+        if replacing_info is not None and item in replacing_info:
+            for new_item, ratio in replacing_info[item].items():
+                self.add_drops(new_item, amount * ratio, drops_list, spreading_info, None)
+            return
         if item not in drops_list:
             drops_list[item] = 0
         drops_list[item] += amount
@@ -1335,27 +1358,26 @@ class Calculator(tk.Tk):
                 drops_list[spreading_item] += amount * spreading_average
         return
 
-    def get_base_drops(self, drops_list, spreading_info, replace_info, minion, harvests_per_time, drop_multiplier):
+    def get_base_drops(self, drops_list, upgrade_effects, minion, harvests_per_time, drop_multiplier):
         """
         Gets generated base drops of the setup and adds them to drops_list
         
         :param drops_list: dict, all drops of the setup
-        :param spreading_info: dict, the average amount of a spreading item generated per drop
-        :param replace_info: dict, the replacements of original item ID as key and final item ID as value
+        :param upgrade_effects: dict, active upgrade effects sorted by type
         :param minion: str, minion type ID
         :param harvests_per_time: float, amount of harvests between empties
         :param drop_multiplier: float, total drop multiplier
         """
         for item, amount in self.md.calculator_data[minion]["drops"].items():
-            self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, spreading_info, replace_info)
+            self.add_drops(item, harvests_per_time * amount * drop_multiplier, drops_list, upgrade_effects["spreading"], upgrade_effects["replacing"])
         return
 
-    def get_upgrade_drops(self, drops_list, spreading_info, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, empty_time_seconds, seconds_per_action):
+    def get_upgrade_drops(self, drops_list, upgrade_effects, minion, minion_tier, drop_multiplier, upgrade_ids, harvests_per_time, afk_toggle, empty_time_seconds, seconds_per_action, setup_data):
         """
         Gets generated drops from upgrades of the setup and adds them to the drops_list
         
         :param drops_list: dict, all drops of the setup
-        :param spreading_info: dict, the average amount of a spreading item generated per drop
+        :param upgrade_effects: dict, active upgrade effects sorted by type
         :param minion: str, minion type ID
         :param minion_tier: int, minion tier, 1 to 12
         :param drop_multiplier: float, total drop multiplier
@@ -1364,53 +1386,54 @@ class Calculator(tk.Tk):
         :param afk_toggle: boolean, True if AFKing, False if offline
         :param empty_time_seconds: float, seconds between empties
         :param seconds_per_action: float, seconds per minion action
+        :param setup_data: dict, needed setup data: setup data for self.get_drop_multiplier
         """
-        for upgrade in upgrade_ids:
-            upgrade_type = self.md.calculator_data[upgrade]["upgrade_special"]["type"]
+        for upgrade, effect_data in upgrade_effects["adding"].items():
+            # adding upgrades are like Corrupt Soils
             specific_multiplier = 1
-            if upgrade_type == "add":
-                # adding upgrades are like Corrupt Soils
-                if afk_toggle:
-                    if "CORRUPT_SOIL" == upgrade:
-                        if "afkcorrupt" in self.md.calculator_data[minion]:
-                            # Certain mob minions get more corrupt drops when afking
-                            # It is not a constant multiplier, it is equivalent in chance to the main drops of the minion
-                            specific_multiplier = self.md.calculator_data[minion]["afkcorrupt"]
-                        if minion == "CHICKEN_MINION" and "ENCHANTED_EGG" not in upgrade_ids:
-                            # Online Chicken minion without Enchanted Egg does not make corrupt drops
-                            specific_multiplier = 0
-                    if "ENCHANTED_EGG" == upgrade:
-                        # Enchanted Eggs make one laid egg and one egg on kill while AFKing
-                        # the egg on spawn is affected by drop multipliers and spreadings
-                        self.add_drops("EGG", harvests_per_time * drop_multiplier, drops_list, spreading_info)
-                    for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
-                        self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list)
-                else:
-                    for item, amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
-                        self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list, spreading_info)
-            elif upgrade_type == "cooldown":
-                # cooldown upgrades are like Soulflow Engines
-                # formula for effective_cooldown still in research
-                if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrade_ids:
-                    continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
-                if afk_toggle:
-                    effective_cooldown = 2 * seconds_per_action * (1 + math.floor(math.ceil(self.md.calculator_data[upgrade]["upgrade_special"]["cooldown"] / seconds_per_action) / 2))
-                else:
-                    effective_cooldown = self.md.calculator_data[upgrade]["upgrade_special"]["offline_cooldown"]
-                if "SOULFLOW_ENGINE" == upgrade and minion == "VOIDLING_MINION":
-                    specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
-                for cooldown_item, cooldown_amount in self.md.calculator_data[upgrade]["upgrade_special"]["items"].items():
-                    self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
+            if afk_toggle:
+                if "CORRUPT_SOIL" == upgrade:
+                    if "afkcorrupt" in self.md.calculator_data[minion]:
+                        # Certain mob minions get more corrupt drops when afking
+                        # It is not a constant multiplier, it is equivalent in chance to the main drops of the minion
+                        specific_multiplier = self.md.calculator_data[minion]["afkcorrupt"]
+                    if minion == "CHICKEN_MINION" and "ENCHANTED_EGG" not in upgrade_ids:
+                        # Online Chicken minion without Enchanted Egg does not make corrupt drops
+                        specific_multiplier = 0
+                if "ENCHANTED_EGG" == upgrade:
+                    # Enchanted Eggs make one laid egg and one egg on kill while AFKing
+                    # the egg on spawn is affected by drop multipliers and spreadings
+                    self.add_drops("EGG", harvests_per_time * drop_multiplier, drops_list, upgrade_effects["spreading"])
+                for item, amount in effect_data.items():
+                    self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list)
+            else:
+                for item, amount in effect_data.items():
+                    self.add_drops(item, harvests_per_time * amount * specific_multiplier, drops_list, upgrade_effects["spreading"])
+        for upgrade, effect_data in upgrade_effects["cooldown"].items():
+            # cooldown upgrades are like Soulflow Engines
+            # formula for effective_cooldown still in research
+            specific_multiplier = 1
+            if afk_toggle and upgrade == "LESSER_SOULFLOW_ENGINE" and "SOULFLOW_ENGINE" in upgrade_ids:
+                continue  # Soulflow Engine overrides Lesser Soulflow Engine while online
+            if afk_toggle:
+                effective_cooldown = 2 * seconds_per_action * (1 + math.floor(math.ceil(effect_data["online_cooldown"] / seconds_per_action) / 2))
+            else:
+                effective_cooldown = effect_data["offline_cooldown"]
+            if "SOULFLOW_ENGINE" == upgrade and minion == "VOIDLING_MINION":
+                specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
+            for cooldown_item, cooldown_amount in effect_data["items"].items():
+                if cooldown_item == "RAW_SOULFLOW":
+                    specific_multiplier *= self.get_drop_multiplier(minion, upgrade_ids, afk_toggle, setup_data)
+                self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
         return
 
-    def get_inferno_drops(self, drops_list, spreading_info, replace_info, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data):
+    def get_inferno_drops(self, drops_list, upgrade_effects, minion, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data):
         """
         Gets generated inferno fuel drops and adds them to drops_list.
         https://wiki.hypixel.net/Inferno_Minion_Fuel
         
         :param drops_list: dict, all drops of the setup
-        :param spreading_info: dict, the average amount of a spreading item generated per drop
-        :param replace_info: dict, the replacements of original item ID as key and final item ID as value
+        :param upgrade_effects: dict, active upgrade effects sorted by type
         :param minion: str, minion type ID
         :param minion_tier: int, minion tier, 1 to 12
         :param minion_fuel: str, ID of minion fuel
@@ -1428,9 +1451,9 @@ class Calculator(tk.Tk):
         amount_per = self.md.inferno_fuel_data["distilates"][distilate][1]
         distillate_harvests = (harvests_per_time * 4) / 5
         if afk_toggle:
-            self.get_base_drops(drops_list, spreading_info, replace_info, minion, - distillate_harvests, drop_multiplier)
+            self.get_base_drops(drops_list, upgrade_effects, minion, - distillate_harvests, drop_multiplier)
         else:
-            self.get_base_drops(drops_list, None, replace_info, minion, - distillate_harvests, drop_multiplier)
+            self.get_base_drops(drops_list, {"spreading": None, "replacing": upgrade_effects["replacing"]}, minion, - distillate_harvests, drop_multiplier)
         self.add_drops(distilate_item, distillate_harvests * amount_per, drops_list)
 
         # Hypergolic drops
@@ -1490,18 +1513,17 @@ class Calculator(tk.Tk):
                 compactables.append(compacted_name)
         return compacted_items
 
-    def get_compacted_drops(self, drops_list, upgrades):
+    def get_compacted_drops(self, drops_list, upgrade_effects):
         """
         Gets compacted drops, returns a list of all compacted items
         
         :param drops_list: dict, all drops of the setup
-        :param upgrades: list, list of upgrades IDs
+        :param upgrade_effects: dict, active upgrade effects sorted by type
         :return compacted_items: list, IDs of items that got compacted
         """
         compacted_items = []
-        for upgrade in upgrades:
-            if "compact" in self.md.calculator_data[upgrade]["upgrade_special"]["type"]:
-                compacted_items.extend(self.apply_compactor(drops_list, self.md.calculator_data[upgrade]["upgrade_special"]["compacting_list"]))
+        for compacting_list in upgrade_effects["compacting"].values():
+            compacted_items.extend(self.apply_compactor(drops_list, compacting_list))
         return compacted_items
 
     def get_available_storage(self, minion, minion_tier, setup_data):
@@ -1823,7 +1845,7 @@ class Calculator(tk.Tk):
             fuel_cost += needed_fuel * cost_per_fuel
         return fuel_cost, needed_fuel
 
-    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_data):
+    def get_setup_cost(self, minion_type, minion_tier, minion_amount, minion_fuel, setup_pets, setup_data):
         """
         Gets cost of all parts of the setup
         
@@ -1831,8 +1853,7 @@ class Calculator(tk.Tk):
         :param minion_tier: int, minion tier, 1 to 12
         :param minion_amount: int, minion amount
         :param minion_fuel: str, ID of minion fuel
-        :param upgrades: list, IDs of upgrades
-        :param setup_data: needed setup data: hopper, infusion, free_will, chest, beacon, crystal, postcard, potato_accessory, pet_exp_boost, expshareitem, toucan_attribute, falcon_attribute, setup data for self.get_price
+        :param setup_data: needed setup data: hopper, upgrade1, upgrade2, infusion, free_will, chest, beacon, crystal, postcard, potato_accessory, pet_exp_boost, expshareitem, toucan_attribute, falcon_attribute, setup data for self.get_price
         :return total_cost: float, total setup cost
         :return extra_cost: str, total extra cost 
         :return cost_per_part: dict, cost per setup part
@@ -1879,9 +1900,10 @@ class Calculator(tk.Tk):
             cost_per_part["hopper"] = self.get_price(setup_data["hopper"], setup_data, "buy", "bazaar")
 
         # Internal minion upgrades cost
-        for i, upgrade in enumerate(upgrades):
-            if upgrade != "NONE":
-                cost_per_part[f"upgrade{i + 1}"] = self.get_price(upgrade, setup_data, "buy", "bazaar")
+        if setup_data["upgrade1"] != "NONE":
+            cost_per_part[f"upgrade1"] = self.get_price(setup_data["upgrade1"], setup_data, "buy", "bazaar")
+        if setup_data["upgrade2"] != "NONE":
+            cost_per_part[f"upgrade2"] = self.get_price(setup_data["upgrade2"], setup_data, "buy", "bazaar")
 
         # Infusion cost
         if setup_data["infusion"]:
@@ -2013,20 +2035,20 @@ class Calculator(tk.Tk):
             afk_toggle = False
             clock_override = True
 
-        # list upgrades types
-        upgrades = [setup_data["upgrade1"], setup_data["upgrade2"]]
+        # get upgrade info
+        upgrades, upgrade_effects = self.get_upgrade_info(minion_fuel, drops_list, setup_data)
 
         # adding up minion speed bonus
-        speed_boost = self.get_speed_boosts(minion_type, minion_fuel, upgrades, afk_toggle, clock_override, setup_data)
+        speed_boost = self.get_speed_boosts(minion_type, upgrades, upgrade_effects, afk_toggle, clock_override, setup_data)
 
         # multiply up minion drop bonus
-        drop_multiplier = self.get_drop_multiplier(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
+        drop_multiplier = self.get_drop_multiplier(minion_type, upgrades, afk_toggle, setup_data)
 
         # AFKing, Special Layouts and Player Harvests influences
-        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data, setup_notes)
+        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, upgrade_effects, afk_toggle, setup_data, setup_notes)
 
         # AFK loot table changes
-        self.update_loot_table(minion_type, minion_fuel, upgrades, afk_toggle, setup_data)
+        self.update_loot_table(minion_type, upgrades, upgrade_effects, afk_toggle, setup_data)
 
         # calculate final minion speed
         seconds_per_action = self.get_seconds_per_action(minion_type, minion_tier, minion_fuel, speed_boost, setup_data)
@@ -2036,21 +2058,18 @@ class Calculator(tk.Tk):
         
         # harvests per time
         harvests_per_time, drop_multiplier = self.get_harvests_per_time(empty_time_seconds, actions_per_harvest, seconds_per_action, afk_toggle, drop_multiplier, setup_data)
-
-        # initialise drops list and get upgrade info
-        spreading_info, replace_info = self.get_upgrade_info(minion_fuel, upgrades, drops_list)
         
         # base drops
-        self.get_base_drops(drops_list, spreading_info, replace_info, minion_type, harvests_per_time, drop_multiplier)
+        self.get_base_drops(drops_list, upgrade_effects, minion_type, harvests_per_time, drop_multiplier)
 
         # upgrade drops
-        self.get_upgrade_drops(drops_list, spreading_info, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, empty_time_seconds, seconds_per_action)
+        self.get_upgrade_drops(drops_list, upgrade_effects, minion_type, minion_tier, drop_multiplier, upgrades, harvests_per_time, afk_toggle, empty_time_seconds, seconds_per_action, setup_data)
         
         # Inferno minion fuel drops
-        self.get_inferno_drops(drops_list, spreading_info, replace_info, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data)
+        self.get_inferno_drops(drops_list, upgrade_effects, minion_type, minion_tier, minion_fuel, drop_multiplier, harvests_per_time, empty_time_seconds, afk_toggle, setup_data)
 
         # Apply compactors
-        compacted_items = self.get_compacted_drops(drops_list, upgrades)
+        compacted_items = self.get_compacted_drops(drops_list, upgrade_effects)
 
         # storage calculations
         available_storage = self.get_available_storage(minion_type, minion_tier, setup_data)
@@ -2081,7 +2100,7 @@ class Calculator(tk.Tk):
         total_profit = item_profit + pet_profit - fuel_cost
 
         # Setup cost
-        total_cost, extra_cost, free_will_optimal_tier, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, upgrades, setup_pets, setup_data)
+        total_cost, extra_cost, free_will_optimal_tier, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, setup_pets, setup_data)
 
         # Construct ID
         setup_ID = self.construct_id(setup_data)
@@ -2333,7 +2352,7 @@ class Calculator(tk.Tk):
         if self.md.has_data_tag(pet_ID, "dragon_pet"):
             level_ranges["max"] = "200"
         api_bin = r"/bin"
-        api_static_filters = r"?filters[Rarity]=" + rarity + r"&filters[Candy]=0&filters[PetLevel]="
+        api_static_filters = r"?filters[Rarity]=" + rarity + r"&filters[Candy]=0&filters[PetItem]=NOT_TIER_BOOST&filters[PetLevel]="
         results = {"min": 0, "max": 0}
         for level_type, level_range in level_ranges.items():
             raw_auction_data = self.huim.call_API(api_end_point + api_pet_id + api_bin + api_static_filters + level_range, f"SkyCofl pet AH BIN API: {api_pet_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
