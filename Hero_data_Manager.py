@@ -488,5 +488,7 @@ The following materials are not in bazaar:
 
 The following items are not in Hypixel's Item API:
 - FRENCH_FRIES
+- ENCHANTED_SHEARS
+- SLEEPY_HOLLOW
 
 """

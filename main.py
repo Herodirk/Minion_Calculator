@@ -1222,6 +1222,7 @@ class Calculator(tk.Tk):
         seconds_per_action = base_speed / (1 + speed_boost / 100)
         if minion_fuel_id == "INFERNO_FUEL":
             seconds_per_action /= 1 + self.md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
+        self.huim.logger.debug(f"Unrounded action time: {seconds_per_action}")
         seconds_per_action = round(seconds_per_action * 20) / 20
         if seconds_per_action < 0.05:
             seconds_per_action = 0.05
@@ -2040,12 +2041,15 @@ class Calculator(tk.Tk):
 
         # adding up minion speed bonus
         speed_boost = self.get_speed_boosts(minion_type, upgrades, upgrade_effects, afk_toggle, clock_override, setup_data)
+        self.huim.logger.debug(f"Speed boost: {speed_boost}")
 
         # multiply up minion drop bonus
         drop_multiplier = self.get_drop_multiplier(minion_type, upgrades, afk_toggle, setup_data)
+        self.huim.logger.debug(f"Drop multiplier: {drop_multiplier}")
 
         # AFKing, Special Layouts and Player Harvests influences
         actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, upgrade_effects, afk_toggle, setup_data, setup_notes)
+        self.huim.logger.debug(f"Actions per harvest: {actions_per_harvest}")
 
         # AFK loot table changes
         self.update_loot_table(minion_type, upgrades, upgrade_effects, afk_toggle, setup_data)

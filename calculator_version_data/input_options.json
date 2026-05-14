@@ -35,6 +35,7 @@
         "Flower": "FLOWER_MINION",
         "Sunflower": "SUNFLOWER_MINION",
         "Fishing": "FISHING_MINION",
+        "Lily Pad": "LILY_PAD_MINION",
         "Zombie": "ZOMBIE_MINION",
         "Revenant": "REVENANT_MINION",
         "Voidling": "VOIDLING_MINION",

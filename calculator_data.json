@@ -2142,6 +2142,42 @@
         },
         "compact_tier": 2
     },
+    "WATER_LILY": {
+        "display": "Lily Pad",
+        "prices": {},
+        "xp": {
+            "fishing": 0.8
+        },
+        "compacting": {
+            "compact": {
+                "makes": "ENCHANTED_WATER_LILY",
+                "per": 160
+            }
+        },
+        "compact_tier": 0
+    },
+    "ENCHANTED_WATER_LILY": {
+        "display": "Enchanted Lily Pad",
+        "prices": {},
+        "xp": {
+            "fishing": 128
+        },
+        "compacting": {
+            "compact": {
+                "makes": "CONDENSED_WATER_LILY",
+                "per": 160
+            }
+        },
+        "compact_tier": 1
+    },
+    "CONDENSED_WATER_LILY": {
+        "display": "Condensed Lily Pad",
+        "prices": {},
+        "xp": {
+            "fishing": 20480
+        },
+        "compact_tier": 2
+    },
     "ROTTEN_FLESH": {
         "display": "Rotten Flesh",
         "prices": {},
@@ -3103,6 +3139,10 @@
         "display": "Enchanted Fermented Spider Eye",
         "prices": {}
     },
+    "LOTUS_DIAMOND": {
+        "display": "Diamond Lotus",
+        "prices": {}
+    },
     "ENCHANTED_CHARCOAL": {
         "display": "Enchanted Charcoal",
         "speed_boost": 20,
@@ -3445,6 +3485,8 @@
                 "ENCHANTED_RAW_FISH": "compact",
                 "ENCHANTED_RAW_SALMON": "compact",
                 "ENCHANTED_SPONGE": "compact",
+                "WATER_LILY": "compact",
+                "ENCHANTED_WATER_LILY": "compact",
                 "ROTTEN_FLESH": "compact",
                 "POISONOUS_POTATO": "compact",
                 "ENCHANTED_ENDER_PEARL": "compact",
@@ -3611,6 +3653,8 @@
                 "ENCHANTED_RAW_FISH": "compact",
                 "ENCHANTED_RAW_SALMON": "compact",
                 "ENCHANTED_SPONGE": "compact",
+                "WATER_LILY": "compact",
+                "ENCHANTED_WATER_LILY": "compact",
                 "ROTTEN_FLESH": "compact",
                 "POISONOUS_POTATO": "compact",
                 "ENCHANTED_ENDER_PEARL": "compact",
@@ -6742,6 +6786,64 @@
             "12": {
                 "COINS": 2000000,
                 "FISHY_TREAT": 256
+            }
+        }
+    },
+    "LILY_PAD_MINION": {
+        "display": "Lily Pad",
+        "drops": {
+            "WATER_LILY": 1
+        },
+        "speed": {
+            "1": 37.5,
+            "2": 37.5,
+            "3": 33.5,
+            "4": 33.5,
+            "5": 29.5,
+            "6": 29.5,
+            "7": 25.5,
+            "8": 25.5,
+            "9": 21.5,
+            "10": 21.5,
+            "11": 17.5,
+            "12": 15
+        },
+        "minion_costs": {
+            "1": {
+                "WATER_LILY": 64
+            },
+            "2": {
+                "WATER_LILY": 128
+            },
+            "3": {
+                "WATER_LILY": 256
+            },
+            "4": {
+                "WATER_LILY": 512
+            },
+            "5": {
+                "ENCHANTED_WATER_LILY": 8
+            },
+            "6": {
+                "ENCHANTED_WATER_LILY": 32
+            },
+            "7": {
+                "ENCHANTED_WATER_LILY": 64
+            },
+            "8": {
+                "ENCHANTED_WATER_LILY": 128
+            },
+            "9": {
+                "ENCHANTED_WATER_LILY": 256
+            },
+            "10": {
+                "ENCHANTED_WATER_LILY": 512
+            },
+            "11": {
+                "CONDENSED_WATER_LILY": 8
+            },
+            "12": {
+                "LOTUS_DIAMOND": 1
             }
         }
     },
