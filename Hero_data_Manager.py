@@ -34,7 +34,8 @@ import pathlib
 
 class H_data_M():
     def __init__(self, huim):
-        self.calculator_data = huim.read_json(pathlib.Path("calculator_data.json"))
+        self.huim = huim
+        self.calculator_data = self.huim.read_json(pathlib.Path("calculator_data.json"))
 
         self.inferno_fuel_data = {
             'grades': { 'HYPERGOLIC_GABAGOOL': 20, 'HEAVY_GABAGOOL': 15, 'FUEL_GABAGOOL': 10 },
@@ -250,11 +251,13 @@ class H_data_M():
                 "CUSTOM_RARITY.max_lvl_pet_xp_amount": {"dtype": float, "display": "Custom Rarity max Pet XP", "options": None},
             }
         }
-        # TODO: combine all instance data files into one
+        # TODO: combine all instance data files into one:
+        # basically, make pet costs part of calculator data,
+        # also add prices for the rarities of Custom Pet in custom inputs
 
         for file_key, file_path in self.instance_data_file_locations.items():
-            huim.check_json(file_path, self.instance_data[file_key])
-            self.instance_data[file_key].update(huim.read_json(file_path))
+            self.huim.check_json(file_path, self.instance_data[file_key])
+            self.instance_data[file_key].update(self.huim.read_json(file_path))
         for file_data in self.instance_data.values():
             for data_loc, data_val in file_data.items():
                 self.set_data(data_loc, data_val)
@@ -262,7 +265,7 @@ class H_data_M():
 
     def has_data_tag(self, data_ID, tag):
         if data_ID not in self.calculator_data:
-            print(f"ERROR - has_data_tag - data ID {data_ID} not in calculator data")  # TODO: connect to HUIM logger
+            self.huim.logger.warning(f"Data ID {data_ID} not in calculator data")
             return False
         if tag is None:
             return False
@@ -296,7 +299,7 @@ class H_data_M():
         data_location_keys = data_location.split(".")
         for key in data_location_keys:
             if key not in data_pointer:
-                # TODO: connect HUIM logger to here and make a warning
+                self.huim.logger.warning(f"Could not find {key} in calculator data for {data_location}")
                 return None
             data_pointer = data_pointer[key]
         return data_pointer
@@ -314,19 +317,19 @@ class H_data_M():
                 data_pointer = data_pointer[key]
         return
 
-    def save_instance_data(self, huim):
+    def save_instance_data(self):
         for file_key, file_data in self.instance_data.items():
             for data_loc in file_data.keys():
                 file_data[data_loc] = self.get_data(data_loc)
-            huim.write_json(self.instance_data_file_locations[file_key], file_data)
+            self.huim.write_json(self.instance_data_file_locations[file_key], file_data)
 
-    def create_custom_inputs_edit_vars(self, huim, option_tree, choice_layer):
+    def create_custom_inputs_edit_vars(self, option_tree, choice_layer):
         if "Cancel" in option_tree:
-            huim.new_edit_vars("custom_input_" + choice_layer, {"custom_input_edit_choice": {"dtype": str, "display": option_tree["Cancel"], "initial": "Cancel", "options": list(option_tree.keys())}}, lambda results: huim.edit_vars("custom_input_" + results["custom_input_edit_choice"]))
+            self.huim.new_edit_vars("custom_input_" + choice_layer, {"custom_input_edit_choice": {"dtype": str, "display": option_tree["Cancel"], "initial": "Cancel", "options": list(option_tree.keys())}}, lambda results: self.huim.edit_vars("custom_input_" + results["custom_input_edit_choice"]))
             for next_layer in option_tree.keys():
                 if next_layer == "Cancel":
                     continue
-                self.create_custom_inputs_edit_vars(huim, option_tree[next_layer], next_layer)
+                self.create_custom_inputs_edit_vars(option_tree[next_layer], next_layer)
             return
         input_variables = {}
         for data_loc, custom_input_options in option_tree.items():
@@ -334,11 +337,17 @@ class H_data_M():
             if custom_input_options is None:
                 continue
             input_variables[data_loc]["initial"] = self.get_data(data_loc)
-        huim.new_edit_vars("custom_input_" + choice_layer, input_variables, lambda results: self.set_custom_inputs(results))
+        self.huim.new_edit_vars("custom_input_" + choice_layer, input_variables, lambda results: self.set_custom_inputs(results, "custom_input_" + choice_layer))
         return
 
-    def set_custom_inputs(self, edited_data_locs):
+    def set_custom_inputs(self, edited_data_locs, request_id):
         for data_loc, data_value in edited_data_locs.items():
+            if type(data_value) == dict:
+                for item_id, value in list(data_value.items()):
+                    if type(value) not in [int, float] or item_id not in self.calculator_data:
+                        self.huim.logger.warning("Skipped bad input: " + item_id)
+                        del data_value[item_id]
+                        self.huim.edit_vars_requests[request_id]["variables"][data_loc]["listbox"].set([f'{key}: {val}' for key, val in data_value.items()])
             self.set_data(data_loc, data_value)
         return
 

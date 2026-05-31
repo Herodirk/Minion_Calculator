@@ -975,7 +975,7 @@ class H_UI_M():
         inputsW.destroy()
         return self.vars_out
 
-    def new_edit_vars(self, request_id, variables, exit_function, relwidth=0.25, relheight=0.5):
+    def new_edit_vars(self, request_id, variables, exit_function, relwidth=0.2, relheight=0.5):
         # variables : {
         #   var_key : {
         #       dtype : data type,
@@ -999,27 +999,30 @@ class H_UI_M():
         # }
         self.edit_vars_requests[request_id]["exit_func"] = exit_function
         new_edit_vars_frame = tk.Frame(self.main, background=self.main.colors["background"])
+        new_edit_vars_grid = tk.Frame(new_edit_vars_frame, background=self.main.colors["frame_background"])
+        new_edit_vars_grid.place(rely=0.5 * 0.02, relx=0.5 * 0.02, relwidth=1 - 0.02, relheight=1 - 0.02)
         self.def_switch(f"edit_vars_{request_id}", widget_references=new_edit_vars_frame,
                         locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": relwidth, "relheight": relheight}, initial=False)
         
         widgets_dict = {}
         for var_key, var_data in variables.items():
             if var_data is None:
-                self.edit_vars_requests[request_id]["variables"][var_key], widgets_dict[var_key] = self.def_input_var(self.main.var_dict[var_key].dtype, new_edit_vars_frame, f"{self.main.var_dict[var_key].get_display()}:", None, self.main.var_dict[var_key].options, None, existing_var=self.main.var_dict[var_key].tkvar)
+                self.edit_vars_requests[request_id]["variables"][var_key], widgets_dict[var_key] = self.def_input_var(self.main.var_dict[var_key].dtype, new_edit_vars_grid, f"{self.main.var_dict[var_key].get_display()}:", None, self.main.var_dict[var_key].options, None, existing_var=self.main.var_dict[var_key].tkvar)
             elif var_data["dtype"] == dict:
                 self.edit_vars_requests[request_id]["variables"][var_key] = {}
-                self.edit_vars_requests[request_id]["variables"][var_key]["listbox"], widgets_dict[var_key + "_listbox"] = self.def_output_var(new_edit_vars_frame, dict, f"{var_data['display']}:", var_data["initial"], 35, 10)
-                self.edit_vars_requests[request_id]["variables"][var_key]["edit_key"], widgets_dict[var_key + "_edit_key"] = self.def_input_var(str, new_edit_vars_frame, "Key:")
-                self.edit_vars_requests[request_id]["variables"][var_key]["edit_val"], widgets_dict[var_key + "_edit_val"] = self.def_input_var(str, new_edit_vars_frame, "Value:")
-                widgets_dict[var_key + "_submit"] = [None, tk.Button(new_edit_vars_frame, text="Submit", command=lambda: self.edit_dict_submit(request_id, var_key))]
+                self.edit_vars_requests[request_id]["variables"][var_key]["listbox"], widgets_dict[var_key + "_listbox"] = self.def_output_var(new_edit_vars_grid, dict, f"{var_data['display']}:", var_data["initial"], 35, 10)
+                self.edit_vars_requests[request_id]["variables"][var_key]["listbox"].set([f'{init_key}: {init_val}' for init_key, init_val in var_data["initial"].items()])
+                self.edit_vars_requests[request_id]["variables"][var_key]["edit_key"], widgets_dict[var_key + "_edit_key"] = self.def_input_var(str, new_edit_vars_grid, "Key:")
+                self.edit_vars_requests[request_id]["variables"][var_key]["edit_val"], widgets_dict[var_key + "_edit_val"] = self.def_input_var(str, new_edit_vars_grid, "Value:")
+                widgets_dict[var_key + "_submit"] = [None, tk.Button(new_edit_vars_grid, text="Submit", command=lambda: self.edit_dict_submit(request_id, var_key))]
                 self.edit_vars_requests[request_id]["variables"][var_key]["dict"] = var_data["initial"]
             else:
-                self.edit_vars_requests[request_id]["variables"][var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], new_edit_vars_frame, f"{var_data['display']}:", var_data["initial"], var_data["options"], None)
+                self.edit_vars_requests[request_id]["variables"][var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], new_edit_vars_grid, f"{var_data['display']}:", var_data["initial"], var_data["options"], None)
 
-        self.fill_grid(widgets_dict.values(), new_edit_vars_frame)
+        self.fill_grid(widgets_dict.values(), new_edit_vars_grid)
 
-        closeB = tk.Button(new_edit_vars_frame, text="Close", command=lambda: self.edit_vars_confirm(request_id))
-        closeB.place(relx=0.5, rely=1, anchor="s", y=10)
+        closeB = tk.Button(new_edit_vars_grid, text="Close", command=lambda: self.edit_vars_confirm(request_id))
+        closeB.place(relx=0.5, rely=1, anchor="s", y=-10)
         self.edit_vars_requests[request_id]["frame"] = new_edit_vars_frame
         return
 
@@ -1027,6 +1030,8 @@ class H_UI_M():
         dict_to_edit = self.edit_vars_requests[request_id]["variables"][edit_dict_key]["dict"]
         edit_key = self.edit_vars_requests[request_id]["variables"][edit_dict_key]["edit_key"].get()
         edit_val = self.edit_vars_requests[request_id]["variables"][edit_dict_key]["edit_val"].get()
+        if edit_key == "":
+            return
         if edit_val == "":
             del dict_to_edit[edit_key]
         else:

@@ -310,8 +310,8 @@ class Calculator(tk.Tk):
 
         self.huim.logger.debug("Variables initialized")
 
-        self.huim.new_edit_vars("settings", {"API_auto_update": None, "API_cooldown": None, "pet_API_cooldown": None, "compact_tolerance": None, "output_to_clipboard": None, "debug_mode": None, "color_palette": None}, self.edit_settings)
-        self.md.create_custom_inputs_edit_vars(self.huim, self.md.custom_inputs_edit_tree, "start")
+        self.huim.new_edit_vars("settings", {"API_auto_update": None, "API_cooldown": None, "pet_API_cooldown": None, "compact_tolerance": None, "output_to_clipboard": None, "debug_mode": None, "color_palette": None}, self.edit_settings, 0.2, 0.3)
+        self.md.create_custom_inputs_edit_vars(self.md.custom_inputs_edit_tree, "start")
 
         # Create widgets for controls menu and placing them
         self.creditLB = self.huim.create_label(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
@@ -2455,7 +2455,7 @@ class Calculator(tk.Tk):
         for var_key, data_file in self.calculator_data_files.items():
             self.huim.write_json(data_file, self.var_dict[var_key].list)
         
-        self.md.save_instance_data(self.huim)
+        self.md.save_instance_data()
         return
 
 #%% main loop
