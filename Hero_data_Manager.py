@@ -191,9 +191,9 @@ class H_data_M():
             },
             "Custom Minion": {
                 "Cancel": "Attribute to edit",
-                # "Drops": {
-                #     "CUSTOM_MINION.drops": {}
-                # },  # TODO: create dict edit function
+                "Drops": {
+                    "CUSTOM_MINION.drops": {"dtype": dict, "display": "Minion drops"}
+                },
                 "Action Time": {
                     "CUSTOM_MINION.speed.1": {"dtype": float, "display": "Action time (s) t1", "options": None},
                     "CUSTOM_MINION.speed.2": {"dtype": float, "display": "Action time (s) t2", "options": None},
@@ -229,15 +229,21 @@ class H_data_M():
             "Custom Upgrade": {
                 "Cancel": "Attribute to edit",
                 "General": {
-                    "custom_upgrade_toggle": {"dtype": bool, "display": "Use Custom Upgrade", "options": None},
+                    "custom_upgrade_toggle": None,
                     "CUSTOM_UPGRADE.speed_boost": {"dtype": float, "display": "Custom Upgrade Speed boost", "options": None},
                     "CUSTOM_UPGRADE.drop_multiplier": {"dtype": float, "display": "Custom Upgrade Drop multiplier", "options": None},
                     "CUSTOM_UPGRADE.upgrade_effects.cooldown.online_cooldown": {"dtype": float, "display": "Custom Upgrade Online Cooldown", "options": None},
                     "CUSTOM_UPGRADE.upgrade_effects.cooldown.offline_cooldown": {"dtype": float, "display": "Custom Upgrade Offline Cooldown", "options": None},
                 },
-                # "Spreading effect": {},
-                # "Adding effect": {},
-                # "Cooldown effect": {}
+                "Spreading effect": {
+                    "CUSTOM_UPGRADE.upgrade_effects.spreading": {"dtype": dict, "display": "Spreading drops"}
+                },
+                "Adding effect": {
+                    "CUSTOM_UPGRADE.upgrade_effects.adding": {"dtype": dict, "display": "Adding drops"}
+                },
+                "Cooldown effect": {
+                    "CUSTOM_UPGRADE.upgrade_effects.cooldown.items": {"dtype": dict, "display": "Cooldown drops"}
+                }
             },
             "Custom Pet": {
                 "PET_CUSTOM_PET.pet_type": {"dtype": str, "display": "Pet Type", "options": ["all", "alchemy", "combat", "enchanting", "farming", "fishing", "foraging", "mining"]},
@@ -314,26 +320,26 @@ class H_data_M():
                 file_data[data_loc] = self.get_data(data_loc)
             huim.write_json(self.instance_data_file_locations[file_key], file_data)
 
-    def edit_custom_inputs(self, huim, option_tree, new_path_choice=False):
-        if new_path_choice:
-            edit_path_choice = huim.edit_vars_output["custom_input_edit_choice"].get()
-            if edit_path_choice == "Cancel":
-                return
-            option_tree = option_tree[edit_path_choice]
-            huim.edit_vars_output["custom_input_edit_choice"].set("Cancel")
+    def create_custom_inputs_edit_vars(self, huim, option_tree, choice_layer):
         if "Cancel" in option_tree:
-            huim.edit_vars(lambda: self.edit_custom_inputs(huim, option_tree, True), {"custom_input_edit_choice": {"dtype": str, "display": option_tree["Cancel"], "initial": "Cancel", "options": list(option_tree.keys())}}, False)
+            huim.new_edit_vars("custom_input_" + choice_layer, {"custom_input_edit_choice": {"dtype": str, "display": option_tree["Cancel"], "initial": "Cancel", "options": list(option_tree.keys())}}, lambda results: huim.edit_vars("custom_input_" + results["custom_input_edit_choice"]))
+            for next_layer in option_tree.keys():
+                if next_layer == "Cancel":
+                    continue
+                self.create_custom_inputs_edit_vars(huim, option_tree[next_layer], next_layer)
             return
         input_variables = {}
         for data_loc, custom_input_options in option_tree.items():
-            input_variables["custom_input_" + data_loc] = custom_input_options
-            input_variables["custom_input_" + data_loc]["initial"] = self.get_data(data_loc)
-        huim.edit_vars(lambda: self.set_custom_inputs(huim, option_tree), input_variables, False)
+            input_variables[data_loc] = custom_input_options
+            if custom_input_options is None:
+                continue
+            input_variables[data_loc]["initial"] = self.get_data(data_loc)
+        huim.new_edit_vars("custom_input_" + choice_layer, input_variables, lambda results: self.set_custom_inputs(results))
         return
 
-    def set_custom_inputs(self, huim, edited_data_locs):
-        for data_loc in edited_data_locs:
-            self.set_data(data_loc, huim.edit_vars_output["custom_input_" + data_loc].get())
+    def set_custom_inputs(self, edited_data_locs):
+        for data_loc, data_value in edited_data_locs.items():
+            self.set_data(data_loc, data_value)
         return
 
 

@@ -18,6 +18,10 @@ The Official Add-ons include:
 import numpy as np
 import math
 
+def init(calculator):
+    calculator.huim.new_edit_vars("basic_minion_loop", {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: basic_minion_loop(calculator, results))
+    calculator.huim.new_edit_vars("inferno_minion_loop", {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: inferno_minion_loop(calculator, results))
+    return
 
 def old_corrupted_frags(calculator):
     # This Add-on is inactive, to turn it back on add this function to `add_ons_package` at the bottom of this file.
@@ -88,12 +92,12 @@ def setup_repay_time(calculator):
     return
 
 
-def basic_minion_loop(calculator):
+def basic_minion_loop(calculator, results):
     setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
-    cost_filter = calculator.huim.edit_vars_output["setup_cost_limit"].get()
+    cost_filter = results["setup_cost_limit"]
     if cost_filter == 0:
         cost_filter = math.inf
-    markdown_output = calculator.huim.edit_vars_output["markdown_output"].get()
+    markdown_output = results["markdown_output"]
     calculated_setup_profits = {}
     calculated_setup_costs = {}
     loop_minion_options = list(calculator.input_options["minion"].values())
@@ -169,20 +173,20 @@ def basic_minion_loop(calculator):
     return
 
 
-def inferno_minion_loop(calculator):
+def inferno_minion_loop(calculator, results):
     setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
     calculated_setup_profits = {}
     calculated_setup_bad_luck_profits = {}
     calculated_setup_costs = {}
 
-    cost_filter = calculator.huim.edit_vars_output["setup_cost_limit"].get()
+    cost_filter = results["setup_cost_limit"]
     if cost_filter == 0:
         cost_filter = math.inf
-    minion_amount_limit = calculator.huim.edit_vars_output["amount_limit"].get()
+    minion_amount_limit = results["amount_limit"]
     if minion_amount_limit < 1:
         calculator.collect_addon_output("Inferno Minion Loop", "Positive minion amount limit is required")
         return
-    markdown_output = calculator.huim.edit_vars_output["markdown_output"].get()
+    markdown_output = results["markdown_output"]
     setup_data["minion"] = "INFERNO_MINION"
     setup_data["fuel"] = "INFERNO_FUEL"
     if setup_data["inferno_grade"] == "HYPERGOLIC_GABAGOOL":
@@ -245,11 +249,11 @@ def inferno_minion_loop(calculator):
     return
 
 def basic_minion_loop_inputs(calculator):
-    calculator.huim.edit_vars(lambda: basic_minion_loop(calculator), {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, False)
+    calculator.huim.edit_vars("basic_minion_loop")
     return
 
 def inferno_minion_loop_inputs(calculator):
-    calculator.huim.edit_vars(lambda: inferno_minion_loop(calculator), {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, False)
+    calculator.huim.edit_vars("inferno_minion_loop")
     return
 
 def craft_material_amount(calculator):
@@ -304,7 +308,7 @@ def dragon_pet_xp(calculator, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boos
         return gained_pet_xp, left_over_pet_xp
 
 def exact_pet_levelling_inputs(calculator):
-    setup_data = calculator.huim.get_from_GUI(["mayor", "levelingpet", "levelingpet_rarity", "expsharepet", "expsharepetslot2", "expsharepetslot3"])
+    setup_data = calculator.huim.get_from_GUI(["mayor", "levelingpet", "levelingpet_rarity", "expsharepet", "expsharepetslot2", "expsharepetslot3", "expsharepet_rarity", "expsharepetslot2_rarity", "expsharepetslot3_rarity"])
     if setup_data["levelingpet"] == "NONE":
         calculator.collect_addon_output("Exact Pet Levelling", "No pet levelling active")
         return
@@ -316,16 +320,19 @@ def exact_pet_levelling_inputs(calculator):
     input_variables = {}
     for pet_slot, pet_info in setup_pets.items():
         input_variables[pet_slot + "_starting_pet_xp"] = {"dtype": float, "display": calculator.md.calculator_data[pet_info["rarity"]]["display"] + " " + calculator.md.calculator_data[pet_info["pet"]]["display"] + " starting pet xp", "initial": 0, "options": None}
-    calculator.huim.edit_vars(lambda pet_data=setup_pets: exact_pet_levelling(calculator, pet_data), input_variables, False)
+    if "exact_pet_levelling" in calculator.huim.edit_vars_requests:
+        calculator.huim.edit_vars_requests["exact_pet_levelling"]["frame"].destroy()
+    calculator.huim.new_edit_vars("exact_pet_levelling", input_variables, lambda results, pet_data=setup_pets: exact_pet_levelling(calculator, results, pet_data))
+    calculator.huim.edit_vars("exact_pet_levelling")
     return
 
-def exact_pet_levelling(calculator, setup_pets):
+def exact_pet_levelling(calculator, results, setup_pets):
     setup_data = calculator.huim.get_from_GUI(["mayor", "xp", "taming", "toucan_attribute", "expshareitem", "pet_exp_boost", "beastmaster", "falcon_attribute", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper"])
     skill_xp = setup_data["xp"]
     main_pet = setup_pets["levelingpet"]["pet"]
     main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
     if calculator.md.has_data_tag(main_pet, "dragon_pet"):
-        left_over_pet_xp = calculator.huim.edit_vars_output["levelingpet_starting_pet_xp"].get()
+        left_over_pet_xp = results["levelingpet_starting_pet_xp"]
         for skill, amount in skill_xp.items():
             pet_xp_boost, xp_boost_pet_item = calculator.get_pet_xp_boosts(main_pet, skill, setup_data)
             main_pet_xp[skill], left_over_pet_xp = dragon_pet_xp(calculator, amount, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item)
@@ -342,7 +349,7 @@ def exact_pet_levelling(calculator, setup_pets):
         if calculator.md.has_data_tag(exp_share_pet, "dragon_pet"):
             if exp_share_boost == 0:
                 continue
-            left_over_pet_xp = calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get()
+            left_over_pet_xp = results[pet_slot + "_starting_pet_xp"]
             for skill, amount in main_pet_xp.items():
                 non_matching = calculator.get_pet_xp_boosts(exp_share_pet, skill, setup_data, True)
                 equiv_pet_xp_boost = non_matching * (exp_share_boost / 100)
@@ -360,12 +367,12 @@ def exact_pet_levelling(calculator, setup_pets):
             max_lvl_pet_xp = calculator.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"] - calculator.md.calculator_data["LEGENDARY"]["max_lvl_pet_xp_amount"]
         else:
             max_lvl_pet_xp = calculator.md.calculator_data[pet_info["rarity"]]["max_lvl_pet_xp_amount"]
-        pets_levelled = (calculator.huim.edit_vars_output[pet_slot + "_starting_pet_xp"].get() + sum(pet_info["pet_xp"].values())) / max_lvl_pet_xp
+        pets_levelled = (results[pet_slot + "_starting_pet_xp"] + sum(pet_info["pet_xp"].values())) / max_lvl_pet_xp
         pet_info["levelled_pets"] = pets_levelled
     output_string = ", ".join([f"{calculator.huim.reduced_number(pet_info['levelled_pets'], 4)} {calculator.md.calculator_data[pet_info["rarity"]]["display"]} {calculator.md.calculator_data[pet_info["pet"]]["display"]}" for pet_info in setup_pets.values()])
     calculator.collect_addon_output("Exact Pet Levelling", output_string)
     return
 
-add_ons_package = {"Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop_inputs, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop_inputs, "Exact Pet Levelling": exact_pet_levelling_inputs}
+add_ons_package = {"Hero_addons__init__": init, "Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop_inputs, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop_inputs, "Exact Pet Levelling": exact_pet_levelling_inputs}
 # "Old Corrupted Frags": old_corrupted_frags
 # "Old Enchanted Hopper": old_enchanted_hopper

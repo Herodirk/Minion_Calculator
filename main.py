@@ -101,20 +101,20 @@ templateList = {
         "afk": True
     },
     "Solo Wisdom": {  # consists of non-random sources of wisdom that can be achieved alone on the private island, excluding pets
-        "mining_wisdom": 97.1,  # Abicase (1.5), cookie (25), god pot (20), Refined Divine drill with Compact X (7 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
-        "combat_wisdom": 110.5,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), Rift Necklace (1), cookie (25), god pot (30), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
-        "farming_wisdom": 187,  # Agarimoo Artifact (1), Abicase (1.5), Lunar Legendary Pelt Belt (1 + 3), Lunar Mythic Zorro's Cape during Contest (2 * (1 + 4)), Lunar Mythic Rift Necklace (1 + 6), Lunar Mythic Gillsplash Gloves (4), Blessed Legendary Mk. III farming tool with Cultivating X (3 + 5 + 10), Mythic Sunny armor (4 * 6), cookie (25), god pot (20), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
-        "fishing_wisdom": 88.5,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
-        "foraging_wisdom": 95.32,  # Abicase (1.5), cookie (25), god pot (20), David's Cloak (5), Foraging Wisdom Boosters armor and equipment (4 + 2), Moonglade Legendary Axe with Absorb X, Foraging Wisdom Boosters and essence shop perk Axed I ((5 + 10 + 1) * 1.02), Efficient Forager (15), Foraging Wisdom (6.5)
-        "alchemy_wisdom": 51.5  # Witch's Artifact (1.5), cookie (25), god pot (20), Spider Slayer VIII (5)
+        "mining_wisdom": 100.1,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Refined Divine drill with Compact X (7 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
+        "combat_wisdom": 113.5,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), Rift Necklace (1), cookie (25), god pot (30), Celestial Mason Jar (3), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
+        "farming_wisdom": 190,  # Agarimoo Artifact (1), Abicase (1.5), Lunar Legendary Pelt Belt (1 + 3), Lunar Mythic Zorro's Cape during Contest (2 * (1 + 4)), Lunar Mythic Rift Necklace (1 + 6), Lunar Mythic Gillsplash Gloves (4), Blessed Legendary Mk. III farming tool with Cultivating X (3 + 5 + 10), Mythic Sunny armor (4 * 6), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
+        "fishing_wisdom": 91.5,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
+        "foraging_wisdom": 98.32,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), David's Cloak (5), Foraging Wisdom Boosters armor and equipment (4 + 2), Moonglade Legendary Axe with Absorb X, Foraging Wisdom Boosters and essence shop perk Axed I ((5 + 10 + 1) * 1.02), Efficient Forager (15), Foraging Wisdom (6.5)
+        "alchemy_wisdom": 54.5  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
     },
     "Full Coop Wisdom": {  # effective wisdom of 8 players, for each player same sources as above, but no tools, armor or equipment. Calculates as `8 * (1 + W / 100) = (1 + (700 + 8 * W) / 100)`
-        "mining_wisdom": 1244,  # Abicase (1.5), cookie (25), god pot (20), Cavern Wisdom (6.5), Seasoned Mineman (15)
-        "combat_wisdom": 1576,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), cookie (25), god pot (30), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
-        "farming_wisdom": 1660,  # Agarimoo Artifact (1), Abicase (1.5), cookie (25), god pot (20), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
-        "fishing_wisdom": 1408,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
-        "foraging_wisdom": 1244,  # Abicase (1.5), cookie (25), god pot (20), Efficient Forager (15), Foraging Wisdom (6.5)
-        "alchemy_wisdom": 1112  # Witch's Artifact (1.5), cookie (25), god pot (20), Spider Slayer VIII (5)
+        "mining_wisdom": 1268,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Cavern Wisdom (6.5), Seasoned Mineman (15)
+        "combat_wisdom": 1600,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), cookie (25), god pot (30), Celestial Mason Jar (3), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
+        "farming_wisdom": 1684,  # Agarimoo Artifact (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
+        "fishing_wisdom": 1432,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
+        "foraging_wisdom": 1268,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Efficient Forager (15), Foraging Wisdom (6.5)
+        "alchemy_wisdom": 1136  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
     },
     "Combat Pet Leveling": {
         "expshareitem": True,
@@ -298,8 +298,6 @@ class Calculator(tk.Tk):
         self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True)
         self.custom_upgrade_toggle = HPM.Hvar(self.huim, key="custom_upgrade_toggle", vtype="storage", dtype=bool, display="Custom Upgrade", initial=False)
 
-        self.huim.edit_vars_output["custom_input_custom_upgrade_toggle"] = self.custom_upgrade_toggle.tkvar
-
         self.empty_time_unit.widget[-1].place(in_=self.empty_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.scaled_time_unit.widget[-1].place(in_=self.scaled_time_amount.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
         self.afkpet_rarity.widget[-1].place(in_=self.afkpet.widget[-1], relx=1, x=3, rely=0.5, anchor='w')
@@ -311,6 +309,9 @@ class Calculator(tk.Tk):
         self.notesAnchor = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="")
 
         self.huim.logger.debug("Variables initialized")
+
+        self.huim.new_edit_vars("settings", {"API_auto_update": None, "API_cooldown": None, "pet_API_cooldown": None, "compact_tolerance": None, "output_to_clipboard": None, "debug_mode": None, "color_palette": None}, self.edit_settings)
+        self.md.create_custom_inputs_edit_vars(self.huim, self.md.custom_inputs_edit_tree, "start")
 
         # Create widgets for controls menu and placing them
         self.creditLB = self.huim.create_label(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
@@ -328,8 +329,8 @@ class Calculator(tk.Tk):
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
         self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
         self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
-        self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars(self.edit_settings, ["API_auto_update", "API_cooldown", "pet_API_cooldown", "compact_tolerance", "output_to_clipboard", "debug_mode", "color_palette"], True))
-        self.custom_inputsB = tk.Button(self.frames["controls"], text="Custom Inputs", command=lambda: self.md.edit_custom_inputs(self.huim, self.md.custom_inputs_edit_tree))
+        self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars("settings"))
+        self.custom_inputsB = tk.Button(self.frames["controls"], text="Custom Inputs", command=lambda: self.huim.edit_vars("custom_input_start"))
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
         controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB, self.settingsB, self.custom_inputsB]
@@ -468,7 +469,12 @@ class Calculator(tk.Tk):
         self.notes.widget[1].tkraise()
 
         # Add-ons buttons
-        self.addons_list = {**external_add_ons}
+        self.addons_list = {}
+        for addon_function_key in external_add_ons.keys():
+            if "__init__" in addon_function_key:
+                external_add_ons[addon_function_key](self)
+            else:
+                self.addons_list[addon_function_key] = external_add_ons[addon_function_key]
         self.addons_buttons = {}
         self.addons_auto_run = {}
         for number, addon_info in enumerate(self.addons_list.items()):
@@ -1014,8 +1020,6 @@ class Calculator(tk.Tk):
             speed_boost += self.md.calculator_data[upgrade]["speed_boost"]
         speed_boost += self.md.calculator_data[setup_data["beacon"]]["speed_boost"] + self.md.calculator_data["MITHRIL_INFUSION"]["speed_boost"] * setup_data["infusion"]
         speed_boost += self.md.calculator_data["FREE_WILL"]["speed_boost"] * setup_data["free_will"] + self.md.calculator_data["POSTCARD"]["speed_boost"] * setup_data["postcard"]
-        if setup_data["custom_upgrade_toggle"]:
-            speed_boost += self.md.calculator_data["CUSTOM_UPGRADE"]["speed_boost"]
         if setup_data["crystal"] != "NONE":
             if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["crystal"]]["affected_minions"]):
                 speed_boost += self.md.calculator_data[setup_data["crystal"]]["speed_boost"]
@@ -2430,7 +2434,7 @@ class Calculator(tk.Tk):
         self.addons_output_container.update_listbox()
         return
     
-    def edit_settings(self):
+    def edit_settings(self, new_settings):
         if self.debug_mode.get():
             self.huim.logger.setLevel(10)
         else:

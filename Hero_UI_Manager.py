@@ -115,8 +115,8 @@ class H_UI_M():
         self.main.frames = {}
         self.main.var_dict = {}
         self.reduced_amounts = {0: "", 1: "k", 2: "M", 3: "B", 4: "T", 5: "Qd"}
-        self.edit_vars_active = False
-        self.edit_vars_output = {}
+        self.active_edit_vars = None
+        self.edit_vars_requests = {}
 
         self.style = ttk.Style()
         self.style.theme_create(
@@ -975,69 +975,108 @@ class H_UI_M():
         inputsW.destroy()
         return self.vars_out
 
-    def edit_vars(self, exit_function, variables=[], existing_variables=True):
+    def new_edit_vars(self, request_id, variables, exit_function, relwidth=0.25, relheight=0.5):
+        # variables : {
+        #   var_key : {
+        #       dtype : data type,
+        #       display : str,
+        #       initial : value of dtype,
+        #       options : list
+        #   },
+        #   dict_key : {
+        #       dtype := dict,
+        #       display : str,
+        #       initial : dict
+        #   },
+        # }
+        self.edit_vars_requests[request_id] = {}
+        self.edit_vars_requests[request_id]["variables"] = {}
+        # frame : main frame
+        # exit_func : exit function
+        # variables : {
+        #   edit_vars_key : tkvar 
+        #   edit_dict_key : {listbox : tkvar, edit_key : tkvar, edit_val : tkvar, dict: dict }
+        # }
+        self.edit_vars_requests[request_id]["exit_func"] = exit_function
+        new_edit_vars_frame = tk.Frame(self.main, background=self.main.colors["background"])
+        self.def_switch(f"edit_vars_{request_id}", widget_references=new_edit_vars_frame,
+                        locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": relwidth, "relheight": relheight}, initial=False)
+        
+        widgets_dict = {}
+        for var_key, var_data in variables.items():
+            if var_data is None:
+                self.edit_vars_requests[request_id]["variables"][var_key], widgets_dict[var_key] = self.def_input_var(self.main.var_dict[var_key].dtype, new_edit_vars_frame, f"{self.main.var_dict[var_key].get_display()}:", None, self.main.var_dict[var_key].options, None, existing_var=self.main.var_dict[var_key].tkvar)
+            elif var_data["dtype"] == dict:
+                self.edit_vars_requests[request_id]["variables"][var_key] = {}
+                self.edit_vars_requests[request_id]["variables"][var_key]["listbox"], widgets_dict[var_key + "_listbox"] = self.def_output_var(new_edit_vars_frame, dict, f"{var_data['display']}:", var_data["initial"], 35, 10)
+                self.edit_vars_requests[request_id]["variables"][var_key]["edit_key"], widgets_dict[var_key + "_edit_key"] = self.def_input_var(str, new_edit_vars_frame, "Key:")
+                self.edit_vars_requests[request_id]["variables"][var_key]["edit_val"], widgets_dict[var_key + "_edit_val"] = self.def_input_var(str, new_edit_vars_frame, "Value:")
+                widgets_dict[var_key + "_submit"] = [None, tk.Button(new_edit_vars_frame, text="Submit", command=lambda: self.edit_dict_submit(request_id, var_key))]
+                self.edit_vars_requests[request_id]["variables"][var_key]["dict"] = var_data["initial"]
+            else:
+                self.edit_vars_requests[request_id]["variables"][var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], new_edit_vars_frame, f"{var_data['display']}:", var_data["initial"], var_data["options"], None)
+
+        self.fill_grid(widgets_dict.values(), new_edit_vars_frame)
+
+        closeB = tk.Button(new_edit_vars_frame, text="Close", command=lambda: self.edit_vars_confirm(request_id))
+        closeB.place(relx=0.5, rely=1, anchor="s", y=10)
+        self.edit_vars_requests[request_id]["frame"] = new_edit_vars_frame
+        return
+
+    def edit_dict_submit(self, request_id, edit_dict_key):
+        dict_to_edit = self.edit_vars_requests[request_id]["variables"][edit_dict_key]["dict"]
+        edit_key = self.edit_vars_requests[request_id]["variables"][edit_dict_key]["edit_key"].get()
+        edit_val = self.edit_vars_requests[request_id]["variables"][edit_dict_key]["edit_val"].get()
+        if edit_val == "":
+            del dict_to_edit[edit_key]
+        else:
+            try:
+                edit_val = float(edit_val)
+            except ValueError:
+                pass
+            dict_to_edit[edit_key] = edit_val
+        self.edit_vars_requests[request_id]["variables"][edit_dict_key]["listbox"].set([f'{key}: {val}' for key, val in dict_to_edit.items()])
+        return
+
+    def edit_vars(self, request_id):
         """
-        Creates a pop-up that asks for values for the inputted variable keys.
+        Activates the inputted edit vars request.
 
         Parameters
         ----------
-        exit_function : function
-            Function run after clicking close.
-        variables : list or dict
-            List containing variable keys as strings. Dict containing variable keys as keys with variable data as value
+        request_id : string
+            ID of edit vars request as defined with new_edit_vars
 
         Returns
         -------
-        list
-            A list containing the inputted values for the variables.
-            Returns an equal dimension list containing only None if the action was canceled
+        None
 
         """
-        if self.edit_vars_active is True:
+        if self.active_edit_vars is not None:
             self.logger.warning("Already editing variables")
             return
-        else:
-            self.edit_vars_active = True
-
-        self.edit_vars_mainframe = tk.Frame(self.main, background=self.main.colors["background"])
-        self.edit_vars_mainframe.place(anchor="c", relx=0.5, rely=0.5, relwidth=0.2, relheight=0.5)
-        
-        self.create_frames(self.edit_vars_mainframe, frame_keys=[["edit_vars"]], grid_frames=True, grid_size=0.96, border=0.04, relControlsHeight=0.1)
-        self.edit_vars_options = tk.Frame(self.edit_vars_mainframe, background=self.main.colors["controls_frame"])
-        self.edit_vars_options.place(rely=0.9, relheight=0.1, relwidth=1)
-
-        self.edit_vars_inputs = self.main.frames["edit_vars_grid"]
-        del self.main.frames["edit_vars_grid"]
-        del self.main.frames["edit_vars"]
-
-        widgets_dict = {}
-        if existing_variables:
-            for var_key in variables:
-                self.edit_vars_output[var_key], widgets_dict[var_key] = self.def_input_var(self.main.var_dict[var_key].dtype, self.edit_vars_inputs, f"{self.main.var_dict[var_key].get_display()}:", None, self.main.var_dict[var_key].options, None, existing_var=self.main.var_dict[var_key].tkvar)
-        else:
-            for var_key, var_data in variables.items():
-                if var_key in self.edit_vars_output:
-                    self.edit_vars_output[var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], self.edit_vars_inputs, f"{var_data['display']}:", None, var_data["options"], None, existing_var=self.edit_vars_output[var_key])
-                else:
-                    self.edit_vars_output[var_key], widgets_dict[var_key] = self.def_input_var(var_data["dtype"], self.edit_vars_inputs, f"{var_data['display']}:", var_data["initial"], var_data["options"], None)
-
-        self.fill_grid(widgets_dict.values(), self.edit_vars_inputs)
-
-        closeB = tk.Button(self.edit_vars_options, text="Close", command=lambda: self.edit_confirm(exit_func=exit_function, vars=variables))
-        closeB.place(relx=0.5, rely=0.5, anchor="c")
+        if request_id not in self.edit_vars_requests:
+            self.logger.warning("Edit vars request does not exist")
+            return
+        self.active_edit_vars = request_id        
+        self.toggle_switch(f"edit_vars_{request_id}")
         return
 
-    def edit_confirm(self, exit_func, vars=[]):
+    def edit_vars_confirm(self, request_id):
+        results = {}
         try:
-            for var_key in vars:
-                self.edit_vars_output[var_key].get()
+            for var_key, tkvar in self.edit_vars_requests[request_id]["variables"].items():
+                if type(tkvar) != dict:
+                    results[var_key] = tkvar.get()
+                else:
+                    results[var_key] = tkvar["dict"]
         except tk._tkinter.TclError:
             self.logger.error("Inputted wrong data type, please try again")
         else:
-            self.edit_vars_mainframe.destroy()
-            self.edit_vars_active = False
-            if exit_func is not None:
-                exit_func()
+            self.active_edit_vars = None
+            self.toggle_switch(f"edit_vars_{request_id}")
+            if self.edit_vars_requests[request_id]["exit_func"] is not None:
+                self.edit_vars_requests[request_id]["exit_func"](results)
         return
 
 
