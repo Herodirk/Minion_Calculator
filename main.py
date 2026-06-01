@@ -29,10 +29,6 @@ except ModuleNotFoundError as import_error:
     else:
         print(f"ERROR - import - Could not find {missing_package} module,\nplease install this module using PIP")
     exit()
-try:
-    pathlib.Path("calculator_instance_data").mkdir()
-except FileExistsError:
-    pass
 
 #%% Settings
 
@@ -154,7 +150,7 @@ class Calculator(tk.Tk):
     def __init__(self):
         super().__init__()
         # Get settings
-        self.settings_file = pathlib.Path("calculator_instance_data/calculator_settings.json")
+        self.settings_file = pathlib.Path("calculator_settings.json")
         self.default_settings = {
             "API_auto_update": True,
             "API_cooldown": 120,
@@ -294,7 +290,6 @@ class Calculator(tk.Tk):
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
         self.scaled_time_unit = HPM.Hvar(self.huim, key="scaled_time_unit", vtype="input", dtype=str, display="Scaled Time unit", initial="Days", frame="inputs_player_grid", options=self.input_options["time_unit"])
         self.rising_celsius_override = HPM.Hvar(self.huim, key="rising_celsius_override", vtype="input", dtype=bool, display="Force Rising Celsius", initial=False, frame="inputs_minion_grid")
-        self.pet_costs = HPM.Hvar(self.huim, key="pet_costs", vtype="storage", dtype=dict, display="Pet Prices", initial={"NONE": {"LEGENDARY": {"min": 1, "max": 1, "last_updated": 0}}})
         self.used_pet_prices = HPM.Hvar(self.huim, key="used_pet_prices", vtype="output", dtype=dict, display="Used Pet Prices", initial={}, frame="outputs_profit_grid", widget_width=35, widget_height=4, switch_initial=True)
         self.custom_upgrade_toggle = HPM.Hvar(self.huim, key="custom_upgrade_toggle", vtype="storage", dtype=bool, display="Custom Upgrade", initial=False)
 
@@ -610,14 +605,6 @@ class Calculator(tk.Tk):
         self.huim.logger.debug("Updated NPC prices")
         self.update_prices(cooldown_warning=False, in_gui=True)
 
-        # Calculator Data locations
-        self.calculator_data_files = {
-            "pet_costs": pathlib.Path("calculator_instance_data/pet_costs.json"),
-        }
-        for var_key, data_file in self.calculator_data_files.items():
-            self.huim.check_json(data_file, self.var_dict[var_key].initial)
-            self.var_dict[var_key].list.update(self.huim.read_json(data_file))
-        self.huim.logger.debug("Calculator Data loaded")
         self.huim.logger.info("Ready")
         return
 
@@ -1808,27 +1795,27 @@ class Calculator(tk.Tk):
         :param setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets
         :param setup_data: needed setup data: expshareitem, pet_exp_boost, setup data for self.get_price
         :return pet_profit: float, total profit from pets
-        :return pet_prices: dict, pet name as key, string as value with lvl 1 price and max lvl price 
+        :return used_pet_prices: dict, pet name as key, string as value with lvl 1 price and max lvl price 
         """
         pet_profit = 0.0
-        pet_prices = {}
+        used_pet_prices = {}
         super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
         for pet_slot, pet_info in setup_pets.items():
             combined_pet_id = pet_info['rarity'] + "." + pet_info["pet"]
-            if pet_info["pet"] not in self.pet_costs.list or pet_info['rarity'] not in self.pet_costs.list[pet_info["pet"]]:
-                if combined_pet_id not in pet_prices:
-                    pet_prices[combined_pet_id] = f"Price not found"
+            if pet_info['rarity'] not in self.md.calculator_data[pet_info["pet"]]["pet_prices"]:
+                if combined_pet_id not in used_pet_prices:
+                    used_pet_prices[combined_pet_id] = f"Price not found"
             else:
-                pet_profit += pet_info["levelled_pets"] * (self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["max"] - self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["min"])
-                if combined_pet_id not in pet_prices:
-                    pet_prices[combined_pet_id] = f"{self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["min"])} - {self.huim.reduced_number(self.pet_costs.list[pet_info["pet"]][pet_info["rarity"]]["max"])}"
+                pet_profit += pet_info["levelled_pets"] * (self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["max"] - self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["min"])
+                if combined_pet_id not in used_pet_prices:
+                    used_pet_prices[combined_pet_id] = f"{self.huim.reduced_number(self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["min"])} - {self.huim.reduced_number(self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["max"])}"
             if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
                 pet_profit -= pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data[main_pet_item]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
                 pet_profit -= pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
-        return pet_profit, pet_prices
+        return pet_profit, used_pet_prices
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
         """
@@ -2099,7 +2086,7 @@ class Calculator(tk.Tk):
         
         # Pet leveling
         setup_pets = self.get_pets_levelled(skill_xp, mayor, setup_data)
-        pet_profit, pet_prices = self.get_pet_profit(setup_pets, setup_data)
+        pet_profit, used_pet_prices = self.get_pet_profit(setup_pets, setup_data)
 
         # calculating beacon and limited fuel cost
         fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, empty_time_seconds, setup_data)
@@ -2147,7 +2134,7 @@ class Calculator(tk.Tk):
             "scaled_time": scaled_time_str,
             "actiontime": seconds_per_action,
             "notes": setup_notes,
-            "used_pet_prices": pet_prices,
+            "used_pet_prices": used_pet_prices,
             "optimal_tier_free_will": free_will_optimal_tier,
         })
 
@@ -2341,9 +2328,9 @@ class Calculator(tk.Tk):
         
         :param pet_ID: str, pet ID as seen in calculator data
         """
-        if pet_ID in ["NONE", "PET_CUSTOM_PET", "PET_BINGO"]:
+        if self.md.has_data_tag(pet_ID, "no_ah_api"):
             return
-        if pet_ID in self.pet_costs.list and rarity in self.pet_costs.list[pet_ID] and time.time() - self.pet_costs.list[pet_ID][rarity]["last_updated"] < self.pet_API_cooldown.get():
+        if rarity in self.md.calculator_data[pet_ID]["pet_prices"] and time.time() - self.md.calculator_data[pet_ID]["pet_prices"][rarity]["last_updated"] < self.pet_API_cooldown.get():
             self.huim.logger.debug(f"{pet_ID} {rarity} price update is on cooldown")
             return
         level_ranges = { "min": "1", "max": "100" }
@@ -2371,20 +2358,16 @@ class Calculator(tk.Tk):
                 results[level_type] = self.huim.call_API(api_end_point + api_pet_id + api_static_filters + level_range, f"SkyCofl pet AH API: {api_pet_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})["mean"]
             else:
                 results[level_type] = (lowest_price + second_lowest_price) / 2
-        if pet_ID not in self.pet_costs.list:
-            # non-zero min and max is required for new entry
+        if rarity not in self.md.calculator_data[pet_ID]["pet_prices"]:
             if results["min"] == 0 or results["max"] == 0:
                 return
-            self.pet_costs.list[pet_ID] = {}
-        if rarity not in self.pet_costs.list[pet_ID]:
-            if results["min"] == 0 or results["max"] == 0:
-                return
-            self.pet_costs.list[pet_ID][rarity] = { "min": 0, "max": 0, "last_updated": 0 }
+            self.md.calculator_data[pet_ID]["pet_prices"][rarity] = { "min": 0, "max": 0, "last_updated": 0 }
+            self.md.instance_data[f"{pet_ID}.pet_prices.{rarity}"] = None  # will auto update when instance data is saved (just need to get the key in)
         if results["min"] != 0:
-            self.pet_costs.list[pet_ID][rarity]["min"] = results["min"]
+            self.md.calculator_data[pet_ID]["pet_prices"][rarity]["min"] = results["min"]
         if results["max"] != 0:
-            self.pet_costs.list[pet_ID][rarity]["max"] = results["max"]
-        self.pet_costs.list[pet_ID][rarity]["last_updated"] = time.time()
+            self.md.calculator_data[pet_ID]["pet_prices"][rarity]["max"] = results["max"]
+        self.md.calculator_data[pet_ID]["pet_prices"][rarity]["last_updated"] = time.time()
         return
 
     def update_listboxes(self):
@@ -2451,10 +2434,6 @@ class Calculator(tk.Tk):
             elif setting == "window_width":
                 saving_settings[setting] = self.winfo_width()
         self.huim.write_json(self.settings_file, saving_settings)
-
-        for var_key, data_file in self.calculator_data_files.items():
-            self.huim.write_json(data_file, self.var_dict[var_key].list)
-        
         self.md.save_instance_data()
         return
 

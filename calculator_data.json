@@ -19,7 +19,13 @@
         "prices": {
             "npc": 0,
             "custom": 0
-        }
+        },
+        "pet_prices": {
+            "LEGENDARY": { "min": 1, "max": 1, "last_updated": 0 }
+        },
+        "tags": [
+            "no_ah_api"
+        ]
     },
     "CUSTOM": {
         "display": "Custom",
@@ -8709,137 +8715,176 @@
     "PET_CUSTOM_PET": {
         "display": "Custom Pet",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "CUSTOM_RARITY"]
+        "pet_rarities": ["CUSTOM_RARITY"],
+        "pet_prices": {
+            "CUSTOM_RARITY": {
+                "min": 0,
+                "max": 20000000,
+                "last_updated": 0
+            }
+        },
+        "tags": [
+            "no_ah_api"
+        ]
     },
     "PET_AMMONITE": {
         "display": "Ammonite",
         "pet_type": "fishing",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ANKYLOSAURUS": {
         "display": "Ankylosaurus",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ARMADILLO": {
         "display": "Armadillo",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_BABY_YETI": {
         "display": "Baby Yeti",
         "pet_type": "fishing",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_BAL": {
         "display": "Bal",
         "pet_type": "mining",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_BAT": {
         "display": "Bat",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_BEE": {
         "display": "Bee",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_BINGO": {
         "display": "Bingo",
         "pet_type": "all",
-        "pet_rarities": ["COMMON"]
+        "pet_rarities": ["COMMON"],
+        "pet_prices": {},
+        "tags": [
+            "no_ah_api"
+        ]
     },
     "PET_BLACK_CAT": {
         "display": "Black Cat",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_BLAZE": {
         "display": "Blaze",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_BLUE_WHALE": {
         "display": "Blue Whale",
         "pet_type": "fishing",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_CHICKEN": {
         "display": "Chicken",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_CROW": {
         "display": "Crow",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_DOLPHIN": {
         "display": "Dolphin",
         "pet_type": "fishing",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_EERIE": {
         "display": "Eerie",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "RARE", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "RARE", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ELEPHANT": {
         "display": "Elephant",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_ENDER_DRAGON": {
         "display": "Ender Dragon",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ENDERMAN": {
         "display": "Enderman",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_ENDERMITE": {
         "display": "Endermite",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_FLYING_FISH": {
         "display": "Flying Fish",
         "pet_type": "fishing",
-        "pet_rarities": ["RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_FROG": {
         "display": "Frog",
         "pet_type": "foraging",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GHOUL": {
         "display": "Ghoul",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GIRAFFE": {
         "display": "Giraffe",
         "pet_type": "foraging",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GLACITE_GOLEM": {
         "display": "Glacite Golem",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GOBLIN": {
         "display": "Goblin",
         "pet_type": "mining",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GOLDEN_DRAGON": {
         "display": "Golden Dragon",
         "pet_type": "combat",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "dragon_pet"
         ]
@@ -8848,6 +8893,7 @@
         "display": "Golden Dragon Egg",
         "pet_type": "combat",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "dragon_egg_pet"
         ]
@@ -8856,6 +8902,7 @@
         "display": "Golden Dragon Hatched",
         "pet_type": "combat",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "hatched_dragon_pet"
         ]
@@ -8863,47 +8910,56 @@
     "PET_GOLEM": {
         "display": "Golem",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GRANDMA_WOLF": {
         "display": "Grandma Wolf",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_GRIFFIN": {
         "display": "Griffin",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_GUARDIAN": {
         "display": "Guardian",
         "pet_type": "enchanting",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_HEDGEHOG": {
         "display": "Hedgehog",
         "pet_type": "farming",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_HERMIT_CRAB": {
         "display": "Hermit Crab",
         "pet_type": "fishing",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_HORSE": {
         "display": "Horse",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_HOUND": {
         "display": "Hound",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_JADE_DRAGON": {
         "display": "Jade Dragon",
         "pet_type": "foraging",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "dragon_pet"
         ]
@@ -8912,6 +8968,7 @@
         "display": "Jade Dragon Egg",
         "pet_type": "foraging",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "dragon_egg_pet"
         ]
@@ -8920,6 +8977,7 @@
         "display": "Jade Dragon Hatched",
         "pet_type": "combat",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "hatched_dragon_pet"
         ]
@@ -8927,22 +8985,26 @@
     "PET_JELLYFISH": {
         "display": "Jellyfish",
         "pet_type": "alchemy",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_JERRY": {
         "display": "Jerry",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_KUUDRA": {
         "display": "Kuudra",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_LION": {
         "display": "Lion",
         "pet_type": "foraging",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_MAGMA_CUBE": {
         "display": "Magma Cube",
@@ -8973,32 +9035,38 @@
         "affected_minions": [
             "SLIME_MINION",
             "MAGMA_CUBE_MINION"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_MAMMOTH": {
         "display": "Mammoth",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_MEGALODON": {
         "display": "Megalodon",
         "pet_type": "fishing",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_MITHRIL_GOLEM": {
         "display": "Mithril Golem",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_MOLE": {
         "display": "Mole",
         "pet_type": "mining",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_MONKEY": {
         "display": "Monkey",
         "pet_type": "foraging",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_MOOSHROOM_COW": {
         "display": "Mooshroom Cow",
@@ -9029,12 +9097,14 @@
         "affected_minions": [
             "MUSHROOM_MINION",
             "MYCELIUM_MINION"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_MOSQUITO": {
         "display": "Mosquito",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_OCELOT": {
         "display": "Ocelot",
@@ -9056,32 +9126,38 @@
         },
         "affected_minions": [
             "foraging_minion"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_OWL": {
         "display": "Owl",
         "pet_type": "taming",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_PARROT": {
         "display": "Parrot",
         "pet_type": "alchemy",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_PENGUIN": {
         "display": "Penguin",
         "pet_type": "fishing",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_PHOENIX": {
         "display": "Phoenix",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_PIG": {
         "display": "Pig",
         "pet_type": "farming",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_PIGMAN": {
         "display": "Pigman",
@@ -9111,12 +9187,14 @@
         },
         "affected_minions": [
             "PIG_MINION"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_PRECURSOR_DRONE": {
         "display": "Precursor Drone",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON"]
+        "pet_rarities": ["COMMON"],
+        "pet_prices": {}
     },
     "PET_RABBIT": {
         "display": "Rabbit",
@@ -9134,32 +9212,38 @@
         },
         "affected_minions": [
             "farming_crop_minion"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_RAT": {
         "display": "Rat",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_REINDEER": {
         "display": "Reindeer",
         "pet_type": "fishing",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_RIFT_FERRET": {
         "display": "Rift Ferret",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ROCK": {
         "display": "Rock",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ROSE_DRAGON": {
         "display": "Rose Dragon",
         "pet_type": "farming",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "dragon_pet"
         ]
@@ -9168,6 +9252,7 @@
         "display": "Rose Dragon Egg",
         "pet_type": "farming",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "dragon_egg_pet"
         ]
@@ -9176,6 +9261,7 @@
         "display": "Rose Dragon Hatched",
         "pet_type": "combat",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {},
         "tags": [
             "hatched_dragon_pet"
         ]
@@ -9183,37 +9269,44 @@
     "PET_SCATHA": {
         "display": "Scatha",
         "pet_type": "mining",
-        "pet_rarities": ["RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SEAL": {
         "display": "Seal",
         "pet_type": "fishing",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SHEEP": {
         "display": "Sheep",
         "pet_type": "alchemy",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SILVERFISH": {
         "display": "Silverfish",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SKELETON": {
         "display": "Skeleton",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SKELETON_HORSE": {
         "display": "Skeleton Horse",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SLUG": {
         "display": "Slug",
         "pet_type": "farming",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SNAIL": {
         "display": "Snail",
@@ -9243,12 +9336,14 @@
         },
         "affected_minions": [
             "RED_SAND_MINION"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_SNOWMAN": {
         "display": "Snowman",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_SPIDER": {
         "display": "Spider",
@@ -9268,62 +9363,74 @@
             "SPIDER_MINION",
             "TARANTULA_MINION",
             "CAVE_SPIDER_MINION"
-        ]
+        ],
+        "pet_prices": {}
     },
     "PET_SPINOSAURUS": {
         "display": "Spinosaurus",
         "pet_type": "fishing",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SPIRIT": {
         "display": "Spirit",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_SQUID": {
         "display": "Squid",
         "pet_type": "fishing",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_TYRANNOSAURUS": {
         "display": "T-Rex",
         "pet_type": "combat",
-        "pet_rarities": ["LEGENDARY"]
+        "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_TARANTULA": {
         "display": "Tarantula",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY", "MYTHIC"]
+        "pet_rarities": ["EPIC", "LEGENDARY", "MYTHIC"],
+        "pet_prices": {}
     },
     "PET_TIGER": {
         "display": "Tiger",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_TURTLE": {
         "display": "Turtle",
         "pet_type": "combat",
-        "pet_rarities": ["EPIC", "LEGENDARY"]
+        "pet_rarities": ["EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_WITCH": {
         "display": "Witch",
         "pet_type": "alchemy",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_WITHER_SKELETON": {
         "display": "Wither Skeleton",
         "pet_type": "mining",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_WOLF": {
         "display": "Wolf",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "PET_ZOMBIE": {
         "display": "Zombie",
         "pet_type": "combat",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"]
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
     },
     "COMMON": {
         "display": "Common",

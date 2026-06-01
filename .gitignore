@@ -1,7 +1,8 @@
 __pycache__
 .vscode
-calculator_instance_data
+calculator_instance_data.json
 to_do_list.txt
 minion_visualiser_add_on.py
 testing_environment.py
 calculator_data_json_generator.py
+calculator_settings.json

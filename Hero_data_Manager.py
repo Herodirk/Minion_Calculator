@@ -36,6 +36,7 @@ class H_data_M():
     def __init__(self, huim):
         self.huim = huim
         self.calculator_data = self.huim.read_json(pathlib.Path("calculator_data.json"))
+        self.huim.logger.debug("Static Calculator Data loaded")
 
         self.inferno_fuel_data = {
             'grades': { 'HYPERGOLIC_GABAGOOL': 20, 'HEAVY_GABAGOOL': 15, 'FUEL_GABAGOOL': 10 },
@@ -57,88 +58,82 @@ class H_data_M():
 
         self.standard_storage = { 1: 1, 2: 3, 3: 3, 4: 6, 5: 6, 6: 9, 7: 9, 8: 12, 9: 12, 10: 15, 11: 15, 12: 15 }
 
-        self.instance_data_file_locations = {
-            # "pet_costs": pathlib.Path("calculator_instance_data/pet_costs.json"),
-            "custom_inputs": pathlib.Path("calculator_instance_data/custom_inputs.json"),
-            # "custom_prices": pathlib.Path("calculator_instance_data/custom_prices.json")
-        }
+        self.instance_data_file = pathlib.Path("calculator_instance_data.json")
 
         self.instance_data = {
-            # "pet_costs": { "NONE": { "LEGENDARY": { "min": 1, "max": 1, "last_updated": 0 } } },
-            "custom_inputs": {
-                "CUSTOM.prices.npc": 1,
-                "CUSTOM.xp.alchemy": 0,
-                "CUSTOM.xp.combat": 1,
-                "CUSTOM.xp.farming": 0,
-                "CUSTOM.xp.fishing": 0,
-                "CUSTOM.xp.foraging": 0,
-                "CUSTOM.xp.mining": 0,
-                "CUSTOM.compacting.block.amount": 2,
-                "CUSTOM.compacting.block.per": 8,
-                "CUSTOM.compacting.compact.amount": 1,
-                "CUSTOM.compacting.compact.per": 160,
-                "CUSTOM_BLOCK.prices.npc": 4,
-                "CUSTOM_BLOCK.xp.alchemy": 0,
-                "CUSTOM_BLOCK.xp.combat": 4,
-                "CUSTOM_BLOCK.xp.farming": 0,
-                "CUSTOM_BLOCK.xp.fishing": 0,
-                "CUSTOM_BLOCK.xp.foraging": 0,
-                "CUSTOM_BLOCK.xp.mining": 0,
-                "CUSTOM_BLOCK.compacting.compact.amount": 4,
-                "CUSTOM_BLOCK.compacting.compact.per": 160,
-                "ENCHANTED_CUSTOM.prices.npc": 160,
-                "ENCHANTED_CUSTOM.xp.alchemy": 0,
-                "ENCHANTED_CUSTOM.xp.combat": 160,
-                "ENCHANTED_CUSTOM.xp.farming": 0,
-                "ENCHANTED_CUSTOM.xp.fishing": 0,
-                "ENCHANTED_CUSTOM.xp.foraging": 0,
-                "ENCHANTED_CUSTOM.xp.mining": 0,
-                "ENCHANTED_CUSTOM.compacting.compact.amount": 1,
-                "ENCHANTED_CUSTOM.compacting.compact.per": 160,
-                "ENCHANTED_CUSTOM_BLOCK.prices.npc": 25600,
-                "ENCHANTED_CUSTOM_BLOCK.xp.alchemy": 0,
-                "ENCHANTED_CUSTOM_BLOCK.xp.combat": 25600,
-                "ENCHANTED_CUSTOM_BLOCK.xp.farming": 0,
-                "ENCHANTED_CUSTOM_BLOCK.xp.fishing": 0,
-                "ENCHANTED_CUSTOM_BLOCK.xp.foraging": 0,
-                "ENCHANTED_CUSTOM_BLOCK.xp.mining": 0,
-                "CUSTOM_MINION.drops": { "CUSTOM": 1 },
-                "CUSTOM_MINION.speed.1": 1,
-                "CUSTOM_MINION.speed.2": 2,
-                "CUSTOM_MINION.speed.3": 3,
-                "CUSTOM_MINION.speed.4": 4,
-                "CUSTOM_MINION.speed.5": 5,
-                "CUSTOM_MINION.speed.6": 6,
-                "CUSTOM_MINION.speed.7": 7,
-                "CUSTOM_MINION.speed.8": 8,
-                "CUSTOM_MINION.speed.9": 9,
-                "CUSTOM_MINION.speed.10": 10,
-                "CUSTOM_MINION.speed.11": 11,
-                "CUSTOM_MINION.speed.12": 12,
-                "CUSTOM_MINION.storage.1": 15,
-                "CUSTOM_MINION.storage.2": 15,
-                "CUSTOM_MINION.storage.3": 15,
-                "CUSTOM_MINION.storage.4": 15,
-                "CUSTOM_MINION.storage.5": 15,
-                "CUSTOM_MINION.storage.6": 15,
-                "CUSTOM_MINION.storage.7": 15,
-                "CUSTOM_MINION.storage.8": 15,
-                "CUSTOM_MINION.storage.9": 15,
-                "CUSTOM_MINION.storage.10": 15,
-                "CUSTOM_MINION.storage.11": 15,
-                "CUSTOM_MINION.storage.12": 15,
-                "CUSTOM_MINION.afkcorrupt": 2,
-                "PET_CUSTOM_PET.pet_type": "farming",
-                "CUSTOM_RARITY.max_lvl_pet_xp_amount": 25353230,
-                "CUSTOM_UPGRADE.speed_boost": 0,
-                "CUSTOM_UPGRADE.drop_multiplier": 1,
-                "CUSTOM_UPGRADE.upgrade_effects.spreading": {},
-                "CUSTOM_UPGRADE.upgrade_effects.adding": {},
-                "CUSTOM_UPGRADE.upgrade_effects.cooldown.items": {},
-                "CUSTOM_UPGRADE.upgrade_effects.cooldown.online_cooldown": 60,
-                "CUSTOM_UPGRADE.upgrade_effects.cooldown.offline_cooldown": 60,
-            },
-            # "custom_prices": {}
+            "NONE.pet_prices.LEGENDARY": { "min": 1, "max": 1, "last_updated": 0 },
+            "CUSTOM.prices.npc": 1,
+            "CUSTOM.xp.alchemy": 0,
+            "CUSTOM.xp.combat": 1,
+            "CUSTOM.xp.farming": 0,
+            "CUSTOM.xp.fishing": 0,
+            "CUSTOM.xp.foraging": 0,
+            "CUSTOM.xp.mining": 0,
+            "CUSTOM.compacting.block.amount": 2,
+            "CUSTOM.compacting.block.per": 8,
+            "CUSTOM.compacting.compact.amount": 1,
+            "CUSTOM.compacting.compact.per": 160,
+            "CUSTOM_BLOCK.prices.npc": 4,
+            "CUSTOM_BLOCK.xp.alchemy": 0,
+            "CUSTOM_BLOCK.xp.combat": 4,
+            "CUSTOM_BLOCK.xp.farming": 0,
+            "CUSTOM_BLOCK.xp.fishing": 0,
+            "CUSTOM_BLOCK.xp.foraging": 0,
+            "CUSTOM_BLOCK.xp.mining": 0,
+            "CUSTOM_BLOCK.compacting.compact.amount": 4,
+            "CUSTOM_BLOCK.compacting.compact.per": 160,
+            "ENCHANTED_CUSTOM.prices.npc": 160,
+            "ENCHANTED_CUSTOM.xp.alchemy": 0,
+            "ENCHANTED_CUSTOM.xp.combat": 160,
+            "ENCHANTED_CUSTOM.xp.farming": 0,
+            "ENCHANTED_CUSTOM.xp.fishing": 0,
+            "ENCHANTED_CUSTOM.xp.foraging": 0,
+            "ENCHANTED_CUSTOM.xp.mining": 0,
+            "ENCHANTED_CUSTOM.compacting.compact.amount": 1,
+            "ENCHANTED_CUSTOM.compacting.compact.per": 160,
+            "ENCHANTED_CUSTOM_BLOCK.prices.npc": 25600,
+            "ENCHANTED_CUSTOM_BLOCK.xp.alchemy": 0,
+            "ENCHANTED_CUSTOM_BLOCK.xp.combat": 25600,
+            "ENCHANTED_CUSTOM_BLOCK.xp.farming": 0,
+            "ENCHANTED_CUSTOM_BLOCK.xp.fishing": 0,
+            "ENCHANTED_CUSTOM_BLOCK.xp.foraging": 0,
+            "ENCHANTED_CUSTOM_BLOCK.xp.mining": 0,
+            "CUSTOM_MINION.drops": { "CUSTOM": 1 },
+            "CUSTOM_MINION.speed.1": 1,
+            "CUSTOM_MINION.speed.2": 2,
+            "CUSTOM_MINION.speed.3": 3,
+            "CUSTOM_MINION.speed.4": 4,
+            "CUSTOM_MINION.speed.5": 5,
+            "CUSTOM_MINION.speed.6": 6,
+            "CUSTOM_MINION.speed.7": 7,
+            "CUSTOM_MINION.speed.8": 8,
+            "CUSTOM_MINION.speed.9": 9,
+            "CUSTOM_MINION.speed.10": 10,
+            "CUSTOM_MINION.speed.11": 11,
+            "CUSTOM_MINION.speed.12": 12,
+            "CUSTOM_MINION.storage.1": 15,
+            "CUSTOM_MINION.storage.2": 15,
+            "CUSTOM_MINION.storage.3": 15,
+            "CUSTOM_MINION.storage.4": 15,
+            "CUSTOM_MINION.storage.5": 15,
+            "CUSTOM_MINION.storage.6": 15,
+            "CUSTOM_MINION.storage.7": 15,
+            "CUSTOM_MINION.storage.8": 15,
+            "CUSTOM_MINION.storage.9": 15,
+            "CUSTOM_MINION.storage.10": 15,
+            "CUSTOM_MINION.storage.11": 15,
+            "CUSTOM_MINION.storage.12": 15,
+            "CUSTOM_MINION.afkcorrupt": 2,
+            "PET_CUSTOM_PET.pet_type": "farming",
+            "CUSTOM_RARITY.max_lvl_pet_xp_amount": 25353230,
+            "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.max": 20000000,
+            "CUSTOM_UPGRADE.speed_boost": 0,
+            "CUSTOM_UPGRADE.drop_multiplier": 1,
+            "CUSTOM_UPGRADE.upgrade_effects.spreading": {},
+            "CUSTOM_UPGRADE.upgrade_effects.adding": {},
+            "CUSTOM_UPGRADE.upgrade_effects.cooldown.items": {},
+            "CUSTOM_UPGRADE.upgrade_effects.cooldown.online_cooldown": 60,
+            "CUSTOM_UPGRADE.upgrade_effects.cooldown.offline_cooldown": 60,
         }
 
         self.custom_inputs_edit_tree = {
@@ -249,18 +244,15 @@ class H_data_M():
             "Custom Pet": {
                 "PET_CUSTOM_PET.pet_type": {"dtype": str, "display": "Pet Type", "options": ["all", "alchemy", "combat", "enchanting", "farming", "fishing", "foraging", "mining"]},
                 "CUSTOM_RARITY.max_lvl_pet_xp_amount": {"dtype": float, "display": "Custom Rarity max Pet XP", "options": None},
+                "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.max": {"dtype": float, "display": "Custom Pet profit per pet", "options": None}
             }
         }
-        # TODO: combine all instance data files into one:
-        # basically, make pet costs part of calculator data,
-        # also add prices for the rarities of Custom Pet in custom inputs
 
-        for file_key, file_path in self.instance_data_file_locations.items():
-            self.huim.check_json(file_path, self.instance_data[file_key])
-            self.instance_data[file_key].update(self.huim.read_json(file_path))
-        for file_data in self.instance_data.values():
-            for data_loc, data_val in file_data.items():
-                self.set_data(data_loc, data_val)
+        self.huim.check_json(self.instance_data_file, self.instance_data)
+        self.instance_data.update(self.huim.read_json(self.instance_data_file))
+        for data_loc, data_val in self.instance_data.items():
+            self.set_data(data_loc, data_val)
+        self.huim.logger.debug("Calculator Instance Data loaded")
         return
 
     def has_data_tag(self, data_ID, tag):
@@ -318,10 +310,10 @@ class H_data_M():
         return
 
     def save_instance_data(self):
-        for file_key, file_data in self.instance_data.items():
-            for data_loc in file_data.keys():
-                file_data[data_loc] = self.get_data(data_loc)
-            self.huim.write_json(self.instance_data_file_locations[file_key], file_data)
+        for data_loc in self.instance_data.keys():
+            self.instance_data[data_loc] = self.get_data(data_loc)
+        self.huim.write_json(self.instance_data_file, self.instance_data)
+        return
 
     def create_custom_inputs_edit_vars(self, option_tree, choice_layer):
         if "Cancel" in option_tree:
