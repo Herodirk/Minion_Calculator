@@ -140,13 +140,16 @@ def basic_minion_loop(calculator, results):
             "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
             "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
-            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
+            "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
+                    " lvl ": {"afkpet_lvl"},
+                    "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
             "player_harvests": {"\n> ": ["player_looting"]},
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
-            "levelingpet": {
+            "Leveling pet: ": {
+                "%": [["levelingpet_rarity", "levelingpet"]],
                 "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
-                "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
+                "%\n> Exp Share Pets: ": [["expsharepet_rarity", "expsharepet"], ["expsharepetslot2_rarity", "expsharepetslot2"], ["expsharepetslot3_rarity", "expsharepetslot3"]]
             },
             "used_pet_prices": None,
             "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
@@ -216,13 +219,16 @@ def inferno_minion_loop(calculator, results):
             "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
             "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
-            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
+            "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
+                    " lvl ": {"afkpet_lvl"},
+                    "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
             "player_harvests": {"\n> ": ["player_looting"]},
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
-            "levelingpet": {
+            "Leveling pet: ": {
+                "%": [["levelingpet_rarity", "levelingpet"]],
                 "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
-                "\n> Exp Share Pets: ": {"expsharepet", "expsharepetslot2", "expsharepetslot3"}
+                "%\n> Exp Share Pets: ": [["expsharepet_rarity", "expsharepet"], ["expsharepetslot2_rarity", "expsharepetslot2"], ["expsharepetslot3_rarity", "expsharepetslot3"]]
             },
             "used_pet_prices": None,
             "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},

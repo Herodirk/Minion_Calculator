@@ -562,7 +562,9 @@ class Calculator(tk.Tk):
             },
             "Beacon Info": {"\n> ": ["beacon_fuel", "free_fuel_beacon"]},
             "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
-            "afk": {"\n> ": ["afkpet", "afkpet_rarity", "afkpet_lvl", "enchanted_clock", "special_layout", "potato_accessory"]},
+            "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
+                    " lvl ": {"afkpet_lvl"},
+                    "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
             "player_harvests": {"\n> ": ["player_looting"]},
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
@@ -1528,7 +1530,7 @@ class Calculator(tk.Tk):
         :return available_storage: available storage measured in slots
         """
         available_storage = self.md.calculator_data[setup_data["chest"]]["storage_slots"]
-        if "storage" in self.md.calculator_data[minion] and minion_tier in self.md.calculator_data[minion]["storage"]:
+        if "storage" in self.md.calculator_data[minion] and str(minion_tier) in self.md.calculator_data[minion]["storage"]:
             available_storage += self.md.calculator_data[minion]["storage"][str(minion_tier)]
         else:
             available_storage += self.md.standard_storage[minion_tier]
@@ -1968,9 +1970,9 @@ class Calculator(tk.Tk):
 
         # Attribute costs
         if setup_data["toucan_attribute"] != 0:
-            cost_per_part["toucan_attribute"] = self.md.calculator_data["EPIC"]["attribute_shards"][setup_data["toucan_attribute"]] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
+            cost_per_part["toucan_attribute"] = self.md.calculator_data["EPIC"]["attribute_shards"][str(setup_data["toucan_attribute"])] * self.get_price("SHARD_TOUCAN", setup_data, "buy", "bazaar")
         if setup_data["falcon_attribute"] != 0:
-            cost_per_part["falcon_attribute"] = self.md.calculator_data["RARE"]["attribute_shards"][setup_data["falcon_attribute"]] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
+            cost_per_part["falcon_attribute"] = self.md.calculator_data["RARE"]["attribute_shards"][str(setup_data["falcon_attribute"])] * self.get_price("SHARD_FALCON", setup_data, "buy", "bazaar")
 
 
         total_cost = sum(cost_per_part.values())
