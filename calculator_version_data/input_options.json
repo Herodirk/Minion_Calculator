@@ -112,6 +112,12 @@
         "Glowstone Distillate": "GLOWSTONE_DUST_DISTILLATE",
         "Gabagool Distillate": "CRUDE_GABAGOOL_DISTILLATE"
     },
+    "boolean": [
+        false,
+        true
+    ],
+    "inferno_eyedrops": "boolean",
+    "rising_celsius_override": "boolean",
     "hopper": {
         "None": "NONE",
         "Budget Hopper": "BUDGET_HOPPER",
@@ -160,6 +166,8 @@
         "Power Crystal": "POWER_CRYSTAL",
         "Scorched Power Crystal": "SCORCHED_POWER_CRYSTAL"
     },
+    "free_fuel_beacon": "boolean",
+    "infusion": "boolean",
     "crystal": {
         "None": "NONE",
         "Farm Crystal": "FARM_CRYSTAL",
@@ -169,6 +177,9 @@
         "Winter Crystal": "WINTER_ISLAND_CRYSTAL",
         "Mithril + Winter Crystal": "MITHRIL_WINTER_CRYSTAL"
     },
+    "free_will": "boolean",
+    "postcard": "boolean",
+    "afk": "boolean",
     "afkpet": {
         "None": "NONE",
         "Magma Cube": "PET_MAGMA_CUBE",
@@ -189,6 +200,9 @@
         "Mythic": "MYTHIC",
         "Custom": "CUSTOM_RARITY"
     },
+    "enchanted_clock": "boolean",
+    "special_layout": "boolean",
+    "player_harvests": "boolean",
     "player_looting": [
         0,
         1,
@@ -353,6 +367,8 @@
         "All Skills Exp Boost": "PET_ITEM_ALL_SKILLS_BOOST_COMMON",
         "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST"
     },
+    "expshareitem": "boolean",
+    "scale_time": "boolean",
     "sell_loc": [
         "Best (NPC/Bazaar)",
         "Bazaar",
@@ -367,6 +383,7 @@
         "Buy Order": "sellPrice",
         "Insta Buy": "buyPrice"
     },
+    "bazaar_taxes": "boolean",
     "bazaar_flipper": [
         0,
         1,
@@ -379,5 +396,6 @@
     },
     "time_unit": ["Years", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Harvests"],
     "empty_time_unit": "time_unit",
-    "scaled_time_unit": "time_unit"
+    "scaled_time_unit": "time_unit",
+    "custom_upgrade_toggle": "boolean"
 }

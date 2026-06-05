@@ -439,6 +439,7 @@ XP notes:
 - MOONFLOWER  # correct (2025-12-17)
 - ENCHANTED_MOONFLOWER  # correct (2025-12-17)
 - COMPACTED_MOONFLOWER  # correct (2025-12-21)
+- WATER_LILY, ENCHANTED_WATER_LILY  # correct (2026-6-4)
 - POISONOUS_POTATO  # TODO: check xp amount
 - ENCHANTED_POISONOUS_POTATO  # TODO: check xp amount
 - ENCHANTED_ENDER_PEARL  # correct inaccuracy

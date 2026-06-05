@@ -100,7 +100,7 @@ templateList = {
         "mining_wisdom": 100.1,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Refined Divine drill with Compact X (7 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
         "combat_wisdom": 113.5,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), Rift Necklace (1), cookie (25), god pot (30), Celestial Mason Jar (3), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
         "farming_wisdom": 190,  # Agarimoo Artifact (1), Abicase (1.5), Lunar Legendary Pelt Belt (1 + 3), Lunar Mythic Zorro's Cape during Contest (2 * (1 + 4)), Lunar Mythic Rift Necklace (1 + 6), Lunar Mythic Gillsplash Gloves (4), Blessed Legendary Mk. III farming tool with Cultivating X (3 + 5 + 10), Mythic Sunny armor (4 * 6), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
-        "fishing_wisdom": 91.5,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
+        "fishing_wisdom": 92,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Ship Crew (0.5), Mysterious Package (1)
         "foraging_wisdom": 98.32,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), David's Cloak (5), Foraging Wisdom Boosters armor and equipment (4 + 2), Moonglade Legendary Axe with Absorb X, Foraging Wisdom Boosters and essence shop perk Axed I ((5 + 10 + 1) * 1.02), Efficient Forager (15), Foraging Wisdom (6.5)
         "alchemy_wisdom": 54.5  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
     },
@@ -108,7 +108,7 @@ templateList = {
         "mining_wisdom": 1268,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Cavern Wisdom (6.5), Seasoned Mineman (15)
         "combat_wisdom": 1600,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), cookie (25), god pot (30), Celestial Mason Jar (3), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
         "farming_wisdom": 1684,  # Agarimoo Artifact (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
-        "fishing_wisdom": 1432,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Mysterious Package (1)
+        "fishing_wisdom": 1436,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Ship Crew (0.5), Mysterious Package (1)
         "foraging_wisdom": 1268,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Efficient Forager (15), Foraging Wisdom (6.5)
         "alchemy_wisdom": 1136  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
     },
