@@ -136,7 +136,38 @@ templateList = {
         "free_will": True,
         "postcard": True,
         "bazaar_sell_type": "Sell Offer",
-        "bazaar_buy_type": "Buy Order"
+        "bazaar_buy_type": "Buy Order",
+        "sell_form": "Compacted"
+    },
+    "Maxed Solo rdrag Levelling": {
+        "minion": "Cactus",
+        "amount": 32,
+        "fuel": "Hyper Catalyst",
+        "sell_loc": "Best (NPC/Bazaar)",
+        "upgrade1": "Super Compactor 3000",
+        "upgrade2": "Berberis Fuel Injector",
+        "chest": "XX-Large Storage",
+        "beacon": "Beacon V",
+        "beacon_fuel": "Scorched Power Crystal",
+        "infusion": True,
+        "free_will": True,
+        "postcard": True,
+        "crystal": "Cornucopia Crystal",
+        "unique_farming_minions": 1,
+        "expshareitem": True,
+        "taming": 60,
+        "pet_exp_boost": "Epic Farming Exp Boost",
+        "toucan_attribute": 10,
+        "bazaar_sell_type": "Sell Offer",
+        "bazaar_buy_type": "Buy Order",
+        "sell_form": "Compacted",
+        "farming_wisdom": 190,
+        "mayor": "Diana",
+        "levelingpet": "Rose Dragon",
+        "expsharepet": "Rose Dragon",
+        "expsharepetslot2": "Rose Dragon",
+        "expsharepetslot3": "Rose Dragon",
+        "beastmaster": 5
     }
 }
 
@@ -1215,6 +1246,7 @@ class Calculator(tk.Tk):
         seconds_per_action = base_speed / (1 + speed_boost / 100)
         if minion_fuel_id == "INFERNO_FUEL":
             seconds_per_action /= 1 + self.md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
+        self.huim.logger.debug(f"Base action time: {base_speed}")
         self.huim.logger.debug(f"Unrounded action time: {seconds_per_action}")
         seconds_per_action = round(seconds_per_action * 20) / 20
         if seconds_per_action < 0.05:

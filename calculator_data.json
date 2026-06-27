@@ -3343,7 +3343,7 @@
                 "COBBLESTONE": {"STONE": 1},
                 "SAND": {"GLASS": 1},
                 "SAND:1": {"GLASS": 1},
-                "CLAY_BALL": {"BRICKS": 1},
+                "CLAY_BALL": {"BRICK": 1},
                 "IRON_ORE": {"IRON_INGOT": 1},
                 "GOLD_ORE": {"GOLD_INGOT": 1},
                 "CACTUS": {"INK_SACK:2": 1},
@@ -3547,7 +3547,7 @@
                 "COBBLESTONE": {"STONE": 1},
                 "SAND": {"GLASS": 1},
                 "SAND:1": {"GLASS": 1},
-                "CLAY_BALL": {"BRICKS": 1},
+                "CLAY_BALL": {"BRICK": 1},
                 "IRON_ORE": {"IRON_INGOT": 1},
                 "GOLD_ORE": {"GOLD_INGOT": 1},
                 "CACTUS": {"INK_SACK:2": 1},
@@ -7366,8 +7366,7 @@
             "3": 4
         },
         "tags": [
-            "mob_minion",
-            "combat_minion"
+            "mob_minion"
         ],
         "minion_costs": {
             "1": {

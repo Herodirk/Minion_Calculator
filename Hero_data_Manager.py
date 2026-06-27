@@ -368,8 +368,8 @@ COW_MINION: minion_costs: 12  # correct
 
 INFERNO_FUEL  # exact item ID does not exist
 MITHRIL_WINTER_CRYSTAL  # exact item ID does not exist
-EVERBURNING_FLAME: affected_minions  # TODO: check affected minions
-AUTO_SMELTER, DWARVEN_COMPACTOR: replacement_list: {CLAY_BALL: BRICKS}  # correct (2026-1-29)
+EVERBURNING_FLAME: affected_minions  # correct that spider minion does not have "combat_minion" tag (2026-6-23)
+AUTO_SMELTER, DWARVEN_COMPACTOR: replacement_list: {CLAY_BALL: BRICK}  # correct (2026-1-29)
 COMPACTOR: compacting_list  # does not make Hay Bales anymore
 SUPER_COMPACTOR_3000, DWARVEN_COMPACTOR: compacting_list  # correct that they do not compact the following items
 - WHEAT -> ENCHANTED_BREAD
