@@ -8,9 +8,10 @@ Notable features:<br>
 | Near infinite customizable setup<br>
 | Corrupt soil calculations<br>
 | Inferno minions calculations<br>
-| Live prices thought Hypixel's and SkyCofl's API<br>
+| Live prices thought Hypixel's API and SkyCofl's API<br>
 | Pet leveling with exp share calculations<br>
 | Setup cost calculations<br>
+| Custom inputs
 Visit https://herodirk.github.io/ for an online manual.<br>
 To start the calculator: run the file `main.py` with a local python interpreter
 
@@ -30,7 +31,7 @@ Current major limitations:<br>
 Lesser limitations are listed on the support discord server,<br>
 the invite to that server is at the bottom of https://herodirk.github.io/
 
-This program, consisting of `main.py`, `Hero_UI_Manager.py`, `HSB_minion_data.py` and `official_calculator_add_ons.py`, are protected under a GNU GENERAL PUBLIC LICENSE (Version 3).<br>
+This program, consisting of all the files in this repository, are protected under a GNU GENERAL PUBLIC LICENSE (Version 3).<br>
 Herodirk: I dont want any legal trouble, just ask me for permission if you want to copy parts of the code for your own public projects. Copying for private projects is fine.
 
 Herodirk is not affiliated with any of the following:
