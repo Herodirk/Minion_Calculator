@@ -1033,7 +1033,8 @@ class H_UI_M():
         if edit_key == "":
             return
         if edit_val == "":
-            del dict_to_edit[edit_key]
+            if edit_key in dict_to_edit:
+                del dict_to_edit[edit_key]
         else:
             try:
                 edit_val = float(edit_val)

@@ -97,7 +97,7 @@ templateList = {
         "afk": True
     },
     "Solo Wisdom": {  # consists of non-random sources of wisdom that can be achieved alone on the private island, excluding pets
-        "mining_wisdom": 100.1,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Refined Divine drill with Compact X (7 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
+        "mining_wisdom": 103.1,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Refined Divine drill with Compact X (10 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
         "combat_wisdom": 113.5,  # Hunter Ring (5), Abicase (1.5), Bubba Blister (2), Rift Necklace (1), cookie (25), god pot (30), Celestial Mason Jar (3), Veteran (10), unique slayer tier kills (6 + 6 + 6 + 12 + 6)
         "farming_wisdom": 190,  # Agarimoo Artifact (1), Abicase (1.5), Lunar Legendary Pelt Belt (1 + 3), Lunar Mythic Zorro's Cape during Contest (2 * (1 + 4)), Lunar Mythic Rift Necklace (1 + 6), Lunar Mythic Gillsplash Gloves (4), Blessed Legendary Mk. III farming tool with Cultivating X (3 + 5 + 10), Mythic Sunny armor (4 * 6), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
         "fishing_wisdom": 92,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Ship Crew (0.5), Mysterious Package (1)
@@ -1449,7 +1449,7 @@ class Calculator(tk.Tk):
                 specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
             for cooldown_item, cooldown_amount in effect_data["items"].items():
                 if cooldown_item == "RAW_SOULFLOW":
-                    specific_multiplier *= self.get_drop_multiplier(minion, upgrade_ids, afk_toggle, setup_data)
+                    specific_multiplier *= self.get_drop_multiplier(minion, [upgrade_id for upgrade_id in upgrade_ids if upgrade_id not in ["LESSER_SOULFLOW_ENGINE", "SOULFLOW_ENGINE"]], afk_toggle, setup_data)
                 self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
         return
 
@@ -1674,6 +1674,8 @@ class Calculator(tk.Tk):
         """
         skill_xp = {}
         for itemtype, amount in drops_list.items():
+            if "xp" not in self.md.calculator_data[itemtype]:
+                continue
             for xptype, value in self.md.calculator_data[itemtype]["xp"].items():
                 if value == 0:
                     continue
@@ -1894,13 +1896,12 @@ class Calculator(tk.Tk):
         tier_loop = range(1, minion_tier + 1)
         for tier in tier_loop:
             tiered_coin_cost[tier] = 0.0
-            if "extra_minion_costs" in self.md.calculator_data[minion_type]:
-                if str(tier) in self.md.calculator_data[minion_type]["extra_minion_costs"]:
-                    if "COINS" in self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]:
-                        tiered_coin_cost[tier] += self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]["COINS"]
-                    if len(self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]) > 1 or "COINS" not in self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)]:
-                        tiered_extra_cost[tier] = {cost_type.replace('_', ' ').title(): amount for cost_type, amount in self.md.calculator_data[minion_type]["extra_minion_costs"][str(tier)].items() if cost_type != "COINS"}
             for item, amount in self.md.calculator_data[minion_type]["minion_costs"][str(tier)].items():
+                if item not in self.md.calculator_data:
+                    if tier not in tiered_extra_cost:
+                        tiered_extra_cost[tier] = {}
+                    tiered_extra_cost[tier][item] = amount
+                    continue
                 if item not in cost_cache:
                     cost_cache[item] = self.get_price(item, setup_data, "buy", "bazaar")
                 tiered_coin_cost[tier] += amount * cost_cache[item]
@@ -1914,7 +1915,7 @@ class Calculator(tk.Tk):
                         tiered_extra_cost[tier][material] = 0
                     tiered_extra_cost[tier][material] += amount
         if len(tiered_extra_cost) != 0:
-            extra_cost = ", ".join([f"{amount * minion_amount} {material}" for material, amount in tiered_extra_cost[minion_tier].items()])
+            extra_cost = ", ".join([f"{amount * minion_amount} {material.replace('_', ' ').title()}" for material, amount in tiered_extra_cost[minion_tier].items()])
         cost_per_part["minion"] = tiered_coin_cost[minion_tier]
 
         # Infinite fuel cost

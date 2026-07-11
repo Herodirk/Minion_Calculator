@@ -377,6 +377,12 @@ SUPER_COMPACTOR_3000, DWARVEN_COMPACTOR: compacting_list  # correct that they do
 - HEMOGLASS -> HEMOBOMB
 - ENCHANTED_GHAST_TEAR -> SILVER_FANG
 
+WOOD_PICKAXE: prices  # Lumber Merchant
+WOOD_SPADE: prices  # Lumber Merchant
+WOOD_HOE: prices  # Lumber Merchant
+WOOD_SWORD: prices  # Lumber Merchant
+WOOD_AXE: prices  # Lumber Merchant
+FISHING_ROD: recipe  # +/- 3 sticks
 INFERNO_FUEL: prices  # this custom price will be automatically updated by the calculator based on grade and distilate
 FLINT_SHOVEL: recipe  # +/- 2 sticks
 HUNTER_KNIFE: prices  # Rusty

@@ -266,7 +266,7 @@ def craft_material_amount(calculator):
     setup_data = calculator.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])  # TODO: make it get calculated_ID, to stop desync inputs and output
     materials = calculator.md.minion_cost_sum(setup_data["minion"], setup_data["miniontier"])
     extra_costs_string = setup_data["extracost"]
-    materials_string = ", ".join([f"{amount * setup_data["amount"]} {calculator.md.calculator_data[material]["display"]}" for material, amount in materials.items()])
+    materials_string = ", ".join([f"{amount * setup_data["amount"]} {calculator.md.calculator_data[material]["display"]}" for material, amount in materials.items() if material in calculator.md.calculator_data])
     if extra_costs_string != "None":
         materials_string += ", " + extra_costs_string
     calculator.collect_addon_output("Minion Crafting Materials", materials_string)
