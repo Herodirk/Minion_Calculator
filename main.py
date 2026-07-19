@@ -972,43 +972,67 @@ class Calculator(tk.Tk):
         action : str, optional
             Type of transaction. "buy" or "sell". The default is "buy".
         location : str, optional
-            Location of the transaction, "npc", "bazaar", "custom", "best". The default is "bazaar".
+            Location of the transaction, "npc", "bazaar", "ah", "custom". The default is "bazaar".
         force : bool, optional
-            Toggle to force the location and action, if location is not found, this function returns 0
+            Toggle to force the location and action, if price point is not found, this function returns 0
 
         Returns
         -------
         float
             price of the item.
         """
-        multiplier = 1
-        if location == "bazaar":
-            if action == "buy":
-                location = setup_data["bazaar_buy_type"]
-            elif action == "sell":
-                location = setup_data["bazaar_sell_type"]
-                if setup_data["bazaar_taxes"]:
-                    bazaar_tax = 0.0125 - 0.00125 * setup_data["bazaar_flipper"]
-                    bazaar_tax *= self.md.calculator_data[setup_data["mayor"]]["tax_multiplier"]
-                    multiplier = 1 - bazaar_tax
-        elif location == "npc" and action == "buy":
-            multiplier = 2
-        if item_ID in self.md.calculator_data:
-            if location in self.md.calculator_data[item_ID]["prices"]:
-                return multiplier * self.md.calculator_data[item_ID]["prices"][location]
-            elif force:
-                self.huim.logger.warning("no forced cost found for " + item_ID)
-                return 0
-            elif "custom" in self.md.calculator_data[item_ID]["prices"]:
-                return self.md.calculator_data[item_ID]["prices"]["custom"]
-            elif "npc" in self.md.calculator_data[item_ID]["prices"]:
-                return multiplier * self.md.calculator_data[item_ID]["prices"]["npc"]
-            else:
-                self.huim.logger.warning("no cost found for " + item_ID)
-                return 0
-        else:
+        if item_ID not in self.md.calculator_data:
             self.huim.logger.error(item_ID + " not in calculator data")
             return 0
+        if "prices" not in self.md.calculator_data[item_ID]:
+            self.huim.logger.error("No prices found for " + item_ID)
+            return 0
+
+        price_point = location
+        if price_point == "bazaar":
+            if action == "buy":
+                price_point = setup_data["bazaar_buy_type"]
+            elif action == "sell":
+                price_point = setup_data["bazaar_sell_type"]
+
+        price = 0
+        if price_point in self.md.calculator_data[item_ID]["prices"]:
+            price = self.md.calculator_data[item_ID]["prices"][price_point]
+        elif force:
+            self.huim.logger.warning("no forced cost found for " + item_ID)
+        else:
+            for backup_price_point in ["sellPrice", "buyPrice", "ah", "custom", "npc", "warn"]:
+                if backup_price_point in self.md.calculator_data[item_ID]["prices"]:
+                    price = self.md.calculator_data[item_ID]["prices"][backup_price_point]
+                    break
+            if backup_price_point == "warn":
+                self.huim.logger.warning("no cost found for " + item_ID)
+
+        if location == "bazaar" and action == "sell":
+            price = self.apply_bazaar_tax(price, setup_data)
+        elif location == "ah" and action == "sell":
+            price = self.apply_ah_tax(price, setup_data)
+        elif location == "npc" and action == "buy":
+            price = 2 * price
+        return price
+
+    def apply_bazaar_tax(self, price, setup_data):
+        if not setup_data["bazaar_taxes"]:
+            return price
+        bazaar_tax = 0.0125 - 0.00125 * setup_data["bazaar_flipper"]
+        bazaar_tax *= self.md.calculator_data[setup_data["mayor"]]["tax_multiplier"]
+        return price * (1 - bazaar_tax)
+
+    def apply_ah_tax(self, price, setup_data):
+        if not setup_data["bazaar_taxes"]:
+            return price
+        if price > 10000000:
+            starting_fee_tax = 0.025
+        elif price > 1000000:
+            starting_fee_tax = 0.02
+        else:
+            starting_fee_tax = 0.01
+        return max(1000000, price * 0.99) - price * starting_fee_tax
 
     def get_speed_boosts(self, minion, upgrade_ids, upgrade_effects, afk_toggle, clock_override, setup_data):
         """
@@ -1842,9 +1866,11 @@ class Calculator(tk.Tk):
                 if combined_pet_id not in used_pet_prices:
                     used_pet_prices[combined_pet_id] = f"Price not found"
             else:
-                pet_profit += pet_info["levelled_pets"] * (self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["max"] - self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["min"])
+                pet_price_max = self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["max"]
+                pet_price_min = self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["min"]
+                pet_profit += pet_info["levelled_pets"] * (self.apply_ah_tax(pet_price_max, setup_data) - pet_price_min)
                 if combined_pet_id not in used_pet_prices:
-                    used_pet_prices[combined_pet_id] = f"{self.huim.reduced_number(self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["min"])} - {self.huim.reduced_number(self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["max"])}"
+                    used_pet_prices[combined_pet_id] = f"{self.huim.reduced_number(pet_price_min)} - {self.huim.reduced_number(pet_price_max)} ({self.huim.reduced_number(self.apply_ah_tax(pet_price_max, setup_data))})"
             if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
@@ -1948,7 +1974,7 @@ class Calculator(tk.Tk):
         E(X)= 1/p
         """
         free_will_price = self.get_price("FREE_WILL", setup_data, "buy", "bazaar")
-        postcard_price = self.get_price("POSTCARD", setup_data, "buy", "custom", True)
+        postcard_price = self.get_price("POSTCARD", setup_data, "sell", "ah")
         free_will_optimal_tier = 0
         if postcard_price == 0:
             # If no price found, use the free will price
@@ -1988,14 +2014,14 @@ class Calculator(tk.Tk):
 
         # Potato Talisman cost
         if setup_data["potato_accessory"] != "NONE":
-            cost_per_part["potato_accessory"] = self.get_price(setup_data["potato_accessory"], setup_data, "buy", "custom", True)
+            cost_per_part["potato_accessory"] = self.get_price(setup_data["potato_accessory"], setup_data, "buy", "ah")
 
         # Pet Item costs
         for pet_slot in setup_pets.keys():
             if self.md.has_data_tag(setup_pets[pet_slot]["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet":
-                cost_per_part["pet_exp_boost"] = self.get_price(setup_data["pet_exp_boost"], setup_data, "buy", "custom", True)
+                cost_per_part["pet_exp_boost"] = self.get_price(setup_data["pet_exp_boost"], setup_data, "buy", "ah")
             elif setup_data["expshareitem"]:
                 if "expshareitem" not in cost_per_part:
                     cost_per_part["expshareitem"] = 0
@@ -2040,7 +2066,7 @@ class Calculator(tk.Tk):
             for pet_slot in ["levelingpet", "expsharepet", "expsharepetslot2", "expsharepetslot3"]:
                 self.update_pet_price(setup_data[pet_slot], setup_data[pet_slot + "_rarity"])
             if self.md.has_data_tag(setup_data["pet_exp_boost"], "auction_price_upon_request") and (time.time() - self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] > self.API_cooldown.get()):
-                self.md.calculator_data[setup_data["pet_exp_boost"]]["prices"]["custom"] = self.call_auction_house(setup_data["pet_exp_boost"])
+                self.md.calculator_data[setup_data["pet_exp_boost"]]["prices"]["ah"] = self.call_auction_house(setup_data["pet_exp_boost"])
                 self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] = time.time()
 
         # extracting often used minion constants
@@ -2316,8 +2342,8 @@ class Calculator(tk.Tk):
         self.md.calculator_data[item_id]["prices"]["sellPrice"] = 0
         for material_id, amount in self.md.calculator_data[item_id]["recipe"].items():
             if self.md.has_data_tag(material_id, "auction_price"):
-                self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["custom"]
-                self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["custom"]
+                self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["ah"]
+                self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["ah"]
                 continue
             self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["buyPrice"]
             self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["sellPrice"]
@@ -2341,7 +2367,7 @@ class Calculator(tk.Tk):
         self.call_bazaar()
         self.huim.logger.info("Updating Auction House prices")
         for item_id in self.AH_items:
-            self.md.calculator_data[item_id]["prices"]["custom"] = self.call_auction_house(item_id)
+            self.md.calculator_data[item_id]["prices"]["ah"] = self.call_auction_house(item_id)
         self.huim.logger.info("Updating Recipe prices")
         for item_id in self.recipe_items:
             self.update_recipe_price(item_id)
