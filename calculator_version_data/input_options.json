@@ -142,6 +142,7 @@
         "Berberis Fuel Injector": "BERBERIS_FUEL_INJECTOR",
         "Enchanted Shears": "ENCHANTED_SHEARS",
         "Sleepy Hollow": "SLEEPY_HOLLOW",
+        "Super Jacob Entertainment System": "SUPER_JACOB_SYSTEM",
         "Hunter Knife": "HUNTER_KNIFE"
     },
     "upgrade1": "upgrade",
@@ -183,7 +184,6 @@
     "afkpet": {
         "None": "NONE",
         "Magma Cube": "PET_MAGMA_CUBE",
-        "Mooshroom Cow": "PET_MOOSHROOM_COW",
         "Ocelot": "PET_OCELOT",
         "Pigman": "PET_PIGMAN",
         "Rabbit": "PET_RABBIT",

@@ -3197,6 +3197,25 @@
         "display": "Spooky Fragment",
         "prices": {}
     },
+    "BOTROOT": {
+        "display": "Botroot",
+        "prices": {}
+    },
+    "ENCHANTED_PAPER": {
+        "display": "Enchanted Paper",
+        "prices": {}
+    },
+    "CHIRPING_STEREO": {
+        "display": "Chirping Stereo",
+        "prices": {},
+        "tags": [
+            "auction_price"
+        ]
+    },
+    "PLANTBOY_ADVANCE": {
+        "display": "PlantBoy Advance",
+        "prices": {}
+    },
     "ENCHANTED_CHARCOAL": {
         "display": "Enchanted Charcoal",
         "speed_boost": 20,
@@ -3910,6 +3929,28 @@
         },
         "prices": {
             "npc": 0
+        }
+    },
+    "SUPER_JACOB_SYSTEM": {
+        "display": "Super Jacob Entertainment System",
+        "speed_boost": 0,
+        "drop_multiplier": 1,
+        "upgrade_effects": {
+            "cooldown": {
+                "items": {
+                    "JACOBS_TICKET": 1
+                },
+                "offline_cooldown": 10800,
+                "online_cooldown": 10800
+            }
+        },
+        "prices": {},
+        "recipe": {
+            "BOTROOT": 64,
+            "ENCHANTED_PAPER": 32,
+            "ENCHANTED_IRON_BLOCK": 3,
+            "CHIRPING_STEREO": 2,
+            "PLANTBOY_ADVANCE": 1
         }
     },
     "HUNTER_KNIFE": {
@@ -8826,7 +8867,7 @@
     "PET_FROG": {
         "display": "Frog",
         "pet_type": "foraging",
-        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
         "pet_prices": {}
     },
     "PET_GHOUL": {
@@ -9045,32 +9086,6 @@
         "display": "Mooshroom Cow",
         "pet_type": "farming",
         "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
-        "boosting_pet": {
-            "COMMON": [
-                0,
-                0.2
-            ],
-            "UNCOMMON": [
-                0,
-                0.2
-            ],
-            "RARE": [
-                0,
-                0.3
-            ],
-            "EPIC": [
-                0,
-                0.3
-            ],
-            "LEGENDARY": [
-                0,
-                0.3
-            ]
-        },
-        "affected_minions": [
-            "MUSHROOM_MINION",
-            "MYCELIUM_MINION"
-        ],
         "pet_prices": {}
     },
     "PET_MOSQUITO": {
