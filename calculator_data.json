@@ -2202,7 +2202,7 @@
         "display": "Poisonous Potato",
         "prices": {},
         "xp": {
-            "farming": 0
+            "farming": 0.1
         },
         "compacting": {
             "compact": {
@@ -2224,7 +2224,7 @@
         "display": "Enchanted Poisonous Potato",
         "prices": {},
         "xp": {
-            "farming": 0
+            "farming": 16
         },
         "compact_tier": 1
     },
@@ -2335,7 +2335,7 @@
             "combat": 0
         },
         "tags": [
-            "auction_price"
+            "auction_price_upon_request"
         ],
         "compact_tier": 0
     },
@@ -3840,7 +3840,7 @@
         },
         "prices": {},
         "tags": [
-            "auction_price"
+            "auction_price_upon_request"
         ]
     },
     "LESSER_SOULFLOW_ENGINE": {
@@ -4158,7 +4158,7 @@
         ],
         "prices": {},
         "tags": [
-            "auction_price"
+            "auction_price_upon_request"
         ]
     },
     "POTATO_RING": {
@@ -4169,7 +4169,7 @@
         ],
         "prices": {},
         "tags": [
-            "auction_price"
+            "auction_price_upon_request"
         ]
     },
     "INFERNO_FUEL_BLOCK": {
@@ -8272,7 +8272,8 @@
             "8": 38,
             "9": 33,
             "10": 33,
-            "11": 27
+            "11": 27,
+            "12": 23
         },
         "notes": {
             "AFK": "+1 wood drop"
@@ -8315,6 +8316,10 @@
             },
             "11": {
                 "ENCHANTED_OAK_LOG": 512
+            },
+            "12": {
+                "ENCHANTED_OAK_LOG": 1024,
+                "COIN": 2000000
             }
         }
     },
@@ -8334,7 +8339,8 @@
             "8": 38,
             "9": 33,
             "10": 33,
-            "11": 27
+            "11": 27,
+            "12": 23
         },
         "notes": {
             "AFK": "+1 wood drop"
@@ -8377,6 +8383,10 @@
             },
             "11": {
                 "ENCHANTED_SPRUCE_LOG": 512
+            },
+            "12": {
+                "ENCHANTED_SPRUCE_LOG": 1024,
+                "COIN": 2000000
             }
         }
     },
@@ -8396,7 +8406,8 @@
             "8": 38,
             "9": 33,
             "10": 33,
-            "11": 27
+            "11": 27,
+            "12": 23
         },
         "notes": {
             "AFK": "+1 wood drop"
@@ -8439,6 +8450,10 @@
             },
             "11": {
                 "ENCHANTED_BIRCH_LOG": 512
+            },
+            "12": {
+                "ENCHANTED_BIRCH_LOG": 1024,
+                "COIN": 2000000
             }
         }
     },
@@ -8458,7 +8473,8 @@
             "8": 38,
             "9": 33,
             "10": 33,
-            "11": 27
+            "11": 27,
+            "12": 23
         },
         "notes": {
             "AFK": "+1 wood drop"
@@ -8501,6 +8517,10 @@
             },
             "11": {
                 "ENCHANTED_DARK_OAK_LOG": 512
+            },
+            "12": {
+                "ENCHANTED_DARK_OAK_LOG": 1024,
+                "COIN": 2000000
             }
         }
     },
@@ -8520,7 +8540,8 @@
             "8": 38,
             "9": 33,
             "10": 33,
-            "11": 27
+            "11": 27,
+            "12": 23
         },
         "notes": {
             "AFK": "+1 wood drop"
@@ -8563,6 +8584,10 @@
             },
             "11": {
                 "ENCHANTED_ACACIA_LOG": 512
+            },
+            "12": {
+                "ENCHANTED_ACACIA_LOG": 1024,
+                "COIN": 2000000
             }
         }
     },
@@ -8582,7 +8607,8 @@
             "8": 38,
             "9": 33,
             "10": 33,
-            "11": 27
+            "11": 27,
+            "12": 23
         },
         "notes": {
             "AFK": "+1 wood drop"
@@ -8625,6 +8651,10 @@
             },
             "11": {
                 "ENCHANTED_JUNGLE_LOG": 512
+            },
+            "12": {
+                "ENCHANTED_JUNGLE_LOG": 1024,
+                "COIN": 2000000
             }
         }
     },

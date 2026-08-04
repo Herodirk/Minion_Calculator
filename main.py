@@ -995,6 +995,9 @@ class Calculator(tk.Tk):
             elif action == "sell":
                 price_point = setup_data["bazaar_sell_type"]
 
+        if self.md.has_data_tag(item_ID, "auction_price_upon_request"):
+            self.update_auction_price(item_ID)
+
         price = 0
         if price_point in self.md.calculator_data[item_ID]["prices"]:
             price = self.md.calculator_data[item_ID]["prices"][price_point]
@@ -2065,9 +2068,6 @@ class Calculator(tk.Tk):
             self.update_prices(cooldown_warning=False, in_gui=inGUI)
             for pet_slot in ["levelingpet", "expsharepet", "expsharepetslot2", "expsharepetslot3"]:
                 self.update_pet_price(setup_data[pet_slot], setup_data[pet_slot + "_rarity"])
-            if self.md.has_data_tag(setup_data["pet_exp_boost"], "auction_price_upon_request") and (time.time() - self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] > self.API_cooldown.get()):
-                self.md.calculator_data[setup_data["pet_exp_boost"]]["prices"]["ah"] = self.call_auction_house(setup_data["pet_exp_boost"])
-                self.md.calculator_data[setup_data["pet_exp_boost"]]["price_last_updated"] = time.time()
 
         # extracting often used minion constants
         minion_type = setup_data["minion"]
@@ -2176,7 +2176,8 @@ class Calculator(tk.Tk):
             "fuelcost": fuel_cost,
             "total_profit": total_profit,
             "fuelamount": needed_fuel,
-            "pets_levelled": {pet_slot: setup_pets[pet_slot]["levelled_pets"] for pet_slot in setup_pets.keys()}
+            "pets_levelled": {pet_slot: setup_pets[pet_slot]["levelled_pets"] for pet_slot in setup_pets.keys()},
+            "time_seconds": empty_time_seconds
         }
 
         self.huim.deepmultiply(outputs, timeratio)
@@ -2348,6 +2349,11 @@ class Calculator(tk.Tk):
             self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["buyPrice"]
             self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["sellPrice"]
         return
+
+    def update_auction_price(self, item_id):
+        if time.time() - self.md.calculator_data[item_id]["price_last_updated"] > self.API_cooldown.get():
+            self.md.calculator_data[item_id]["prices"]["ah"] = self.call_auction_house(item_id)
+            self.md.calculator_data[item_id]["price_last_updated"] = time.time()
 
     def update_prices(self, cooldown_warning=True, in_gui=True):
         """

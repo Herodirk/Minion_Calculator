@@ -21,6 +21,8 @@ import math
 def init(calculator):
     calculator.huim.new_edit_vars("basic_minion_loop", {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: basic_minion_loop(calculator, results))
     calculator.huim.new_edit_vars("inferno_minion_loop", {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: inferno_minion_loop(calculator, results))
+    calculator.huim.new_edit_vars("collection_maxing", {"sort_by": {"dtype": str, "display": "Sort By", "initial": "Fastest Time", "options": ["Fastest Time", "Lowest Setup Cost", "Lowest Total Cost"]}, "time_limit": {"dtype": float, "display": "Time Limit", "initial": 0, "options": None}, "setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: collection_maxing(calculator, results))
+    calculator.huim.new_edit_vars("partial_setup_cost", {setup_part_key: {"dtype": bool, "display": setup_part_display, "initial": True, "options": None} for setup_part_key, setup_part_display in {"minion": "Minion", "fuel": "Fuel", "hopper": "Hopper", "upgrade1": "Upgrade 1", "upgrade2": "Upgrade 2", "infusion": "Infusion", "free_will": "Free Will", "chest": "Chest", "beacon": "Beacon", "crystal": "Crystal", "postcard": "Postcard", "potato_accessory": "Potato Accessory","pet_exp_boost": "Pet EXP Boost","expshareitem": "EXP Share Item","toucan_attribute": "Toucan Shards","falcon_attribute": "Falcon Shards"}.items()}, lambda results: partial_setup_cost(calculator, results))
     return
 
 def old_corrupted_frags(calculator):
@@ -273,45 +275,45 @@ def craft_material_amount(calculator):
     return
 
 def dragon_pet_xp(calculator, gained_xp, left_over_pet_xp, pet_xp_boost, xp_boost_pet_item):
-        """
-        Calculates the pet xp gain on the dragon pets.
+    """
+    Calculates the pet xp gain on the dragon pets.
 
-        Parameters
-        ----------
-        gained_xp : float
-            Gained skill xp of a specific type.
-        left_over_pet_xp : float
-            Left over pet xp on the pet before applying the gained skill xp.
-        pet_xp_boost : float
-            Combined pet xp boost multiplier without pet item.
-        xp_boost_pet_item : float
-            Pet xp boost multiplier from pet item.
+    Parameters
+    ----------
+    gained_xp : float
+        Gained skill xp of a specific type.
+    left_over_pet_xp : float
+        Left over pet xp on the pet before applying the gained skill xp.
+    pet_xp_boost : float
+        Combined pet xp boost multiplier without pet item.
+    xp_boost_pet_item : float
+        Pet xp boost multiplier from pet item.
 
-        Returns
-        -------
-        gained_pet_xp : float
-            Amount of pet xp gained after applying the gained skill xp.
-        left_over_pet_xp : float
-            Left over pet xp on the pet after applying the gained skill xp.
+    Returns
+    -------
+    gained_pet_xp : float
+        Amount of pet xp gained after applying the gained skill xp.
+    left_over_pet_xp : float
+        Left over pet xp on the pet after applying the gained skill xp.
 
-        """
-        drag_lvl_100 = calculator.md.calculator_data["LEGENDARY"]["max_lvl_pet_xp_amount"]
-        drag_lvl_200 = calculator.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"]
-        gained_pet_xp = 0.0
-        skill_xp_per_pet = (drag_lvl_200 + drag_lvl_100 * (xp_boost_pet_item - 1)) / (xp_boost_pet_item * pet_xp_boost)
-        gained_pet_xp = - left_over_pet_xp
-        if left_over_pet_xp <= drag_lvl_100:
-            gained_xp += left_over_pet_xp / pet_xp_boost
-        else:
-            gained_xp += (left_over_pet_xp + drag_lvl_100 * (xp_boost_pet_item - 1)) / (pet_xp_boost * xp_boost_pet_item)
-        gained_pet_xp += (gained_xp // skill_xp_per_pet) * drag_lvl_200
-        left_over_xp = gained_xp % skill_xp_per_pet
-        if left_over_xp <= drag_lvl_100 / pet_xp_boost:
-            left_over_pet_xp = left_over_xp * pet_xp_boost
-        else:
-            left_over_pet_xp = left_over_xp * pet_xp_boost * xp_boost_pet_item + drag_lvl_100 * (1 - xp_boost_pet_item)
-        gained_pet_xp += left_over_pet_xp
-        return gained_pet_xp, left_over_pet_xp
+    """
+    drag_lvl_100 = calculator.md.calculator_data["LEGENDARY"]["max_lvl_pet_xp_amount"]
+    drag_lvl_200 = calculator.md.calculator_data["DRAGON"]["max_lvl_pet_xp_amount"]
+    gained_pet_xp = 0.0
+    skill_xp_per_pet = (drag_lvl_200 + drag_lvl_100 * (xp_boost_pet_item - 1)) / (xp_boost_pet_item * pet_xp_boost)
+    gained_pet_xp = - left_over_pet_xp
+    if left_over_pet_xp <= drag_lvl_100:
+        gained_xp += left_over_pet_xp / pet_xp_boost
+    else:
+        gained_xp += (left_over_pet_xp + drag_lvl_100 * (xp_boost_pet_item - 1)) / (pet_xp_boost * xp_boost_pet_item)
+    gained_pet_xp += (gained_xp // skill_xp_per_pet) * drag_lvl_200
+    left_over_xp = gained_xp % skill_xp_per_pet
+    if left_over_xp <= drag_lvl_100 / pet_xp_boost:
+        left_over_pet_xp = left_over_xp * pet_xp_boost
+    else:
+        left_over_pet_xp = left_over_xp * pet_xp_boost * xp_boost_pet_item + drag_lvl_100 * (1 - xp_boost_pet_item)
+    gained_pet_xp += left_over_pet_xp
+    return gained_pet_xp, left_over_pet_xp
 
 def exact_pet_levelling_inputs(calculator):
     setup_data = calculator.huim.get_from_GUI(["mayor", "levelingpet", "levelingpet_rarity", "expsharepet", "expsharepetslot2", "expsharepetslot3", "expsharepet_rarity", "expsharepetslot2_rarity", "expsharepetslot3_rarity"])
@@ -379,6 +381,127 @@ def exact_pet_levelling(calculator, results, setup_pets):
     calculator.collect_addon_output("Exact Pet Levelling", output_string)
     return
 
-add_ons_package = {"Hero_addons__init__": init, "Minion Crafting": craft_material_amount, "Days to Repay Setup": setup_repay_time, "Basic Minion Loop": basic_minion_loop_inputs, "Bad Luck Inferno": bad_luck_inferno, "Inferno Minion Loop": inferno_minion_loop_inputs, "Exact Pet Levelling": exact_pet_levelling_inputs}
-# "Old Corrupted Frags": old_corrupted_frags
-# "Old Enchanted Hopper": old_enchanted_hopper
+def collection_maxing_inputs(calculator):
+    calculator.huim.edit_vars("collection_maxing")
+    return
+
+def collection_maxing(calculator, results):
+    display_name = "Chili Pepper Collection"
+    setup_data = calculator.huim.get_from_GUI(calculator.ID_order)
+    calculated_setup_profits = {}
+    calculated_setup_costs = {}
+    calculated_collection_max_cost = {}
+    calculated_needed_time = {}
+
+    ordering = results["sort_by"]
+    ordering_data = {"Fastest Time": calculated_needed_time, "Lowest Setup Cost": calculated_setup_costs, "Lowest Total Cost": calculated_collection_max_cost}[ordering]
+    
+    cost_filter = results["setup_cost_limit"]
+    time_filter = results["time_limit"]
+    if cost_filter == 0:
+        cost_filter = math.inf
+    if time_filter == 0:
+        time_filter = math.inf
+    minion_amount_limit = results["amount_limit"]
+    if minion_amount_limit < 1:
+        calculator.collect_addon_output(display_name, "Positive minion amount limit is required")
+        return
+    markdown_output = results["markdown_output"]
+    setup_data["minion"] = "INFERNO_MINION"
+    setup_data["fuel"] = "INFERNO_FUEL"
+    setup_data["inferno_grade"] = "HYPERGOLIC_GABAGOOL"
+    setup_data["chest"] = "XXLARGE_ENCHANTED_CHEST"
+    setup_data["rising_celsius_override"] = True
+    setup_data["sell_form"] = 1
+    setup_data["scale_time"] = False
+    
+    loop_tiers = range(1, 12)
+    loop_amounts = range(1, minion_amount_limit + 1)
+    for loop_tier in loop_tiers:
+        setup_data["miniontier"] = loop_tier
+        for loop_amount in loop_amounts:
+            setup_data["amount"] = loop_amount
+            outputs = calculator.calculate(setup_data=setup_data, return_outputs=True)
+            cost = outputs["setupcost"]
+            needed_time_scaling = 20000 / outputs["items"]["CHILI_PEPPER"]
+            needed_time = setup_data["empty_time_amount"] * needed_time_scaling
+            if cost < cost_filter and needed_time < time_filter:
+                calculated_setup_costs[f"{loop_tier}, {loop_amount}"] = cost
+                calculated_setup_profits[f"{loop_tier}, {loop_amount}"] = needed_time_scaling * outputs["total_profit"]
+                calculated_collection_max_cost[f"{loop_tier}, {loop_amount}"] = cost - needed_time_scaling * outputs["total_profit"]
+                calculated_needed_time[f"{loop_tier}, {loop_amount}"] = needed_time
+
+    if len(calculated_collection_max_cost) == 0:
+        calculator.collect_addon_output(display_name, "No setups pass the cost filter")
+        return
+    setup_data.update(calculator.decode_id(outputs["calculated_ID"]))
+    setup_data.update(outputs)
+    setup_data["bazaar_update_txt"] = calculator.bazaar_update_txt.get()
+    output_str = calculator.text_output(calculation_data=setup_data, output_switches={}, output_order={
+            "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
+            "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
+            "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
+            "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
+                    " lvl ": {"afkpet_lvl"},
+                    "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
+            "player_harvests": {"\n> ": ["player_looting"]},
+            "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
+            "mayor": None,
+            "Leveling pet: ": {
+                "%": [["levelingpet_rarity", "levelingpet"]],
+                "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
+                "%\n> Exp Share Pets: ": [["expsharepet_rarity", "expsharepet"], ["expsharepetslot2_rarity", "expsharepetslot2"], ["expsharepetslot3_rarity", "expsharepetslot3"]]
+            },
+            "used_pet_prices": None,
+            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
+            }, markdown=markdown_output, to_terminal=False)
+    if markdown_output:
+        output_str += "\n```"
+    else:
+        output_str += "\n"
+    output_str += f"\nTier, Amount (limit: {calculator.huim.reduced_number(minion_amount_limit)}): max collection cost, time (limit: {calculator.huim.reduced_number(time_filter)} {setup_data["empty_time_unit"]}), setup cost (limit: {calculator.huim.reduced_number(cost_filter)}), profit"
+
+    for _ in range(10):
+        if len(ordering_data) == 0:
+            break
+        top_minion = min(ordering_data, key=ordering_data.get)
+        output_str += "\n" + top_minion + ": " + calculator.huim.reduced_number(calculated_collection_max_cost[top_minion]) + ", " + f"{calculator.huim.reduced_number(calculated_needed_time[top_minion])} {setup_data["empty_time_unit"]}" + ", " + calculator.huim.reduced_number(calculated_setup_costs[top_minion]) + ", " + calculator.huim.reduced_number(calculated_setup_profits[top_minion])
+        del ordering_data[top_minion]
+    if markdown_output:
+        output_str += "\n```"
+    output_str += f"\n Ordered by: {ordering}"
+    if calculator.output_to_clipboard.get():
+        calculator.clipboard_clear()
+        calculator.clipboard_append(output_str)
+    calculator.huim.logger.info("\n" + output_str)
+    calculator.collect_addon_output(display_name, "See terminal")
+    return
+
+def partial_setup_cost_inputs(calculator):
+    calculator.huim.edit_vars("partial_setup_cost")
+    return
+
+def partial_setup_cost(calculator, results):
+    outputs = calculator.huim.get_from_GUI(["setupcost_breakdown"])
+    partial_cost = 0
+    used_parts = []
+    for setup_part, state in results.items():
+        if state and setup_part in outputs["setupcost_breakdown"]:
+            partial_cost += outputs["setupcost_breakdown"][setup_part]
+            used_parts.append(calculator.var_dict[setup_part].get_display())
+    calculator.collect_addon_output("Partial Setup Cost", calculator.huim.reduced_number(partial_cost) + " for " + ", ".join(used_parts))
+    return
+
+add_ons_package = {
+    "Hero_addons__init__": init,
+    "Minion Crafting": craft_material_amount,
+    "Partial Setup Cost": partial_setup_cost_inputs,
+    "Days to Repay Setup": setup_repay_time,
+    "Basic Minion Loop": basic_minion_loop_inputs,
+    "Bad Luck Inferno": bad_luck_inferno,
+    "Inferno Minion Loop": inferno_minion_loop_inputs,
+    "Exact Pet Levelling": exact_pet_levelling_inputs,
+    "Chili Pepper Collection": collection_maxing_inputs,
+}
+# "Old Corrupted Frags": old_corrupted_frags,
+# "Old Enchanted Hopper": old_enchanted_hopper,
