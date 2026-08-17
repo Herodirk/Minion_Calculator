@@ -21,7 +21,7 @@ try:
     import json
     import Hero_data_Manager as HDM
     import Hero_UI_Manager as HPM
-    import official_calculator_add_ons as Hero_addons
+    import official_calculator_add_ons as Hero_add_ons
 except ModuleNotFoundError as import_error:
     missing_package = import_error.name
     if missing_package in ["Hero_data_Manager", "Hero_UI_Manager", "official_calculator_add_ons"]:
@@ -32,12 +32,16 @@ except ModuleNotFoundError as import_error:
 
 #%% Settings
 
-external_add_ons = {**Hero_addons.add_ons_package}
-# add-ons are function that use the results of the main calculation
-# add-ons can have no output or send output to the calculator through collect_addon_output
-# add-ons are stored as {display name: function reference}
-# the name will show up on the button, the funtion will only get the argument calculator=self sent to it.
-# the support for this is limited and will be improved later
+external_add_on_classes = {"official": Hero_add_ons.Calc_add_ons}
+# Add-ons are functions that use the main calculator for more specific calculations.
+# Add-ons can have no output or send output to the calculator through collect_add_on_output.
+# Add-ons are stored in classes:
+# - the __init__ function of the class should accept the argument `calculator=self` where self is the root of the calculator
+# - the data about the add-ons is taken from .add_ons_data, which should be a dictionary with the following structure
+#       display name of add-on: {"function": function reference, "auto_run": "pre" or "post"}
+#   the display name will be shown on the button,
+#   the function referenced will be called without any arguments,
+#   "pre" or "post" determine if the auto-run option will happen before or after the main calculation
 
 # Setup Templates
 templateList = {
@@ -171,10 +175,6 @@ templateList = {
     }
 }
 
-
-# and the custom prices in calculator data (see HSB_minion_data.py)
-
-
 #%% Main Class
 
 class Calculator(tk.Tk):
@@ -193,6 +193,7 @@ class Calculator(tk.Tk):
             "window_width": 1450,
             "window_height": 750,
             "calculated_ID": "",
+            "data_version": 2,
         }
         if not self.settings_file.is_file():
             self.settings_file.write_text(json.dumps(self.default_settings, indent=4, sort_keys=True), encoding="utf-8")
@@ -212,8 +213,8 @@ class Calculator(tk.Tk):
             self.huim.logger.error(f"Could not find the following settings: {", ".join(setting_load_errors)}")
         self.huim.create_controls()
         self.huim.create_frames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
-        self.frames["addons_main"] = tk.Frame(self, background=self.colors["background"])
-        self.huim.create_frames(self.frames["addons_main"], frame_keys=[["addons_buttons", "addons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
+        self.frames["add_ons_main"] = tk.Frame(self, background=self.colors["background"])
+        self.huim.create_frames(self.frames["add_ons_main"], frame_keys=[["add_ons_buttons", "add_ons_output"]], grid_frames=True, grid_size=0.96, border=0.01, relControlsHeight=0)
         self.huim.logger.debug("Framework set up")
         self.version = self.huim.def_var(dtype=str, initial="1.2.2")
         self.huim.logger.info(f"Calculator version {self.version.get()}")
@@ -224,6 +225,7 @@ class Calculator(tk.Tk):
         self.input_options = self.huim.read_json(pathlib.Path(r"calculator_version_data/input_options.json"))
 
         # Define variables
+        self.data_version = HPM.Hvar(self.huim, key="data_version", vtype="storage", dtype=int, display="Data Version", initial=found_settings["data_version"])
         self.API_auto_update = HPM.Hvar(self.huim, key="API_auto_update", vtype="storage", dtype=bool, display="API Auto Update", initial=found_settings["API_auto_update"])
         self.API_cooldown = HPM.Hvar(self.huim, key="API_cooldown", vtype="storage", dtype=int, display="API Cooldown (s)", initial=found_settings["API_cooldown"])
         self.pet_API_cooldown = HPM.Hvar(self.huim, key="pet_API_cooldown", vtype="storage", dtype=int, display="Pet API Cooldown (s)", initial=found_settings["pet_API_cooldown"])
@@ -315,7 +317,7 @@ class Calculator(tk.Tk):
         self.extracost = HPM.Hvar(self.huim, key="extracost", vtype="output", dtype=str, display="Extra cost", frame="outputs_profit_grid", initial="None", switch_initial=True)
         self.optimal_tier_free_will = HPM.Hvar(self.huim, key="optimal_tier_free_will", vtype="output", dtype=int, display="Free Will Tier", fancy_display="Optimal tier Free Will", frame="outputs_profit_grid", initial=0, switch_initial=True)
         self.available_storage = HPM.Hvar(self.huim, key="available_storage", vtype="output", dtype=int, display="Available Storage", frame="outputs_setup_grid", initial=0, switch_initial=False)
-        self.addons_output_container = HPM.Hvar(self.huim, key="addons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="addons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
+        self.add_ons_output_container = HPM.Hvar(self.huim, key="add_ons_output_container", vtype="output", dtype=dict, display="Add-on Outputs", frame="add_ons_output_grid", widget_width=65, widget_height=20, initial={}, switch_initial=False)
         self.empty_time_amount = HPM.Hvar(self.huim, key="empty_time_amount", vtype="input", dtype=float, display="Empty Time span", initial=1.0, frame="inputs_player_grid")
         self.empty_time_unit = HPM.Hvar(self.huim, key="empty_time_unit", vtype="input", dtype=str, display="Empty Time unit", initial="Days", frame="inputs_player_grid", options=self.input_options["time_unit"])
         self.scaled_time_amount = HPM.Hvar(self.huim, key="scaled_time_amount", vtype="input", dtype=float, display="Scaled Time span", initial=1.0, frame="inputs_player_grid")
@@ -340,7 +342,7 @@ class Calculator(tk.Tk):
         self.md.create_custom_inputs_edit_vars(self.md.custom_inputs_edit_tree, "start")
 
         # Create widgets for controls menu and placing them
-        self.creditLB = self.huim.create_label(frm=self.frames["controls"], txt=f"Minion Calculator V{self.version.get()}\nMade by Herodirk")
+        self.creditLB = self.huim.create_label(frm=self.frames["controls"], txt=f"Minion Calculator v{self.version.get()}\nMade by Herodirk")
         self.creditLB.place(in_=self.stopB, x=-10, rely=0.5, y=-1, anchor="e")
         self.manualLB = self.huim.create_label(frm=self.frames["controls"], txt="Online Manual:\nCalculator Manual")
         self.manualLB.place(in_=self.creditLB, x=-10, rely=0.5, anchor="e")
@@ -353,13 +355,13 @@ class Calculator(tk.Tk):
         self.markdown_outputB = tk.Button(self.frames["controls"], text='Markdown Output', command=lambda: self.text_output(markdown=True))
         self.calcB = tk.Button(self.frames["controls"], text='Calculate', command=lambda: self.calculate(True))
         self.statusC = tk.Canvas(self.frames["controls"], bg="green", width=10, height=10, borderwidth=0)
-        self.addonsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("addons"))
+        self.add_onsB = tk.Button(self.frames["controls"], text="Add-ons Menu", command=lambda: self.huim.toggle_switch("add_ons"))
         self.pricesB = tk.Button(self.frames["controls"], text="Update Prices", command=self.update_prices)
         self.settingsB = tk.Button(self.frames["controls"], text="Edit Settings", command=lambda: self.huim.edit_vars("settings"))
         self.custom_inputsB = tk.Button(self.frames["controls"], text="Custom Inputs", command=lambda: self.huim.edit_vars("custom_input_start"))
         # self.status, self.statusO = self.huim.def_output_var(frame=self.frames["controls"], dtype=str, L_text="Status:", initial="Ready")  # might use later
 
-        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.addonsB, self.settingsB, self.custom_inputsB]
+        controlsGrid = [self.calcB, self.statusC, self.text_outputB, self.markdown_outputB, self.pricesB, self.add_onsB, self.settingsB, self.custom_inputsB]
         self.huim.fill_arr(controlsGrid, self.frames["controls"])
 
         # Create miscellaneous labels
@@ -375,8 +377,8 @@ class Calculator(tk.Tk):
         minionprintLB = self.huim.create_label(frm=self.frames["outputs_setup_grid"], txt="Share")
         profitoutputsLB = self.huim.create_label(frm=self.frames["outputs_profit_grid"], txt="Profit Outputs")
         profitprintLB = self.huim.create_label(frm=self.frames["outputs_profit_grid"], txt="Share")
-        addonsprintLB = self.huim.create_label(frm=self.frames["addons_output_grid"], txt="Share")
-        addonsoutputsLB = self.huim.create_label(frm=self.frames["addons_output_grid"], txt="Add-on Outputs")
+        add_onsprintLB = self.huim.create_label(frm=self.frames["add_ons_output_grid"], txt="Share")
+        add_onsoutputsLB = self.huim.create_label(frm=self.frames["add_ons_output_grid"], txt="Add-on Outputs")
 
         # Defining the order of widgets and placing them for all the grids
         self.grids = {
@@ -483,9 +485,9 @@ class Calculator(tk.Tk):
                 "fuelcost": None,
                 "total_profit": None
             },
-            "addons_output_grid": {
-                "labels": [None, addonsoutputsLB, addonsprintLB],
-                "addons_output_container": [None, self.addons_output_container.widget[1], self.addons_output_container.widget[2]]
+            "add_ons_output_grid": {
+                "labels": [None, add_onsoutputsLB, add_onsprintLB],
+                "add_ons_output_container": [None, self.add_ons_output_container.widget[1], self.add_ons_output_container.widget[2]]
             },
         }
         for grid_key in self.grids.keys():
@@ -495,21 +497,23 @@ class Calculator(tk.Tk):
         self.notes.widget[1].tkraise()
 
         # Add-ons buttons
-        self.addons_list = {}
-        for addon_function_key in external_add_ons.keys():
-            if "__init__" in addon_function_key:
-                external_add_ons[addon_function_key](self)
-            else:
-                self.addons_list[addon_function_key] = external_add_ons[addon_function_key]
-        self.addons_buttons = {}
-        self.addons_auto_run = {}
-        for number, addon_info in enumerate(self.addons_list.items()):
-            addon_name, addon_function = addon_info
-            button_function = lambda func=addon_function: func(self)
-            self.addons_buttons[addon_name] = tk.Button(self.frames["addons_buttons_grid"], text=addon_name, command=button_function)
-            self.addons_auto_run[addon_name], widget = self.huim.def_input_var(dtype=bool, frame=self.frames["addons_buttons_grid"], L_text="", initial=False)
-            widget[-1].place(in_=self.addons_buttons[addon_name], anchor="w", relx=1, rely=0.5, x=10)
-            self.addons_buttons[addon_name].grid(row=number % 8, column=(int(number / 8)) * 2)
+        self.add_ons_list = {}
+        self.add_ons_classes = {}
+        for add_ons_class_key, add_ons_class in external_add_on_classes.items():
+            self.add_ons_classes[add_ons_class_key] = add_ons_class(self)
+            self.add_ons_list.update(self.add_ons_classes[add_ons_class_key].add_ons_data)
+        self.add_ons_buttons = {}
+        self.add_ons_auto_run = {
+            "pre": {},
+            "post": {}
+        }
+        for number, add_on in enumerate(self.add_ons_list.items()):
+            add_on_name, add_on_data = add_on
+            button_function = lambda func=add_on_data["function"]: func()
+            self.add_ons_buttons[add_on_name] = tk.Button(self.frames["add_ons_buttons_grid"], text=add_on_name, command=button_function)
+            self.add_ons_auto_run[add_on_data["auto_run"]][add_on_name], widget = self.huim.def_input_var(dtype=bool, frame=self.frames["add_ons_buttons_grid"], L_text="", initial=False)
+            widget[-1].place(in_=self.add_ons_buttons[add_on_name], anchor="w", relx=1, rely=0.5, x=10)
+            self.add_ons_buttons[add_on_name].grid(row=number % 8, column=(int(number / 8)) * 2)
 
         self.huim.logger.debug("Widgets placed")
 
@@ -544,7 +548,7 @@ class Calculator(tk.Tk):
                             locations="grid", control=None, negate=False, initial=False)
         self.huim.def_switch("cornucopia_bonus", widget_references="unique_farming_minions",
                             locations="grid", control="Cornucopia Crystal", negate=False, initial=False)
-        self.huim.def_switch("addons", widget_references=self.frames["addons_main"],
+        self.huim.def_switch("add_ons", widget_references=self.frames["add_ons_main"],
                             locations={"anchor": "c", "relx": 0.5, "rely": 0.5, "relwidth": 0.7, "relheight": 0.8}, initial=False)
         
         # Show/Hide toggle buttons for large amount of extended options
@@ -625,7 +629,7 @@ class Calculator(tk.Tk):
             "pets_levelled": None,
             "fuelcost": None,
             "total_profit": None,
-            "addons_output_container": None
+            "add_ons_output_container": None
         }
         self.huim.logger.debug("Output orders defined")
 
@@ -883,7 +887,7 @@ class Calculator(tk.Tk):
             Setup ID.
 
         """
-        setup_id = self.version.get() + "!"
+        setup_id = str(self.data_version.get()) + "!"
         for var_key in self.ID_order:
             if var_key not in setup_data:
                 self.huim.logger.warning(f"{var_key} key not in setup_data, assuming default value")
@@ -926,12 +930,12 @@ class Calculator(tk.Tk):
             self.huim.logger.error("Invalid setup ID, could not find version number")
             return setup_data
         try:
-            version = setup_id[0:end_ver]
+            version = int(setup_id[0:end_ver])
         except Exception:
             self.huim.logger.error("Invalid setup ID, could not find version number")
             return setup_data
         ID_index = end_ver + 1
-        if version != self.version.get():
+        if version != self.data_version.get():
             self.huim.logger.error("Invalid setup ID, Incompatible version")
             return setup_data
         try:
@@ -1164,7 +1168,7 @@ class Calculator(tk.Tk):
                 else:
                     actions_per_harvest = 1
                     if minion in ["GRAVEL_MINION"]:
-                        upgrade_effects["replacing"]["GRAVEL"] = { "FLINT": 1 }
+                        self.add_replacing_effect(upgrade_effects["replacing"], {"GRAVEL": { "FLINT": 1 }}, True)
                         setup_notes["Player Tools"] = "Assuming Player is using Flint Shovel"
                     if minion in ["ICE_MINION"]:
                         setup_notes["Player Tools"] = "Assuming Player is using Silk Touch"
@@ -1206,33 +1210,30 @@ class Calculator(tk.Tk):
         if self.md.has_data_tag(minion, "wood_minion"):
             if afk_toggle:
                 # chopped trees have 4 blocks of wood, unknown why offline gives 3
-                upgrade_effects["replacing"].update({
+                self.add_replacing_effect(upgrade_effects["replacing"], {
                     "LOG": {"LOG": 4 / 3},
                     "LOG:1": {"LOG:1": 4 / 3},
                     "LOG:2": {"LOG:2": 4 / 3},
                     "LOG_2:1": {"LOG_2:1": 4 / 3},
                     "LOG_2": {"LOG_2": 4 / 3},
                     "LOG:3": {"LOG:3": 4 / 3},
-                })
+                }, True)
         elif minion == "GRAVEL_MINION":
-            if afk_toggle:
-                # vanilla minecraft chance for gravel to become flint
-                self.md.calculator_data[minion]["drops"]["GRAVEL"] = 0.9
-                self.md.calculator_data[minion]["drops"]["FLINT"] = 0.1
-            else:
-                self.md.calculator_data[minion]["drops"]["GRAVEL"] = 1
-                self.md.calculator_data[minion]["drops"]["FLINT"] = 0
+            if not afk_toggle:
+                # vanilla minecraft chance for gravel to become flint does not happen offline
+                self.add_replacing_effect(upgrade_effects["replacing"], {"FLINT": {"GRAVEL": 1}}, True)
         elif minion == "PUMPKIN_MINION":
             if not afk_toggle:
-                upgrade_effects["replacing"].update({"PUMPKIN": {"PUMPKIN": 3}})
                 # it just does this, idk, ask Hypixel
+                self.add_replacing_effect(upgrade_effects["replacing"], {"PUMPKIN": {"PUMPKIN": 3}}, True)
         elif minion == "SHEEP_MINION":
             if "ENCHANTED_SHEARS" in upgrade_ids:
-                upgrade_effects["replacing"].update({"WOOL": {"WOOL": 0}})
+                # Enchanted shears remove base drops in exchange for upgrade drops
+                self.add_replacing_effect(upgrade_effects["replacing"], {"WOOL": {"WOOL": 0}}, True)
         elif minion == "FLOWER_MINION":
             if afk_toggle and setup_data["special_layout"] and "THORNY_VINES" not in upgrade_ids:
                 # tall flowers blocked by low ceiling
-                upgrade_effects["replacing"].update({
+                self.add_replacing_effect(upgrade_effects["replacing"], {
                     "RED_ROSE:1": {"RED_ROSE:1": 11 / 8},
                     "RED_ROSE:2": {"RED_ROSE:2": 11 / 8},
                     "RED_ROSE:3": {"RED_ROSE:3": 11 / 8},
@@ -1244,7 +1245,7 @@ class Calculator(tk.Tk):
                     "DOUBLE_PLANT:1": {},
                     "DOUBLE_PLANT:4": {},
                     "DOUBLE_PLANT:5": {}
-                })
+                }, True)
         return
 
     def get_seconds_per_action(self, minion, minion_tier, minion_fuel_id, speed_boost, setup_data):
@@ -1275,9 +1276,10 @@ class Calculator(tk.Tk):
             seconds_per_action /= 1 + self.md.inferno_fuel_data["grades"][setup_data["inferno_grade"]]
         self.huim.logger.debug(f"Base action time: {base_speed}")
         self.huim.logger.debug(f"Unrounded action time: {seconds_per_action}")
-        seconds_per_action = round(seconds_per_action * 20) / 20
+        seconds_per_action = int(seconds_per_action * 20) / 20
         if seconds_per_action < 0.05:
             seconds_per_action = 0.05
+        self.huim.logger.debug(f"Display action time: {round(seconds_per_action, 1)}")
         return seconds_per_action
 
     def get_time_constants(self, seconds_per_action, actions_per_harvest, setup_data):
@@ -1388,16 +1390,36 @@ class Calculator(tk.Tk):
                 else:
                     upgrade_effects[effect_type][upgrade] = upgrade_effect_data
         return upgrade_ids, upgrade_effects
-    
+
+    def add_replacing_effect(self, replacing_info, new_effect, priority=False):
+        if priority:
+            first_effect = new_effect
+            second_effect = replacing_info
+        else:
+            first_effect = replacing_info
+            second_effect = new_effect
+
+        combined_effect = {**second_effect}
+        for first_input, first_outputs in first_effect.items():
+            combined_effect[first_input] = {}
+            for first_output, first_ratio in first_outputs.items():
+                if first_output in second_effect:
+                    for second_output, second_ratio in second_effect[first_output].items():
+                        combined_effect[first_input][second_output] = first_ratio * second_ratio
+                else:
+                    combined_effect[first_input][first_output] = first_ratio
+        replacing_info.update(combined_effect)
+        return 
+
     def add_drops(self, item, amount, drops_list, spreading_info=None, replacing_info=None):
         """
-        Adds drops to drops_list, automatically applies spreading_info and replace_info if given
+        Adds drops to drops_list, automatically applies spreading_info and replacing_info if given
         
         :param item: str, item ID of the drop
         :param amount: float, amount of the drop
         :param drops_list: dict, all drops of the setup
         :param spreading_info: dict, the average amount of a spreading item generated per drop
-        :param replace_info: dict, the replacements of original item ID as key and final item ID as value
+        :param replacing_info: dict, the replacements of original item ID as key and final item ID as value
         """
         if replacing_info is not None and item in replacing_info:
             for new_item, ratio in replacing_info[item].items():
@@ -1773,7 +1795,7 @@ class Calculator(tk.Tk):
                 pet_xp_boost = 1 / 12
             else:
                 pet_xp_boost = 1 / 3
-        if xp_type in ["mining", "fishing"]:
+        if xp_type in ["fishing"]:
             pet_xp_boost *= 1.5
         if exp_share:
             return pet_xp_boost
@@ -1865,15 +1887,20 @@ class Calculator(tk.Tk):
         super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
         for pet_slot, pet_info in setup_pets.items():
             combined_pet_id = pet_info['rarity'] + "." + pet_info["pet"]
-            if pet_info['rarity'] not in self.md.calculator_data[pet_info["pet"]]["pet_prices"]:
+            pet_prices_data = self.md.calculator_data[pet_info["pet"]]["pet_prices"]
+            if pet_info['rarity'] not in pet_prices_data:
                 if combined_pet_id not in used_pet_prices:
                     used_pet_prices[combined_pet_id] = f"Price not found"
-            else:
-                pet_price_max = self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["max"]
-                pet_price_min = self.md.calculator_data[pet_info["pet"]]["pet_prices"][pet_info["rarity"]]["min"]
-                pet_profit += pet_info["levelled_pets"] * (self.apply_ah_tax(pet_price_max, setup_data) - pet_price_min)
+                continue
+            pet_price_max = pet_prices_data[pet_info["rarity"]]["max"]
+            pet_price_min = pet_prices_data[pet_info["rarity"]]["min"]
+            if pet_price_min == 0 or pet_price_max == 0:
                 if combined_pet_id not in used_pet_prices:
-                    used_pet_prices[combined_pet_id] = f"{self.huim.reduced_number(pet_price_min)} - {self.huim.reduced_number(pet_price_max)} ({self.huim.reduced_number(self.apply_ah_tax(pet_price_max, setup_data))})"
+                    used_pet_prices[combined_pet_id] = f"Price not found"
+                continue
+            pet_profit += pet_info["levelled_pets"] * (self.apply_ah_tax(pet_price_max, setup_data) - pet_price_min)
+            if combined_pet_id not in used_pet_prices:
+                used_pet_prices[combined_pet_id] = f"{self.huim.reduced_number(pet_price_min)} - {self.huim.reduced_number(pet_price_max)} (Taxed: {self.huim.reduced_number(self.apply_ah_tax(pet_price_max, setup_data))})"
             if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
@@ -2055,9 +2082,13 @@ class Calculator(tk.Tk):
         None.
 
         """
-        if inGUI is True:
+        if inGUI:
             self.statusC.configure(bg="yellow")
             self.statusC.update()
+            self.add_ons_output_container.list.clear()
+            for add_on_name, auto_run_bool in self.add_ons_auto_run["pre"].items():
+                if auto_run_bool.get():
+                    self.add_ons_list[add_on_name]["function"]()
 
         # Get inputs if none are given
         if setup_data is None:
@@ -2080,6 +2111,9 @@ class Calculator(tk.Tk):
         # create shared lists
         setup_notes = {}
         drops_list = {}
+
+        if setup_data["custom_upgrade_toggle"]:
+            setup_notes["Custom Inputs"] = "Custom Upgrade is active"
 
         # Enchanted Clock uses offline calculations, but you can be on the island when using it to apply boosts that require a loaded island.
         # This clock_override replaces afk_toggle for these boosts
@@ -2203,10 +2237,9 @@ class Calculator(tk.Tk):
         # Update GUI
         if inGUI:
             self.huim.send_to_GUI(outputs)
-            self.addons_output_container.list.clear()
-            for addon_name, auto_run_bool in self.addons_auto_run.items():
+            for add_on_name, auto_run_bool in self.add_ons_auto_run["post"].items():
                 if auto_run_bool.get():
-                    self.addons_list[addon_name](self)
+                    self.add_ons_list[add_on_name]["function"]()
             self.update_listboxes()
             self.statusC.configure(bg="green")
             self.statusC.update()
@@ -2426,8 +2459,6 @@ class Calculator(tk.Tk):
             else:
                 results[level_type] = (lowest_price + second_lowest_price) / 2
         if rarity not in self.md.calculator_data[pet_ID]["pet_prices"]:
-            if results["min"] == 0 or results["max"] == 0:
-                return
             self.md.calculator_data[pet_ID]["pet_prices"][rarity] = { "min": 0, "max": 0, "last_updated": 0 }
             self.md.instance_data[f"{pet_ID}.pet_prices.{rarity}"] = None  # will auto update when instance data is saved (just need to get the key in)
         if results["min"] != 0:
@@ -2463,10 +2494,10 @@ class Calculator(tk.Tk):
                 self.var_dict[var_key].update_listbox(key_format_function=format_function)
         return
 
-    def collect_addon_output(self, output_name, output_str):
+    def collect_add_on_output(self, output_name, output_str):
         """
-        Collect outputs from add-ons, places them in addons_output_container
-        and updates the GUI for addons_output_container
+        Collect outputs from add-ons, places them in add_ons_output_container
+        and updates the GUI for add_ons_output_container
 
         Parameters
         ----------
@@ -2480,8 +2511,8 @@ class Calculator(tk.Tk):
         None.
 
         """
-        self.addons_output_container.list[output_name] = output_str
-        self.addons_output_container.update_listbox()
+        self.add_ons_output_container.list[output_name] = output_str
+        self.add_ons_output_container.update_listbox()
         return
     
     def edit_settings(self, new_settings):

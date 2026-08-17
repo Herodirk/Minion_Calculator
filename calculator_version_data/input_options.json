@@ -80,6 +80,7 @@
     "fuel": {
         "None": "NONE",
         "Coal": "COAL",
+        "Charcoal": "CHARCOAL",
         "Block Of Coal": "COAL_BLOCK",
         "Enchanted Coal": "ENCHANTED_COAL",
         "Enchanted Charcoal": "ENCHANTED_CHARCOAL",
@@ -286,6 +287,7 @@
         "Mooshroom Cow": "PET_MOOSHROOM_COW",
         "Mosquito": "PET_MOSQUITO",
         "Ocelot": "PET_OCELOT",
+        "Orchid Mantis": "PET_ORCHID_MANTIS",
         "Owl": "PET_OWL",
         "Parrot": "PET_PARROT",
         "Penguin": "PET_PENGUIN",
@@ -307,6 +309,7 @@
         "Silverfish": "PET_SILVERFISH",
         "Skeleton": "PET_SKELETON",
         "Skeleton Horse": "PET_SKELETON_HORSE",
+        "Sloth": "PET_SLOTH",
         "Slug": "PET_SLUG",
         "Snail": "PET_SNAIL",
         "Snowman": "PET_SNOWMAN",

@@ -3216,6 +3216,13 @@
         "display": "PlantBoy Advance",
         "prices": {}
     },
+    "CHARCOAL": {
+        "display": "Charcoal",
+        "speed_boost": 5,
+        "drop_multiplier": 1,
+        "fuel_duration": 1800,
+        "prices": {}
+    },
     "ENCHANTED_CHARCOAL": {
         "display": "Enchanted Charcoal",
         "speed_boost": 20,
@@ -9147,6 +9154,12 @@
         ],
         "pet_prices": {}
     },
+    "PET_ORCHID_MANTIS": {
+        "display": "Orchid Mantis",
+        "pet_type": "farming",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
+    },
     "PET_OWL": {
         "display": "Owl",
         "pet_type": "taming",
@@ -9318,6 +9331,12 @@
         "display": "Skeleton Horse",
         "pet_type": "combat",
         "pet_rarities": ["LEGENDARY"],
+        "pet_prices": {}
+    },
+    "PET_SLOTH": {
+        "display": "Sloth",
+        "pet_type": "foraging",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "pet_prices": {}
     },
     "PET_SLUG": {
@@ -9492,7 +9511,7 @@
     },
     "DRAGON": {
         "display": "Dragon",
-        "max_lvl_pet_xp_amount": 210255385
+        "max_lvl_pet_xp_amount": 214023230
     },
     "CUSTOM_RARITY": {
         "display": "Custom",
