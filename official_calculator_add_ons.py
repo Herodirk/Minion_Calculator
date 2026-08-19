@@ -22,19 +22,53 @@ class Calc_add_ons():
     def __init__(self, calculator):
         self.calc = calculator
 
-        self.calc.huim.new_edit_vars("basic_minion_loop", {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: self.basic_minion_loop(results))
+        self.calc.huim.new_edit_vars("basic_minion_loop", {
+            "setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None},
+            "auto_crystal": {"dtype": bool, "display": "Automatic Crystal", "initial": True, "options": None},
+            "auto_afkpet": {"dtype": bool, "display": "Automatic AFK Pet", "initial": True, "options": None},
+            "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}
+            }, lambda results: self.basic_minion_loop(results))
         self.calc.huim.new_edit_vars("inferno_minion_loop", {"setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: self.inferno_minion_loop(results))
         self.calc.huim.new_edit_vars("collection_maxing", {"sort_by": {"dtype": str, "display": "Sort By", "initial": "Fastest Time", "options": ["Fastest Time", "Lowest Setup Cost", "Lowest Total Cost"]}, "time_limit": {"dtype": float, "display": "Time Limit", "initial": 0, "options": None}, "setup_cost_limit": {"dtype": float, "display": "Setup Cost Limit", "initial": 0, "options": None}, "amount_limit": {"dtype": int, "display": "Minion Amount Limit", "initial": 32, "options": None}, "markdown_output": {"dtype": bool, "display": "Markdown Output", "initial": True, "options": None}}, lambda results: self.collection_maxing(results))
         self.calc.huim.new_edit_vars("partial_setup_cost", {setup_part_key: {"dtype": bool, "display": setup_part_display, "initial": True, "options": None} for setup_part_key, setup_part_display in {"minion": "Minion", "fuel": "Fuel", "hopper": "Hopper", "upgrade1": "Upgrade 1", "upgrade2": "Upgrade 2", "infusion": "Infusion", "free_will": "Free Will", "chest": "Chest", "beacon": "Beacon", "crystal": "Crystal", "postcard": "Postcard", "potato_accessory": "Potato Accessory","pet_exp_boost": "Pet EXP Boost","expshareitem": "EXP Share Item","toucan_attribute": "Toucan Shards","falcon_attribute": "Falcon Shards"}.items()}, lambda results: self.partial_setup_cost(results))
+        self.calc.huim.new_edit_vars("wisp_levelling", {
+            "gabagool_tier": {"dtype": str, "display": "Gabagool Tier", "initial": "Crude Gabagool", "options": ["Crude Gabagool", "Fuel Gabagool", "Heavy Gabagool", "Hypergolic Gabagool"]},
+            "wisp_pet": {"dtype": str, "display": "Wisp Pet", "initial": "Subzero Wisp", "options": ["Droplet Wisp", "Frost Wisp", "Glacial Wisp", "Subzero Wisp"]},
+            "pet_item": {"dtype": str, "display": "Pet Item", "initial": "All Skills Exp Super-Boost", "options": ["None", "All Skills Exp Boost", "All Skills Exp Super-Boost"]},
+            "taming": {"dtype": int, "display": "Taming", "initial": 60, "options": None},
+            "battle_experience": {"dtype": int, "display": "Battle Experience", "initial": 10, "options": self.calc.input_options["attribute"]},
+            "diana": {"dtype": bool, "display": "Diana", "initial": False, "options": None},
+            "beastmaster": {"dtype": float, "display": "Beastmaster", "initial": 0, "options": None},
+            "blaze_slayer": {"dtype": bool, "display": "Blaze Slayer 8", "initial": False, "options": None},
+            }, self.wisp_levelling)
+
+        self.reverse_affected_minions = {
+            "afkpet": {},
+            "crystal": {}
+        }
+        for modifier_key in self.reverse_affected_minions.keys():
+            for modifier_id in self.calc.input_options[modifier_key].values():
+                if modifier_id == "NONE":
+                    continue
+                for affected_minion in self.calc.md.calculator_data[modifier_id]["affected_minions"]:
+                    if affected_minion in self.calc.md.calculator_data:
+                        self.reverse_affected_minions[modifier_key][affected_minion] = modifier_id
+                        continue
+                    for minion_id in self.calc.input_options["minion"].values():
+                        if self.calc.md.has_data_tag(minion_id, affected_minion):
+                            self.reverse_affected_minions[modifier_key][minion_id] = modifier_id
 
         self.add_ons_data = {
             "Minion Crafting": {"function": self.craft_material_amount, "auto_run": "post"},
+            "Crystal and Pet": {"function": self.crystal_and_pet, "auto_run": "pre"},
+            "Dragon Pet Source Prices": {"function": self.dragon_source_prices, "auto_run": "pre"},
             "Partial Setup Cost": {"function": self.partial_setup_cost_inputs, "auto_run": "post"},
             "Days to Repay Setup": {"function": self.setup_repay_time, "auto_run": "post"},
             "Basic Minion Loop": {"function": self.basic_minion_loop_inputs, "auto_run": "post"},
             "Bad Luck Inferno": {"function": self.bad_luck_inferno, "auto_run": "post"},
             "Inferno Minion Loop": {"function": self.inferno_minion_loop_inputs, "auto_run": "post"},
             "Exact Pet Levelling": {"function": self.exact_pet_levelling_inputs, "auto_run": "post"},
+            # "Wisp Pet Levelling": {"function": self.wisp_levelling_inputs, "auto_run": "post"},
             "Chili Pepper Collection": {"function": self.collection_maxing_inputs, "auto_run": "post"},
             # "Old Corrupted Frags": {"function": self.old_corrupted_frags, "auto_run": "post"},
             # "Old Enchanted Hopper": {"function": self.old_enchanted_hopper, "auto_run": "post"},
@@ -42,7 +76,7 @@ class Calc_add_ons():
         return
 
     def old_corrupted_frags(self):
-        # This Add-on is inactive, to turn it back on add this function to `add_ons_package` at the bottom of this file.
+        # This Add-on is inactive, to turn it back on uncomment the add-on in self.add_ons_data in __init__
         """Outputs the total profit for the old price of Corrupted Fragments"""
         if "CORRUPTED_FRAGMENT" not in self.calc.itemtype_profit.list:
             self.calc.collect_add_on_output("Old Corrupted Frag profit", "Setup does not produce Corrupted Fragments")
@@ -53,13 +87,132 @@ class Calc_add_ons():
         return
 
     def old_enchanted_hopper(self):
-        # This Add-on is inactive, to turn it back on add this function to `add_ons_package` at the bottom of this file.
+        # This Add-on is inactive, to turn it back on uncomment the add-on in self.add_ons_data in __init__
         """Outputs the total profit for the old sell rate of Enchanted Hoppers"""
         if self.calc.hopper.get() != "Enchanted Hopper" or self.calc.sell_loc.get() != "Hopper":
             self.calc.collect_add_on_output("Old Enchanted Hopper profit", "Setup does not use Enchanted Hoppers")
             return
         profit = self.calc.total_profit.get()
         self.calc.collect_add_on_output("Old Enchanted Hopper profit", f"{self.calc.huim.reduced_number(profit * (9 / 7), 2)}")
+        return
+
+    def crystal_and_pet(self, minion_id=None, return_outputs=False):
+        if minion_id is None:
+            minion_id = self.calc.minion.get()
+        outputs = {}
+        for modifier_key in self.reverse_affected_minions.keys():
+            result = "NONE"
+            if minion_id in self.reverse_affected_minions[modifier_key]:
+                result = self.reverse_affected_minions[modifier_key][minion_id]
+            if return_outputs:
+                outputs[modifier_key] = result
+            else:
+                self.calc.var_dict[modifier_key].set(result, True)
+            if modifier_key == "afkpet":
+                afkpet_level = 100
+                if result == "NONE":
+                    afkpet_level = 0
+                if return_outputs:
+                    outputs["afkpet_lvl"] = afkpet_level
+                else:
+                    self.calc.afkpet_lvl.set(afkpet_level)
+        if return_outputs:
+            return outputs
+        return
+
+    def wisp_levelling_inputs(self):
+        # This Add-on is inactive, it works but is missing a lot of logic
+        outputs = self.calc.huim.get_from_GUI(["items"])
+        if "CRUDE_GABAGOOL" not in outputs["items"] and "VERY_CRUDE_GABAGOOL" not in outputs["items"]:
+            self.calc.collect_add_on_output("Wisp Pet Levelling", "No Gabagool found")
+            return
+        self.calc.huim.edit_vars("wisp_levelling")
+        return
+
+    def wisp_levelling(self, results):
+        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        outputs = self.calc.huim.get_from_GUI(["items"])
+        gabagool_tier = { "Crude Gabagool": "CRUDE_GABAGOOL", "Fuel Gabagool": "FUEL_GABAGOOL", "Heavy Gabagool": "HEAVY_GABAGOOL", "Hypergolic Gabagool": "HYPERGOLIC_GABAGOOL" }[results["gabagool_tier"]]
+        wisp_pet = { "Droplet Wisp": "PET_DROPLET_WISP", "Frost Wisp": "PET_FROST_WISP", "Glacial Wisp": "PET_GLACIAL_WISP", "Subzero Wisp": "PET_SUBZERO_WISP" }[results["wisp_pet"]]
+        pet_item = { "None": "NONE", "All Skills Exp Boost": "PET_ITEM_ALL_SKILLS_BOOST_COMMON", "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST" }[results["pet_item"]]
+
+        crude_gabagool_amount = outputs["items"]["CRUDE_GABAGOOL"] + 192 * outputs["items"]["VERY_CRUDE_GABAGOOL"]
+        base_xp_per_crude_gabagool = { "CRUDE_GABAGOOL": 100, "FUEL_GABAGOOL": 3200 / 24, "HEAVY_GABAGOOL": 102400 / 576, "HYPERGOLIC_GABAGOOL": 3276800 / 6912 }[gabagool_tier]
+        extra_cost_per_crude_gabagool = { "CRUDE_GABAGOOL": {}, "FUEL_GABAGOOL": { "ENCHANTED_COAL": 4 / 24, "ENCHANTED_SULPHUR": 0.25 / 24 }, "HEAVY_GABAGOOL": { "ENCHANTED_COAL": 100 / 576, "ENCHANTED_SULPHUR": 6.25 / 576 }, "HYPERGOLIC_GABAGOOL": { "ENCHANTED_COAL": 1204 / 6912, "ENCHANTED_SULPHUR": 75.25 / 6912 } }[gabagool_tier]
+
+        total_xp = base_xp_per_crude_gabagool * crude_gabagool_amount * (1 + results["taming"] / 100) * (1 + results["battle_experience"] / 100) * (1 + results["beastmaster"] / 100)
+        if results["diana"]:
+            total_xp *= 1.35
+        if results["blaze_slayer"]:
+            total_xp *= 1.2
+        if pet_item != "NONE":
+            total_xp *= 1 + self.calc.md.calculator_data[pet_item]["exp_boost_amount"] / 100
+
+        pet_rarity = self.calc.md.calculator_data[wisp_pet]["pet_rarities"][0]
+        max_pet_xp = self.calc.md.calculator_data[pet_rarity]["max_lvl_pet_xp_amount"]
+        pets_levelled = total_xp / max_pet_xp
+
+        total_cost = 0
+        for item_id, per_gabagool_amount in extra_cost_per_crude_gabagool.items():
+            total_cost += crude_gabagool_amount * per_gabagool_amount * self.calc.get_price(item_id, setup_data, "buy", "bazaar")
+        self.calc.update_pet_price(wisp_pet, pet_rarity)
+        pet_price_max = self.calc.md.calculator_data[wisp_pet]["pet_prices"][pet_rarity]["max"]
+        pet_price_min = self.calc.md.calculator_data[wisp_pet]["pet_prices"][pet_rarity]["min"]
+        pet_profit = pets_levelled * (self.calc.apply_ah_tax(pet_price_max, setup_data) - pet_price_min)
+        used_prices = f"{self.calc.huim.reduced_number(pet_price_min)} - {self.calc.huim.reduced_number(pet_price_max)} (Taxed: {self.calc.huim.reduced_number(self.calc.apply_ah_tax(pet_price_max, setup_data))})"
+
+        self.calc.collect_add_on_output("Wisp Pet Levelling", f"{self.calc.huim.reduced_number(pet_profit)} - {self.calc.huim.reduced_number(total_cost)} = {self.calc.huim.reduced_number(pet_profit - total_cost)}, Used Pet Prices: " + used_prices)
+        return
+
+    def dragon_source_prices(self):
+        """Calculates dragon prices for buying from the source"""
+        dragon_pet_recipes = {
+            "PET_GOLDEN_DRAGON": {
+                "COIN": 500000000,
+                "ENCHANTED_GOLD_BLOCK": 50,
+                "PERFECT_AMETHYST_GEM": 1,
+                "PERFECT_JADE_GEM": 1,
+                "PERFECT_SAPPHIRE_GEM": 1,
+                "PERFECT_AMBER_GEM": 1,
+                "PERFECT_TOPAZ_GEM": 1
+            },
+            "PET_JADE_DRAGON": {
+                "COIN": 500000000,
+                "STARLYN_PRIZE": 20,
+                "FIGSTONE": 64,
+                "MANGCORE": 64,
+                "HELIXIS": 64,
+            },
+            "PET_ROSE_DRAGON": {
+                "COIN": 500000000,
+                "COPPER": 20000,
+                "CONDENSED_HELIANTHUS": 5,
+                "GLASSCORN": 1,
+                "DEVOURER": 1,
+                "ALL_IN_ALOE": 1,
+                "PHANTOMLEAF": 1,
+                "TIMESTALK": 1,
+            }
+        }
+        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        coins_per_copper = []
+        for mutation, base_copper in { "ALL_IN_ALOE": 2300, "PHANTOMLEAF": 1500, "ZOMBUD": 500, "FLESHTRAP": 180 }.items():
+            coins_per_copper.append((self.calc.get_price(mutation, setup_data, "buy", "bazaar") + base_copper * 2000) / (base_copper * 1.6))
+        self.calc.md.calculator_data["COPPER"]["prices"]["custom"] = min(coins_per_copper)
+
+        updated_pets = []
+        for pet_slot in ["levelingpet", "expsharepet", "expsharepetslot2", "expsharepetslot3"]:
+            if not self.calc.md.has_data_tag(setup_data[pet_slot], ["dragon_pet", "dragon_egg_pet"]):
+                continue
+            if setup_data[pet_slot] in updated_pets:
+                continue
+            self.calc.update_pet_price(setup_data[pet_slot], setup_data[pet_slot + "_rarity"])
+            updated_pets.append(setup_data[pet_slot])
+            dragon_base_id = setup_data[pet_slot].removesuffix("_EGG")
+            source_cost = 0
+            for item_id, amount in dragon_pet_recipes[dragon_base_id].items():
+                source_cost += amount * self.calc.get_price(item_id, setup_data, "buy", "bazaar")
+            self.calc.md.calculator_data[setup_data[pet_slot]]["pet_prices"][setup_data[pet_slot + "_rarity"]]["min"] = source_cost
         return
 
     def bad_luck_inferno(self, setup_data=None, outputs=None, return_value=False):
@@ -111,6 +264,8 @@ class Calc_add_ons():
         cost_filter = results["setup_cost_limit"]
         if cost_filter == 0:
             cost_filter = math.inf
+        auto_crystal = results["auto_crystal"]
+        auto_afkpet = results["auto_afkpet"]
         markdown_output = results["markdown_output"]
         calculated_setup_profits = {}
         calculated_setup_costs = {}
@@ -138,6 +293,13 @@ class Calc_add_ons():
                     setup_data["upgrade1"] = "DWARVEN_COMPACTOR"
                 else:
                     setup_data["upgrade1"] = "SUPER_COMPACTOR_3000"
+            if auto_crystal or auto_afkpet:
+                auto_crystal_and_pet = self.crystal_and_pet(setup_data["minion"], True)
+            if auto_crystal:
+                setup_data["crystal"] = auto_crystal_and_pet["crystal"]
+            if auto_afkpet:
+                setup_data["afkpet"] = auto_crystal_and_pet["afkpet"]
+                setup_data["afkpet_lvl"] = auto_crystal_and_pet["afkpet_lvl"]
             outputs = self.calc.calculate(setup_data=setup_data, return_outputs=True)
 
             if outputs["setupcost"] < cost_filter:
@@ -169,8 +331,16 @@ class Calc_add_ons():
                 "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
                 }, markdown=markdown_output, to_terminal=False)
         if markdown_output:
+            if auto_crystal:
+                output_str += "\nAutomatic Crystal: `True`"
+            if auto_afkpet:
+                output_str += "\nAutomatic AFK Pet: `True`"
             output_str += "\n```"
         else:
+            if auto_crystal:
+                output_str += "\nAutomatic Crystal: True"
+            if auto_afkpet:
+                output_str += "\nAutomatic AFK Pet: True"
             output_str += "\n"
         output_str += f"\nMinion: profit, setup cost (limit: {self.calc.huim.reduced_number(cost_filter)})"
         for _ in range(10):

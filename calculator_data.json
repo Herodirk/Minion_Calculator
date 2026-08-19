@@ -3137,6 +3137,13 @@
             "custom": 1
         }
     },
+    "COPPER": {
+        "display": "Copper",
+        "prices": {
+            "npc": 0,
+            "custom": 1
+        }
+    },
     "REFINED_MITHRIL": {
         "display": "Refined Mithril",
         "prices": {}
@@ -3401,6 +3408,7 @@
         "display": "Custom Upgrade",
         "speed_boost": 0,
         "drop_multiplier": 1,
+        "xp_multiplier": 1,
         "upgrade_effects": {
             "spreading": {},
             "adding": {},
@@ -4248,6 +4256,74 @@
     },
     "CORNUCOPIA": {
         "display": "Cornucopia",
+        "prices": {}
+    },
+    "CONDENSED_HELIANTHUS": {
+        "display": "Condensed Helianthus",
+        "prices": {}
+    },
+    "GLASSCORN": {
+        "display": "Glasscorn",
+        "prices": {}
+    },
+    "DEVOURER": {
+        "display": "Devourer",
+        "prices": {}
+    },
+    "ALL_IN_ALOE": {
+        "display": "All-in Aloe",
+        "prices": {}
+    },
+    "PHANTOMLEAF": {
+        "display": "Phantomleaf",
+        "prices": {}
+    },
+    "TIMESTALK": {
+        "display": "Timestalk",
+        "prices": {}
+    },
+    "ZOMBUD": {
+        "display": "Zombud",
+        "prices": {}
+    },
+    "FLESHTRAP": {
+        "display": "Fleshtrap",
+        "prices": {}
+    },
+    "STARLYN_PRIZE": {
+        "display": "Agatha's Prize",
+        "prices": {}
+    },
+    "FIGSTONE": {
+        "display": "Figstone",
+        "prices": {}
+    },
+    "MANGCORE": {
+        "display": "Mangcore",
+        "prices": {}
+    },
+    "HELIXIS": {
+        "display": "Helixis",
+        "prices": {}
+    },
+    "PERFECT_AMETHYST_GEM": {
+        "display": "Perfect Amethyst Gemstone",
+        "prices": {}
+    },
+    "PERFECT_JADE_GEM": {
+        "display": "Perfect Jade Gemstone",
+        "prices": {}
+    },
+    "PERFECT_SAPPHIRE_GEM": {
+        "display": "Perfect Sapphire Gemstone",
+        "prices": {}
+    },
+    "PERFECT_AMBER_GEM": {
+        "display": "Perfect Amber Gemstone",
+        "prices": {}
+    },
+    "PERFECT_TOPAZ_GEM": {
+        "display": "Perfect Topaz Gemstone",
         "prices": {}
     },
     "PET_ITEM_MINING_SKILL_BOOST_COMMON": {
@@ -9467,6 +9543,30 @@
         "display": "Zombie",
         "pet_type": "combat",
         "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
+    },
+    "PET_DROPLET_WISP": {
+        "display": "Droplet Wisp",
+        "pet_type": "gabagool",
+        "pet_rarities": ["UNCOMMON"],
+        "pet_prices": {}
+    },
+    "PET_FROST_WISP": {
+        "display": "Frost Wisp",
+        "pet_type": "gabagool",
+        "pet_rarities": ["RARE"],
+        "pet_prices": {}
+    },
+    "PET_GLACIAL_WISP": {
+        "display": "Glacial Wisp",
+        "pet_type": "gabagool",
+        "pet_rarities": ["EPIC"],
+        "pet_prices": {}
+    },
+    "PET_SUBZERO_WISP": {
+        "display": "Subzero Wisp",
+        "pet_type": "gabagool",
+        "pet_rarities": ["LEGENDARY"],
         "pet_prices": {}
     },
     "COMMON": {

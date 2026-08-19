@@ -48,6 +48,7 @@ templateList = {
     "Choose Template": {},  # would suggest to keep this one
     "Load ID": {},  # would suggest to keep this one too
     "Clean": {},  # would suggest to also keep this one
+    "Crystal and Pet": {},
     "Corrupt": {
         "hopper": "Enchanted Hopper",
         "upgrade1": "Corrupt Soil",
@@ -95,10 +96,6 @@ templateList = {
         "infusion": True,
         "free_will": True,
         "postcard": True
-    },
-    "AFK with pet": {
-        "afkpet_lvl": 100,
-        "afk": True
     },
     "Solo Wisdom": {  # consists of non-random sources of wisdom that can be achieved alone on the private island, excluding pets
         "mining_wisdom": 103.1,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Refined Divine drill with Compact X (10 + 10), Dimensional Mythic armor (4 * 3), Cavern Wisdom (6.5), Blue Omelette Seasoned Mineman (15.1)
@@ -288,7 +285,7 @@ class Calculator(tk.Tk):
         self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=self.input_options["sell_loc"], command=self.huim.create_switch_call("NPC_Bazaar", controlvar="self"))
         self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="Sell Offer", options=self.input_options["bazaar_sell_type"])
         self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="Buy Order", options=self.input_options["bazaar_buy_type"])
-        self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Bazaar taxes", frame="inputs_player_grid", initial=True, command=self.huim.create_switch_call("bazaar_tax", controlvar="bazaar_taxes"))
+        self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Taxes", frame="inputs_player_grid", initial=True, command=self.huim.create_switch_call("bazaar_tax", controlvar="bazaar_taxes"))
         self.bazaar_flipper = HPM.Hvar(self.huim, key="bazaar_flipper", vtype="input", dtype=int, display="Bazaar Flipper", frame="inputs_player_grid", initial=1, options=self.input_options["bazaar_flipper"])
         self.sell_form = HPM.Hvar(self.huim, key="sell_form", vtype="input", dtype=str, display="Sell Form", frame="inputs_player_grid", initial="Base", options=self.input_options["sell_form"])
         self.calculated_ID = HPM.Hvar(self.huim, key="calculated_ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
@@ -513,7 +510,7 @@ class Calculator(tk.Tk):
             self.add_ons_buttons[add_on_name] = tk.Button(self.frames["add_ons_buttons_grid"], text=add_on_name, command=button_function)
             self.add_ons_auto_run[add_on_data["auto_run"]][add_on_name], widget = self.huim.def_input_var(dtype=bool, frame=self.frames["add_ons_buttons_grid"], L_text="", initial=False)
             widget[-1].place(in_=self.add_ons_buttons[add_on_name], anchor="w", relx=1, rely=0.5, x=10)
-            self.add_ons_buttons[add_on_name].grid(row=number % 8, column=(int(number / 8)) * 2)
+            self.add_ons_buttons[add_on_name].grid(row=number % 16, column=(int(number / 16)) * 2)
 
         self.huim.logger.debug("Widgets placed")
 
@@ -710,7 +707,10 @@ class Calculator(tk.Tk):
         if template_name == "Load ID":
             template = self.decode_id(self.load_ID.get())
         elif template_name == "Clean":
-            template = {var_key: self.var_dict[var_key].initial for var_key in self.ID_order if var_key not in ["minion", "miniontier"]}
+            template = {var_key: self.var_dict[var_key].initial for var_key in self.ID_order if var_key not in ["minion", "miniontier", "amount"]}
+        elif template_name == "Crystal and Pet":
+            template = {}
+            self.add_ons_list["Crystal and Pet"]["function"]()
         else:
             template = templateList[template_name]
         for setting, variable in template.items():
@@ -763,7 +763,7 @@ class Calculator(tk.Tk):
         elif var_key == "special_layout" and "Special Layout" in calculation_data["notes"]:  # special case: special layout description instead of True
             data = f"{calculation_data["notes"]["Special Layout"]}"
         elif var_key == "custom_upgrade_toggle" and calculation_data[var_key]:
-            data = f"Speed boost: {self.md.calculator_data["CUSTOM_UPGRADE"]["speed_boost"]}, Drop multiplier: {self.md.calculator_data["CUSTOM_UPGRADE"]["drop_multiplier"]}"
+            data = f"Speed boost: {self.md.calculator_data["CUSTOM_UPGRADE"]["speed_boost"]}, Drop multiplier: {self.md.calculator_data["CUSTOM_UPGRADE"]["drop_multiplier"]}, XP multiplier: {self.md.calculator_data["CUSTOM_UPGRADE"]["xp_multiplier"]}"
         elif self.var_dict[var_key].dtype in [dict, list]:
             data = calculation_data[var_key]
         elif self.var_dict[var_key].dtype in [int, float]:
@@ -1718,7 +1718,7 @@ class Calculator(tk.Tk):
         :param afk_toggle: boolean, True if AFKing, False if offline
         :param mayor: str, mayor
         :param drops_list: dict, all drops of the setup
-        :param setup_data: needed setup data: player_harvests, combat_wisdom, mining_wisdom, farming_wisdom, fishing_wisdom, foraging_wisdom, alchemy_wisdom
+        :param setup_data: needed setup data: player_harvests, combat_wisdom, mining_wisdom, farming_wisdom, fishing_wisdom, foraging_wisdom, alchemy_wisdom, custom_upgrade_toggle
         :return skill_xp: dict, gained skill xp per type
         """
         skill_xp = {}
@@ -1732,6 +1732,8 @@ class Calculator(tk.Tk):
                     skill_xp[xptype] = 0
                 skill_xp[xptype] += amount * value * (1 + setup_data[xptype + "_wisdom"] / 100)
         self.huim.deepmultiply(skill_xp, self.md.calculator_data[mayor]["xp_multiplier"])
+        if setup_data["custom_upgrade_toggle"]:
+            self.huim.deepmultiply(skill_xp, self.md.calculator_data["CUSTOM_UPGRADE"]["xp_multiplier"])
         if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
             del skill_xp["combat"]
         return skill_xp
