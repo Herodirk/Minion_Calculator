@@ -651,7 +651,7 @@ class Calc_add_ons():
             del ordering_data[top_minion]
         if markdown_output:
             output_str += "\n```"
-        output_str += f"\n Ordered by: {ordering}"
+        output_str += f"\nOrdered by: {ordering}"
         if self.calc.output_to_clipboard.get():
             self.calc.clipboard_clear()
             self.calc.clipboard_append(output_str)
@@ -671,5 +671,8 @@ class Calc_add_ons():
             if state and setup_part in outputs["setupcost_breakdown"]:
                 partial_cost += outputs["setupcost_breakdown"][setup_part]
                 used_parts.append(self.calc.var_dict[setup_part].get_display())
+        if len(used_parts) == 0:
+            self.calc.collect_add_on_output("Partial Setup Cost", "No setup parts pass the filter")
+            return
         self.calc.collect_add_on_output("Partial Setup Cost", self.calc.huim.reduced_number(partial_cost) + " for " + ", ".join(used_parts))
         return

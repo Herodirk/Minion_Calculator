@@ -2005,22 +2005,17 @@ class Calculator(tk.Tk):
         E(X) = E(X)- pE(X) + 1
         E(X)= 1/p
         """
-        free_will_price = self.get_price("FREE_WILL", setup_data, "buy", "bazaar")
-        postcard_price = self.get_price("POSTCARD", setup_data, "sell", "ah")
         free_will_optimal_tier = 0
-        if postcard_price == 0:
-            # If no price found, use the free will price
-            final_postcard_cost = free_will_price
-        else:
-            final_postcard_cost = postcard_price
         if setup_data["free_will"]:
+            free_will_price = self.get_price("FREE_WILL", setup_data, "buy", "bazaar")
+            postcard_sell_price = self.get_price("POSTCARD", setup_data, "sell", "ah")
             tiered_free_will = {}
             for tier in tier_loop:
                 free_wills_needed = 1 / (0.5 + 0.04 * (tier - 1))
                 # for each failed Free Will we need another minion and we get a postcard
                 # the last Free Will will not give a post card
                 free_wills_failed = free_wills_needed - 1
-                tiered_free_will[tier] = free_wills_failed * (tiered_coin_cost[tier] - final_postcard_cost) + free_wills_needed * free_will_price
+                tiered_free_will[tier] = free_wills_failed * (tiered_coin_cost[tier] - postcard_sell_price) + free_wills_needed * free_will_price
             self.huim.logger.debug(f"Found Average Free Will cost per tier:\n{tiered_free_will}",)
             free_will_optimal_tier = min(tiered_free_will, key=tiered_free_will.get)
             cost_per_part["free_will"] = tiered_free_will[free_will_optimal_tier]
@@ -2042,7 +2037,7 @@ class Calculator(tk.Tk):
 
         # Postcard cost
         if setup_data["postcard"]:
-            cost_per_part["postcard"] = final_postcard_cost
+            cost_per_part["postcard"] = self.get_price("POSTCARD", setup_data, "buy", "ah")
 
         # Potato Talisman cost
         if setup_data["potato_accessory"] != "NONE":
@@ -2052,7 +2047,7 @@ class Calculator(tk.Tk):
         for pet_slot in setup_pets.keys():
             if self.md.has_data_tag(setup_pets[pet_slot]["pet"], "dragon_egg_pet"):
                 continue
-            if pet_slot == "levelingpet":
+            if pet_slot == "levelingpet" and setup_data["pet_exp_boost"] != "NONE":
                 cost_per_part["pet_exp_boost"] = self.get_price(setup_data["pet_exp_boost"], setup_data, "buy", "ah")
             elif setup_data["expshareitem"]:
                 if "expshareitem" not in cost_per_part:
