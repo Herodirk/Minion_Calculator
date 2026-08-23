@@ -2335,7 +2335,7 @@
             "combat": 0
         },
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ],
         "compact_tier": 0
     },
@@ -3855,7 +3855,7 @@
         },
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "LESSER_SOULFLOW_ENGINE": {
@@ -4173,7 +4173,7 @@
         ],
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "POTATO_RING": {
@@ -4184,7 +4184,7 @@
         ],
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "INFERNO_FUEL_BLOCK": {
@@ -4351,7 +4351,7 @@
         "exp_boost_amount": 40,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_FARMING_SKILL_BOOST_COMMON": {
@@ -4370,7 +4370,7 @@
         "exp_boost_amount": 30,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_FARMING_SKILL_BOOST_RARE": {
@@ -4407,7 +4407,7 @@
         "exp_boost_amount": 30,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_FISHING_SKILL_BOOST_RARE": {
@@ -4417,7 +4417,7 @@
         "exp_boost_amount": 40,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_FISHING_SKILL_BOOST_EPIC": {
@@ -4427,7 +4427,7 @@
         "exp_boost_amount": 50,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_COMMON": {
@@ -4446,7 +4446,7 @@
         "exp_boost_amount": 30,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_RARE": {
@@ -4456,7 +4456,7 @@
         "exp_boost_amount": 40,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_COMBAT_SKILL_BOOST_EPIC": {
@@ -4466,7 +4466,7 @@
         "exp_boost_amount": 50,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_FORAGING_SKILL_BOOST_COMMON": {
@@ -4478,6 +4478,26 @@
             "custom": 60000
         }
     },
+    "PET_ITEM_FORAGING_SKILL_BOOST_UNCOMMON": {
+        "display": "Uncommon Foraging Exp Boost",
+        "rarity": "UNCOMMON",
+        "exp_boost_type": "foraging",
+        "exp_boost_amount": 30,
+        "prices": {},
+        "tags": [
+            "auction_price"
+        ]
+    },
+    "PET_ITEM_FORAGING_SKILL_BOOST_RARE": {
+        "display": "Rare Foraging Exp Boost",
+        "rarity": "RARE",
+        "exp_boost_type": "foraging",
+        "exp_boost_amount": 40,
+        "prices": {},
+        "tags": [
+            "auction_price"
+        ]
+    },
     "PET_ITEM_FORAGING_SKILL_BOOST_EPIC": {
         "display": "Epic Foraging Exp Boost",
         "rarity": "EPIC",
@@ -4485,7 +4505,7 @@
         "exp_boost_amount": 50,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_ALL_SKILLS_BOOST_COMMON": {
@@ -4504,7 +4524,7 @@
         "exp_boost_amount": 20,
         "prices": {},
         "tags": [
-            "auction_price_upon_request"
+            "auction_price"
         ]
     },
     "PET_ITEM_EXP_SHARE": {

@@ -357,7 +357,7 @@ If that date is missing, it was confirmed by an old test and might need to be ch
 
 
 LAPIS_MINION: drops  # correct
-HARD_STONE_MINION: drops  # correct
+HARD_STONE_MINION: drops  # correct (2026-7-27)
 WHEAT_MINION: drops  # correct
 NETHER_WART_MINION: drops  # correct (2025-10-18)
 FLOWER_MINION: drops  # TODO: check
@@ -377,7 +377,7 @@ SUPER_COMPACTOR_3000, DWARVEN_COMPACTOR: compacting_list  # correct that they do
 - WHEAT -> ENCHANTED_BREAD
 - CHILI_PEPPER -> STUFFED_CHILI_PEPPER
 - HEMOGLASS -> HEMOBOMB
-- ENCHANTED_GHAST_TEAR -> SILVER_FANG
+- ENCHANTED_GHAST_TEAR -> SILVER_FANG  # correct (2026-7-27)
 
 WOOD_PICKAXE: prices  # Lumber Merchant
 WOOD_SPADE: prices  # Lumber Merchant
@@ -406,7 +406,6 @@ Offline cooldown of the following upgrades are not confirmed:
 - SOULFLOW_ENGINE
 - BERBERIS_FUEL_INJECTOR
 
-JACOBS_PARTICIPATION_MEDAL: upgrade_effects  # rough estimate of drop rate
 ENCHANTED_SHEARS: upgrade_effects  # Base drop wool gets set to 0. For online, its possible that the sheep regrow their wool, making it up to 3 wool per spawn and harvest, needs testing
 
 Compacting recipes notes:
@@ -419,25 +418,28 @@ CACTUS  # correct (2025-12-17)
 ENCHANTED_COCOA  # correct (2025-12-19)
 CRUDE_GABAGOOL  # correct
 SUPER_EGG  # correct
-POISONOUS_POTATO  # TODO: check if compacting is even possible
+POISONOUS_POTATO  # correct (2026-7-29)
 
 XP notes:
-- ENCHANTED_GLOWSTONE  # correct inaccuracy
+- ENCHANTED_GLOWSTONE  # correct inaccuracy (2026-7-28)
 - WHEAT  # correct (2026-5-10)
 - SEEDS  # correct (2026-5-10)
 - ENCHANTED_WHEAT  # correct
 - ENCHANTED_HAY_BALE  # correct
 - MELON_SLICE  # correct (2026-5-10)
 - ENCHANTED_GOLDEN_CARROT  # correct (2026-3-7)
-- HUGE_MUSHROOM_2  # correct inaccuracy
-- HUGE_MUSHROOM_1  # correct inaccuracy
-- ENCHANTED_HUGE_MUSHROOM_2  # correct inaccuracy (2026-3-17)
-- ENCHANTED_HUGE_MUSHROOM_1  # correct inaccuracy (2026-3-17)
-- ENCHANTED_CACTUS_GREEN  # correct inaccuracy
+- HUGE_MUSHROOM_2  # correct inaccuracy (2026-7-26)
+- HUGE_MUSHROOM_1  # correct inaccuracy (2026-7-26)
+- ENCHANTED_HUGE_MUSHROOM_2  # correct inaccuracy (2026-8-3)
+- ENCHANTED_HUGE_MUSHROOM_1  # correct inaccuracy (2026-8-3)
+- ENCHANTED_CACTUS_GREEN  # correct inaccuracy (2026-7-26)
 - ENCHANTED_CACTUS  # correct inaccuracy
 - ENCHANTED_COOKIE  # correct (2026-3-9)
 - ENCHANTED_SUGAR  # correct type and amount (2026-5-10)
 - ENCHANTED_SUGAR_CANE  # correct type
+- MUTANT_NETHER_STALK  # correct type and amount (2026-7-30)
+- ENCHANTED_DANDELION  # correct (2026-7-29)
+- ENCHANTED_POPPY  # correct (2026-7-29)
 - WILD_ROSE  # correct (2025-12-17)
 - ENCHANTED_WILD_ROSE  # correct (2025-12-17)
 - COMPACTED_WILD_ROSE  # correct (2025-12-21)
@@ -447,22 +449,24 @@ XP notes:
 - MOONFLOWER  # correct (2025-12-17)
 - ENCHANTED_MOONFLOWER  # correct (2025-12-17)
 - COMPACTED_MOONFLOWER  # correct (2025-12-21)
-- WATER_LILY, ENCHANTED_WATER_LILY  # correct (2026-6-4)
-- POISONOUS_POTATO  # TODO: check xp amount
-- ENCHANTED_POISONOUS_POTATO  # TODO: check xp amount
-- ENCHANTED_ENDER_PEARL  # correct inaccuracy
-- ABSOLUTE_ENDER_PEARL  # correct inaccuracy
+- WATER_LILY  # correct (2026-8-3)
+- ENCHANTED_WATER_LILY  # correct (2026-8-3)
+- CONDENSED_WATER_LILY  # correct (2026-8-3)
+- POISONOUS_POTATO  # correct (2026-7-29)
+- ENCHANTED_POISONOUS_POTATO  # correct (2026-7-29)
+- ENCHANTED_ENDER_PEARL  # correct inaccuracy (2026-7-27)
+- ABSOLUTE_ENDER_PEARL  # correct inaccuracy (2026-7-27)
 - HEMOGLASS  # correct
-- ENCHANTED_STRING  # correct inaccuracy
-- ENCHANTED_GHAST_TEAR  # correct inaccuracy
-- ENCHANTED_LEATHER  # correct inaccuracy
-- ENCHANTED_EGG  # correct inaccuracy
+- ENCHANTED_STRING  # correct inaccuracy (2026-7-27)
+- ENCHANTED_GHAST_TEAR  # correct inaccuracy (2026-7-27)
+- ENCHANTED_LEATHER  # correct inaccuracy (2026-7-26)
+- ENCHANTED_EGG  # correct inaccuracy (2026-7-26)
 - SUPER_EGG  # TODO: check xp amount
 - OMEGA_EGG  # TODO: check xp amount
 - ENCHANTED_RABBIT  # correct
 - ENCHANTED_COOKED_RABBIT  # correct
 - ENCHANTED_RABBIT_FOOT  # correct
-- ENCHANTED_RABBIT_HIDE  # correct inaccuracy
+- ENCHANTED_RABBIT_HIDE  # correct inaccuracy (2026-7-26)
 
 The following items are not produced by minions anymore:
 - HAY_BLOCK

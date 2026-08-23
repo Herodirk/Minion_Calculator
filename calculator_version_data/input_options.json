@@ -366,6 +366,8 @@
         "Rare Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_RARE",
         "Epic Combat Exp Boost": "PET_ITEM_COMBAT_SKILL_BOOST_EPIC",
         "Common Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_COMMON",
+        "Uncommon Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_UNCOMMON",
+        "Rare Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_RARE",
         "Epic Foraging Exp Boost": "PET_ITEM_FORAGING_SKILL_BOOST_EPIC",
         "All Skills Exp Boost": "PET_ITEM_ALL_SKILLS_BOOST_COMMON",
         "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST"

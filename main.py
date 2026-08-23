@@ -14,6 +14,7 @@ AH data from https://sky.coflnet.com/data
 
 try:
     import tkinter as tk
+    import tkinter.font as tkFont
     import math
     import time
     import webbrowser
@@ -343,8 +344,11 @@ class Calculator(tk.Tk):
         self.creditLB.place(in_=self.stopB, x=-10, rely=0.5, y=-1, anchor="e")
         self.manualLB = self.huim.create_label(frm=self.frames["controls"], txt="Online Manual:\nCalculator Manual")
         self.manualLB.place(in_=self.creditLB, x=-10, rely=0.5, anchor="e")
-        self.manualLB.bind("<Button-1>", lambda void_event: webbrowser.open(r"https://herodirk.github.io/"))
+        self.manualLB.bind("<Button-1>", lambda void_event: webbrowser.open(r"https://herodirk.github.io/minion/index.html"))
         self.API_creditLB = self.huim.create_label(frm=self.frames["controls"], txt="Bazaar data from Hypixel API,\nAH data from SkyCofl API")
+        underline_font = tkFont.Font(self.API_creditLB, self.API_creditLB.cget("font"))
+        underline_font.configure(underline=True)
+        self.API_creditLB.configure(font=underline_font)
         self.API_creditLB.place(in_=self.manualLB, x=-10, rely=0.5, anchor="e")
         self.API_creditLB.bind("<Button-1>", lambda click_event: webbrowser.open(r"https://api.hypixel.net/") if click_event.y < 18 else webbrowser.open(r"https://sky.coflnet.com/data"))
 
@@ -999,9 +1003,6 @@ class Calculator(tk.Tk):
             elif action == "sell":
                 price_point = setup_data["bazaar_sell_type"]
 
-        if self.md.has_data_tag(item_ID, "auction_price_upon_request"):
-            self.update_auction_price(item_ID)
-
         price = 0
         if price_point in self.md.calculator_data[item_ID]["prices"]:
             price = self.md.calculator_data[item_ID]["prices"][price_point]
@@ -1011,15 +1012,16 @@ class Calculator(tk.Tk):
             for backup_price_point in ["sellPrice", "buyPrice", "ah", "custom", "npc", "warn"]:
                 if backup_price_point in self.md.calculator_data[item_ID]["prices"]:
                     price = self.md.calculator_data[item_ID]["prices"][backup_price_point]
+                    price_point = backup_price_point
                     break
             if backup_price_point == "warn":
                 self.huim.logger.warning("no cost found for " + item_ID)
 
-        if location == "bazaar" and action == "sell":
+        if price_point in ["sellPrice", "buyPrice"] and action == "sell":
             price = self.apply_bazaar_tax(price, setup_data)
-        elif location == "ah" and action == "sell":
+        elif price_point == "ah" and action == "sell":
             price = self.apply_ah_tax(price, setup_data)
-        elif location == "npc" and action == "buy":
+        elif price_point == "npc" and action == "buy":
             price = 2 * price
         return price
 
@@ -1039,7 +1041,9 @@ class Calculator(tk.Tk):
             starting_fee_tax = 0.02
         else:
             starting_fee_tax = 0.01
-        return max(1000000, price * 0.99) - price * starting_fee_tax
+        if price > 1000000:
+            price = max(1000000, price * 0.99)
+        return price * (1 - starting_fee_tax)
 
     def get_speed_boosts(self, minion, upgrade_ids, upgrade_effects, afk_toggle, clock_override, setup_data):
         """
@@ -2282,12 +2286,9 @@ class Calculator(tk.Tk):
                 self.recipe_items.append(item_id)
             elif self.md.has_data_tag(item_id, "auction_price"):
                 self.AH_items.append(item_id)
-            elif self.md.has_data_tag(item_id, "auction_price_upon_request"):
-                self.md.calculator_data[item_id]["price_last_updated"] = 0
         return  
 
-
-    def call_bazaar(self):
+    def update_bazaar_prices(self):
         """
         calls to Hypixel API for most recent bazaar data,
         handles that data to calculate accurate buy and sell prices.
@@ -2303,7 +2304,6 @@ class Calculator(tk.Tk):
         if "success" not in raw_bazaar_data or raw_bazaar_data["success"] is False:
             self.huim.logger.error("Hypixel Bazaar API call was unsuccessful")
             return
-        self.API_timer = raw_bazaar_data["lastUpdated"] / 1000
         top_percent = 0.1
         for item_id in self.bazaar_items:
             if item_id not in raw_bazaar_data["products"]:
@@ -2334,24 +2334,8 @@ class Calculator(tk.Tk):
                     self.huim.logger.info(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
                     self.md.calculator_data[item_id]["prices"][f"{action}Price"] = top_percent_avg_price
-        self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(self.API_timer)))
+        self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(raw_bazaar_data["lastUpdated"] / 1000)))
         return
-
-    def call_auction_house(self, item_id):
-        """
-        API call to SkyCofl to update Auction House price of the given item.
-
-        AH data from https://sky.coflnet.com/data
-
-        :param item_id: item ID
-
-        Returns
-        -------
-        None.
-
-        """
-        raw_auction_data = self.huim.call_API(r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin", f"SkyCofl AH BIN API: {item_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
-        return (raw_auction_data["lowest"] + raw_auction_data["secondLowest"]) / 2
 
     def update_recipe_price(self, item_id):
         """
@@ -2380,10 +2364,23 @@ class Calculator(tk.Tk):
             self.md.calculator_data[item_id]["prices"]["sellPrice"] += amount * self.md.calculator_data[material_id]["prices"]["sellPrice"]
         return
 
-    def update_auction_price(self, item_id):
-        if time.time() - self.md.calculator_data[item_id]["price_last_updated"] > self.API_cooldown.get():
-            self.md.calculator_data[item_id]["prices"]["ah"] = self.call_auction_house(item_id)
-            self.md.calculator_data[item_id]["price_last_updated"] = time.time()
+    def update_auction_prices(self):
+        """
+        First calls bulk AH data from https://sky.coflnet.com/api/prices/neu
+        If an item is not in the bulk data, it calls individual item bin price through https://sky.coflnet.com/api/item/price/{item_id}/bin
+
+        AH data from https://sky.coflnet.com/data
+        """
+        raw_auction_data = self.huim.call_API(r"https://sky.coflnet.com/api/prices/neu", "SkyCofl AH API", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
+        for item_id in self.AH_items:
+            price = 0
+            if item_id in raw_auction_data:
+                price = raw_auction_data[item_id]
+            else:
+                raw_auction_bin_data = self.huim.call_API(r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin", f"SkyCofl AH BIN API: {item_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
+                price = (raw_auction_bin_data["lowest"] + raw_auction_bin_data["secondLowest"]) / 2
+            self.md.calculator_data[item_id]["prices"]["ah"] = price
+        return
 
     def update_prices(self, cooldown_warning=True, in_gui=True):
         """
@@ -2395,15 +2392,15 @@ class Calculator(tk.Tk):
             if cooldown_warning:
                 self.huim.logger.info("API update is on cooldown")
             return
+        self.API_timer = time.time()  # seconds
         self.huim.logger.info("Updating Bazaar prices")
         if in_gui is True:
             background_color_storage = self.statusC["background"]
             self.statusC.configure(bg="aqua")
             self.statusC.update()
-        self.call_bazaar()
+        self.update_bazaar_prices()
         self.huim.logger.info("Updating Auction House prices")
-        for item_id in self.AH_items:
-            self.md.calculator_data[item_id]["prices"]["ah"] = self.call_auction_house(item_id)
+        self.update_auction_prices()
         self.huim.logger.info("Updating Recipe prices")
         for item_id in self.recipe_items:
             self.update_recipe_price(item_id)
