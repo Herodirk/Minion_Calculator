@@ -1900,7 +1900,7 @@ class Calculator(tk.Tk):
                 continue
             pet_price_max = pet_prices_data[pet_info["rarity"]]["max"]
             pet_price_min = pet_prices_data[pet_info["rarity"]]["min"]
-            if pet_price_min == 0 or pet_price_max == 0:
+            if pet_info["rarity"] != "CUSTOM_RARITY" and (pet_price_min == 0 or pet_price_max == 0):
                 if combined_pet_id not in used_pet_prices:
                     used_pet_prices[combined_pet_id] = f"Price not found"
                 continue
