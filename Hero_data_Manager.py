@@ -35,8 +35,6 @@ import pathlib
 class H_data_M():
     def __init__(self, huim):
         self.huim = huim
-        self.calculator_data = self.huim.read_json(pathlib.Path("calculator_data.json"))
-        self.huim.logger.debug("Static Calculator Data loaded")
 
         self.inferno_fuel_data = {
             'grades': { 'HYPERGOLIC_GABAGOOL': 20, 'HEAVY_GABAGOOL': 15, 'FUEL_GABAGOOL': 10 },
@@ -252,9 +250,44 @@ class H_data_M():
 
         self.huim.check_json(self.instance_data_file, self.instance_data)
         self.instance_data.update(self.huim.read_json(self.instance_data_file))
+        self.init_calculator_data()
+        self.huim.logger.debug("Calculator Data loaded")
+        return
+
+    def init_calculator_data(self):
+        """
+        calls to Hypixel's Item,
+        uses that data to get NPC prices and XP amounts
+
+        Returns
+        -------
+        None
+
+        """
+        self.calculator_data = self.huim.read_json(pathlib.Path("calculator_data.json"))
+        self.huim.logger.debug("Static Calculator Data loaded")
+
+        raw_item_data = self.huim.call_API(r"https://api.hypixel.net/resources/skyblock/items", "Hypixel Item API")
+        if "success" not in raw_item_data or raw_item_data["success"] is False:
+            self.huim.logger.error("Hypixel Item API call was unsuccessful")
+            return
+        dict_item_data = {}
+        for item_data in raw_item_data["items"]:
+            dict_item_data[item_data["id"]] = item_data
+        for item_id in self.calculator_data.keys():
+            if item_id not in dict_item_data:
+                continue
+            if "npc_sell_price" in dict_item_data[item_id]:
+                self.set_data(item_id + ".prices.npc", dict_item_data[item_id]["npc_sell_price"])
+            else:
+                self.set_data(item_id + ".prices.npc", 0)
+            if "experience" not in dict_item_data[item_id]:
+                continue
+            for skill, xp_data in dict_item_data[item_id]["experience"].items():
+                if "MINION_STORAGE" in xp_data:
+                    self.set_data(item_id + ".xp." + skill, xp_data["MINION_STORAGE"])
         for data_loc, data_val in self.instance_data.items():
             self.set_data(data_loc, data_val)
-        self.huim.logger.debug("Calculator Instance Data loaded")
         return
 
     def has_data_tag(self, data_ID, tag):
@@ -288,15 +321,25 @@ class H_data_M():
                 final_cost[item] += amount
         return final_cost
 
-    def get_data(self, data_location):
+    def get_data(self, data_location, fallback=None):
         data_pointer = self.calculator_data
         data_location_keys = data_location.split(".")
         for key in data_location_keys:
             if key not in data_pointer:
-                self.huim.logger.warning(f"Could not find {key} in calculator data for {data_location}")
-                return None
+                if fallback is None:
+                    self.huim.logger.warning(f"Could not find {key} in calculator data for {data_location}")
+                return fallback
             data_pointer = data_pointer[key]
         return data_pointer
+
+    def check_data(self, data_location):
+        data_pointer = self.calculator_data
+        data_location_keys = data_location.split(".")
+        for key in data_location_keys:
+            if key not in data_pointer:
+                return False
+            data_pointer = data_pointer[key]
+        return True
 
     def set_data(self, data_location, data_value):
         data_pointer = self.calculator_data
@@ -420,53 +463,6 @@ CRUDE_GABAGOOL  # correct
 SUPER_EGG  # correct
 POISONOUS_POTATO  # correct (2026-7-29)
 
-XP notes:
-- ENCHANTED_GLOWSTONE  # correct inaccuracy (2026-7-28)
-- WHEAT  # correct (2026-5-10)
-- SEEDS  # correct (2026-5-10)
-- ENCHANTED_WHEAT  # correct
-- ENCHANTED_HAY_BALE  # correct
-- MELON_SLICE  # correct (2026-5-10)
-- ENCHANTED_GOLDEN_CARROT  # correct (2026-3-7)
-- HUGE_MUSHROOM_2  # correct inaccuracy (2026-7-26)
-- HUGE_MUSHROOM_1  # correct inaccuracy (2026-7-26)
-- ENCHANTED_HUGE_MUSHROOM_2  # correct inaccuracy (2026-8-3)
-- ENCHANTED_HUGE_MUSHROOM_1  # correct inaccuracy (2026-8-3)
-- ENCHANTED_CACTUS_GREEN  # correct inaccuracy (2026-7-26)
-- ENCHANTED_CACTUS  # correct inaccuracy
-- ENCHANTED_COOKIE  # correct (2026-3-9)
-- ENCHANTED_SUGAR  # correct type and amount (2026-5-10)
-- ENCHANTED_SUGAR_CANE  # correct type
-- MUTANT_NETHER_STALK  # correct type and amount (2026-7-30)
-- ENCHANTED_DANDELION  # correct (2026-7-29)
-- ENCHANTED_POPPY  # correct (2026-7-29)
-- WILD_ROSE  # correct (2025-12-17)
-- ENCHANTED_WILD_ROSE  # correct (2025-12-17)
-- COMPACTED_WILD_ROSE  # correct (2025-12-21)
-- DOUBLE_PLANT  # correct (2025-12-17)
-- ENCHANTED_SUNFLOWER  # correct (2025-12-17)
-- COMPACTED_SUNFLOWER  # correct (2025-12-21)
-- MOONFLOWER  # correct (2025-12-17)
-- ENCHANTED_MOONFLOWER  # correct (2025-12-17)
-- COMPACTED_MOONFLOWER  # correct (2025-12-21)
-- WATER_LILY  # correct (2026-8-3)
-- ENCHANTED_WATER_LILY  # correct (2026-8-3)
-- CONDENSED_WATER_LILY  # correct (2026-8-3)
-- POISONOUS_POTATO  # correct (2026-7-29)
-- ENCHANTED_POISONOUS_POTATO  # correct (2026-7-29)
-- ENCHANTED_ENDER_PEARL  # correct inaccuracy (2026-7-27)
-- ABSOLUTE_ENDER_PEARL  # correct inaccuracy (2026-7-27)
-- HEMOGLASS  # correct
-- ENCHANTED_STRING  # correct inaccuracy (2026-7-27)
-- ENCHANTED_GHAST_TEAR  # correct inaccuracy (2026-7-27)
-- ENCHANTED_LEATHER  # correct inaccuracy (2026-7-26)
-- ENCHANTED_EGG  # correct inaccuracy (2026-7-26)
-- SUPER_EGG  # TODO: check xp amount
-- OMEGA_EGG  # TODO: check xp amount
-- ENCHANTED_RABBIT  # correct
-- ENCHANTED_COOKED_RABBIT  # correct
-- ENCHANTED_RABBIT_FOOT  # correct
-- ENCHANTED_RABBIT_HIDE  # correct inaccuracy (2026-7-26)
 
 The following items are not produced by minions anymore:
 - HAY_BLOCK

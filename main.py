@@ -208,7 +208,7 @@ class Calculator(tk.Tk):
         # Use Hero UI Manager to initialize the window and the frames with grids
         self.huim = HPM.H_UI_M(main=self, windowTitle="Minion Calculator", windowWidth=found_settings["window_width"], windowHeight=found_settings["window_height"], palette=found_settings["color_palette"], debug_mode=found_settings["debug_mode"])
         if len(setting_load_errors) != 0:
-            self.huim.logger.error(f"Could not find the following settings: {", ".join(setting_load_errors)}")
+            self.huim.logger.warning(f"Could not find the following settings: {", ".join(setting_load_errors)}. Assuming default values")
         self.huim.create_controls()
         self.huim.create_frames(self, frame_keys=[["inputs_minion", "inputs_player", "outputs_setup", "outputs_profit"]], grid_frames=True, grid_size=0.96, border=0.003)
         self.frames["add_ons_main"] = tk.Frame(self, background=self.colors["background"])
@@ -1226,10 +1226,6 @@ class Calculator(tk.Tk):
             if not afk_toggle:
                 # vanilla minecraft chance for gravel to become flint does not happen offline
                 self.add_replacing_effect(upgrade_effects["replacing"], {"FLINT": {"GRAVEL": 1}}, True)
-        elif minion == "PUMPKIN_MINION":
-            if not afk_toggle:
-                # it just does this, idk, ask Hypixel
-                self.add_replacing_effect(upgrade_effects["replacing"], {"PUMPKIN": {"PUMPKIN": 3}}, True)
         elif minion == "SHEEP_MINION":
             if "ENCHANTED_SHEARS" in upgrade_ids:
                 # Enchanted shears remove base drops in exchange for upgrade drops
@@ -1556,7 +1552,7 @@ class Calculator(tk.Tk):
         costPerInfernofuel = 0
         for component_ID, amount in infernofuel_components.items():
             costPerInfernofuel += amount * self.get_price(component_ID, setup_data, action="buy", location="bazaar")
-        self.md.calculator_data["INFERNO_FUEL"]["prices"]["custom"] = costPerInfernofuel
+        self.md.set_data("INFERNO_FUEL.prices.custom", costPerInfernofuel)
         # the fuel cost is put into the item data to be used later in the general fuel cost calculator
         return
 
@@ -2251,8 +2247,8 @@ class Calculator(tk.Tk):
 
     def init_prices(self):
         """
-        calls to Hypixel's Item and Bazaar API,
-        handles that data to get NPC prices and check which items are on Bazaar.
+        calls to Hypixel's Bazaar API,
+        uses that data to check which items are on Bazaar.
         Also checks calculator data for all recipe and AH items
 
         Returns
@@ -2265,21 +2261,7 @@ class Calculator(tk.Tk):
             self.huim.logger.error("Hypixel Bazaar API call was unsuccessful")
             return
 
-        raw_item_data = self.huim.call_API(r"https://api.hypixel.net/resources/skyblock/items", "Hypixel Item API")
-        if "success" not in raw_item_data or raw_item_data["success"] is False:
-            self.huim.logger.error("Hypixel Item API call was unsuccessful")
-            return
-        dict_item_data = {}
-        for item_data in raw_item_data["items"]:
-            dict_item_data[item_data["id"]] = item_data
-        
         for item_id in self.md.calculator_data.keys():
-            if "prices" not in self.md.calculator_data[item_id]:
-                continue
-            if item_id in dict_item_data and "npc_sell_price" in dict_item_data[item_id]:
-                self.md.calculator_data[item_id]["prices"]["npc"] = dict_item_data[item_id]["npc_sell_price"]
-            elif "npc" not in self.md.calculator_data[item_id]["prices"]:
-                self.md.calculator_data[item_id]["prices"]["npc"] = 0
             if item_id in raw_bazaar_data["products"]:
                 self.bazaar_items.append(item_id)
             elif "recipe" in self.md.calculator_data[item_id]:
@@ -2311,7 +2293,7 @@ class Calculator(tk.Tk):
             for action in ["buy", "sell"]:
                 top_amount = top_percent * sum([order["amount"] for order in raw_bazaar_data["products"][item_id][f"{action}_summary"]])
                 if top_amount == 0:
-                    self.md.calculator_data[item_id]["prices"][f"{action}Price"] = 0
+                    self.md.set_data(item_id + f".prices.{action}Price", 0)
                     if "npc" not in self.md.calculator_data[item_id]["prices"]:
                         self.huim.logger.warning(f"no {action} supply for {item_id}")
                     continue
@@ -2330,10 +2312,10 @@ class Calculator(tk.Tk):
                 top_percent_avg_price = top_sum / top_amount
                 top_price = raw_bazaar_data["products"][item_id][f"{action}_summary"][0]["pricePerUnit"]
                 if top_price / top_percent_avg_price >= 2.5:
-                    self.md.calculator_data[item_id]["prices"][f"{action}Price"] = top_price
+                    self.md.set_data(f"{item_id}.prices.{action}Price", top_price)
                     self.huim.logger.info(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
-                    self.md.calculator_data[item_id]["prices"][f"{action}Price"] = top_percent_avg_price
+                    self.md.set_data(f"{item_id}.prices.{action}Price", top_percent_avg_price)
         self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(raw_bazaar_data["lastUpdated"] / 1000)))
         return
 
@@ -2353,8 +2335,8 @@ class Calculator(tk.Tk):
         if "recipe" not in self.md.calculator_data[item_id]:
             self.huim.logger.error(f"{item_id} is not a recipe item")
             return
-        self.md.calculator_data[item_id]["prices"]["buyPrice"] = 0
-        self.md.calculator_data[item_id]["prices"]["sellPrice"] = 0
+        self.md.set_data(item_id + ".prices.buyPrice", 0)
+        self.md.set_data(item_id + ".prices.sellPrice", 0)
         for material_id, amount in self.md.calculator_data[item_id]["recipe"].items():
             if self.md.has_data_tag(material_id, "auction_price"):
                 self.md.calculator_data[item_id]["prices"]["buyPrice"] += amount * self.md.calculator_data[material_id]["prices"]["ah"]
@@ -2379,7 +2361,7 @@ class Calculator(tk.Tk):
             else:
                 raw_auction_bin_data = self.huim.call_API(r"https://sky.coflnet.com/api/item/price/" + item_id + r"/bin", f"SkyCofl AH BIN API: {item_id}", headers={'User-Agent': f"Minion Calculator v{self.version.get()} (Python)"})
                 price = (raw_auction_bin_data["lowest"] + raw_auction_bin_data["secondLowest"]) / 2
-            self.md.calculator_data[item_id]["prices"]["ah"] = price
+            self.md.set_data(item_id + ".prices.ah", price)
         return
 
     def update_prices(self, cooldown_warning=True, in_gui=True):
@@ -2510,10 +2492,16 @@ class Calculator(tk.Tk):
         return
     
     def edit_settings(self, new_settings):
-        if self.debug_mode.get():
+        if new_settings["debug_mode"]:
             self.huim.logger.setLevel(10)
         else:
             self.huim.logger.setLevel(20)
+        if new_settings["API_cooldown"] < 60:
+            self.huim.logger.warning("API Cooldown may not be lower than 60 seconds")
+            self.API_cooldown.set(60)
+        if new_settings["pet_API_cooldown"] < 60:
+            self.pet_API_cooldown.set(60)
+            self.huim.logger.warning("Pet API Cooldown may not be lower than 60 seconds")
         return
 
     def save_calculator_data(self):

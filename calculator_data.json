@@ -115,10 +115,6 @@
     },
     "LUSH_BERBERIS": {
         "display": "Lush Berberis",
-        "prices": {},
-        "xp": {
-            "farming": 10
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_LUSH_BERBERIS",
@@ -129,42 +125,22 @@
     },
     "ENCHANTED_LUSH_BERBERIS": {
         "display": "Enchanted Lush Berberis",
-        "prices": {},
-        "xp": {
-            "farming": 1600
-        },
         "compact_tier": 1
     },
     "RED_GIFT": {
         "display": "Red Gift",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compact_tier": 0
     },
     "PURPLE_CANDY": {
         "display": "Purple Candy",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "JACOBS_TICKET": {
         "display": "Jacob's Ticket",
-        "prices": {},
-        "xp": {
-            "farming": 0
-        },
         "compact_tier": 0
     },
     "RAW_SOULFLOW": {
         "display": "Raw Soulflow",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compacting": {
             "compact": {
                 "makes": "SOULFLOW",
@@ -175,18 +151,10 @@
     },
     "SOULFLOW": {
         "display": "Soulflow",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 1
     },
     "SULPHUR_ORE": {
         "display": "Sulphur",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SULPHUR",
@@ -197,10 +165,6 @@
     },
     "ENCHANTED_SULPHUR": {
         "display": "Enchanted Sulphur",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SULPHUR_CUBE",
@@ -211,26 +175,14 @@
     },
     "ENCHANTED_SULPHUR_CUBE": {
         "display": "Enchanted Sulphur Cube",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compact_tier": 2
     },
     "CORRUPTED_FRAGMENT": {
         "display": "Corrupted Fragment",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compact_tier": 0
     },
     "COBBLESTONE": {
         "display": "Cobblestone",
-        "prices": {},
-        "xp": {
-            "mining": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COBBLESTONE",
@@ -241,26 +193,14 @@
     },
     "ENCHANTED_COBBLESTONE": {
         "display": "Enchanted Cobblestone",
-        "prices": {},
-        "xp": {
-            "mining": 16
-        },
         "compact_tier": 1
     },
     "STONE": {
         "display": "Stone",
-        "prices": {},
-        "xp": {
-            "mining": 0.1
-        },
         "compact_tier": 0
     },
     "OBSIDIAN": {
         "display": "Obsidian",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_OBSIDIAN",
@@ -271,18 +211,10 @@
     },
     "ENCHANTED_OBSIDIAN": {
         "display": "Enchanted Obsidian",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compact_tier": 1
     },
     "GLOWSTONE_DUST": {
         "display": "Glowstone Dust",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compacting": {
             "block": {
                 "makes": "GLOWSTONE",
@@ -297,10 +229,6 @@
     },
     "GLOWSTONE": {
         "display": "Glowstone",
-        "prices": {},
-        "xp": {
-            "mining": 0.8
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GLOWSTONE_DUST",
@@ -311,10 +239,6 @@
     },
     "ENCHANTED_GLOWSTONE_DUST": {
         "display": "Enchanted Glowstone Dust",
-        "prices": {},
-        "xp": {
-            "mining": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GLOWSTONE",
@@ -325,26 +249,14 @@
     },
     "ENCHANTED_GLOWSTONE": {
         "display": "Enchanted Glowstone",
-        "prices": {},
-        "xp": {
-            "mining": 6144
-        },
         "compact_tier": 2
     },
     "GRAVEL": {
         "display": "Gravel",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compact_tier": 0
     },
     "FLINT": {
         "display": "Flint",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_FLINT",
@@ -355,18 +267,10 @@
     },
     "ENCHANTED_FLINT": {
         "display": "Enchanted Flint",
-        "prices": {},
-        "xp": {
-            "mining": 32
-        },
         "compact_tier": 1
     },
     "SAND": {
         "display": "Sand",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SAND",
@@ -377,18 +281,10 @@
     },
     "ENCHANTED_SAND": {
         "display": "Enchanted Sand",
-        "prices": {},
-        "xp": {
-            "mining": 32
-        },
         "compact_tier": 1
     },
     "SAND:1": {
         "display": "Red Sand",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RED_SAND",
@@ -399,10 +295,6 @@
     },
     "ENCHANTED_RED_SAND": {
         "display": "Enchanted Red Sand",
-        "prices": {},
-        "xp": {
-            "mining": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RED_SAND_CUBE",
@@ -413,26 +305,14 @@
     },
     "ENCHANTED_RED_SAND_CUBE": {
         "display": "Enchanted Red Sand Cube",
-        "prices": {},
-        "xp": {
-            "mining": 5120
-        },
         "compact_tier": 2
     },
     "GLASS": {
         "display": "Glass",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compact_tier": 0
     },
     "MYCEL": {
         "display": "Mycelium",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MYCELIUM",
@@ -443,10 +323,6 @@
     },
     "ENCHANTED_MYCELIUM": {
         "display": "Enchanted Mycelium",
-        "prices": {},
-        "xp": {
-            "mining": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MYCELIUM_CUBE",
@@ -457,18 +333,10 @@
     },
     "ENCHANTED_MYCELIUM_CUBE": {
         "display": "Enchanted Mycelium Cube",
-        "prices": {},
-        "xp": {
-            "mining": 5120
-        },
         "compact_tier": 2
     },
     "CLAY_BALL": {
         "display": "Clay Ball",
-        "prices": {},
-        "xp": {
-            "fishing": 0.1
-        },
         "compacting": {
             "block": {
                 "makes": "CLAY",
@@ -483,10 +351,6 @@
     },
     "CLAY": {
         "display": "Clay",
-        "prices": {},
-        "xp": {
-            "fishing": 0.4
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CLAY_BALL",
@@ -498,10 +362,6 @@
     },
     "ENCHANTED_CLAY_BALL": {
         "display": "Enchanted Clay Ball",
-        "prices": {},
-        "xp": {
-            "fishing": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CLAY_BLOCK",
@@ -512,18 +372,10 @@
     },
     "ENCHANTED_CLAY_BLOCK": {
         "display": "Enchanted Clay Block",
-        "prices": {},
-        "xp": {
-            "fishing": 2560
-        },
         "compact_tier": 2
     },
     "CLAY_BRICK": {
         "display": "Brick",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compacting": {
             "block": {
                 "makes": "BRICK",
@@ -534,18 +386,10 @@
     },
     "BRICK": {
         "display": "Bricks",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compact_tier": 0
     },
     "ICE": {
         "display": "Ice",
-        "prices": {},
-        "xp": {
-            "mining": 0.5
-        },
         "compacting": {
             "block": {
                 "makes": "PACKED_ICE",
@@ -560,10 +404,6 @@
     },
     "PACKED_ICE": {
         "display": "Packed Ice",
-        "prices": {},
-        "xp": {
-            "mining": 4.5
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_ICE",
@@ -575,10 +415,6 @@
     },
     "ENCHANTED_ICE": {
         "display": "Enchanted Ice",
-        "prices": {},
-        "xp": {
-            "mining": 80
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_PACKED_ICE",
@@ -589,18 +425,10 @@
     },
     "ENCHANTED_PACKED_ICE": {
         "display": "Enchanted Packed Ice",
-        "prices": {},
-        "xp": {
-            "mining": 12800
-        },
         "compact_tier": 2
     },
     "SNOW_BALL": {
         "display": "Snowball",
-        "prices": {},
-        "xp": {
-            "mining": 0.1
-        },
         "compacting": {
             "block": {
                 "makes": "SNOW_BLOCK",
@@ -615,10 +443,6 @@
     },
     "SNOW_BLOCK": {
         "display": "Snow Block",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SNOW_BLOCK",
@@ -629,10 +453,6 @@
     },
     "ENCHANTED_SNOW_BLOCK": {
         "display": "Enchanted Snow Block",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compact_tier": 1
     },
     "COAL": {
@@ -640,10 +460,6 @@
         "speed_boost": 5,
         "drop_multiplier": 1,
         "fuel_duration": 1800,
-        "prices": {},
-        "xp": {
-            "mining": 0.3
-        },
         "compacting": {
             "block": {
                 "makes": "COAL_BLOCK",
@@ -661,10 +477,6 @@
         "speed_boost": 5,
         "drop_multiplier": 1,
         "fuel_duration": 18000,
-        "prices": {},
-        "xp": {
-            "mining": 2.7
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COAL",
@@ -679,10 +491,6 @@
         "speed_boost": 10,
         "drop_multiplier": 1,
         "fuel_duration": 86400,
-        "prices": {},
-        "xp": {
-            "mining": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COAL_BLOCK",
@@ -693,26 +501,14 @@
     },
     "ENCHANTED_COAL_BLOCK": {
         "display": "Enchanted Coal Block",
-        "prices": {},
-        "xp": {
-            "mining": 7680
-        },
         "compact_tier": 2
     },
     "IRON_ORE": {
         "display": "Iron Ore",
-        "prices": {},
-        "xp": {
-            "mining": 0.3
-        },
         "compact_tier": 0
     },
     "IRON_INGOT": {
         "display": "Iron Ingot",
-        "prices": {},
-        "xp": {
-            "mining": 0.3
-        },
         "compacting": {
             "block": {
                 "makes": "IRON_BLOCK",
@@ -727,10 +523,6 @@
     },
     "IRON_BLOCK": {
         "display": "Block of Iron",
-        "prices": {},
-        "xp": {
-            "mining": 2.7
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_IRON",
@@ -742,10 +534,6 @@
     },
     "ENCHANTED_IRON": {
         "display": "Enchanted Iron Ingot",
-        "prices": {},
-        "xp": {
-            "mining": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_IRON_BLOCK",
@@ -756,26 +544,14 @@
     },
     "ENCHANTED_IRON_BLOCK": {
         "display": "Enchanted Iron Block",
-        "prices": {},
-        "xp": {
-            "mining": 7680
-        },
         "compact_tier": 2
     },
     "GOLD_ORE": {
         "display": "Gold Ore",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compact_tier": 0
     },
     "GOLD_INGOT": {
         "display": "Gold Ingot",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "block": {
                 "makes": "GOLD_BLOCK",
@@ -790,10 +566,6 @@
     },
     "GOLD_BLOCK": {
         "display": "Block of Gold",
-        "prices": {},
-        "xp": {
-            "mining": 3.6
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GOLD",
@@ -805,10 +577,6 @@
     },
     "ENCHANTED_GOLD": {
         "display": "Enchanted Gold Ingot",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GOLD_BLOCK",
@@ -819,18 +587,10 @@
     },
     "ENCHANTED_GOLD_BLOCK": {
         "display": "Enchanted Gold Block",
-        "prices": {},
-        "xp": {
-            "mining": 10240
-        },
         "compact_tier": 2
     },
     "DIAMOND": {
         "display": "Diamond",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "block": {
                 "makes": "DIAMOND_BLOCK",
@@ -845,10 +605,6 @@
     },
     "DIAMOND_BLOCK": {
         "display": "Block of Diamond",
-        "prices": {},
-        "xp": {
-            "mining": 3.6
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_DIAMOND",
@@ -860,10 +616,6 @@
     },
     "ENCHANTED_DIAMOND": {
         "display": "Enchanted Diamond",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_DIAMOND_BLOCK",
@@ -874,18 +626,10 @@
     },
     "ENCHANTED_DIAMOND_BLOCK": {
         "display": "Enchanted Diamond Block",
-        "prices": {},
-        "xp": {
-            "mining": 10240
-        },
         "compact_tier": 2
     },
     "INK_SACK:4": {
         "display": "Lapis Lazuli",
-        "prices": {},
-        "xp": {
-            "mining": 0.1
-        },
         "compacting": {
             "block": {
                 "makes": "LAPIS_BLOCK",
@@ -900,10 +644,6 @@
     },
     "LAPIS_BLOCK": {
         "display": "Block of Lapis Lazuli",
-        "prices": {},
-        "xp": {
-            "mining": 0.9
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_LAPIS_LAZULI",
@@ -915,10 +655,6 @@
     },
     "ENCHANTED_LAPIS_LAZULI": {
         "display": "Enchanted Lapis Lazuli",
-        "prices": {},
-        "xp": {
-            "mining": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_LAPIS_LAZULI_BLOCK",
@@ -929,18 +665,10 @@
     },
     "ENCHANTED_LAPIS_LAZULI_BLOCK": {
         "display": "Enchanted Lapis Lazuli Block",
-        "prices": {},
-        "xp": {
-            "mining": 2560
-        },
         "compact_tier": 2
     },
     "REDSTONE": {
         "display": "Redstone Dust",
-        "prices": {},
-        "xp": {
-            "mining": 0.2
-        },
         "compacting": {
             "block": {
                 "makes": "REDSTONE_BLOCK",
@@ -955,10 +683,6 @@
     },
     "REDSTONE_BLOCK": {
         "display": "Block of Redstone",
-        "prices": {},
-        "xp": {
-            "mining": 1.8
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_REDSTONE",
@@ -970,10 +694,6 @@
     },
     "ENCHANTED_REDSTONE": {
         "display": "Enchanted Redstone Dust",
-        "prices": {},
-        "xp": {
-            "mining": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_REDSTONE_BLOCK",
@@ -984,18 +704,10 @@
     },
     "ENCHANTED_REDSTONE_BLOCK": {
         "display": "Enchanted Redstone Block",
-        "prices": {},
-        "xp": {
-            "mining": 5120
-        },
         "compact_tier": 2
     },
     "EMERALD": {
         "display": "Emerald",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "block": {
                 "makes": "EMERALD_BLOCK",
@@ -1010,10 +722,6 @@
     },
     "EMERALD_BLOCK": {
         "display": "Block of Emerald",
-        "prices": {},
-        "xp": {
-            "mining": 3.6
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_EMERALD",
@@ -1025,10 +733,6 @@
     },
     "ENCHANTED_EMERALD": {
         "display": "Enchanted Emerald",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_EMERALD_BLOCK",
@@ -1039,18 +743,10 @@
     },
     "ENCHANTED_EMERALD_BLOCK": {
         "display": "Enchanted Emerald Block",
-        "prices": {},
-        "xp": {
-            "mining": 10240
-        },
         "compact_tier": 2
     },
     "QUARTZ": {
         "display": "Nether Quartz",
-        "prices": {},
-        "xp": {
-            "mining": 0.3
-        },
         "compacting": {
             "block": {
                 "makes": "QUARTZ_BLOCK",
@@ -1065,10 +761,6 @@
     },
     "QUARTZ_BLOCK": {
         "display": "Block of Quartz",
-        "prices": {},
-        "xp": {
-            "mining": 1.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_QUARTZ",
@@ -1080,10 +772,6 @@
     },
     "ENCHANTED_QUARTZ": {
         "display": "Enchanted Nether Quartz",
-        "prices": {},
-        "xp": {
-            "mining": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_QUARTZ_BLOCK",
@@ -1094,18 +782,10 @@
     },
     "ENCHANTED_QUARTZ_BLOCK": {
         "display": "Enchanted Quartz Block",
-        "prices": {},
-        "xp": {
-            "mining": 7680
-        },
         "compact_tier": 2
     },
     "ENDER_STONE": {
         "display": "End Stone",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_ENDSTONE",
@@ -1116,18 +796,10 @@
     },
     "ENCHANTED_ENDSTONE": {
         "display": "Enchanted End Stone",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compact_tier": 1
     },
     "MITHRIL_ORE": {
         "display": "Mithril",
-        "prices": {},
-        "xp": {
-            "mining": 0.4
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MITHRIL",
@@ -1138,18 +810,10 @@
     },
     "ENCHANTED_MITHRIL": {
         "display": "Enchanted Mithril",
-        "prices": {},
-        "xp": {
-            "mining": 64
-        },
         "compact_tier": 1
     },
     "HARD_STONE": {
         "display": "Hard Stone",
-        "prices": {},
-        "xp": {
-            "mining": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_HARD_STONE",
@@ -1160,10 +824,6 @@
     },
     "ENCHANTED_HARD_STONE": {
         "display": "Enchanted Hard Stone",
-        "prices": {},
-        "xp": {
-            "mining": 57.6
-        },
         "compacting": {
             "compact": {
                 "makes": "CONCENTRATED_STONE",
@@ -1174,18 +834,10 @@
     },
     "CONCENTRATED_STONE": {
         "display": "Concentrated Stone",
-        "prices": {},
-        "xp": {
-            "mining": 33177.6
-        },
         "compact_tier": 2
     },
     "WHEAT": {
         "display": "Wheat",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_WHEAT",
@@ -1196,18 +848,10 @@
     },
     "HAY_BLOCK": {
         "display": "Hay Bale",
-        "prices": {},
-        "xp": {
-            "farming": 1.8
-        },
         "compact_tier": 0
     },
     "SEEDS": {
         "display": "Seeds",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SEEDS",
@@ -1221,18 +865,10 @@
         "speed_boost": 5,
         "drop_multiplier": 1,
         "fuel_duration": 43200,
-        "prices": {},
-        "xp": {
-            "farming": 1.8
-        },
         "compact_tier": 0
     },
     "ENCHANTED_WHEAT": {
         "display": "Enchanted Wheat",
-        "prices": {},
-        "xp": {
-            "farming": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_HAY_BALE",
@@ -1243,18 +879,10 @@
     },
     "ENCHANTED_HAY_BALE": {
         "display": "Enchanted Hay Bale",
-        "prices": {},
-        "xp": {
-            "farming": 5120
-        },
         "compact_tier": 2
     },
     "ENCHANTED_SEEDS": {
         "display": "Enchanted Seeds",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "BOX_OF_SEEDS",
@@ -1265,18 +893,10 @@
     },
     "BOX_OF_SEEDS": {
         "display": "Box of Seeds",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "MELON": {
         "display": "Melon Slice",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "block": {
                 "makes": "MELON_BLOCK",
@@ -1291,10 +911,6 @@
     },
     "MELON_BLOCK": {
         "display": "Melon",
-        "prices": {},
-        "xp": {
-            "farming": 0.9
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MELON",
@@ -1306,10 +922,6 @@
     },
     "ENCHANTED_MELON": {
         "display": "Enchanted Melon Slice",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MELON_BLOCK",
@@ -1320,18 +932,10 @@
     },
     "ENCHANTED_MELON_BLOCK": {
         "display": "Enchanted Melon",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "PUMPKIN": {
         "display": "Pumpkin",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_PUMPKIN",
@@ -1342,10 +946,6 @@
     },
     "ENCHANTED_PUMPKIN": {
         "display": "Enchanted Pumpkin",
-        "prices": {},
-        "xp": {
-            "farming": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "POLISHED_PUMPKIN",
@@ -1356,18 +956,10 @@
     },
     "POLISHED_PUMPKIN": {
         "display": "Polished Pumpkin",
-        "prices": {},
-        "xp": {
-            "farming": 7680
-        },
         "compact_tier": 2
     },
     "CARROT_ITEM": {
         "display": "Carrot",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CARROT",
@@ -1378,10 +970,6 @@
     },
     "ENCHANTED_CARROT": {
         "display": "Enchanted Carrot",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GOLDEN_CARROT",
@@ -1392,18 +980,10 @@
     },
     "ENCHANTED_GOLDEN_CARROT": {
         "display": "Enchanted Golden Carrot",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "POTATO_ITEM": {
         "display": "Potato",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_POTATO",
@@ -1414,10 +994,6 @@
     },
     "ENCHANTED_POTATO": {
         "display": "Enchanted Potato",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BAKED_POTATO",
@@ -1428,10 +1004,6 @@
     },
     "ENCHANTED_BAKED_POTATO": {
         "display": "Enchanted Baked Potato",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "FRENCH_FRIES": {
@@ -1446,10 +1018,6 @@
     },
     "RED_MUSHROOM": {
         "display": "Red Mushroom",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "block": {
                 "makes": "HUGE_MUSHROOM_2",
@@ -1464,10 +1032,6 @@
     },
     "BROWN_MUSHROOM": {
         "display": "Brown Mushroom",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "block": {
                 "makes": "HUGE_MUSHROOM_1",
@@ -1482,10 +1046,6 @@
     },
     "HUGE_MUSHROOM_2": {
         "display": "Red Mushroom Block",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RED_MUSHROOM",
@@ -1497,10 +1057,6 @@
     },
     "HUGE_MUSHROOM_1": {
         "display": "Brown Mushroom Block",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BROWN_MUSHROOM",
@@ -1512,10 +1068,6 @@
     },
     "ENCHANTED_RED_MUSHROOM": {
         "display": "Enchanted Red Mushroom",
-        "prices": {},
-        "xp": {
-            "farming": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_HUGE_MUSHROOM_2",
@@ -1526,10 +1078,6 @@
     },
     "ENCHANTED_BROWN_MUSHROOM": {
         "display": "Enchanted Brown Mushroom",
-        "prices": {},
-        "xp": {
-            "farming": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_HUGE_MUSHROOM_1",
@@ -1540,26 +1088,14 @@
     },
     "ENCHANTED_HUGE_MUSHROOM_2": {
         "display": "Enchanted Red Mushroom Block",
-        "prices": {},
-        "xp": {
-            "farming": 1536
-        },
         "compact_tier": 2
     },
     "ENCHANTED_HUGE_MUSHROOM_1": {
         "display": "Enchanted Brown Mushroom Block",
-        "prices": {},
-        "xp": {
-            "farming": 1536
-        },
         "compact_tier": 2
     },
     "CACTUS": {
         "display": "Cactus",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CACTUS_GREEN",
@@ -1570,10 +1106,6 @@
     },
     "INK_SACK:2": {
         "display": "Cactus Green",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CACTUS_GREEN",
@@ -1584,10 +1116,6 @@
     },
     "ENCHANTED_CACTUS_GREEN": {
         "display": "Enchanted Cactus Green",
-        "prices": {},
-        "xp": {
-            "farming": 80
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CACTUS",
@@ -1598,18 +1126,10 @@
     },
     "ENCHANTED_CACTUS": {
         "display": "Enchanted Cactus",
-        "prices": {},
-        "xp": {
-            "farming": 12800
-        },
         "compact_tier": 2
     },
     "INK_SACK:3": {
         "display": "Cocoa Beans",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COCOA",
@@ -1620,10 +1140,6 @@
     },
     "ENCHANTED_COCOA": {
         "display": "Enchanted Cocoa Beans",
-        "prices": {},
-        "xp": {
-            "farming": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COOKIE",
@@ -1634,18 +1150,10 @@
     },
     "ENCHANTED_COOKIE": {
         "display": "Enchanted Cookie",
-        "prices": {},
-        "xp": {
-            "farming": 5120
-        },
         "compact_tier": 2
     },
     "SUGAR_CANE": {
         "display": "Sugar Cane",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SUGAR",
@@ -1656,10 +1164,6 @@
     },
     "ENCHANTED_SUGAR": {
         "display": "Enchanted Sugar",
-        "prices": {},
-        "xp": {
-            "alchemy": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SUGAR_CANE",
@@ -1670,18 +1174,10 @@
     },
     "ENCHANTED_SUGAR_CANE": {
         "display": "Enchanted Sugar Cane",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "NETHER_STALK": {
         "display": "Nether Wart",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_NETHER_STALK",
@@ -1692,10 +1188,6 @@
     },
     "ENCHANTED_NETHER_STALK": {
         "display": "Enchanted Nether Wart",
-        "prices": {},
-        "xp": {
-            "farming": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "MUTANT_NETHER_STALK",
@@ -1706,18 +1198,10 @@
     },
     "MUTANT_NETHER_STALK": {
         "display": "Mutant Nether Wart",
-        "prices": {},
-        "xp": {
-            "farming": 5120
-        },
         "compact_tier": 2
     },
     "YELLOW_FLOWER": {
         "display": "Dandelion",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_DANDELION",
@@ -1728,10 +1212,6 @@
     },
     "RED_ROSE": {
         "display": "Poppy",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_POPPY",
@@ -1742,114 +1222,58 @@
     },
     "RED_ROSE:1": {
         "display": "Blue Orchid",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:2": {
         "display": "Allium",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:3": {
         "display": "Azure Bluet",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:4": {
         "display": "Red Tulip",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:5": {
         "display": "Orange Tulip",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:6": {
         "display": "White Tulip",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:7": {
         "display": "Pink Tulip",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "RED_ROSE:8": {
         "display": "Oxeye Daisy",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compact_tier": 0
     },
     "DOUBLE_PLANT:1": {
         "display": "Lilac",
-        "prices": {},
-        "xp": {
-            "foraging": 0.2
-        },
         "compact_tier": 0
     },
     "DOUBLE_PLANT:4": {
-        "display": "Peony",
-        "prices": {},
-        "xp": {
-            "foraging": 0.2
-        },
+        "display": "Rose Bush",
         "compact_tier": 0
     },
     "DOUBLE_PLANT:5": {
-        "display": "Rose Bush",
-        "prices": {},
-        "xp": {
-            "foraging": 0.2
-        },
+        "display": "Peony",
         "compact_tier": 0
     },
     "ENCHANTED_DANDELION": {
         "display": "Enchanted Dandelion",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_POPPY": {
         "display": "Enchanted Poppy",
-        "prices": {},
-        "xp": {
-            "foraging": 57.6
-        },
         "compact_tier": 1
     },
     "WILD_ROSE": {
         "display": "Wild Rose",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_WILD_ROSE",
@@ -1860,10 +1284,6 @@
     },
     "ENCHANTED_WILD_ROSE": {
         "display": "Enchanted Wild Rose",
-        "prices": {},
-        "xp": {
-            "farming": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "COMPACTED_WILD_ROSE",
@@ -1874,18 +1294,10 @@
     },
     "COMPACTED_WILD_ROSE": {
         "display": "Compacted Wild Rose",
-        "prices": {},
-        "xp": {
-            "farming": 7680
-        },
         "compact_tier": 2
     },
     "DOUBLE_PLANT": {
         "display": "Sunflower",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SUNFLOWER",
@@ -1896,10 +1308,6 @@
     },
     "ENCHANTED_SUNFLOWER": {
         "display": "Enchanted Sunflower",
-        "prices": {},
-        "xp": {
-            "farming": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "COMPACTED_SUNFLOWER",
@@ -1910,18 +1318,10 @@
     },
     "COMPACTED_SUNFLOWER": {
         "display": "Compacted Sunflower",
-        "prices": {},
-        "xp": {
-            "farming": 7680
-        },
         "compact_tier": 2
     },
     "MOONFLOWER": {
         "display": "Moonflower",
-        "prices": {},
-        "xp": {
-            "farming": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MOONFLOWER",
@@ -1932,10 +1332,6 @@
     },
     "ENCHANTED_MOONFLOWER": {
         "display": "Enchanted Moonflower",
-        "prices": {},
-        "xp": {
-            "farming": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "COMPACTED_MOONFLOWER",
@@ -1946,18 +1342,10 @@
     },
     "COMPACTED_MOONFLOWER": {
         "display": "Compacted Moonflower",
-        "prices": {},
-        "xp": {
-            "farming": 7680
-        },
         "compact_tier": 2
     },
     "RAW_FISH": {
         "display": "Raw Cod",
-        "prices": {},
-        "xp": {
-            "fishing": 0.5
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RAW_FISH",
@@ -1968,10 +1356,6 @@
     },
     "RAW_FISH:1": {
         "display": "Raw Salmon",
-        "prices": {},
-        "xp": {
-            "fishing": 0.7
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RAW_SALMON",
@@ -1982,10 +1366,6 @@
     },
     "RAW_FISH:3": {
         "display": "Pufferfish",
-        "prices": {},
-        "xp": {
-            "fishing": 1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_PUFFERFISH",
@@ -1996,10 +1376,6 @@
     },
     "RAW_FISH:2": {
         "display": "Tropical Fish",
-        "prices": {},
-        "xp": {
-            "fishing": 2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_CLOWNFISH",
@@ -2010,10 +1386,6 @@
     },
     "PRISMARINE_CRYSTALS": {
         "display": "Prismarine Crystals",
-        "prices": {},
-        "xp": {
-            "fishing": 0.5
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_PRISMARINE_CRYSTALS",
@@ -2024,10 +1396,6 @@
     },
     "PRISMARINE_SHARD": {
         "display": "Prismarine Shard",
-        "prices": {},
-        "xp": {
-            "fishing": 0.5
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_PRISMARINE_SHARD",
@@ -2038,10 +1406,6 @@
     },
     "SPONGE": {
         "display": "Sponge",
-        "prices": {},
-        "xp": {
-            "fishing": 0.5
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SPONGE",
@@ -2052,10 +1416,6 @@
     },
     "ENCHANTED_RAW_FISH": {
         "display": "Enchanted Raw Cod",
-        "prices": {},
-        "xp": {
-            "fishing": 80
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COOKED_FISH",
@@ -2066,10 +1426,6 @@
     },
     "ENCHANTED_RAW_SALMON": {
         "display": "Enchanted Raw Salmon",
-        "prices": {},
-        "xp": {
-            "fishing": 112
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COOKED_SALMON",
@@ -2080,42 +1436,22 @@
     },
     "ENCHANTED_PUFFERFISH": {
         "display": "Enchanted Pufferfish",
-        "prices": {},
-        "xp": {
-            "fishing": 160
-        },
         "compact_tier": 1
     },
     "ENCHANTED_CLOWNFISH": {
         "display": "Enchanted Tropical Fish",
-        "prices": {},
-        "xp": {
-            "fishing": 320
-        },
         "compact_tier": 1
     },
     "ENCHANTED_PRISMARINE_CRYSTALS": {
         "display": "Enchanted Prismarine Crystals",
-        "prices": {},
-        "xp": {
-            "fishing": 40
-        },
         "compact_tier": 1
     },
     "ENCHANTED_PRISMARINE_SHARD": {
         "display": "Enchanted Prismarine Shard",
-        "prices": {},
-        "xp": {
-            "fishing": 40
-        },
         "compact_tier": 1
     },
     "ENCHANTED_SPONGE": {
         "display": "Enchanted Sponge",
-        "prices": {},
-        "xp": {
-            "fishing": 20
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_WET_SPONGE",
@@ -2126,34 +1462,18 @@
     },
     "ENCHANTED_COOKED_FISH": {
         "display": "Enchanted Cooked Cod",
-        "prices": {},
-        "xp": {
-            "fishing": 12800
-        },
         "compact_tier": 2
     },
     "ENCHANTED_COOKED_SALMON": {
         "display": "Enchanted Cooked Salmon",
-        "prices": {},
-        "xp": {
-            "fishing": 17920
-        },
         "compact_tier": 2
     },
     "ENCHANTED_WET_SPONGE": {
         "display": "Enchanted Wet Sponge",
-        "prices": {},
-        "xp": {
-            "fishing": 800
-        },
         "compact_tier": 2
     },
     "WATER_LILY": {
         "display": "Lily Pad",
-        "prices": {},
-        "xp": {
-            "fishing": 0.8
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_WATER_LILY",
@@ -2164,10 +1484,6 @@
     },
     "ENCHANTED_WATER_LILY": {
         "display": "Enchanted Lily Pad",
-        "prices": {},
-        "xp": {
-            "fishing": 128
-        },
         "compacting": {
             "compact": {
                 "makes": "CONDENSED_WATER_LILY",
@@ -2178,18 +1494,10 @@
     },
     "CONDENSED_WATER_LILY": {
         "display": "Condensed Lily Pad",
-        "prices": {},
-        "xp": {
-            "fishing": 20480
-        },
         "compact_tier": 2
     },
     "ROTTEN_FLESH": {
         "display": "Rotten Flesh",
-        "prices": {},
-        "xp": {
-            "combat": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_ROTTEN_FLESH",
@@ -2200,10 +1508,6 @@
     },
     "POISONOUS_POTATO": {
         "display": "Poisonous Potato",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_POISONOUS_POTATO",
@@ -2214,26 +1518,14 @@
     },
     "ENCHANTED_ROTTEN_FLESH": {
         "display": "Enchanted Rotten Flesh",
-        "prices": {},
-        "xp": {
-            "combat": 48
-        },
         "compact_tier": 1
     },
     "ENCHANTED_POISONOUS_POTATO": {
         "display": "Enchanted Poisonous Potato",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_ENDER_PEARL": {
         "display": "Enchanted Ender Pearl",
-        "prices": {},
-        "xp": {
-            "combat": 9
-        },
         "compacting": {
             "compact": {
                 "makes": "ABSOLUTE_ENDER_PEARL",
@@ -2244,26 +1536,14 @@
     },
     "DYE_BYZANTIUM": {
         "display": "Byzantium Dye",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "ABSOLUTE_ENDER_PEARL": {
         "display": "Absolute Ender Pearl",
-        "prices": {},
-        "xp": {
-            "combat": 720
-        },
         "compact_tier": 2
     },
     "CRUDE_GABAGOOL": {
         "display": "Crude Gabagool",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compacting": {
             "compact": {
                 "makes": "VERY_CRUDE_GABAGOOL",
@@ -2274,66 +1554,34 @@
     },
     "VERY_CRUDE_GABAGOOL": {
         "display": "Very Crude Gabagool",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 1
     },
     "DYE_FLAME": {
         "display": "Flame Dye",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "CHILI_PEPPER": {
         "display": "Chili Pepper",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "STUFFED_CHILI_PEPPER": {
         "display": "Stuffed Chili Pepper",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 1
     },
     "INFERNO_VERTEX": {
         "display": "Inferno Vertex",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "INFERNO_APEX": {
         "display": "Inferno Apex",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "REAPER_PEPPER": {
         "display": "Reaper Pepper",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "GABAGOOL_THE_FISH": {
         "display": "Gabagool the Fish",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "tags": [
             "auction_price"
         ],
@@ -2341,18 +1589,10 @@
     },
     "HYPERGOLIC_IONIZED_CERAMICS": {
         "display": "Hypergolic Ionized Ceramics",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 0
     },
     "HEMOVIBE": {
         "display": "Hemovibe",
-        "prices": {},
-        "xp": {
-            "combat": 5
-        },
         "compacting": {
             "compact": {
                 "makes": "HEMOGLASS",
@@ -2363,26 +1603,14 @@
     },
     "HEMOGLASS": {
         "display": "Hemoglass",
-        "prices": {},
-        "xp": {
-            "combat": 800
-        },
         "compact_tier": 1
     },
     "HEMOBOMB": {
         "display": "Hemobomb",
-        "prices": {},
-        "xp": {
-            "combat": 0
-        },
         "compact_tier": 1
     },
     "BONE": {
         "display": "Bone",
-        "prices": {},
-        "xp": {
-            "combat": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BONE",
@@ -2393,10 +1621,6 @@
     },
     "ENCHANTED_BONE": {
         "display": "Enchanted Bone",
-        "prices": {},
-        "xp": {
-            "combat": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BONE_BLOCK",
@@ -2407,18 +1631,10 @@
     },
     "ENCHANTED_BONE_BLOCK": {
         "display": "Enchanted Bone Block",
-        "prices": {},
-        "xp": {
-            "combat": 5120
-        },
         "compact_tier": 2
     },
     "SULPHUR": {
         "display": "Gunpowder",
-        "prices": {},
-        "xp": {
-            "combat": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GUNPOWDER",
@@ -2429,18 +1645,10 @@
     },
     "ENCHANTED_GUNPOWDER": {
         "display": "Enchanted Gunpowder",
-        "prices": {},
-        "xp": {
-            "combat": 48
-        },
         "compact_tier": 1
     },
     "STRING": {
         "display": "String",
-        "prices": {},
-        "xp": {
-            "combat": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_STRING",
@@ -2451,10 +1659,6 @@
     },
     "SPIDER_EYE": {
         "display": "Spider Eye",
-        "prices": {},
-        "xp": {
-            "combat": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SPIDER_EYE",
@@ -2465,26 +1669,14 @@
     },
     "ENCHANTED_STRING": {
         "display": "Enchanted String",
-        "prices": {},
-        "xp": {
-            "combat": 38
-        },
         "compact_tier": 1
     },
     "ENCHANTED_SPIDER_EYE": {
         "display": "Enchanted Spider Eye",
-        "prices": {},
-        "xp": {
-            "combat": 48
-        },
         "compact_tier": 1
     },
     "BLAZE_ROD": {
         "display": "Blaze Rod",
-        "prices": {},
-        "xp": {
-            "combat": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BLAZE_POWDER",
@@ -2495,10 +1687,6 @@
     },
     "ENCHANTED_BLAZE_POWDER": {
         "display": "Enchanted Blaze Powder",
-        "prices": {},
-        "xp": {
-            "combat": 48
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BLAZE_ROD",
@@ -2509,18 +1697,10 @@
     },
     "ENCHANTED_BLAZE_ROD": {
         "display": "Enchanted Blaze Rod",
-        "prices": {},
-        "xp": {
-            "combat": 7680
-        },
         "compact_tier": 2
     },
     "MAGMA_CREAM": {
         "display": "Magma Cream",
-        "prices": {},
-        "xp": {
-            "combat": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MAGMA_CREAM",
@@ -2531,10 +1711,6 @@
     },
     "ENCHANTED_MAGMA_CREAM": {
         "display": "Enchanted Magma Cream",
-        "prices": {},
-        "xp": {
-            "combat": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "WHIPPED_MAGMA_CREAM",
@@ -2545,18 +1721,10 @@
     },
     "WHIPPED_MAGMA_CREAM": {
         "display": "Whipped Magma Cream",
-        "prices": {},
-        "xp": {
-            "combat": 5120
-        },
         "compact_tier": 2
     },
     "ENDER_PEARL": {
         "display": "Ender Pearl",
-        "prices": {},
-        "xp": {
-            "combat": 0.3
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_ENDER_PEARL",
@@ -2567,10 +1735,6 @@
     },
     "GHAST_TEAR": {
         "display": "Ghast Tear",
-        "prices": {},
-        "xp": {
-            "combat": 0.5
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GHAST_TEAR",
@@ -2581,18 +1745,10 @@
     },
     "ENCHANTED_GHAST_TEAR": {
         "display": "Enchanted Ghast Tear",
-        "prices": {},
-        "xp": {
-            "combat": 7.5
-        },
         "compact_tier": 1
     },
     "SLIME_BALL": {
         "display": "Slimeball",
-        "prices": {},
-        "xp": {
-            "combat": 0.2
-        },
         "compacting": {
             "block": {
                 "makes": "SLIME_BLOCK",
@@ -2607,10 +1763,6 @@
     },
     "SLIME_BLOCK": {
         "display": "Slime Block",
-        "prices": {},
-        "xp": {
-            "combat": 1.8
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SLIME_BALL",
@@ -2622,10 +1774,6 @@
     },
     "ENCHANTED_SLIME_BALL": {
         "display": "Enchanted Slimeball",
-        "prices": {},
-        "xp": {
-            "combat": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SLIME_BLOCK",
@@ -2636,18 +1784,10 @@
     },
     "ENCHANTED_SLIME_BLOCK": {
         "display": "Enchanted Slime Block",
-        "prices": {},
-        "xp": {
-            "combat": 5120
-        },
         "compact_tier": 2
     },
     "RAW_BEEF": {
         "display": "Raw Beef",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RAW_BEEF",
@@ -2658,10 +1798,6 @@
     },
     "LEATHER": {
         "display": "Leather",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_LEATHER",
@@ -2672,26 +1808,14 @@
     },
     "ENCHANTED_RAW_BEEF": {
         "display": "Enchanted Raw Beef",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_LEATHER": {
         "display": "Enchanted Leather",
-        "prices": {},
-        "xp": {
-            "farming": 115
-        },
         "compact_tier": 1
     },
     "PORK": {
         "display": "Raw Porkchop",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_PORK",
@@ -2702,10 +1826,6 @@
     },
     "ENCHANTED_PORK": {
         "display": "Enchanted Raw Porkchop",
-        "prices": {},
-        "xp": {
-            "farming": 32
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_GRILLED_PORK",
@@ -2716,18 +1836,10 @@
     },
     "ENCHANTED_GRILLED_PORK": {
         "display": "Enchanted Cooked Porkchop",
-        "prices": {},
-        "xp": {
-            "farming": 5120
-        },
         "compact_tier": 2
     },
     "RAW_CHICKEN": {
         "display": "Raw Chicken",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RAW_CHICKEN",
@@ -2738,10 +1850,6 @@
     },
     "FEATHER": {
         "display": "Feather",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_FEATHER",
@@ -2752,10 +1860,6 @@
     },
     "EGG": {
         "display": "Egg",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_EGG",
@@ -2766,18 +1870,10 @@
     },
     "ENCHANTED_RAW_CHICKEN": {
         "display": "Enchanted Raw Chicken",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_FEATHER": {
         "display": "Enchanted Feather",
-        "prices": {},
-        "xp": {
-            "farming": 32
-        },
         "compact_tier": 1
     },
     "ENCHANTED_EGG": {
@@ -2789,10 +1885,6 @@
                 "EGG": 1
             }
         },
-        "prices": {},
-        "xp": {
-            "farming": 115
-        },
         "compacting": {
             "compact": {
                 "makes": "SUPER_EGG",
@@ -2803,10 +1895,6 @@
     },
     "SUPER_EGG": {
         "display": "Super Enchanted Egg",
-        "prices": {},
-        "xp": {
-            "farming": 16560
-        },
         "compacting": {
             "compact": {
                 "makes": "OMEGA_EGG",
@@ -2817,18 +1905,10 @@
     },
     "OMEGA_EGG": {
         "display": "Omega Enchanted Egg",
-        "prices": {},
-        "xp": {
-            "farming": 149040
-        },
         "compact_tier": 1
     },
     "WOOL": {
         "display": "White Wool",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_WOOL",
@@ -2839,10 +1919,6 @@
     },
     "MUTTON": {
         "display": "Raw Mutton",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_MUTTON",
@@ -2853,18 +1929,10 @@
     },
     "ENCHANTED_WOOL": {
         "display": "Enchanted Wool",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_MUTTON": {
         "display": "Enchanted Raw Mutton",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COOKED_MUTTON",
@@ -2875,18 +1943,10 @@
     },
     "ENCHANTED_COOKED_MUTTON": {
         "display": "Enchanted Cooked Mutton",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "RABBIT": {
         "display": "Raw Rabbit",
-        "prices": {},
-        "xp": {
-            "farming": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RABBIT",
@@ -2897,10 +1957,6 @@
     },
     "RABBIT_FOOT": {
         "display": "Rabbit's Foot",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RABBIT_FOOT",
@@ -2911,10 +1967,6 @@
     },
     "RABBIT_HIDE": {
         "display": "Rabbit Hide",
-        "prices": {},
-        "xp": {
-            "farming": 0.2
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_RABBIT_HIDE",
@@ -2925,10 +1977,6 @@
     },
     "ENCHANTED_RABBIT": {
         "display": "Enchanted Raw Rabbit",
-        "prices": {},
-        "xp": {
-            "farming": 16
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_COOKED_RABBIT",
@@ -2939,34 +1987,18 @@
     },
     "ENCHANTED_COOKED_RABBIT": {
         "display": "Enchanted Cooked Rabbit",
-        "prices": {},
-        "xp": {
-            "farming": 2560
-        },
         "compact_tier": 2
     },
     "ENCHANTED_RABBIT_FOOT": {
         "display": "Enchanted Rabbit Foot",
-        "prices": {},
-        "xp": {
-            "farming": 32
-        },
         "compact_tier": 1
     },
     "ENCHANTED_RABBIT_HIDE": {
         "display": "Enchanted Rabbit Hide",
-        "prices": {},
-        "xp": {
-            "farming": 115
-        },
         "compact_tier": 1
     },
     "LOG": {
         "display": "Oak Log",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_OAK_LOG",
@@ -2977,10 +2009,6 @@
     },
     "LOG:1": {
         "display": "Spruce Log",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_SPRUCE_LOG",
@@ -2991,10 +2019,6 @@
     },
     "LOG:2": {
         "display": "Birch Log",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_BIRCH_LOG",
@@ -3005,10 +2029,6 @@
     },
     "LOG_2:1": {
         "display": "Dark Oak Log",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_DARK_OAK_LOG",
@@ -3019,10 +2039,6 @@
     },
     "LOG_2": {
         "display": "Acacia Log",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_ACACIA_LOG",
@@ -3033,10 +2049,6 @@
     },
     "LOG:3": {
         "display": "Jungle Log",
-        "prices": {},
-        "xp": {
-            "foraging": 0.1
-        },
         "compacting": {
             "compact": {
                 "makes": "ENCHANTED_JUNGLE_LOG",
@@ -3047,50 +2059,26 @@
     },
     "ENCHANTED_OAK_LOG": {
         "display": "Enchanted Oak Log",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_SPRUCE_LOG": {
         "display": "Enchanted Spruce Log",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_BIRCH_LOG": {
         "display": "Enchanted Birch Log",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_DARK_OAK_LOG": {
         "display": "Enchanted Dark Oak Log",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_ACACIA_LOG": {
         "display": "Enchanted Acacia Log",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "ENCHANTED_JUNGLE_LOG": {
         "display": "Enchanted Jungle Log",
-        "prices": {},
-        "xp": {
-            "foraging": 16
-        },
         "compact_tier": 1
     },
     "WOOD_PICKAXE": {
@@ -3118,14 +2106,13 @@
         }
     },
     "WOOD_AXE": {
-        "display": "Wooden Hoe",
+        "display": "Wooden Axe",
         "prices": {
             "custom": 5
         }
     },
     "FISHING_ROD": {
         "display": "Fishing Rod",
-        "prices": {},
         "recipe": {
             "STRING": 2
         }
@@ -3145,160 +2132,130 @@
         }
     },
     "REFINED_MITHRIL": {
-        "display": "Refined Mithril",
-        "prices": {}
+        "display": "Refined Mithril"
     },
     "ENCHANTED_EYE_OF_ENDER": {
-        "display": "Enchanted Eye of Ender",
-        "prices": {}
+        "display": "Enchanted Eye of Ender"
     },
     "SILVER_FANG": {
-        "display": "Silver Fang",
-        "prices": {}
+        "display": "Silver Fang"
     },
     "REVENANT_FLESH": {
-        "display": "Revenant Flesh",
-        "prices": {}
+        "display": "Revenant Flesh"
     },
     "REVENANT_VISCERA": {
-        "display": "Revenant Viscera",
-        "prices": {}
+        "display": "Revenant Viscera"
     },
     "TARANTULA_WEB": {
-        "display": "Tarantula Web",
-        "prices": {}
+        "display": "Tarantula Web"
     },
     "TARANTULA_SILK": {
-        "display": "Tarantula Silk",
-        "prices": {}
+        "display": "Tarantula Silk"
     },
     "NULL_SPHERE": {
-        "display": "Null Sphere",
-        "prices": {}
+        "display": "Null Sphere"
     },
     "NULL_OVOID": {
-        "display": "Null Ovoid",
-        "prices": {}
+        "display": "Null Ovoid"
     },
     "DERELICT_ASHE": {
-        "display": "Derelict Ashe",
-        "prices": {}
+        "display": "Derelict Ashe"
     },
     "MOLTEN_POWDER": {
-        "display": "Molten Powder",
-        "prices": {}
+        "display": "Molten Powder"
     },
     "ENCHANTED_FIREWORK_ROCKET": {
-        "display": "Enchanted Firework Rocket",
-        "prices": {}
+        "display": "Enchanted Firework Rocket"
     },
     "ENCHANTED_FERMENTED_SPIDER_EYE": {
-        "display": "Enchanted Fermented Spider Eye",
-        "prices": {}
+        "display": "Enchanted Fermented Spider Eye"
     },
     "LOTUS_DIAMOND": {
-        "display": "Diamond Lotus",
-        "prices": {}
+        "display": "Diamond Lotus"
     },
     "SPOOKY_SHARD": {
-        "display": "Spooky Fragment",
-        "prices": {}
+        "display": "Spooky Fragment"
     },
     "BOTROOT": {
-        "display": "Botroot",
-        "prices": {}
+        "display": "Botroot"
     },
     "ENCHANTED_PAPER": {
-        "display": "Enchanted Paper",
-        "prices": {}
+        "display": "Enchanted Paper"
     },
     "CHIRPING_STEREO": {
         "display": "Chirping Stereo",
-        "prices": {},
         "tags": [
             "auction_price"
         ]
     },
     "PLANTBOY_ADVANCE": {
-        "display": "PlantBoy Advance",
-        "prices": {}
+        "display": "PlantBoy Advance"
     },
     "CHARCOAL": {
         "display": "Charcoal",
         "speed_boost": 5,
         "drop_multiplier": 1,
-        "fuel_duration": 1800,
-        "prices": {}
+        "fuel_duration": 1800
     },
     "ENCHANTED_CHARCOAL": {
         "display": "Enchanted Charcoal",
         "speed_boost": 20,
         "drop_multiplier": 1,
-        "fuel_duration": 129600,
-        "prices": {}
+        "fuel_duration": 129600
     },
     "HAMSTER_WHEEL": {
         "display": "Hamster Wheel",
         "speed_boost": 50,
         "drop_multiplier": 1,
-        "fuel_duration": 86400,
-        "prices": {}
+        "fuel_duration": 86400
     },
     "FOUL_FLESH": {
         "display": "Foul Flesh",
         "speed_boost": 90,
         "drop_multiplier": 1,
-        "fuel_duration": 18000,
-        "prices": {}
+        "fuel_duration": 18000
     },
     "CATALYST": {
         "display": "Catalyst",
         "speed_boost": 0,
         "drop_multiplier": 3,
-        "fuel_duration": 10800,
-        "prices": {}
+        "fuel_duration": 10800
     },
     "HYPER_CATALYST": {
         "display": "Hyper Catalyst",
         "speed_boost": 0,
         "drop_multiplier": 4,
-        "fuel_duration": 21600,
-        "prices": {}
+        "fuel_duration": 21600
     },
     "CHEESE_FUEL": {
         "display": "Tasty Cheese",
         "speed_boost": 0,
         "drop_multiplier": 2,
-        "fuel_duration": 3600,
-        "prices": {}
+        "fuel_duration": 3600
     },
     "SOLAR_PANEL": {
         "display": "Solar Panel",
         "speed_boost": 25,
         "drop_multiplier": 1,
-        "fuel_duration": -1,
-        "prices": {}
+        "fuel_duration": -1
     },
     "ENCHANTED_LAVA_BUCKET": {
         "display": "Enchanted Lava Bucket",
         "speed_boost": 25,
         "drop_multiplier": 1,
-        "fuel_duration": -1,
-        "prices": {}
+        "fuel_duration": -1
     },
     "MAGMA_BUCKET": {
         "display": "Magma Bucket",
         "speed_boost": 30,
         "drop_multiplier": 1,
-        "fuel_duration": -1,
-        "prices": {}
+        "fuel_duration": -1
     },
     "PLASMA_BUCKET": {
         "display": "Plasma Bucket",
         "speed_boost": 35,
         "drop_multiplier": 1,
-        "fuel_duration": -1,
-        "prices": {}
+        "fuel_duration": -1
     },
     "EVERBURNING_FLAME": {
         "display": "Everburning Flame",
@@ -3313,7 +2270,6 @@
                 ]
             }
         },
-        "prices": {},
         "recipe": {
             "PLASMA_BUCKET": 1,
             "FLAMES": 16,
@@ -3351,8 +2307,7 @@
                 "DOUBLE_PLANT:4": {},
                 "DOUBLE_PLANT:5": {}
             }
-        },
-        "prices": {}
+        }
     },
     "DAYSWITCH": {
         "display": "Dayswitch",
@@ -3363,8 +2318,7 @@
             "replacing": {
                 "MOONFLOWER": {"DOUBLE_PLANT": 1}
             }
-        },
-        "prices": {}
+        }
     },
     "NIGHTSWITCH": {
         "display": "Nightswitch",
@@ -3375,8 +2329,7 @@
             "replacing": {
                 "DOUBLE_PLANT": {"MOONFLOWER": 1}
             }
-        },
-        "prices": {}
+        }
     },
     "JACOBS_PARTICIPATION_MEDAL": {
         "display": "Jacob's Participation Medal",
@@ -3391,18 +2344,15 @@
                 "offline_cooldown": 10800,
                 "online_cooldown": 10800
             }
-        },
-        "prices": {}
+        }
     },
     "BUDGET_HOPPER": {
         "display": "Budget Hopper",
-        "hopper_selling_rate": 0.5,
-        "prices": {}
+        "hopper_selling_rate": 0.5
     },
     "ENCHANTED_HOPPER": {
         "display": "Enchanted Hopper",
-        "hopper_selling_rate": 0.7,
-        "prices": {}
+        "hopper_selling_rate": 0.7
     },
     "CUSTOM_UPGRADE": {
         "display": "Custom Upgrade",
@@ -3417,8 +2367,7 @@
                 "online_cooldown": 60,
                 "offline_cooldown": 60
             }
-        },
-        "prices": {}
+        }
     },
     "AUTO_SMELTER": {
         "display": "Auto Smelter",
@@ -3440,8 +2389,7 @@
                 "LOG_2": {"COAL": 1},
                 "LOG:3": {"COAL": 1}
             }
-        },
-        "prices": {}
+        }
     },
     "COMPACTOR": {
         "display": "Compactor",
@@ -3468,8 +2416,7 @@
                 "BROWN_MUSHROOM": "block",
                 "SLIME_BALL": "block"
             }
-        },
-        "prices": {}
+        }
     },
     "SUPER_COMPACTOR_3000": {
         "display": "Super Compactor 3000",
@@ -3621,8 +2568,7 @@
                 "LOG_2": "compact",
                 "LOG:3": "compact"
             }
-        },
-        "prices": {}
+        }
     },
     "DWARVEN_COMPACTOR": {
         "display": "Dwarven Super Compactor",
@@ -3789,8 +2735,7 @@
                 "LOG_2": "compact",
                 "LOG:3": "compact"
             }
-        },
-        "prices": {}
+        }
     },
     "DIAMOND_SPREADING": {
         "display": "Diamond Spreading",
@@ -3800,8 +2745,7 @@
             "spreading": {
                 "DIAMOND": 0.1
             }
-        },
-        "prices": {}
+        }
     },
     "POTATO_SPREADING": {
         "display": "Potato Spreading",
@@ -3811,8 +2755,7 @@
             "spreading": {
                 "POTATO_ITEM": 0.05
             }
-        },
-        "prices": {}
+        }
     },
     "MINION_EXPANDER": {
         "display": "Minion Expander",
@@ -3820,8 +2763,7 @@
         "drop_multiplier": 1,
         "upgrade_effects": {
             "expanding": 1
-        },
-        "prices": {}
+        }
     },
     "FLINT_SHOVEL": {
         "display": "Flint Shovel",
@@ -3832,7 +2774,6 @@
                 "GRAVEL": {"FLINT": 1}
             }
         },
-        "prices": {},
         "recipe": {
             "FLINT": 10
         }
@@ -3841,8 +2782,7 @@
         "display": "Flycatcher",
         "speed_boost": 20,
         "drop_multiplier": 1,
-        "upgrade_effects": {},
-        "prices": {}
+        "upgrade_effects": {}
     },
     "KRAMPUS_HELMET": {
         "display": "Krampus Helmet",
@@ -3853,7 +2793,6 @@
                 "RED_GIFT": 4.5e-05
             }
         },
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -3870,8 +2809,7 @@
                 "online_cooldown": 180,
                 "offline_cooldown": 185
             }
-        },
-        "prices": {}
+        }
     },
     "SOULFLOW_ENGINE": {
         "display": "Soulflow Engine",
@@ -3885,8 +2823,7 @@
                 "online_cooldown": 90,
                 "offline_cooldown": 105
             }
-        },
-        "prices": {}
+        }
     },
     "CORRUPT_SOIL": {
         "display": "Corrupt Soil",
@@ -3898,8 +2835,7 @@
                 "CORRUPTED_FRAGMENT": 1
             }
         },
-        "affected_minions": [],
-        "prices": {}
+        "affected_minions": []
     },
     "BERBERIS_FUEL_INJECTOR": {
         "display": "Berberis Fuel Injector",
@@ -3914,8 +2850,7 @@
                 "offline_cooldown": 300
             }
         },
-        "affected_minions": [],
-        "prices": {}
+        "affected_minions": []
     },
     "ENCHANTED_SHEARS": {
         "display": "Enchanted Shears",
@@ -3959,7 +2894,6 @@
                 "online_cooldown": 10800
             }
         },
-        "prices": {},
         "recipe": {
             "BOTROOT": 64,
             "ENCHANTED_PAPER": 32,
@@ -3984,7 +2918,6 @@
     "BEACON_1": {
         "display": "Beacon I",
         "speed_boost": 2,
-        "prices": {},
         "recipe": {
             "ENCHANTED_MITHRIL": 192,
             "STARFALL": 64
@@ -3993,7 +2926,6 @@
     "BEACON_2": {
         "display": "Beacon II",
         "speed_boost": 4,
-        "prices": {},
         "recipe": {
             "ENCHANTED_MITHRIL": 192,
             "STARFALL": 64,
@@ -4003,7 +2935,6 @@
     "BEACON_3": {
         "display": "Beacon III",
         "speed_boost": 6,
-        "prices": {},
         "recipe": {
             "ENCHANTED_MITHRIL": 192,
             "STARFALL": 64,
@@ -4013,7 +2944,6 @@
     "BEACON_4": {
         "display": "Beacon IV",
         "speed_boost": 8,
-        "prices": {},
         "recipe": {
             "ENCHANTED_MITHRIL": 192,
             "STARFALL": 64,
@@ -4024,7 +2954,6 @@
     "BEACON_5": {
         "display": "Beacon V",
         "speed_boost": 10,
-        "prices": {},
         "recipe": {
             "ENCHANTED_MITHRIL": 192,
             "STARFALL": 64,
@@ -4035,13 +2964,11 @@
     "POWER_CRYSTAL": {
         "display": "Power Crystal",
         "speed_boost": 0,
-        "prices": {},
         "fuel_duration": 172800
     },
     "SCORCHED_POWER_CRYSTAL": {
         "display": "Scorched Power Crystal",
         "speed_boost": 1,
-        "prices": {},
         "fuel_duration": 172800
     },
     "FARM_CRYSTAL": {
@@ -4051,7 +2978,6 @@
             "farming_crop_minion",
             "farm_animal_minion"
         ],
-        "prices": {},
         "recipe": {
             "ENCHANTED_PUMPKIN": 96,
             "ENCHANTED_QUARTZ": 1
@@ -4064,7 +2990,6 @@
             "farming_crop_minion",
             "farm_animal_minion"
         ],
-        "prices": {},
         "recipe": {
             "ENCHANTED_PUMPKIN": 96,
             "ENCHANTED_QUARTZ": 1,
@@ -4077,7 +3002,6 @@
         "affected_minions": [
             "foraging_minion"
         ],
-        "prices": {},
         "recipe": {
             "ENCHANTED_SPRUCE_LOG": 96,
             "ENCHANTED_QUARTZ": 1
@@ -4089,7 +3013,6 @@
         "affected_minions": [
             "mining_minion"
         ],
-        "prices": {},
         "recipe": {
             "ENCHANTED_MITHRIL": 16,
             "ENCHANTED_QUARTZ": 1
@@ -4101,7 +3024,6 @@
         "affected_minions": [
             "winter_minion"
         ],
-        "prices": {},
         "recipe": {
             "WINTER_ISLAND": 1
         }
@@ -4112,7 +3034,6 @@
         "affected_minions": [
             "winter_minion"
         ],
-        "prices": {},
         "recipe": {
             "MITHRIL_CRYSTAL": 1,
             "WINTER_ISLAND_CRYSTAL": 1
@@ -4120,47 +3041,38 @@
     },
     "SMALL_ENCHANTED_CHEST": {
         "display": "Small Storage",
-        "storage_slots": 3,
-        "prices": {}
+        "storage_slots": 3
     },
     "MEDIUM_ENCHANTED_CHEST": {
         "display": "Medium Storage",
-        "storage_slots": 9,
-        "prices": {}
+        "storage_slots": 9
     },
     "LARGE_ENCHANTED_CHEST": {
         "display": "Large Storage",
-        "storage_slots": 15,
-        "prices": {}
+        "storage_slots": 15
     },
     "XLARGE_ENCHANTED_CHEST": {
         "display": "X-Large Storage",
-        "storage_slots": 21,
-        "prices": {}
+        "storage_slots": 21
     },
     "XXLARGE_ENCHANTED_CHEST": {
         "display": "XX-Large Storage",
-        "storage_slots": 27,
-        "prices": {}
+        "storage_slots": 27
     },
     "MITHRIL_INFUSION": {
         "display": "Mithril Infusion",
-        "speed_boost": 10,
-        "prices": {}
+        "speed_boost": 10
     },
     "CAPSAICIN_EYEDROPS_NO_CHARGES": {
-        "display": "Capsaicin Eyedrops",
-        "prices": {}
+        "display": "Capsaicin Eyedrops"
     },
     "FREE_WILL": {
         "display": "Free Will",
-        "speed_boost": 10,
-        "prices": {}
+        "speed_boost": 10
     },
     "POSTCARD": {
         "display": "Postcard",
         "speed_boost": 5,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4171,7 +3083,6 @@
         "affected_minions": [
             "POTATO_MINION"
         ],
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4182,149 +3093,112 @@
         "affected_minions": [
             "POTATO_MINION"
         ],
-        "prices": {},
         "tags": [
             "auction_price"
         ]
     },
     "INFERNO_FUEL_BLOCK": {
-        "display": "Inferno Fuel Block",
-        "prices": {}
+        "display": "Inferno Fuel Block"
     },
     "HYPERGOLIC_GABAGOOL": {
-        "display": "Hypergolic Gabagool",
-        "prices": {}
+        "display": "Hypergolic Gabagool"
     },
     "HEAVY_GABAGOOL": {
-        "display": "Heavy Gabagool",
-        "prices": {}
+        "display": "Heavy Gabagool"
     },
     "FUEL_GABAGOOL": {
-        "display": "Fuel Gabagool",
-        "prices": {}
+        "display": "Fuel Gabagool"
     },
     "MAGMA_CREAM_DISTILLATE": {
-        "display": "Magma Cream Distillate",
-        "prices": {}
+        "display": "Magma Cream Distillate"
     },
     "BLAZE_ROD_DISTILLATE": {
-        "display": "Blaze Rod Distillate",
-        "prices": {}
+        "display": "Blaze Rod Distillate"
     },
     "NETHER_STALK_DISTILLATE": {
-        "display": "Nether Wart Distillate",
-        "prices": {}
+        "display": "Nether Wart Distillate"
     },
     "GLOWSTONE_DUST_DISTILLATE": {
-        "display": "Glowstone Distillate",
-        "prices": {}
+        "display": "Glowstone Distillate"
     },
     "CRUDE_GABAGOOL_DISTILLATE": {
-        "display": "Gabagool Distillate",
-        "prices": {}
+        "display": "Gabagool Distillate"
     },
     "STARFALL": {
-        "display": "Starfall",
-        "prices": {}
+        "display": "Starfall"
     },
     "PLASMA": {
-        "display": "Plasma",
-        "prices": {}
+        "display": "Plasma"
     },
     "FLAMES": {
-        "display": "Flames",
-        "prices": {}
+        "display": "Flames"
     },
     "PRISMARINE:1": {
         "display": "Prismarine Bricks",
-        "prices": {},
-        "xp": {
-            "mining": 0
-        },
         "compact_tier": 0
     },
     "PET_ITEM_EXP_SHARE_DROP": {
-        "display": "Exp Share Core",
-        "prices": {}
+        "display": "Exp Share Core"
     },
     "WINTER_ISLAND": {
         "display": "Winter Island",
-        "prices": {},
         "tags": [
             "auction_price"
         ]
     },
     "CORNUCOPIA": {
-        "display": "Cornucopia",
-        "prices": {}
+        "display": "Cornucopia"
     },
     "CONDENSED_HELIANTHUS": {
-        "display": "Condensed Helianthus",
-        "prices": {}
+        "display": "Condensed Helianthus"
     },
     "GLASSCORN": {
-        "display": "Glasscorn",
-        "prices": {}
+        "display": "Glasscorn"
     },
     "DEVOURER": {
-        "display": "Devourer",
-        "prices": {}
+        "display": "Devourer"
     },
     "ALL_IN_ALOE": {
-        "display": "All-in Aloe",
-        "prices": {}
+        "display": "All-in Aloe"
     },
     "PHANTOMLEAF": {
-        "display": "Phantomleaf",
-        "prices": {}
+        "display": "Phantomleaf"
     },
     "TIMESTALK": {
-        "display": "Timestalk",
-        "prices": {}
+        "display": "Timestalk"
     },
     "ZOMBUD": {
-        "display": "Zombud",
-        "prices": {}
+        "display": "Zombud"
     },
     "FLESHTRAP": {
-        "display": "Fleshtrap",
-        "prices": {}
+        "display": "Fleshtrap"
     },
     "STARLYN_PRIZE": {
-        "display": "Agatha's Prize",
-        "prices": {}
+        "display": "Agatha's Prize"
     },
     "FIGSTONE": {
-        "display": "Figstone",
-        "prices": {}
+        "display": "Figstone"
     },
     "MANGCORE": {
-        "display": "Mangcore",
-        "prices": {}
+        "display": "Mangcore"
     },
     "HELIXIS": {
-        "display": "Helixis",
-        "prices": {}
+        "display": "Helixis"
     },
     "PERFECT_AMETHYST_GEM": {
-        "display": "Perfect Amethyst Gemstone",
-        "prices": {}
+        "display": "Perfect Amethyst Gemstone"
     },
     "PERFECT_JADE_GEM": {
-        "display": "Perfect Jade Gemstone",
-        "prices": {}
+        "display": "Perfect Jade Gemstone"
     },
     "PERFECT_SAPPHIRE_GEM": {
-        "display": "Perfect Sapphire Gemstone",
-        "prices": {}
+        "display": "Perfect Sapphire Gemstone"
     },
     "PERFECT_AMBER_GEM": {
-        "display": "Perfect Amber Gemstone",
-        "prices": {}
+        "display": "Perfect Amber Gemstone"
     },
     "PERFECT_TOPAZ_GEM": {
-        "display": "Perfect Topaz Gemstone",
-        "prices": {}
+        "display": "Perfect Topaz Gemstone"
     },
     "PET_ITEM_MINING_SKILL_BOOST_COMMON": {
         "display": "Common Mining Exp Boost",
@@ -4349,7 +3223,6 @@
         "rarity": "RARE",
         "exp_boost_type": "mining",
         "exp_boost_amount": 40,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4368,7 +3241,6 @@
         "rarity": "UNCOMMON",
         "exp_boost_type": "farming",
         "exp_boost_amount": 30,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4405,7 +3277,6 @@
         "rarity": "UNCOMMON",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 30,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4415,7 +3286,6 @@
         "rarity": "RARE",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 40,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4425,7 +3295,6 @@
         "rarity": "EPIC",
         "exp_boost_type": "fishing",
         "exp_boost_amount": 50,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4444,7 +3313,6 @@
         "rarity": "UNCOMMON",
         "exp_boost_type": "combat",
         "exp_boost_amount": 30,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4454,7 +3322,6 @@
         "rarity": "RARE",
         "exp_boost_type": "combat",
         "exp_boost_amount": 40,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4464,7 +3331,6 @@
         "rarity": "EPIC",
         "exp_boost_type": "combat",
         "exp_boost_amount": 50,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4483,7 +3349,6 @@
         "rarity": "UNCOMMON",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 30,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4493,7 +3358,6 @@
         "rarity": "RARE",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 40,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4503,7 +3367,6 @@
         "rarity": "EPIC",
         "exp_boost_type": "foraging",
         "exp_boost_amount": 50,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4522,7 +3385,6 @@
         "rarity": "UNCOMMON",
         "exp_boost_type": "all",
         "exp_boost_amount": 20,
-        "prices": {},
         "tags": [
             "auction_price"
         ]
@@ -4530,7 +3392,6 @@
     "PET_ITEM_EXP_SHARE": {
         "display": "Exp Share",
         "rarity": "EPIC",
-        "prices": {},
         "recipe": {
             "PET_ITEM_EXP_SHARE_DROP": 1,
             "ENCHANTED_GOLD": 72
@@ -4543,12 +3404,10 @@
         }
     },
     "SHARD_TOUCAN": {
-        "display": "Toucan",
-        "prices": {}
+        "display": "Toucan"
     },
     "SHARD_FALCON": {
-        "display": "Falcon",
-        "prices": {}
+        "display": "Falcon"
     },
     "CUSTOM_MINION": {
         "display": "Custom",
@@ -8958,6 +7817,12 @@
     "PET_DOLPHIN": {
         "display": "Dolphin",
         "pet_type": "fishing",
+        "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
+        "pet_prices": {}
+    },
+    "PET_EAGLE": {
+        "display": "Eagle",
+        "pet_type": "hunting",
         "pet_rarities": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"],
         "pet_prices": {}
     },

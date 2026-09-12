@@ -41,6 +41,7 @@ class Calc_add_ons():
             "beastmaster": {"dtype": float, "display": "Beastmaster", "initial": 0, "options": None},
             "blaze_slayer": {"dtype": bool, "display": "Blaze Slayer 8", "initial": False, "options": None},
             }, self.wisp_levelling)
+        self.calc.huim.new_edit_vars("calculator_data_debug", {"data_loc": {"dtype": str, "display": "Data Location", "initial": "COBBLESTONE.prices.npc", "options": None}}, self.calculator_data_debug)
 
         self.reverse_affected_minions = {
             "afkpet": {},
@@ -72,6 +73,7 @@ class Calc_add_ons():
             "Chili Pepper Collection": {"function": self.collection_maxing_inputs, "auto_run": "post"},
             # "Old Corrupted Frags": {"function": self.old_corrupted_frags, "auto_run": "post"},
             # "Old Enchanted Hopper": {"function": self.old_enchanted_hopper, "auto_run": "post"},
+            # "Calculator Data Debug": {"function": self.calculator_data_debug_inputs, "auto_run": "post"},
         }
         return
 
@@ -311,25 +313,30 @@ class Calc_add_ons():
         setup_data.update(self.calc.decode_id(outputs["calculated_ID"]))
         setup_data.update(outputs)
         setup_data["bazaar_update_txt"] = self.calc.bazaar_update_txt.get()
-        output_str = self.calc.text_output(calculation_data=setup_data, output_switches={}, output_order={
-                "amount": None,
-                "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
-                "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
-                "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
-                "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
-                        " lvl ": {"afkpet_lvl"},
-                        "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
-                "player_harvests": {"\n> ": ["player_looting"]},
-                "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
-                "mayor": None,
-                "Leveling pet: ": {
-                    "%": [["levelingpet_rarity", "levelingpet"]],
-                    "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
-                    "%\n> Exp Share Pets: ": [["expsharepet_rarity", "expsharepet"], ["expsharepetslot2_rarity", "expsharepetslot2"], ["expsharepetslot3_rarity", "expsharepetslot3"]]
-                },
-                "used_pet_prices": None,
-                "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
-                }, markdown=markdown_output, to_terminal=False)
+        text_output_order = {
+            "amount": None,
+            "Upgrades: ": { "": {"fuel", "hopper", "upgrade1", "upgrade2", "chest", "beacon", "crystal", "postcard", "infusion", "free_will"}},
+            "Beacon Info": {"\n> ": ["scorched", "B_constant", "B_acquired"]},
+            "Inferno Info": {"\n> ": ["inferno_grade", "inferno_distillate", "inferno_eyedrops", "rising_celsius_override"]},
+            "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
+                    " lvl ": {"afkpet_lvl"},
+                    "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
+            "player_harvests": {"\n> ": ["player_looting"]},
+            "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
+            "mayor": None,
+            "Leveling pet: ": {
+                "%": [["levelingpet_rarity", "levelingpet"]],
+                "\n> ": ["taming", "falcon_attribute", "pet_exp_boost", "beastmaster", "toucan_attribute", "expshareitem"],
+                "%\n> Exp Share Pets: ": [["expsharepet_rarity", "expsharepet"], ["expsharepetslot2_rarity", "expsharepetslot2"], ["expsharepetslot3_rarity", "expsharepetslot3"]]
+            },
+            "used_pet_prices": None,
+            "": {"": ["sell_loc", "bazaar_update_txt", "bazaar_sell_type", "bazaar_buy_type", "bazaar_taxes", "bazaar_flipper", "sell_form"]},
+        }
+        if auto_crystal:
+            text_output_order["Upgrades: "][""].remove("crystal")
+        if auto_afkpet:
+            text_output_order["afk"]["%\n> "][0].remove("afkpet")
+        output_str = self.calc.text_output(calculation_data=setup_data, output_switches={}, output_order=text_output_order, markdown=markdown_output, to_terminal=False)
         if markdown_output:
             if auto_crystal:
                 output_str += "\nAutomatic Crystal: `True`"
@@ -605,7 +612,7 @@ class Calc_add_ons():
                 setup_data["amount"] = loop_amount
                 outputs = self.calc.calculate(setup_data=setup_data, return_outputs=True)
                 cost = outputs["setupcost"]
-                needed_time_scaling = 20000 / outputs["items"]["CHILI_PEPPER"]
+                needed_time_scaling = 10000 / outputs["items"]["CHILI_PEPPER"]
                 needed_time = setup_data["empty_time_amount"] * needed_time_scaling
                 if cost < cost_filter and needed_time < time_filter:
                     calculated_setup_costs[f"{loop_tier}, {loop_amount}"] = cost
@@ -675,4 +682,13 @@ class Calc_add_ons():
             self.calc.collect_add_on_output("Partial Setup Cost", "No setup parts pass the filter")
             return
         self.calc.collect_add_on_output("Partial Setup Cost", self.calc.huim.reduced_number(partial_cost) + " for " + ", ".join(used_parts))
+        return
+
+    def calculator_data_debug_inputs(self):
+        # This Add-on is inactive, to turn it back on uncomment the add-on in self.add_ons_data in __init__
+        self.calc.huim.edit_vars("calculator_data_debug")
+        return
+
+    def calculator_data_debug(self, results):
+        self.calc.collect_add_on_output("Calculator Data", self.calc.md.get_data(results["data_loc"]))
         return
