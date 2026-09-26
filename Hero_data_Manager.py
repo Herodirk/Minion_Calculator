@@ -256,7 +256,7 @@ class H_data_M():
 
     def init_calculator_data(self):
         """
-        calls to Hypixel's Item,
+        calls to Hypixel's Item API,
         uses that data to get NPC prices and XP amounts
 
         Returns

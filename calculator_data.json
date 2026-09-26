@@ -7987,7 +7987,7 @@
     },
     "PET_JADE_DRAGON_HATCHED": {
         "display": "Jade Dragon Hatched",
-        "pet_type": "combat",
+        "pet_type": "foraging",
         "pet_rarities": ["LEGENDARY"],
         "pet_prices": {},
         "tags": [
@@ -8251,7 +8251,7 @@
     },
     "PET_ROSE_DRAGON_HATCHED": {
         "display": "Rose Dragon Hatched",
-        "pet_type": "combat",
+        "pet_type": "farming",
         "pet_rarities": ["LEGENDARY"],
         "pet_prices": {},
         "tags": [
