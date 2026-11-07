@@ -36,7 +36,7 @@ class Calc_add_ons():
             "wisp_pet": {"dtype": str, "display": "Wisp Pet", "initial": "Subzero Wisp", "options": ["Droplet Wisp", "Frost Wisp", "Glacial Wisp", "Subzero Wisp"]},
             "pet_item": {"dtype": str, "display": "Pet Item", "initial": "All Skills Exp Super-Boost", "options": ["None", "All Skills Exp Boost", "All Skills Exp Super-Boost"]},
             "taming": {"dtype": int, "display": "Taming", "initial": 60, "options": None},
-            "battle_experience": {"dtype": int, "display": "Battle Experience", "initial": 10, "options": self.calc.input_options["attribute"]},
+            "battle_experience": {"dtype": int, "display": "Battle Experience", "initial": 10, "options": self.calc.md.input_options["attribute"]},
             "diana": {"dtype": bool, "display": "Diana", "initial": False, "options": None},
             "beastmaster": {"dtype": float, "display": "Beastmaster", "initial": 0, "options": None},
             "blaze_slayer": {"dtype": bool, "display": "Blaze Slayer 8", "initial": False, "options": None},
@@ -48,14 +48,14 @@ class Calc_add_ons():
             "crystal": {}
         }
         for modifier_key in self.reverse_affected_minions.keys():
-            for modifier_id in self.calc.input_options[modifier_key].values():
+            for modifier_id in self.calc.md.input_options[modifier_key].values():
                 if modifier_id == "NONE":
                     continue
                 for affected_minion in self.calc.md.calculator_data[modifier_id]["affected_minions"]:
                     if affected_minion in self.calc.md.calculator_data:
                         self.reverse_affected_minions[modifier_key][affected_minion] = modifier_id
                         continue
-                    for minion_id in self.calc.input_options["minion"].values():
+                    for minion_id in self.calc.md.input_options["minion"].values():
                         if self.calc.md.has_data_tag(minion_id, affected_minion):
                             self.reverse_affected_minions[modifier_key][minion_id] = modifier_id
 
@@ -132,7 +132,7 @@ class Calc_add_ons():
         return
 
     def wisp_levelling(self, results):
-        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
         outputs = self.calc.huim.get_from_GUI(["items"])
         gabagool_tier = { "Crude Gabagool": "CRUDE_GABAGOOL", "Fuel Gabagool": "FUEL_GABAGOOL", "Heavy Gabagool": "HEAVY_GABAGOOL", "Hypergolic Gabagool": "HYPERGOLIC_GABAGOOL" }[results["gabagool_tier"]]
         wisp_pet = { "Droplet Wisp": "PET_DROPLET_WISP", "Frost Wisp": "PET_FROST_WISP", "Glacial Wisp": "PET_GLACIAL_WISP", "Subzero Wisp": "PET_SUBZERO_WISP" }[results["wisp_pet"]]
@@ -196,7 +196,7 @@ class Calc_add_ons():
                 "TIMESTALK": 1,
             }
         }
-        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
         coins_per_copper = []
         for mutation, base_copper in { "ALL_IN_ALOE": 2300, "PHANTOMLEAF": 1500, "ZOMBUD": 500, "FLESHTRAP": 180 }.items():
             coins_per_copper.append((self.calc.get_price(mutation, setup_data, "buy", "bazaar") + base_copper * 2000) / (base_copper * 1.6))
@@ -262,7 +262,7 @@ class Calc_add_ons():
         return
 
     def basic_minion_loop(self, results):
-        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
         cost_filter = results["setup_cost_limit"]
         if cost_filter == 0:
             cost_filter = math.inf
@@ -271,7 +271,7 @@ class Calc_add_ons():
         markdown_output = results["markdown_output"]
         calculated_setup_profits = {}
         calculated_setup_costs = {}
-        loop_minion_options = list(self.calc.input_options["minion"].values())
+        loop_minion_options = list(self.calc.md.input_options["minion"].values())
         loop_minion_skip = ["CUSTOM_MINION"]
         loop_minion_smelting = ["IRON_MINION", "GOLD_MINION", "CACTUS_MINION"]
         super_compactor = False
@@ -368,7 +368,7 @@ class Calc_add_ons():
 
 
     def inferno_minion_loop(self, results):
-        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
         calculated_setup_profits = {}
         calculated_setup_bad_luck_profits = {}
         calculated_setup_costs = {}
@@ -576,7 +576,7 @@ class Calc_add_ons():
 
     def collection_maxing(self, results):
         display_name = "Chili Pepper Collection"
-        setup_data = self.calc.huim.get_from_GUI(self.calc.ID_order)
+        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
         calculated_setup_profits = {}
         calculated_setup_costs = {}
         calculated_collection_max_cost = {}

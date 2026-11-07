@@ -33,7 +33,7 @@ Notes about inaccuracies and tests at the bottom of this file
 import pathlib
 
 class H_data_M():
-    def __init__(self, huim):
+    def __init__(self, huim, calculator_version, initial_data_version):
         self.huim = huim
 
         self.inferno_fuel_data = {
@@ -250,9 +250,31 @@ class H_data_M():
 
         self.huim.check_json(self.instance_data_file, self.instance_data)
         self.instance_data.update(self.huim.read_json(self.instance_data_file))
-        self.init_calculator_data()
+        self.versions_data = self.huim.call_API(r"https://herodirk.github.io/minion/calculator/versions_api/ranges.json", "Herodirk Github Data Version Ranges")
+        self.data_versions_range = self.versions_data[calculator_version]
+        self.active_data_version = 0
+        if initial_data_version != 0 and (initial_data_version < self.data_versions_range["min"] or initial_data_version > self.data_versions_range["max"]):
+            self.huim.logger.warning("Initial data version not compatible with Calculator version. Defaulting to max data version")
+            initial_data_version = self.data_versions_range["max"]
+        if self.versions_data["latest"] > self.data_versions_range["max"]:
+            self.huim.logger.warning("Download new Calculator version to be able to use the latest data version")
+        self.set_data_version(initial_data_version)
         self.huim.logger.debug("Calculator Data loaded")
         return
+
+    def set_data_version(self, version):
+        if version == 0:
+            self.huim.logger.debug(f"Applying max data version: {self.data_versions_range["max"]}")
+            version = self.data_versions_range["max"]
+        if version < self.data_versions_range["min"] or version > self.data_versions_range["max"]:
+            return
+        self.id_order = self.huim.call_API(r"https://herodirk.github.io/minion/calculator/versions_api/" + str(version) + r"/id_order.json", "Herodirk Github ID Order")
+        self.input_options = self.huim.call_API(r"https://herodirk.github.io/minion/calculator/versions_api/" + str(version) + r"/input_options.json", "Herodirk Github Input Options")
+        self.calculator_data = self.huim.call_API(r"https://herodirk.github.io/minion/calculator/versions_api/" + str(version) + r"/calculator_data.json", "Herodirk Github Calculator Data")
+        self.huim.logger.debug("Static Calculator Data loaded")
+        self.init_calculator_data()
+        self.active_data_version = version
+        self.huim.logger.debug(f"Active Data Version: {version}")
 
     def init_calculator_data(self):
         """
@@ -264,9 +286,6 @@ class H_data_M():
         None
 
         """
-        self.calculator_data = self.huim.read_json(pathlib.Path("calculator_data.json"))
-        self.huim.logger.debug("Static Calculator Data loaded")
-
         raw_item_data = self.huim.call_API(r"https://api.hypixel.net/resources/skyblock/items", "Hypixel Item API")
         if "success" not in raw_item_data or raw_item_data["success"] is False:
             self.huim.logger.error("Hypixel Item API call was unsuccessful")
