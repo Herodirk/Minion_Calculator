@@ -104,7 +104,8 @@ templateList = {
         "farming_wisdom": 190,  # Agarimoo Artifact (1), Abicase (1.5), Lunar Legendary Pelt Belt (1 + 3), Lunar Mythic Zorro's Cape during Contest (2 * (1 + 4)), Lunar Mythic Rift Necklace (1 + 6), Lunar Mythic Gillsplash Gloves (4), Blessed Legendary Mk. III farming tool with Cultivating X (3 + 5 + 10), Mythic Sunny armor (4 * 6), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
         "fishing_wisdom": 92,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Ship Crew (0.5), Mysterious Package (1)
         "foraging_wisdom": 98.32,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), David's Cloak (5), Foraging Wisdom Boosters armor and equipment (4 + 2), Moonglade Legendary Axe with Absorb X, Foraging Wisdom Boosters and essence shop perk Axed I ((5 + 10 + 1) * 1.02), Efficient Forager (15), Foraging Wisdom (6.5)
-        "alchemy_wisdom": 54.5  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
+        "alchemy_wisdom": 54.5,  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
+        "force_switch_on": "wisdom_inputs"
     },
     "Full Coop Wisdom": {  # effective wisdom of 8 players, for each player same sources as above, but no tools, armor or equipment. Calculates as `8 * (1 + W / 100) = (1 + (700 + 8 * W) / 100)`
         "mining_wisdom": 1268,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Cavern Wisdom (6.5), Seasoned Mineman (15)
@@ -112,7 +113,8 @@ templateList = {
         "farming_wisdom": 1684,  # Agarimoo Artifact (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Very Moldy Bread (30 + 5), Garden Wisdom (6.5), Sowledge Chip (30), Fruit Bowl (1)
         "fishing_wisdom": 1436,  # Agarimoo Artifact (1), Chumming Talisman (1), Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Moby-Duck (30 + 1), Sea Wisdom (6.5), Ship Parts (1.5), Ship Crew (0.5), Mysterious Package (1)
         "foraging_wisdom": 1268,  # Abicase (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Efficient Forager (15), Foraging Wisdom (6.5)
-        "alchemy_wisdom": 1136  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
+        "alchemy_wisdom": 1136,  # Witch's Artifact (1.5), cookie (25), god pot (20), Celestial Mason Jar (3), Spider Slayer VIII (5)
+        "force_switch_on": "wisdom_inputs"
     },
     "Combat Pet Leveling": {
         "expshareitem": True,
@@ -120,6 +122,7 @@ templateList = {
         "falcon_attribute": 10,
         "pet_exp_boost": "Epic Combat Exp Boost",
         "toucan_attribute": 10,
+        "force_switch_on": "pet_leveling"
     },
     "Maxed Inferno Minion": {
         "minion": "Inferno",
@@ -303,6 +306,7 @@ class Calculator(tk.Tk):
         self.xp = HPM.Hvar(self.huim, key="xp", vtype="output", dtype=dict, display="XP amounts", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)
         self.pets_levelled = HPM.Hvar(self.huim, key="pets_levelled", vtype="output", dtype=dict, display="Pets Levelled", frame="outputs_setup_grid", widget_width=35, widget_height=4, initial={}, switch_initial=False)
         self.pet_profit = HPM.Hvar(self.huim, key="pet_profit", vtype="output", dtype=float, display="Pet profit", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
+        self.pet_cost = HPM.Hvar(self.huim, key="pet_cost", vtype="output", dtype=float, display="Pet cost", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
         self.fuelcost = HPM.Hvar(self.huim, key="fuelcost", vtype="output", dtype=float, display="Fuel cost", frame="outputs_profit_grid", initial=0.0, switch_initial=False)
         self.fuelamount = HPM.Hvar(self.huim, key="fuelamount", vtype="output", dtype=float, display="Fuel amount", frame="outputs_setup_grid", initial=0.0, switch_initial=False)
         self.total_profit = HPM.Hvar(self.huim, key="total_profit", vtype="output", dtype=float, display="Total profit", frame="outputs_profit_grid", initial=0.0, switch_initial=True)
@@ -481,6 +485,7 @@ class Calculator(tk.Tk):
                 "item_profit": None,
                 "used_pet_prices": None,
                 "pet_profit": None,
+                "pet_cost": None,
                 "fuelcost": None,
                 "total_profit": None
             },
@@ -519,7 +524,7 @@ class Calculator(tk.Tk):
         # Create switches with Hero UI Manager for the extended minion options
         self.huim.def_switch("wisdom_inputs", widget_references=["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"],
                             locations="grid", control=None, negate=False, initial=False)
-        self.huim.def_switch("pet_leveling", widget_references=["taming", "pet_exp_boost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "falcon_attribute", "toucan_attribute", "used_pet_prices"],
+        self.huim.def_switch("pet_leveling", widget_references=["taming", "pet_exp_boost", "beastmaster", "expsharepet", "expshareitem", "pets_levelled", "pet_profit", "pet_cost", "falcon_attribute", "toucan_attribute", "used_pet_prices"],
                             locations="grid", control="None", negate=True, initial=False)
         self.huim.def_switch("exp_share_diana", widget_references=["expsharepetslot2", "expsharepetslot3"],
                             locations="grid", control="DianaTrue", negate=False, initial=False)
@@ -566,6 +571,7 @@ class Calculator(tk.Tk):
             "pets_levelled": "levelingpet",
             "used_pet_prices": "levelingpet",
             "pet_profit": "levelingpet",
+            "pet_cost": "levelingpet",
             "levelingpet_rarity": "levelingpet",
             "expsharepet_rarity": "expsharepet",
             "expsharepetslot2_rarity": "expsharepetslot2",
@@ -625,6 +631,7 @@ class Calculator(tk.Tk):
             "itemtype_profit": None,
             "xp": None,
             "pet_profit": None,
+            "pet_cost": None,
             "pets_levelled": None,
             "fuelcost": None,
             "total_profit": None,
@@ -716,6 +723,9 @@ class Calculator(tk.Tk):
         else:
             template = templateList[template_name]
         for setting, variable in template.items():
+            if setting == "force_switch_on":
+                self.huim.force_switch(variable, True)
+                continue
             self.var_dict[setting].set(variable)
             if self.var_dict[setting].command is not None:
                 if type(variable) == bool:
@@ -1879,10 +1889,12 @@ class Calculator(tk.Tk):
         
         :param setup_pets: dict, pet slot var key as key, dict as value with pet name, pet xp and amount of levelled pets
         :param setup_data: needed setup data: expshareitem, pet_exp_boost, setup data for self.get_price
-        :return pet_profit: float, total profit from pets
+        :return pet_profit: float, total coin gain from pets
+        :return pet_cost: float, total cost for pets
         :return used_pet_prices: dict, pet name as key, string as value with lvl 1 price and max lvl price 
         """
         pet_profit = 0.0
+        pet_cost = 0.0
         used_pet_prices = {}
         super_scrubber_price = self.get_price("SUPER_SCRUBBER", setup_data, "buy", "custom", True)
         for pet_slot, pet_info in setup_pets.items():
@@ -1898,16 +1910,17 @@ class Calculator(tk.Tk):
                 if combined_pet_id not in used_pet_prices:
                     used_pet_prices[combined_pet_id] = f"Price not found"
                 continue
-            pet_profit += pet_info["levelled_pets"] * (self.apply_ah_tax(pet_price_max, setup_data) - pet_price_min)
+            pet_profit += pet_info["levelled_pets"] * self.apply_ah_tax(pet_price_max, setup_data)
+            pet_cost += pet_info["levelled_pets"] * pet_price_min
             if combined_pet_id not in used_pet_prices:
                 used_pet_prices[combined_pet_id] = f"{self.huim.reduced_number(pet_price_min)} - {self.huim.reduced_number(pet_price_max)} (Taxed: {self.huim.reduced_number(self.apply_ah_tax(pet_price_max, setup_data))})"
             if self.md.has_data_tag(pet_info["pet"], "dragon_egg_pet"):
                 continue
             if pet_slot == "levelingpet" and (main_pet_item := setup_data["pet_exp_boost"]) != "NONE":
-                pet_profit -= pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data[main_pet_item]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
+                pet_cost += pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data[main_pet_item]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
             if pet_slot != "levelingpet" and setup_data["expshareitem"]:
-                pet_profit -= pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
-        return pet_profit, used_pet_prices
+                pet_cost += pet_info["levelled_pets"] * (self.md.calculator_data[self.md.calculator_data["PET_ITEM_EXP_SHARE"]["rarity"]]["pet_item_scrub_cost"] + super_scrubber_price)
+        return pet_profit, pet_cost, used_pet_prices
 
     def get_finite_fuel_cost(self, minion_amount, minion_fuel, empty_time_seconds, setup_data):
         """
@@ -2176,13 +2189,13 @@ class Calculator(tk.Tk):
         
         # Pet leveling
         setup_pets = self.get_pets_levelled(skill_xp, mayor, setup_data)
-        pet_profit, used_pet_prices = self.get_pet_profit(setup_pets, setup_data)
+        pet_profit, pet_cost, used_pet_prices = self.get_pet_profit(setup_pets, setup_data)
 
         # calculating beacon and limited fuel cost
         fuel_cost, needed_fuel = self.get_finite_fuel_cost(minion_amount, minion_fuel, empty_time_seconds, setup_data)
 
         # total profit
-        total_profit = item_profit + pet_profit - fuel_cost
+        total_profit = item_profit + pet_profit - pet_cost - fuel_cost
 
         # Setup cost
         total_cost, extra_cost, free_will_optimal_tier, cost_per_part = self.get_setup_cost(minion_type, minion_tier, minion_amount, minion_fuel, setup_pets, setup_data)
@@ -2197,6 +2210,7 @@ class Calculator(tk.Tk):
         # collect outputs
         outputs = {
             "pet_profit": pet_profit,
+            "pet_cost": pet_cost,
             "harvests": minion_amount * harvests_per_time,
             "itemtype_profit": per_item_profit,
             "items": drops_list,

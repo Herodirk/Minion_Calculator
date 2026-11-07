@@ -124,6 +124,7 @@ class H_data_M():
             "CUSTOM_MINION.afkcorrupt": 2,
             "PET_CUSTOM_PET.pet_type": "farming",
             "CUSTOM_RARITY.max_lvl_pet_xp_amount": 25353230,
+            "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.min": 0,
             "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.max": 20000000,
             "CUSTOM_UPGRADE.speed_boost": 0,
             "CUSTOM_UPGRADE.drop_multiplier": 1,
@@ -244,7 +245,8 @@ class H_data_M():
             "Custom Pet": {
                 "PET_CUSTOM_PET.pet_type": {"dtype": str, "display": "Pet Type", "options": ["all", "alchemy", "combat", "enchanting", "farming", "fishing", "foraging", "mining"]},
                 "CUSTOM_RARITY.max_lvl_pet_xp_amount": {"dtype": float, "display": "Custom Rarity max Pet XP", "options": None},
-                "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.max": {"dtype": float, "display": "Custom Pet profit per pet", "options": None}
+                "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.min": {"dtype": float, "display": "Custom Pet lvl 1 cost", "options": None},
+                "PET_CUSTOM_PET.pet_prices.CUSTOM_RARITY.max": {"dtype": float, "display": "Custom Pet max lvl cost", "options": None}
             }
         }
 

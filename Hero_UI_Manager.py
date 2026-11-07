@@ -589,6 +589,16 @@ class H_UI_M():
         self.main.switches[switch_id]["state"] = bool(1 - int(state))
         return
 
+    def force_switch(self, switch_id, state):
+        if switch_id not in self.main.switches:
+            self.logger.error(f"ID {switch_id} does not exist in switch storage")
+            return
+        current_state = self.main.switches[switch_id]["state"]
+        if current_state == state:
+            return
+        self.toggle_switch(switch_id, None)
+        return
+
     def create_switch_call(self, switch_id, controlvar=None):
         """
         Creates a command for a GUI widget that calls a switch.
