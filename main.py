@@ -172,7 +172,8 @@ templateList = {
         "expsharepet": "Rose Dragon",
         "expsharepetslot2": "Rose Dragon",
         "expsharepetslot3": "Rose Dragon",
-        "beastmaster": 5
+        "beastmaster": 5,
+        "force_switch_on": "wisdom_inputs"
     }
 }
 
@@ -234,62 +235,62 @@ class Calculator(tk.Tk):
         self.color_palette = HPM.Hvar(self.huim, key="color_palette", vtype="storage", dtype=str, display="Color Palette", initial=found_settings["color_palette"], options=list(HPM.color_palettes.keys()))
         self.template = HPM.Hvar(self.huim, key="template", vtype="input", display="Templates", initial="Choose Template", dtype=str, frame="inputs_minion_grid", options=list(templateList.keys()), command=self.load_template)
         self.load_ID = HPM.Hvar(self.huim, key="load_id", vtype="input", dtype=str, frame="inputs_minion_grid", display="Load ID", initial=found_settings["calculated_ID"])
-        self.minion = HPM.Hvar(self.huim, key="minion", vtype="input", dtype=str, display="Minion", frame="inputs_minion_grid", initial="Custom", options=self.md.input_options["minion"], command=lambda x: self.multiswitch('minion', x))
+        self.minion = HPM.Hvar(self.huim, key="minion", vtype="input", dtype=str, display="Minion", frame="inputs_minion_grid", initial="CUSTOM_MINION", options=self.md.input_options["minion"], command=lambda x: self.multiswitch('minion', x))
         self.miniontier = HPM.Hvar(self.huim, key="miniontier", vtype="input", dtype=int, display="Tier", frame="inputs_minion_grid", initial=12, options=self.md.input_options["miniontier"], command=lambda x: self.multiswitch('minion', x))
         self.amount = HPM.Hvar(self.huim, key="amount", vtype="input", dtype=int, display="Amount", frame="inputs_minion_grid", initial=1, options=None)
-        self.fuel = HPM.Hvar(self.huim, key="fuel", vtype="input", dtype=str, display="Fuel", frame="inputs_minion_grid", initial="None", options=self.md.input_options["fuel"], command=lambda x: self.multiswitch('fuel', x))
-        self.inferno_grade = HPM.Hvar(self.huim, key="inferno_grade", vtype="input", dtype=str, display="Grade", frame="inputs_minion_grid", initial="Hypergolic Gabagool", options=self.md.input_options["inferno_grade"])
-        self.inferno_distillate = HPM.Hvar(self.huim, key="inferno_distillate", vtype="input", dtype=str, display="Distillate", frame="inputs_minion_grid", initial="Gabagool Distillate", options=self.md.input_options["inferno_distillate"])
+        self.fuel = HPM.Hvar(self.huim, key="fuel", vtype="input", dtype=str, display="Fuel", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["fuel"], command=lambda x: self.multiswitch('fuel', x))
+        self.inferno_grade = HPM.Hvar(self.huim, key="inferno_grade", vtype="input", dtype=str, display="Grade", frame="inputs_minion_grid", initial="HYPERGOLIC_GABAGOOL", options=self.md.input_options["inferno_grade"])
+        self.inferno_distillate = HPM.Hvar(self.huim, key="inferno_distillate", vtype="input", dtype=str, display="Distillate", frame="inputs_minion_grid", initial="CRUDE_GABAGOOL_DISTILLATE", options=self.md.input_options["inferno_distillate"])
         self.inferno_eyedrops = HPM.Hvar(self.huim, key="inferno_eyedrops", vtype="input", dtype=bool, display="Eyedrops", frame="inputs_minion_grid", initial=False)
-        self.hopper = HPM.Hvar(self.huim, key="hopper", vtype="input", dtype=str, display="Hopper", frame="inputs_minion_grid", initial="None", options=self.md.input_options["hopper"])
-        self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="None", options=self.md.input_options["upgrade"])
-        self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="None", options=self.md.input_options["upgrade"])
-        self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="None", options=self.md.input_options["chest"])
-        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=str, display="Beacon", frame="inputs_minion_grid", initial="None", options=self.md.input_options["beacon"], command=self.huim.create_switch_call("beacon", controlvar="self"))
-        self.beacon_fuel = HPM.Hvar(self.huim, key="beacon_fuel", vtype="input", dtype=str, display="Beacon Fuel", frame="inputs_minion_grid", initial="Power Crystal", options=self.md.input_options["beacon_fuel"])
+        self.hopper = HPM.Hvar(self.huim, key="hopper", vtype="input", dtype=str, display="Hopper", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["hopper"])
+        self.upgrade1 = HPM.Hvar(self.huim, key="upgrade1", vtype="input", dtype=str, display="Upgrade 1", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["upgrade"])
+        self.upgrade2 = HPM.Hvar(self.huim, key="upgrade2", vtype="input", dtype=str, display="Upgrade 2", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["upgrade"])
+        self.chest = HPM.Hvar(self.huim, key="chest", vtype="input", dtype=str, display="Chest", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["chest"])
+        self.beacon = HPM.Hvar(self.huim, key="beacon", vtype="input", dtype=str, display="Beacon", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["beacon"], command=self.huim.create_switch_call("beacon", controlvar="self"))
+        self.beacon_fuel = HPM.Hvar(self.huim, key="beacon_fuel", vtype="input", dtype=str, display="Beacon Fuel", frame="inputs_minion_grid", initial="POWER_CRYSTAL", options=self.md.input_options["beacon_fuel"])
         self.free_fuel_beacon = HPM.Hvar(self.huim, key="free_fuel_beacon", vtype="input", dtype=bool, display="Free Fuel Beacon", frame="inputs_minion_grid", initial=False)
         self.infusion = HPM.Hvar(self.huim, key="infusion", vtype="input", dtype=bool, display="Infusion", frame="inputs_minion_grid", initial=False)
-        self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="None", options=self.md.input_options["crystal"], command=self.huim.create_switch_call("cornucopia_bonus", controlvar="self"))
+        self.crystal = HPM.Hvar(self.huim, key="crystal", vtype="input", dtype=str, display="Crystal", frame="inputs_minion_grid", initial="NONE", options=self.md.input_options["crystal"], command=self.huim.create_switch_call("cornucopia_bonus", controlvar="self"))
         self.unique_farming_minions = HPM.Hvar(self.huim, key="unique_farming_minions", vtype="input", dtype=int, display="Uniques", fancy_display="Unique Farming Minions", frame="inputs_minion_grid", initial=1)
         self.free_will = HPM.Hvar(self.huim, key="free_will", vtype="input", dtype=bool, display="Free Will", frame="inputs_minion_grid", initial=False, command=self.huim.create_switch_call("optimal_free_will", controlvar="free_will"))
         self.postcard = HPM.Hvar(self.huim, key="postcard", vtype="input", dtype=bool, display="Postcard", frame="inputs_minion_grid", initial=False)
         self.afk = HPM.Hvar(self.huim, key="afk", vtype="input", dtype=bool, display="AFK", frame="inputs_player_grid", initial=False, command=lambda: self.multiswitch("afk", None))
-        self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="None", options=self.md.input_options["afkpet"], command=lambda x: self.afkpet_rarity.update_option_list(list(self.md.calculator_data[self.md.input_options["afkpet"][x]]["boosting_pet"].keys()), True))
-        self.afkpet_rarity = HPM.Hvar(self.huim, key="afkpet_rarity", vtype="input", dtype=str, display="AFK Pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.md.input_options["pet_rarity"])
+        self.afkpet = HPM.Hvar(self.huim, key="afkpet", vtype="input", dtype=str, display="AFK Pet", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["afkpet"], command=lambda x: self.afkpet_rarity.update_option_list(list(self.md.calculator_data[self.md.input_options["afkpet"][x]]["boosting_pet"].keys())))
+        self.afkpet_rarity = HPM.Hvar(self.huim, key="afkpet_rarity", vtype="input", dtype=str, display="AFK Pet Rarity", frame="inputs_player_grid", initial="LEGENDARY", options=self.md.input_options["pet_rarity"])
         self.afkpet_lvl = HPM.Hvar(self.huim, key="afkpet_lvl", vtype="input", dtype=float, display="AFK Pet level", frame="inputs_player_grid", initial=0.0)
         self.enchanted_clock = HPM.Hvar(self.huim, key="enchanted_clock", vtype="input", dtype=bool, display="Enchanted Clock", frame="inputs_player_grid", initial=False)
         self.special_layout = HPM.Hvar(self.huim, key="special_layout", vtype="input", dtype=bool, display="Special Layout", frame="inputs_player_grid", initial=False)
         self.player_harvests = HPM.Hvar(self.huim, key="player_harvests", vtype="input", dtype=bool, display="Player Harvests", frame="inputs_player_grid", initial=False)
         self.player_looting = HPM.Hvar(self.huim, key="player_looting", vtype="input", dtype=int, display="Looting", frame="inputs_player_grid", initial=0, options=self.md.input_options["player_looting"])
-        self.potato_accessory = HPM.Hvar(self.huim, key="potato_accessory", vtype="input", dtype=str, display="Potato Accessory", frame="inputs_player_grid", initial="None", options=self.md.input_options["potato_accessory"])
+        self.potato_accessory = HPM.Hvar(self.huim, key="potato_accessory", vtype="input", dtype=str, display="Potato Accessory", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["potato_accessory"])
         self.combat_wisdom = HPM.Hvar(self.huim, key="combat_wisdom", vtype="input", dtype=float, display="Combat wisdom", fancy_display="Combat", frame="inputs_player_grid", initial=0.0)
         self.mining_wisdom = HPM.Hvar(self.huim, key="mining_wisdom", vtype="input", dtype=float, display="Mining wisdom", fancy_display="Mining", frame="inputs_player_grid", initial=0.0)
         self.farming_wisdom = HPM.Hvar(self.huim, key="farming_wisdom", vtype="input", dtype=float, display="Farming wisdom", fancy_display="Farming", frame="inputs_player_grid", initial=0.0)
         self.fishing_wisdom = HPM.Hvar(self.huim, key="fishing_wisdom", vtype="input", dtype=float, display="Fishing wisdom", fancy_display="Fishing", frame="inputs_player_grid", initial=0.0)
         self.foraging_wisdom = HPM.Hvar(self.huim, key="foraging_wisdom", vtype="input", dtype=float, display="Foraging wisdom", fancy_display="Foraging", frame="inputs_player_grid", initial=0.0)
         self.alchemy_wisdom = HPM.Hvar(self.huim, key="alchemy_wisdom", vtype="input", dtype=float, display="Alchemy wisdom", fancy_display="Alchemy", frame="inputs_player_grid", initial=0.0)
-        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="None", options=self.md.input_options["mayor"], command=lambda x: self.multiswitch("mayors", x))
-        self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="None", options=self.md.input_options["levelingpet"], command=lambda x: self.multiswitch("pet_leveling", x))
-        self.levelingpet_rarity = HPM.Hvar(self.huim, key="levelingpet_rarity", vtype="input", dtype=str, display="Leveling pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.md.input_options["pet_rarity"])
+        self.mayor = HPM.Hvar(self.huim, key="mayor", vtype="input", dtype=str, display="Mayor", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["mayor"], command=lambda x: self.multiswitch("mayors", x))
+        self.levelingpet = HPM.Hvar(self.huim, key="levelingpet", vtype="input", dtype=str, display="Leveling pet", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["levelingpet"], command=lambda x: self.multiswitch("pet_leveling", x))
+        self.levelingpet_rarity = HPM.Hvar(self.huim, key="levelingpet_rarity", vtype="input", dtype=str, display="Leveling pet Rarity", frame="inputs_player_grid", initial="LEGENDARY", options=self.md.input_options["pet_rarity"])
         self.taming = HPM.Hvar(self.huim, key="taming", vtype="input", dtype=float, display="Taming", frame="inputs_player_grid", initial=0.0)
         self.falcon_attribute = HPM.Hvar(self.huim, key="falcon_attribute", vtype="input", dtype=int, display="Battle Experience", frame="inputs_player_grid", initial=0, options=self.md.input_options["attribute"])
         self.toucan_attribute = HPM.Hvar(self.huim, key="toucan_attribute", vtype="input", dtype=int, display="Why Not More", frame="inputs_player_grid", initial=0, options=self.md.input_options["attribute"])
-        self.pet_exp_boost = HPM.Hvar(self.huim, key="pet_exp_boost", vtype="input", dtype=str, display="Pet XP boost", frame="inputs_player_grid", initial="None", options=self.md.input_options["pet_exp_boost"])
+        self.pet_exp_boost = HPM.Hvar(self.huim, key="pet_exp_boost", vtype="input", dtype=str, display="Pet XP boost", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["pet_exp_boost"])
         self.beastmaster = HPM.Hvar(self.huim, key="beastmaster", vtype="input", dtype=float, display="Beastmaster", frame="inputs_player_grid", initial=0.0)
-        self.expsharepet = HPM.Hvar(self.huim, key="expsharepet", vtype="input", dtype=str, display="Exp Share pet", frame="inputs_player_grid", initial="None", options=self.md.input_options["levelingpet"], command=lambda x: self.expsharepet_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][x]]["pet_rarities"], True))
-        self.expsharepet_rarity = HPM.Hvar(self.huim, key="expsharepet_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.md.input_options["pet_rarity"])
-        self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="None", options=self.md.input_options["levelingpet"], command=lambda x: self.expsharepetslot2_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][x]]["pet_rarities"], True))
-        self.expsharepetslot2_rarity = HPM.Hvar(self.huim, key="expsharepetslot2_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.md.input_options["pet_rarity"])
-        self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="None", options=self.md.input_options["levelingpet"], command=lambda x: self.expsharepetslot3_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][x]]["pet_rarities"], True))
-        self.expsharepetslot3_rarity = HPM.Hvar(self.huim, key="expsharepetslot3_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="Legendary", options=self.md.input_options["pet_rarity"])
+        self.expsharepet = HPM.Hvar(self.huim, key="expsharepet", vtype="input", dtype=str, display="Exp Share pet", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["levelingpet"], command=lambda x: self.expsharepet_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][x]]["pet_rarities"]))
+        self.expsharepet_rarity = HPM.Hvar(self.huim, key="expsharepet_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="LEGENDARY", options=self.md.input_options["pet_rarity"])
+        self.expsharepetslot2 = HPM.Hvar(self.huim, key="expsharepetslot2", vtype="input", dtype=str, display="Exp Share pet 2", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["levelingpet"], command=lambda x: self.expsharepetslot2_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][x]]["pet_rarities"]))
+        self.expsharepetslot2_rarity = HPM.Hvar(self.huim, key="expsharepetslot2_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="LEGENDARY", options=self.md.input_options["pet_rarity"])
+        self.expsharepetslot3 = HPM.Hvar(self.huim, key="expsharepetslot3", vtype="input", dtype=str, display="Exp Share pet 3", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["levelingpet"], command=lambda x: self.expsharepetslot3_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][x]]["pet_rarities"]))
+        self.expsharepetslot3_rarity = HPM.Hvar(self.huim, key="expsharepetslot3_rarity", vtype="input", dtype=str, display="Exp Share pet Rarity", frame="inputs_player_grid", initial="LEGENDARY", options=self.md.input_options["pet_rarity"])
         self.expshareitem = HPM.Hvar(self.huim, key="expshareitem", vtype="input", dtype=bool, display="Exp Share pet item", frame="inputs_player_grid", initial=False)
         self.scale_time = HPM.Hvar(self.huim, key="scale_time", vtype="input", dtype=bool, display="Scale Time", frame="inputs_player_grid", initial=False, command=self.huim.create_switch_call("scaled_time_switch", controlvar="scale_time"))
         self.sell_loc = HPM.Hvar(self.huim, key="sell_loc", vtype="input", dtype=str, display="Sell Location", frame="inputs_player_grid", initial="Best (NPC/Bazaar)", options=self.md.input_options["sell_loc"], command=self.huim.create_switch_call("NPC_Bazaar", controlvar="self"))
-        self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="Sell Offer", options=self.md.input_options["bazaar_sell_type"])
-        self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="Buy Order", options=self.md.input_options["bazaar_buy_type"])
+        self.bazaar_sell_type = HPM.Hvar(self.huim, key="bazaar_sell_type", vtype="input", dtype=str, display="Bazaar sell type", frame="inputs_player_grid", initial="buyPrice", options=self.md.input_options["bazaar_sell_type"])
+        self.bazaar_buy_type = HPM.Hvar(self.huim, key="bazaar_buy_type", vtype="input", dtype=str, display="Bazaar buy type", frame="inputs_player_grid", initial="sellPrice", options=self.md.input_options["bazaar_buy_type"])
         self.bazaar_taxes = HPM.Hvar(self.huim, key="bazaar_taxes", vtype="input", dtype=bool, display="Taxes", frame="inputs_player_grid", initial=True, command=self.huim.create_switch_call("bazaar_tax", controlvar="bazaar_taxes"))
         self.bazaar_flipper = HPM.Hvar(self.huim, key="bazaar_flipper", vtype="input", dtype=int, display="Bazaar Flipper", frame="inputs_player_grid", initial=1, options=self.md.input_options["bazaar_flipper"])
-        self.sell_form = HPM.Hvar(self.huim, key="sell_form", vtype="input", dtype=str, display="Sell Form", frame="inputs_player_grid", initial="Base", options=self.md.input_options["sell_form"])
+        self.sell_form = HPM.Hvar(self.huim, key="sell_form", vtype="input", dtype=str, display="Sell Form", frame="inputs_player_grid", initial=0, options=self.md.input_options["sell_form"])
         self.calculated_ID = HPM.Hvar(self.huim, key="calculated_ID", vtype="output", dtype=str, display="Setup ID", frame="outputs_setup_grid", initial="", switch_initial=True)
         self.ID_container = HPM.Hvar(self.huim, key="ID_container", vtype="output", dtype=list, display="ID", frame="outputs_setup_grid", widget_width=35, widget_height=1, initial=[], switch_initial=False)
         self.scaled_time = HPM.Hvar(self.huim, key="scaled_time", vtype="output", dtype=str, display="Scaled Time", frame="outputs_setup_grid", initial="1.0 Days", switch_initial=True)
@@ -668,25 +669,26 @@ class Calculator(tk.Tk):
 
         """
         if multi_ID == "minion":
-            if type(control) == str or str(self.miniontier.get()) not in self.md.calculator_data[self.minion.get()]["speed"].keys():
-                self.miniontier.set(list(self.md.calculator_data[self.minion.get()]["speed"].keys())[-1])
+            minion = self.minion.parsing_function(self.minion.get_ui(True))
+            if type(control) == str or str(self.miniontier.get_ui(True)) not in self.md.calculator_data[minion]["speed"].keys():
+                self.miniontier.set_ui(list(self.md.calculator_data[minion]["speed"].keys())[-1])
             if type(control) == str:
-                self.huim.toggle_switch("potato_accessory_switch", control + str(self.afk.get()))
+                self.huim.toggle_switch("potato_accessory_switch", control + str(self.afk.get_ui(True)))
                 self.huim.toggle_switch("rising_celsius", control)
         elif multi_ID == "fuel":
             self.huim.toggle_switch("infernofuel", control)
             self.huim.toggle_switch("fuel_amount", self.md.calculator_data[self.md.input_options["fuel"][control]]["fuel_duration"])
         elif multi_ID == "afk":
-            afkState = self.afk.get()
+            afkState = self.afk.get_ui(True)
             self.huim.toggle_switch("afking", afkState)
-            self.huim.toggle_switch("potato_accessory_switch", self.minion.get(False) + str(afkState))
+            self.huim.toggle_switch("potato_accessory_switch", self.minion.get_ui(True) + str(afkState))
         elif multi_ID == "pet_leveling":
             self.huim.toggle_switch("pet_leveling", control)
-            mayor = self.mayor.get(False)
+            mayor = self.mayor.get_ui(True)
             pet_leveling_state = self.switches["pet_leveling"]["state"]
             self.huim.toggle_switch("exp_share_diana", mayor + str(pet_leveling_state))
             if control is not None:
-                self.levelingpet_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][control]]["pet_rarities"], True)
+                self.levelingpet_rarity.update_option_list(self.md.calculator_data[self.md.input_options["levelingpet"][control]]["pet_rarities"])
         elif multi_ID == "mayors":
             pet_leveling_state = self.switches["pet_leveling"]["state"]
             self.huim.toggle_switch("exp_share_diana", control + str(pet_leveling_state))
@@ -712,26 +714,28 @@ class Calculator(tk.Tk):
         """
         if template_name == "Choose Template":
             return
-        self.template.set("Choose Template")
+        self.template.set_ui("Choose Template")
         if template_name == "Load ID":
-            template = self.decode_id(self.load_ID.get())
+            template = self.decode_id(self.load_ID.get_ui(True))
         elif template_name == "Clean":
-            template = {var_key: self.var_dict[var_key].initial for var_key in self.md.id_order if var_key not in ["minion", "miniontier", "amount"]}
+            template = {var_key: self.var_dict[var_key].formatted_initial for var_key in self.md.id_order if var_key not in ["minion", "miniontier", "amount"]}
         elif template_name == "Crystal and Pet":
             template = {}
             self.add_ons_list["Crystal and Pet"]["function"]()
+            self.crystal.set_ui()
+            self.afkpet.set_ui()
         else:
             template = templateList[template_name]
-        for setting, variable in template.items():
-            if setting == "force_switch_on":
-                self.huim.force_switch(variable, True)
+        for var_key, val in template.items():
+            if var_key == "force_switch_on":
+                self.huim.force_switch(val, True)
                 continue
-            self.var_dict[setting].set(variable)
-            if self.var_dict[setting].command is not None:
-                if type(variable) == bool:
-                    self.var_dict[setting].command()
+            self.var_dict[var_key].set_ui(val)
+            if self.var_dict[var_key].command is not None:
+                if type(val) == bool:
+                    self.var_dict[var_key].command()
                 else:
-                    self.var_dict[setting].command(variable)
+                    self.var_dict[var_key].command(val)
         return
 
     def data_to_text(self, var_key, calculation_data, output_switches, display=True, newline=False, markdown=True):
@@ -821,7 +825,7 @@ class Calculator(tk.Tk):
 
     def text_output(self, calculation_data=None, output_switches=None, output_order=None, markdown=True, to_terminal=True):
         if calculation_data is None:
-            calculation_data = self.huim.get_from_GUI(self.var_dict.keys())
+            calculation_data = self.huim.mass_get(self.var_dict.keys())
             calculation_data.update(self.decode_id(calculation_data["calculated_ID"]))
         if output_switches is None:
             output_switches = {var_key: self.var_dict[var_key].get_output_switch() for var_key in self.var_dict}
@@ -899,13 +903,11 @@ class Calculator(tk.Tk):
             Setup ID.
 
         """
-        setup_id = str(self.data_version.get()) + "!"
+        setup_id = str(self.md.active_data_version) + "!"
         for var_key in self.md.id_order:
             if var_key not in setup_data:
                 self.huim.logger.warning(f"{var_key} key not in setup_data, assuming default value")
                 val = self.var_dict[var_key].initial
-            elif self.var_dict[var_key].reverse_translation is not None:
-                val = self.var_dict[var_key].reverse_translation[setup_data[var_key]]
             else:
                 val = setup_data[var_key]
             var_options = self.var_dict[var_key].options
@@ -947,12 +949,12 @@ class Calculator(tk.Tk):
             self.huim.logger.error("Invalid setup ID, could not find version number")
             return setup_data
         ID_index = end_ver + 1
-        if version != self.data_version.get():
+        if version != self.md.active_data_version:
             self.huim.logger.error("Invalid setup ID, Incompatible version")
             return setup_data
         try:
             for var_key in self.md.id_order:
-                var_options = self.var_dict[var_key].options
+                var_options = self.var_dict[var_key].formatted_options
                 if var_options is None:
                     if setup_id[ID_index] != "!":
                         self.huim.logger.error(f"did not find {var_key}")
@@ -2100,7 +2102,7 @@ class Calculator(tk.Tk):
 
         # Get inputs if none are given
         if setup_data is None:
-            setup_data = self.huim.get_from_GUI(self.md.id_order)
+            setup_data = self.huim.mass_get(self.md.id_order, False, True)
 
         # auto update API
         if self.API_auto_update.get():
@@ -2245,7 +2247,7 @@ class Calculator(tk.Tk):
 
         # Update GUI
         if inGUI:
-            self.huim.send_to_GUI(outputs)
+            self.huim.mass_set(outputs, False, True)
             for add_on_name, auto_run_bool in self.add_ons_auto_run["post"].items():
                 if auto_run_bool.get():
                     self.add_ons_list[add_on_name]["function"]()
@@ -2293,7 +2295,7 @@ class Calculator(tk.Tk):
         None
 
         """
-        self.bazaar_update_txt.set("Loading...")
+        self.bazaar_update_txt.set_ui("Loading...")
         raw_bazaar_data = self.huim.call_API(r"https://api.hypixel.net/v2/skyblock/bazaar", "Hypixel Bazaar API")
         if "success" not in raw_bazaar_data or raw_bazaar_data["success"] is False:
             self.huim.logger.error("Hypixel Bazaar API call was unsuccessful")
@@ -2328,7 +2330,7 @@ class Calculator(tk.Tk):
                     self.huim.logger.info(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
                     self.md.set_data(f"{item_id}.prices.{action}Price", top_percent_avg_price)
-        self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(raw_bazaar_data["lastUpdated"] / 1000)))
+        self.bazaar_update_txt.set_ui(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(raw_bazaar_data["lastUpdated"] / 1000)))
         return
 
     def update_recipe_price(self, item_id):
@@ -2468,7 +2470,7 @@ class Calculator(tk.Tk):
         for var_key in self.var_dict:
             if self.var_dict[var_key].dtype in [list, dict]:
                 if var_key == "pets_levelled":
-                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x + "_rarity"].get(False) + " " + self.var_dict[x].get(False))
+                    self.pets_levelled.update_listbox(key_format_function=lambda x: self.var_dict[x + "_rarity"].get(True) + " " + self.var_dict[x].get(True))
                     continue
                 elif var_key == "setupcost_breakdown":
                     self.setupcost_breakdown.update_listbox(key_format_function=lambda x: self.var_dict[x].get_display(False))

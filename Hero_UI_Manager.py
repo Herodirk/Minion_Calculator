@@ -621,7 +621,7 @@ class H_UI_M():
         elif controlvar is None:
             return lambda: self.toggle_switch(switch_id, None)
         else:
-            return lambda: self.toggle_switch(switch_id, self.main.var_dict[controlvar].get())
+            return lambda: self.toggle_switch(switch_id, self.main.var_dict[controlvar].get_ui(True))
 
     def create_show_hide_toggle(self, anchor_widget, switch_id, place_args={"relx": 1, "x": 3, "rely": 0.5, "anchor": 'w'}, button_text="Toggle extra options"):
         """
@@ -675,9 +675,10 @@ class H_UI_M():
         else:
             return json.loads(call_data)
 
-    def get_from_GUI(self, var_keys, translate=True):
+    def mass_get(self, var_keys, formatted=False, from_ui=False):
         """
-        Gets the requested variables of the GUI and returns them as a dict.
+        Gets the requested variables and returns them as a dict.
+        Optionally, first updates the variables with values from the UI
 
         Returns
         -------
@@ -693,16 +694,19 @@ class H_UI_M():
             if self.main.var_dict[var_key].dtype in [dict, list]:
                 var_values[var_key] = deepcopy(self.main.var_dict[var_key].list)
             else:
-                var_values[var_key] = self.main.var_dict[var_key].get(translate)
+                if from_ui:
+                    self.main.var_dict[var_key].get_ui()
+                var_values[var_key] = self.main.var_dict[var_key].get(formatted)
         return var_values
 
-    def send_to_GUI(self, outputs):
+    def mass_set(self, var_key_vals, formatted=False, to_ui=False):
         """
-        sends outputs to the GUI.
+        stores the given values in the provided variables.
+        Optionally, updates the UI with the new values
 
         Parameters
         ----------
-        outputs : dict
+        var_key_vals : dict
             dict containing variable keys as keys with the wanted value.
 
         Returns
@@ -710,18 +714,20 @@ class H_UI_M():
         None.
 
         """
-        for var_key in outputs:
+        for var_key in var_key_vals:
             if var_key not in self.main.var_dict:
                 self.logger.warning(f"Output {var_key} not found in self.var_dict")
                 continue
             if (var_dtype := self.main.var_dict[var_key].dtype) in [dict, list]:
                 self.main.var_dict[var_key].list.clear()
                 if var_dtype is dict:
-                    self.main.var_dict[var_key].list.update(outputs[var_key])
+                    self.main.var_dict[var_key].list.update(var_key_vals[var_key])
                 else:
-                    self.main.var_dict[var_key].list.extend(outputs[var_key])
+                    self.main.var_dict[var_key].list.extend(var_key_vals[var_key])
             else:
-                self.main.var_dict[var_key].set(outputs[var_key])
+                self.main.var_dict[var_key].set(var_key_vals[var_key], formatted)
+                if to_ui:
+                    self.main.var_dict[var_key].set_ui()
         return
 
     def check_json(self, file, default):
@@ -804,6 +810,16 @@ class H_UI_M():
                 obj[key] *= multiplier
         return
 
+    def function_composition(self, f, g):
+        if f is None and g is None:
+            return None
+        if f is None and g is not None:
+            return g
+        if f is not None and g is None:
+            return f
+        if f is not None and g is not None:
+            return lambda x: f(g(x))
+
     def time_number(self, time_unit, time_amount, custom_time_unit_seconds=1.0):
         """
         Translates time amount and length into seconds.
@@ -840,6 +856,7 @@ class H_UI_M():
 
     def input_args(self, func, execute=False):
         """
+        OUTDATED
         Creates a new Tkinter window that asks for inputs for a chosen function.
         That function can be executed.
 
@@ -909,6 +926,7 @@ class H_UI_M():
 
     def input_vars(self, variables={}):
         """
+        OUTDATED
         Creates a new Tkinter window that asks for values for the inputted variables.
 
         Parameters
@@ -1099,7 +1117,7 @@ class H_UI_M():
 #%% Hero Variable Manager
 
 class Hvar():
-    def __init__(self, huim: H_UI_M, key: str, vtype: str, dtype: type, display: str, initial, frame: str=None, fancy_display: str=None , widget_width:int=None, widget_height: int=None, options: list | dict=None, command=None, switch_initial: None | bool=None, checkbox_text: None | str=None, tags: list| None=None):
+    def __init__(self, huim: H_UI_M, key: str, vtype: str, dtype: type, display: str, initial, frame: str=None, fancy_display: str=None , widget_width:int=None, widget_height: int=None, options: list=None, formatting_function=None, parsing_function=None, command=None, switch_initial: None | bool=None, checkbox_text: None | str=None, tags: list| None=None):
         if key in huim.main.var_dict:
             self.logger.warning(f"{key} already exists in variable dictionary, overwriting it")
         huim.main.var_dict[key] = self  # define in variable dictionary
@@ -1113,38 +1131,51 @@ class Hvar():
         # Optional data:
         self.frame = frame  # str, ID of Tk Frame in huim.main.frames where the widgets get made
         self.fancy_name_display = fancy_display  # str, fancy display name of variable, if None, self.name_display is used
-        if self.dtype == bool:
-            self.options = [False, True]
-        else:
-            self.options = options  # list containing allowed values, None if no restrictions. If given as dict: allowed values as keys, automatic translation for .get() as values. Dict saved in self.translation, list of keys saved in self.options
-        self.command = command  # callable, function to run when input changed 
+        self.command = command  # callable, function to run when input changed
         self.switch_initial = switch_initial  # bool or None, initial state of the output switch, None if no output switch
         self.widget_width = widget_width  # int, width of widget in characters
         self.widget_height = widget_height  # int, height of widget in amount of lines
         self.checkbox_text = checkbox_text  # str, text added next to the checkbox
         self.tags = tags  # list, tags of the variable
 
+        # Options and formatting
+        # list containing allowed values, None if no restrictions
+        # If given as dict: display values as keys, internal values as values. Formatting and parsing functions automatically convert between them using translation dicts.
+        if self.dtype == bool:
+            self.options = [False, True]
+        else:
+            self.options = options
+        translation = None  # Translation: untranslated (display) -> translated (internal)
+        reverse_translation = None  # Reverse Translation: translated (internal) -> untranslated (display)
+        if type(self.options) == dict:
+             translation = lambda x, d=self.options: d[x]
+             reverse_translation = lambda x, d={translated: untranslated for untranslated, translated in self.options.items()}: d[x]
+             self.options = list(self.options.values())
+        self.formatting_function = huim.function_composition(formatting_function, reverse_translation)  # formatting function, input val or key-val pair, output string
+        self.parsing_function = huim.function_composition(parsing_function, translation)  # parsing function, input string, output val
+
         # Generated data:
-        self.tkvar = None
+        self.val = self.initial  # internal value
+        self.tkvar = None  # tkinter variable
         self.list = None
         if self.dtype in [list, dict]:
             self.list = self.initial
         self.widget = None
-        self.translation = None  # Translation: untranslated (display) -> translated (internal)
-        self.reverse_translation = None  # Reverse Translation: translated (internal) -> untranslated (display)
-        if type(self.options) is dict:
-            self.translation = self.options
-            self.options = list(self.options.keys())
-            self.reverse_translation = {translated: untranslated for untranslated, translated in self.translation.items()}
         self.tk_output_switch = None
 
+        self.formatted_initial = self.initial
+        self.formatted_options = self.options
+        if self.formatting_function is not None:
+            self.formatted_initial = self.formatting_function(self.formatted_initial)
+            if self.options is not None:
+                self.formatted_options = list(map(self.formatting_function, self.formatted_options))
         if self.vtype == "input":
             self.tkvar, self.widget = huim.def_input_var(dtype=self.dtype, frame=huim.main.frames[self.frame],
-                                                 L_text=f"{self.name_display}:", initial=self.initial,
-                                                 options=self.options, cmd=self.command, checkbox_text=self.checkbox_text)
+                                                 L_text=f"{self.name_display}:", initial=self.formatted_initial,
+                                                 options=self.formatted_options, cmd=self.command, checkbox_text=self.checkbox_text)
         elif self.vtype == "output":
             self.tkvar, self.widget = huim.def_output_var(dtype=self.dtype, frame=huim.main.frames[self.frame],
-                                                 L_text=f"{self.name_display}:", initial=self.initial,
+                                                 L_text=f"{self.name_display}:", initial=self.formatted_initial,
                                                  h=self.widget_height, w=self.widget_width)
         elif self.vtype == "storage":
             self.tkvar = huim.def_var(dtype=self.dtype, initial=self.initial)
@@ -1152,11 +1183,35 @@ class Hvar():
             self.tk_output_switch, widget = huim.def_input_var(dtype=bool, frame=huim.main.frames[self.frame], L_text="", initial=self.switch_initial)
             self.widget.append(widget[-1])
 
-    def get(self, translate=True):
-        if (self.translation is None) or (translate is False):
+    def get_ui(self, return_val=False):
+        if self.tkvar is None:
+            return
+        if return_val:
             return self.tkvar.get()
-        elif translate:
-            return self.translation[self.tkvar.get()]
+        self.set(self.tkvar.get(), True)
+        return
+
+    def set_ui(self, val_overwrite=None):
+        if self.tkvar is None:
+            return
+        if val_overwrite is None:
+            self.tkvar.set(self.get(True))
+        else:
+            self.tkvar.set(val_overwrite)
+        return
+
+    def get(self, formatted=False):
+        if formatted and self.formatting_function is not None:
+            return self.formatting_function(self.val)
+        else:
+            return self.val
+
+    def set(self, value, formatted=False):
+        if formatted and self.parsing_function is not None:
+            self.val = self.parsing_function(value)
+        else:
+            self.val = value
+        return
 
     def get_display(self, fancy: bool=False) -> str:
         if fancy and self.fancy_name_display is not None:
@@ -1175,14 +1230,6 @@ class Hvar():
         else:
             return tag in self.tags
 
-    def set(self, value, translated=False) -> None:
-        if (self.translation is None) or (translated is False):
-            self.tkvar.set(value)
-            return
-        else:
-            self.tkvar.set(self.reverse_translation[value])
-            return
-
     def update_listbox(self, key_format_function=lambda x: x, value_format_function=lambda x: x, filter=lambda key, val: True) -> None:
         if self.dtype not in [dict, list]:
             return
@@ -1197,19 +1244,19 @@ class Hvar():
                 if not filter(None, val):
                     continue
                 listbox_list.append(key_format_function(val))
-        self.set(listbox_list)
+        self.set_ui(listbox_list)
         return
 
-    def update_option_list(self, new_list, translated=False):
+    def update_option_list(self, new_list, formatted=False):
         if self.dtype == bool:
             return
         if self.options == None:
             return
-        if translated:
-            new_list = [self.reverse_translation[list_item] for list_item in new_list]
-        if not (set(new_list) <= set(self.options)):
+        if not formatted:
+            new_list = [self.formatting_function(list_item) for list_item in new_list]
+        if not (set(new_list) <= set(self.formatted_options)):
             return
         self.widget[1].config(values=new_list)
-        if self.get(False) not in new_list:
-            self.set(new_list[-1])
+        if self.get_ui(True) not in new_list:
+            self.set_ui(new_list[-1])
         return

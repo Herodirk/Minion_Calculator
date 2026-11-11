@@ -42,6 +42,7 @@ class Calc_add_ons():
             "blaze_slayer": {"dtype": bool, "display": "Blaze Slayer 8", "initial": False, "options": None},
             }, self.wisp_levelling)
         self.calc.huim.new_edit_vars("calculator_data_debug", {"data_loc": {"dtype": str, "display": "Data Location", "initial": "COBBLESTONE.prices.npc", "options": None}}, self.calculator_data_debug)
+        self.calc.huim.new_edit_vars("calculator_variables_debug", {"var_key": {"dtype": str, "display": "Variable Key", "initial": "minion", "options": None}}, self.calculator_variables_debug)
 
         self.reverse_affected_minions = {
             "afkpet": {},
@@ -74,6 +75,7 @@ class Calc_add_ons():
             # "Old Corrupted Frags": {"function": self.old_corrupted_frags, "auto_run": "post"},
             # "Old Enchanted Hopper": {"function": self.old_enchanted_hopper, "auto_run": "post"},
             # "Calculator Data Debug": {"function": self.calculator_data_debug_inputs, "auto_run": "post"},
+            # "Calculator Variables Debug": {"function": self.calculator_variables_debug_inputs, "auto_run": "post"},
         }
         return
 
@@ -100,7 +102,7 @@ class Calc_add_ons():
 
     def crystal_and_pet(self, minion_id=None, return_outputs=False):
         if minion_id is None:
-            minion_id = self.calc.minion.get()
+            minion_id = self.calc.minion.get_ui(True)
         outputs = {}
         for modifier_key in self.reverse_affected_minions.keys():
             result = "NONE"
@@ -109,7 +111,7 @@ class Calc_add_ons():
             if return_outputs:
                 outputs[modifier_key] = result
             else:
-                self.calc.var_dict[modifier_key].set(result, True)
+                self.calc.var_dict[modifier_key].set(result)
             if modifier_key == "afkpet":
                 afkpet_level = 100
                 if result == "NONE":
@@ -124,7 +126,7 @@ class Calc_add_ons():
 
     def wisp_levelling_inputs(self):
         # This Add-on is inactive, it works but is missing a lot of logic
-        outputs = self.calc.huim.get_from_GUI(["items"])
+        outputs = self.calc.huim.mass_get(["items"])
         if "CRUDE_GABAGOOL" not in outputs["items"] and "VERY_CRUDE_GABAGOOL" not in outputs["items"]:
             self.calc.collect_add_on_output("Wisp Pet Levelling", "No Gabagool found")
             return
@@ -132,8 +134,8 @@ class Calc_add_ons():
         return
 
     def wisp_levelling(self, results):
-        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
-        outputs = self.calc.huim.get_from_GUI(["items"])
+        setup_data = self.calc.huim.mass_get(self.calc.md.id_order)
+        outputs = self.calc.huim.mass_get(["items"])
         gabagool_tier = { "Crude Gabagool": "CRUDE_GABAGOOL", "Fuel Gabagool": "FUEL_GABAGOOL", "Heavy Gabagool": "HEAVY_GABAGOOL", "Hypergolic Gabagool": "HYPERGOLIC_GABAGOOL" }[results["gabagool_tier"]]
         wisp_pet = { "Droplet Wisp": "PET_DROPLET_WISP", "Frost Wisp": "PET_FROST_WISP", "Glacial Wisp": "PET_GLACIAL_WISP", "Subzero Wisp": "PET_SUBZERO_WISP" }[results["wisp_pet"]]
         pet_item = { "None": "NONE", "All Skills Exp Boost": "PET_ITEM_ALL_SKILLS_BOOST_COMMON", "All Skills Exp Super-Boost": "ALL_SKILLS_SUPER_BOOST" }[results["pet_item"]]
@@ -196,7 +198,7 @@ class Calc_add_ons():
                 "TIMESTALK": 1,
             }
         }
-        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
+        setup_data = self.calc.huim.mass_get(self.calc.md.id_order, from_ui=True)
         coins_per_copper = []
         for mutation, base_copper in { "ALL_IN_ALOE": 2300, "PHANTOMLEAF": 1500, "ZOMBUD": 500, "FLESHTRAP": 180 }.items():
             coins_per_copper.append((self.calc.get_price(mutation, setup_data, "buy", "bazaar") + base_copper * 2000) / (base_copper * 1.6))
@@ -220,8 +222,8 @@ class Calc_add_ons():
     def bad_luck_inferno(self, setup_data=None, outputs=None, return_value=False):
         """Outputs the profit of the common Hypergolic drops and the price per Inferno Vertex"""
         if setup_data is None:
-            setup_data = self.calc.huim.get_from_GUI(["fuel", "inferno_grade", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper", "mayor"])
-            outputs = self.calc.huim.get_from_GUI(["total_profit", "itemtype_profit", "harvests"])
+            setup_data = self.calc.huim.mass_get(["fuel", "inferno_grade", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper", "mayor"])
+            outputs = self.calc.huim.mass_get(["total_profit", "itemtype_profit", "harvests"])
         if setup_data["fuel"] != "INFERNO_FUEL":
             self.calc.collect_add_on_output("Bad Luck Inferno", "No Inferno Minion Fuel Found")
             return
@@ -245,7 +247,7 @@ class Calc_add_ons():
 
     def setup_repay_time(self):
         """Outputs the time (in days) it take for a setup to repay itself"""
-        setup_data = self.calc.huim.get_from_GUI(["time_seconds", "setupcost", "free_will", "total_profit"])
+        setup_data = self.calc.huim.mass_get(["time_seconds", "setupcost", "free_will", "total_profit"])
         setupcost = setup_data["setupcost"]
         profit = setup_data["total_profit"]
         if profit < 0:
@@ -262,7 +264,7 @@ class Calc_add_ons():
         return
 
     def basic_minion_loop(self, results):
-        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
+        setup_data = self.calc.huim.mass_get(self.calc.md.id_order, from_ui=True)
         cost_filter = results["setup_cost_limit"]
         if cost_filter == 0:
             cost_filter = math.inf
@@ -368,7 +370,7 @@ class Calc_add_ons():
 
 
     def inferno_minion_loop(self, results):
-        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
+        setup_data = self.calc.huim.mass_get(self.calc.md.id_order, from_ui=True)
         calculated_setup_profits = {}
         calculated_setup_bad_luck_profits = {}
         calculated_setup_costs = {}
@@ -454,7 +456,7 @@ class Calc_add_ons():
         return
 
     def craft_material_amount(self):
-        setup_data = self.calc.huim.get_from_GUI(["minion", "miniontier", "amount", "extracost"])  # TODO: make it get calculated_ID, to stop desync inputs and output
+        setup_data = self.calc.huim.mass_get(["minion", "miniontier", "amount", "extracost"])
         materials = self.calc.md.minion_cost_sum(setup_data["minion"], setup_data["miniontier"])
         extra_costs_string = setup_data["extracost"]
         materials_string = ", ".join([f"{amount * setup_data["amount"]} {self.calc.md.calculator_data[material]["display"]}" for material, amount in materials.items() if material in self.calc.md.calculator_data])
@@ -505,7 +507,7 @@ class Calc_add_ons():
         return gained_pet_xp, left_over_pet_xp
 
     def exact_pet_levelling_inputs(self):
-        setup_data = self.calc.huim.get_from_GUI(["mayor", "levelingpet", "levelingpet_rarity", "expsharepet", "expsharepetslot2", "expsharepetslot3", "expsharepet_rarity", "expsharepetslot2_rarity", "expsharepetslot3_rarity"])
+        setup_data = self.calc.huim.mass_get(["mayor", "levelingpet", "levelingpet_rarity", "expsharepet", "expsharepetslot2", "expsharepetslot3", "expsharepet_rarity", "expsharepetslot2_rarity", "expsharepetslot3_rarity"])
         if setup_data["levelingpet"] == "NONE":
             self.calc.collect_add_on_output("Exact Pet Levelling", "No pet levelling active")
             return
@@ -524,7 +526,7 @@ class Calc_add_ons():
         return
 
     def exact_pet_levelling(self, results, setup_pets):
-        setup_data = self.calc.huim.get_from_GUI(["mayor", "xp", "taming", "toucan_attribute", "expshareitem", "pet_exp_boost", "beastmaster", "falcon_attribute", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper"])
+        setup_data = self.calc.huim.mass_get(["mayor", "xp", "taming", "toucan_attribute", "expshareitem", "pet_exp_boost", "beastmaster", "falcon_attribute", "bazaar_buy_type", "bazaar_sell_type", "bazaar_taxes", "bazaar_flipper"])
         skill_xp = setup_data["xp"]
         main_pet = setup_pets["levelingpet"]["pet"]
         main_pet_xp = setup_pets["levelingpet"]["pet_xp"]
@@ -576,7 +578,7 @@ class Calc_add_ons():
 
     def collection_maxing(self, results):
         display_name = "Chili Pepper Collection"
-        setup_data = self.calc.huim.get_from_GUI(self.calc.md.id_order)
+        setup_data = self.calc.huim.mass_get(self.calc.md.id_order, from_ui=True)
         calculated_setup_profits = {}
         calculated_setup_costs = {}
         calculated_collection_max_cost = {}
@@ -671,7 +673,7 @@ class Calc_add_ons():
         return
 
     def partial_setup_cost(self, results):
-        outputs = self.calc.huim.get_from_GUI(["setupcost_breakdown"])
+        outputs = self.calc.huim.mass_get(["setupcost_breakdown"])
         partial_cost = 0
         used_parts = []
         for setup_part, state in results.items():
@@ -691,4 +693,13 @@ class Calc_add_ons():
 
     def calculator_data_debug(self, results):
         self.calc.collect_add_on_output("Calculator Data", self.calc.md.get_data(results["data_loc"]))
+        return
+
+    def calculator_variables_debug_inputs(self):
+        # This Add-on is inactive, to turn it back on uncomment the add-on in self.add_ons_data in __init__
+        self.calc.huim.edit_vars("calculator_variables_debug")
+        return
+
+    def calculator_variables_debug(self, results):
+        self.calc.collect_add_on_output("Calculator Data", self.calc.var_dict[results["var_key"]].get())
         return
