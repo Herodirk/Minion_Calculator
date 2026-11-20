@@ -262,6 +262,22 @@ class H_data_M():
             self.huim.logger.warning("Download new Calculator version to be able to use the latest data version")
         self.set_data_version(initial_data_version)
         self.huim.logger.debug("Calculator Data loaded")
+
+        self.reverse_affected_minions = {
+            "afkpet": {},
+            "crystal": {}
+        }
+        for modifier_key in self.reverse_affected_minions.keys():
+            for modifier_id in self.input_options[modifier_key].values():
+                if modifier_id == "NONE":
+                    continue
+                for affected_minion in self.calculator_data[modifier_id]["affected_minions"]:
+                    if affected_minion in self.calculator_data:
+                        self.reverse_affected_minions[modifier_key][affected_minion] = modifier_id
+                        continue
+                    for minion_id in self.input_options["minion"].values():
+                        if self.has_data_tag(minion_id, affected_minion):
+                            self.reverse_affected_minions[modifier_key][minion_id] = modifier_id
         return
 
     def set_data_version(self, version):
@@ -409,6 +425,19 @@ class H_data_M():
             self.set_data(data_loc, data_value)
         return
 
+    def crystal_and_pet(self, minion_id):
+        outputs = {}
+        for modifier_key in self.reverse_affected_minions.keys():
+            result = "NONE"
+            if minion_id in self.reverse_affected_minions[modifier_key]:
+                result = self.reverse_affected_minions[modifier_key][minion_id]
+            if modifier_key == "afkpet":
+                afkpet_level = 100
+                if result == "NONE":
+                    afkpet_level = 0
+                outputs["afkpet_lvl"] = afkpet_level
+            outputs[modifier_key] = result
+        return outputs
 
 
 """

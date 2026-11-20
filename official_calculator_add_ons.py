@@ -45,25 +45,9 @@ class Calc_add_ons():
         self.calc.huim.new_edit_vars("calculator_variables_debug", {"var_key": {"dtype": str, "display": "Variable Key", "initial": "minion", "options": None}}, self.calculator_variables_debug)
         self.calc.huim.new_edit_vars("manual_harvesting", {"magic_find": {"dtype": float, "display": "Magic Find", "initial": 0, "options": None}}, self.manual_harvesting)
 
-        self.reverse_affected_minions = {
-            "afkpet": {},
-            "crystal": {}
-        }
-        for modifier_key in self.reverse_affected_minions.keys():
-            for modifier_id in self.calc.md.input_options[modifier_key].values():
-                if modifier_id == "NONE":
-                    continue
-                for affected_minion in self.calc.md.calculator_data[modifier_id]["affected_minions"]:
-                    if affected_minion in self.calc.md.calculator_data:
-                        self.reverse_affected_minions[modifier_key][affected_minion] = modifier_id
-                        continue
-                    for minion_id in self.calc.md.input_options["minion"].values():
-                        if self.calc.md.has_data_tag(minion_id, affected_minion):
-                            self.reverse_affected_minions[modifier_key][minion_id] = modifier_id
-
         self.add_ons_data = {
             "Minion Crafting": {"function": self.craft_material_amount, "auto_run": "post"},
-            "Crystal and Pet": {"function": self.crystal_and_pet, "auto_run": "pre"},
+            "Crystal and Pet": {"function": lambda: self.calc.load_template("Crystal and Pet"), "auto_run": "pre"},
             "Dragon Pet Source Prices": {"function": self.dragon_source_prices, "auto_run": "pre"},
             "Partial Setup Cost": {"function": self.partial_setup_cost_inputs, "auto_run": "post"},
             "Days to Repay Setup": {"function": self.setup_repay_time, "auto_run": "post"},
@@ -100,30 +84,6 @@ class Calc_add_ons():
             return
         profit = self.calc.total_profit.get()
         self.calc.collect_add_on_output("Old Enchanted Hopper profit", f"{self.calc.huim.reduced_number(profit * (9 / 7), 2)}")
-        return
-
-    def crystal_and_pet(self, minion_id=None, return_outputs=False):
-        if minion_id is None:
-            minion_id = self.calc.minion.get_ui(True)
-        outputs = {}
-        for modifier_key in self.reverse_affected_minions.keys():
-            result = "NONE"
-            if minion_id in self.reverse_affected_minions[modifier_key]:
-                result = self.reverse_affected_minions[modifier_key][minion_id]
-            if return_outputs:
-                outputs[modifier_key] = result
-            else:
-                self.calc.var_dict[modifier_key].set(result)
-            if modifier_key == "afkpet":
-                afkpet_level = 100
-                if result == "NONE":
-                    afkpet_level = 0
-                if return_outputs:
-                    outputs["afkpet_lvl"] = afkpet_level
-                else:
-                    self.calc.afkpet_lvl.set(afkpet_level)
-        if return_outputs:
-            return outputs
         return
 
     def wisp_levelling_inputs(self):
@@ -300,7 +260,7 @@ class Calc_add_ons():
                 else:
                     setup_data["upgrade1"] = "SUPER_COMPACTOR_3000"
             if auto_crystal or auto_afkpet:
-                auto_crystal_and_pet = self.crystal_and_pet(setup_data["minion"], True)
+                auto_crystal_and_pet = self.calc.md.crystal_and_pet(setup_data["minion"])
             if auto_crystal:
                 setup_data["crystal"] = auto_crystal_and_pet["crystal"]
             if auto_afkpet:
@@ -700,7 +660,7 @@ class Calc_add_ons():
         return
 
     def calculator_variables_debug(self, results):
-        self.calc.collect_add_on_output("Calculator Data", self.calc.var_dict[results["var_key"]].get())
+        self.calc.collect_add_on_output("Calculator Variable", self.calc.var_dict[results["var_key"]].get())
         return
 
     def manual_harvesting_inputs(self):

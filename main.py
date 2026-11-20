@@ -714,10 +714,10 @@ class Calculator(tk.Tk):
         elif template_name == "Clean":
             template = {var_key: self.var_dict[var_key].formatted_initial for var_key in self.md.id_order if var_key not in ["minion", "miniontier", "amount"]}
         elif template_name == "Crystal and Pet":
-            template = {}
-            self.add_ons_list["Crystal and Pet"]["function"]()
-            self.crystal.set_ui()
-            self.afkpet.set_ui()
+            template = self.md.crystal_and_pet(self.minion.parsing_function(self.minion.get_ui(True)))
+            for var_key in template.keys():
+                if self.var_dict[var_key].formatting_function is not None:
+                    template[var_key] = self.var_dict[var_key].formatting_function(template[var_key])
         else:
             template = templateList[template_name]
         for var_key, val in template.items():
@@ -2303,7 +2303,8 @@ class Calculator(tk.Tk):
                     self.huim.logger.info(f"bottom heavy {action} supply for {item_id}, taking top order price")
                 else:
                     self.md.set_data(f"{item_id}.prices.{action}Price", top_percent_avg_price)
-        self.bazaar_update_txt.set_ui(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(raw_bazaar_data["lastUpdated"] / 1000)))
+        self.bazaar_update_txt.set(time.strftime("%Y-%m-%d %H:%M:%S UTC%z", time.localtime(raw_bazaar_data["lastUpdated"] / 1000)))
+        self.bazaar_update_txt.set_ui()
         return
 
     def update_recipe_price(self, item_id):
