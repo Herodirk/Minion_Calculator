@@ -260,8 +260,6 @@ class Calculator(tk.Tk):
         self.afkpet_lvl = HPM.Hvar(self.huim, key="afkpet_lvl", vtype="input", dtype=float, display="AFK Pet level", frame="inputs_player_grid", initial=0.0)
         self.enchanted_clock = HPM.Hvar(self.huim, key="enchanted_clock", vtype="input", dtype=bool, display="Enchanted Clock", frame="inputs_player_grid", initial=False)
         self.special_layout = HPM.Hvar(self.huim, key="special_layout", vtype="input", dtype=bool, display="Special Layout", frame="inputs_player_grid", initial=False)
-        self.player_harvests = HPM.Hvar(self.huim, key="player_harvests", vtype="input", dtype=bool, display="Player Harvests", frame="inputs_player_grid", initial=False)
-        self.player_looting = HPM.Hvar(self.huim, key="player_looting", vtype="input", dtype=int, display="Looting", frame="inputs_player_grid", initial=0, options=self.md.input_options["player_looting"])
         self.potato_accessory = HPM.Hvar(self.huim, key="potato_accessory", vtype="input", dtype=str, display="Potato Accessory", frame="inputs_player_grid", initial="NONE", options=self.md.input_options["potato_accessory"])
         self.combat_wisdom = HPM.Hvar(self.huim, key="combat_wisdom", vtype="input", dtype=float, display="Combat wisdom", fancy_display="Combat", frame="inputs_player_grid", initial=0.0)
         self.mining_wisdom = HPM.Hvar(self.huim, key="mining_wisdom", vtype="input", dtype=float, display="Mining wisdom", fancy_display="Mining", frame="inputs_player_grid", initial=0.0)
@@ -419,8 +417,6 @@ class Calculator(tk.Tk):
                 "afkpet_lvl": None,
                 "enchanted_clock": None,
                 "special_layout": None,
-                "player_harvests": None,
-                "player_looting": None,
                 "potato_accessory": None,
                 "wisdom_label": [wisdomLB, self.huim.create_show_hide_toggle(wisdomLB, "wisdom_inputs", None)],
                 "combat_wisdom": None,
@@ -541,7 +537,7 @@ class Calculator(tk.Tk):
                             locations="grid", control="PotatoTrue", negate=False, initial=False)
         self.huim.def_switch("bazaar_tax", widget_references="bazaar_flipper",
                             locations="grid", control=1, negate=False, initial=True)
-        self.huim.def_switch("afking", widget_references=["afkpet", "afkpet_lvl", "enchanted_clock", "special_layout", "player_harvests", "player_looting"],
+        self.huim.def_switch("afking", widget_references=["afkpet", "afkpet_lvl", "enchanted_clock", "special_layout"],
                             locations="grid", control=True, negate=False, initial=False)
         self.huim.def_switch("fuel_amount", widget_references="fuelamount",
                             locations="grid", control=-1, negate=True, initial=False)
@@ -565,7 +561,6 @@ class Calculator(tk.Tk):
         self.dependent_variables = {
             "afkpet_rarity": "afkpet",
             "afkpet_lvl": "afkpet",
-            "player_harvests": "afk",
             "empty_time": "scale_time",
             "optimal_tier_free_will": "free_will",
             "expshareitem": "expsharepet",
@@ -606,7 +601,6 @@ class Calculator(tk.Tk):
             "afk": {"%\n> ": [["afkpet_rarity", "afkpet"]],
                     " lvl ": {"afkpet_lvl"},
                     "\n> ": ["enchanted_clock", "special_layout", "potato_accessory"]},
-            "player_harvests": {"\n> ": ["player_looting"]},
             "Wisdoms": {"\n> ": ["combat_wisdom", "mining_wisdom", "farming_wisdom", "fishing_wisdom", "foraging_wisdom", "alchemy_wisdom"]},
             "mayor": None,
             "Leveling pet: ": {
@@ -1112,7 +1106,7 @@ class Calculator(tk.Tk):
             speed_boost += self.md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][0] + setup_data["afkpet_lvl"] * self.md.calculator_data[afkpet]["boosting_pet"][afkpet_rarity][1]
         return speed_boost
 
-    def get_drop_multiplier(self, minion, upgrade_ids, afk_toggle, setup_data):
+    def get_drop_multiplier(self, minion, upgrade_ids, afk_toggle, mayor):
         """
         Multiplies together drop multipliers.
 
@@ -1124,8 +1118,8 @@ class Calculator(tk.Tk):
             List of upgrade IDs
         afk_toggle : boolean
             True if AFKing, False if offline
-        setup_data : dict
-            Needed setup data: player_harvests, player_looting, mayor
+        mayor : str
+            Mayor ID
 
         Returns
         -------
@@ -1133,20 +1127,16 @@ class Calculator(tk.Tk):
             Total multiplicative drop multiplier.
         """
         drop_multiplier = 1
-        if afk_toggle and setup_data["player_harvests"] and (minion not in ["FISHING_MINION", "PUMPKIN_MINION", "MELON_MINION"]):
-            if self.md.has_data_tag(minion, "mob_minion"):
-                drop_multiplier *= 1 + 15 * setup_data["player_looting"] / 100
-            return drop_multiplier
         for upgrade in upgrade_ids:
             drop_multiplier *= self.md.calculator_data[upgrade]["drop_multiplier"]
             if afk_toggle and drop_multiplier > 1:
                 # drop multiplier greater than 1 is rounded down while online, TODO: test again
                 drop_multiplier = int(drop_multiplier)
-        if self.md.has_data_tag(minion, self.md.calculator_data[setup_data["mayor"]]["affected_minions"]):
-            drop_multiplier *= self.md.calculator_data[setup_data["mayor"]]["drop_multiplier"]
+        if self.md.has_data_tag(minion, self.md.calculator_data[mayor]["affected_minions"]):
+            drop_multiplier *= self.md.calculator_data[mayor]["drop_multiplier"]
         return drop_multiplier
     
-    def get_actions_per_harvest(self, minion, upgrade_ids, upgrade_effects, afk_toggle, setup_data, setup_notes):
+    def get_actions_per_harvest(self, minion, upgrade_ids, afk_toggle, setup_data):
         """
         Multiplies together drop multipliers.
 
@@ -1154,14 +1144,10 @@ class Calculator(tk.Tk):
         ----------
         minion : str
             Minion type ID.
-        upgrade_effects : dict
-            Active upgrade effects sorted by type
         afk_toggle : boolean
             True if AFKing, False if offline
         setup_data : dict
-            Needed setup data: player_harvests, special_layout
-        setup_notes : dict
-            setup notes
+            Needed setup data: special_layout
 
         Returns
         -------
@@ -1176,17 +1162,7 @@ class Calculator(tk.Tk):
             if minion in ["PUMPKIN_MINION", "MELON_MINION"]:
                 # pumpkins and melons are forced to regrow for minion to harvest
                 actions_per_harvest = 1
-            if setup_data["player_harvests"]:
-                if minion in ["FISHING_MINION", "PUMPKIN_MINION", "MELON_MINION"]:
-                    setup_notes["Player Harvests"] = "Player Harvesting does not work with this minion"
-                else:
-                    actions_per_harvest = 1
-                    if minion in ["GRAVEL_MINION"]:
-                        self.add_replacing_effect(upgrade_effects["replacing"], {"GRAVEL": { "FLINT": 1 }}, True)
-                        setup_notes["Player Tools"] = "Assuming Player is using Flint Shovel"
-                    if minion in ["ICE_MINION"]:
-                        setup_notes["Player Tools"] = "Assuming Player is using Silk Touch"
-            elif setup_data["special_layout"]:
+            if setup_data["special_layout"]:
                 if minion in ["COBBLESTONE_MINION", "MYCELIUM_MINION", "ICE_MINION"]:
                     # cobblestone generator, regrowing mycelium, freezing water
                     actions_per_harvest = 1
@@ -1471,7 +1447,7 @@ class Calculator(tk.Tk):
         :param afk_toggle: boolean, True if AFKing, False if offline
         :param empty_time_seconds: float, seconds between empties
         :param seconds_per_action: float, seconds per minion action
-        :param setup_data: dict, needed setup data: setup data for self.get_drop_multiplier
+        :param setup_data: dict, needed setup data: mayor
         """
         for upgrade, effect_data in upgrade_effects["adding"].items():
             # adding upgrades are like Corrupt Soils
@@ -1508,7 +1484,7 @@ class Calculator(tk.Tk):
                 specific_multiplier = 1 + 0.03 * minion_tier  # correct most likely, needs testing
             for cooldown_item, cooldown_amount in effect_data["items"].items():
                 if cooldown_item == "RAW_SOULFLOW":
-                    specific_multiplier *= self.get_drop_multiplier(minion, [upgrade_id for upgrade_id in upgrade_ids if upgrade_id not in ["LESSER_SOULFLOW_ENGINE", "SOULFLOW_ENGINE"]], afk_toggle, setup_data)
+                    specific_multiplier *= self.get_drop_multiplier(minion, [upgrade_id for upgrade_id in upgrade_ids if upgrade_id not in ["LESSER_SOULFLOW_ENGINE", "SOULFLOW_ENGINE"]], afk_toggle, setup_data["mayor"])
                 self.add_drops(cooldown_item, specific_multiplier * cooldown_amount * empty_time_seconds / effective_cooldown, drops_list)
         return
 
@@ -1720,15 +1696,14 @@ class Calculator(tk.Tk):
         item_profit *= hopper_multiplier
         return item_profit, per_item_profit, per_item_sell_location
 
-    def get_skill_xp(self, afk_toggle, mayor, drops_list, setup_data):
+    def get_skill_xp(self, mayor, drops_list, setup_data):
         """
         Get amount of total skill xp, after having wisdom and mayor applied.
         Hypixel's bonus skill xp doesn't seem to apply to minions
         
-        :param afk_toggle: boolean, True if AFKing, False if offline
         :param mayor: str, mayor
         :param drops_list: dict, all drops of the setup
-        :param setup_data: needed setup data: player_harvests, combat_wisdom, mining_wisdom, farming_wisdom, fishing_wisdom, foraging_wisdom, alchemy_wisdom, custom_upgrade_toggle
+        :param setup_data: needed setup data: combat_wisdom, mining_wisdom, farming_wisdom, fishing_wisdom, foraging_wisdom, alchemy_wisdom, custom_upgrade_toggle
         :return skill_xp: dict, gained skill xp per type
         """
         skill_xp = {}
@@ -1744,8 +1719,6 @@ class Calculator(tk.Tk):
         self.huim.deepmultiply(skill_xp, self.md.calculator_data[mayor]["xp_multiplier"])
         if setup_data["custom_upgrade_toggle"]:
             self.huim.deepmultiply(skill_xp, self.md.calculator_data["CUSTOM_UPGRADE"]["xp_multiplier"])
-        if afk_toggle and setup_data["player_harvests"] and "combat" in skill_xp:
-            del skill_xp["combat"]
         return skill_xp
 
     def get_over_compacting(self, sell_location, compacted_items, per_item_sell_location, setup_notes, setup_data):
@@ -2140,11 +2113,11 @@ class Calculator(tk.Tk):
         self.huim.logger.debug(f"Speed boost: {speed_boost}")
 
         # multiply up minion drop bonus
-        drop_multiplier = self.get_drop_multiplier(minion_type, upgrades, afk_toggle, setup_data)
+        drop_multiplier = self.get_drop_multiplier(minion_type, upgrades, afk_toggle, mayor)
         self.huim.logger.debug(f"Drop multiplier: {drop_multiplier}")
 
-        # AFKing, Special Layouts and Player Harvests influences
-        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, upgrade_effects, afk_toggle, setup_data, setup_notes)
+        # AFKing and Special Layouts influences
+        actions_per_harvest = self.get_actions_per_harvest(minion_type, upgrades, afk_toggle, setup_data)
         self.huim.logger.debug(f"Actions per harvest: {actions_per_harvest}")
 
         # AFK loot table changes
@@ -2184,7 +2157,7 @@ class Calculator(tk.Tk):
         # Coins
         item_profit, per_item_profit, per_item_sell_location = self.get_item_profit(sell_location, hopper_multiplier, drops_list, setup_data)
         # XP
-        skill_xp = self.get_skill_xp(afk_toggle, mayor, drops_list, setup_data)
+        skill_xp = self.get_skill_xp(mayor, drops_list, setup_data)
 
         # Check for over-compacting
         self.get_over_compacting(sell_location, compacted_items, per_item_sell_location, setup_notes, setup_data)
